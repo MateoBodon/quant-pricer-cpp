@@ -1,0 +1,16 @@
+# Build
+/build/
+/build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Testing/
+compile_commands.json
+CTestTestfile.cmake
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
