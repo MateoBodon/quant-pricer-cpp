@@ -38,4 +38,43 @@ else()
 endif()
 
 # Options
-option(QUANT_ENABLE_OPENMP Enable
+option(QUANT_ENABLE_OPENMP "Enable OpenMP parallelization" ON)
+
+# OpenMP
+if(QUANT_ENABLE_OPENMP)
+  find_package(OpenMP)
+  if(OpenMP_CXX_FOUND)
+    message(STATUS "OpenMP found: enabling")
+    set(HAS_OPENMP ON)
+  else()
+    message(STATUS "OpenMP not found: continuing without")
+    set(HAS_OPENMP OFF)
+  endif()
+endif()
+
+# Library target (will grow with pricers)
+add_library(quant_pricer
+  src/main.cpp
+)
+
+target_include_directories(quant_pricer PUBLIC include)
+
+if(HAS_OPENMP)
+  target_compile_definitions(quant_pricer PUBLIC QUANT_HAS_OPENMP=1)
+  target_link_libraries(quant_pricer PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
+# Executable for CLI (placeholder)
+add_executable(quant_cli src/main.cpp)
+target_link_libraries(quant_cli PRIVATE quant_pricer)
+
+# Tests
+enable_testing()
+add_executable(unit_tests tests/test_sanity.cpp)
+target_link_libraries(unit_tests PRIVATE quant_pricer GTest::gtest_main)
+include(GoogleTest)
+gtest_discover_tests(unit_tests)
+
+# Benchmarks
+add_executable(micro_bench benchmarks/bench_sanity.cpp)
+target_link_libraries(micro_bench PRIVATE quant_pricer benchmark::benchmark)
