@@ -54,7 +54,7 @@ endif()
 
 # Library target (will grow with pricers)
 add_library(quant_pricer
-  src/main.cpp
+  src/version.cpp
 )
 
 target_include_directories(quant_pricer PUBLIC include)
