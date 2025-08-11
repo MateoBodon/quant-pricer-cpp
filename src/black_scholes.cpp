@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "quant/black_scholes.hpp"
 
 namespace quant::bs {
