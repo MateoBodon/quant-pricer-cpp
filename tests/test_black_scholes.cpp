@@ -58,11 +58,15 @@ TEST(BlackScholesGreeks, SignsAndKnown) {
     EXPECT_LT(dp, 0.0);
     EXPECT_GT(g,  0.0);
     EXPECT_GT(v,  0.0);
-    // Theta typically negative for calls (with q small), positive for puts
+    // Theta: calls typically negative (time decay). Puts can be negative too depending on params.
     EXPECT_LT(thc, 0.0);
-    EXPECT_GT(thp, 0.0);
     EXPECT_GT(rhc, 0.0);
     EXPECT_LT(rhp, 0.0);
+
+    // Parity for theta: Theta_C - Theta_P = q S e^{-qT} - r K e^{-rT}
+    double df_r = std::exp(-r * T);
+    double df_q = std::exp(-q * T);
+    EXPECT_NEAR(thc - thp, q * S * df_q - r * K * df_r, 1e-10);
 
     // Finite-difference sanity for delta and vega
     double epsS = 1e-4;
