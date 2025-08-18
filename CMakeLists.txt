@@ -59,6 +59,7 @@ add_library(quant_pricer
 )
 
 target_include_directories(quant_pricer PUBLIC include)
+target_include_directories(quant_pricer PUBLIC ${CMAKE_SOURCE_DIR}/external/pcg/include)
 
 if(HAS_OPENMP)
   target_compile_definitions(quant_pricer PUBLIC QUANT_HAS_OPENMP=1)
@@ -79,3 +80,6 @@ gtest_discover_tests(unit_tests)
 # Benchmarks
 add_executable(micro_bench benchmarks/bench_sanity.cpp)
 target_link_libraries(micro_bench PRIVATE quant_pricer benchmark::benchmark)
+
+add_executable(bench_mc benchmarks/bench_mc.cpp)
+target_link_libraries(bench_mc PRIVATE quant_pricer benchmark::benchmark)
