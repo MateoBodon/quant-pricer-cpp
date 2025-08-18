@@ -56,6 +56,7 @@ endif()
 add_library(quant_pricer
   src/version.cpp
   src/black_scholes.cpp
+  src/mc.cpp
 )
 
 target_include_directories(quant_pricer PUBLIC include)
@@ -72,7 +73,7 @@ target_link_libraries(quant_cli PRIVATE quant_pricer)
 
 # Tests
 enable_testing()
-add_executable(unit_tests tests/test_sanity.cpp tests/test_black_scholes.cpp)
+add_executable(unit_tests tests/test_sanity.cpp tests/test_black_scholes.cpp tests/test_mc.cpp)
 target_link_libraries(unit_tests PRIVATE quant_pricer GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests(unit_tests)
