@@ -61,6 +61,81 @@ McResult price_european_call(const McParams& p) {
     return {mean, se};
 }
 
+GreeksResult greeks_european_call(const McParams& p) {
+    const double S0 = p.spot;
+    const double K  = p.strike;
+    const double r  = p.rate;
+    const double q  = p.dividend;
+    const double s  = p.vol;
+    const double T  = p.time;
+    const std::uint64_t N = p.num_paths;
+    const bool use_antithetic = p.antithetic;
+
+    const double df_r = std::exp(-r * T);
+    const double drift = (r - q - 0.5 * s * s) * T;
+    const double volt = s * std::sqrt(T);
+
+    pcg64 rng(p.seed);
+    std::normal_distribution<double> normal(0.0, 1.0);
+
+    double sum_delta = 0.0, sumsq_delta = 0.0;
+    double sum_vega  = 0.0, sumsq_vega  = 0.0;
+    double sum_gamma = 0.0, sumsq_gamma = 0.0;
+
+    for (std::uint64_t i = 0; i < N; ++i) {
+        const double z = normal(rng);
+        const double ST1 = S0 * std::exp(drift + volt * z);
+        const double ST2 = use_antithetic ? S0 * std::exp(drift - volt * z) : ST1;
+
+        // Pathwise delta and vega
+        auto pathwise = [&](double ST) {
+            if (ST <= K) {
+                return std::pair<double,double>{0.0, 0.0};
+            }
+            const double dST_dS0 = ST / S0; // dST/dS0
+            const double dST_dsigma = ST * ( -s * T + std::sqrt(T) * z ); // d/drift+d(volt*z) wrt sigma times ST
+            const double dPayoff_dS0 = dST_dS0; // d(ST-K)^+ / dS0 = 1_{ST>K} * dST/dS0
+            const double dPayoff_dsigma = dST_dsigma; // similarly
+            const double delta = df_r * dPayoff_dS0;
+            const double vega  = df_r * dPayoff_dsigma;
+            return std::pair<double,double>{delta, vega};
+        };
+
+        double delta_samp, vega_samp;
+        if (use_antithetic) {
+            auto [d1, v1] = pathwise(ST1);
+            auto [d2, v2] = pathwise(ST2);
+            delta_samp = 0.5 * (d1 + d2);
+            vega_samp  = 0.5 * (v1 + v2);
+        } else {
+            auto [d1, v1] = pathwise(ST1);
+            delta_samp = d1;
+            vega_samp  = v1;
+        }
+
+        // LRM gamma estimator
+        // For lognormal GBM terminal: log-likelihood derivative wrt S0: (z/(S0*volt))
+        // For gamma (second derivative), LRM weight for S0 is ((z*z - 1)/(S0*S0*volt*volt))
+        double payoff1 = std::max(0.0, ST1 - K);
+        double payoff2 = use_antithetic ? std::max(0.0, ST2 - K) : payoff1;
+        double pay = use_antithetic ? 0.5 * (payoff1 + payoff2) : payoff1;
+        const double lrm_weight = (z*z - 1.0) / (S0 * S0 * volt * volt);
+        const double gamma_samp = df_r * pay * lrm_weight;
+
+        sum_delta += delta_samp; sumsq_delta += delta_samp * delta_samp;
+        sum_vega  += vega_samp;  sumsq_vega  += vega_samp  * vega_samp;
+        sum_gamma += gamma_samp; sumsq_gamma += gamma_samp * gamma_samp;
+    }
+
+    const double n = static_cast<double>(N);
+    auto finalize = [&](double s, double ss) {
+        double m = s / n; double v = std::max(0.0, (ss / n) - m * m); return std::pair<double,double>{m, std::sqrt(v / n)}; };
+    auto [delta, delta_se] = finalize(sum_delta, sumsq_delta);
+    auto [vega,  vega_se ] = finalize(sum_vega,  sumsq_vega);
+    auto [gamma, gamma_se] = finalize(sum_gamma, sumsq_gamma);
+    return {delta, delta_se, vega, vega_se, gamma, gamma_se};
+}
+
 } // namespace quant::mc
 
 

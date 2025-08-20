@@ -49,4 +49,26 @@ TEST(MonteCarlo, VarianceReductionWorks) {
     EXPECT_LT(res_both.std_error, res_cv.std_error);
 }
 
+TEST(MonteCarlo, GreeksCloseToAnalytic) {
+    mc::McParams mp{
+        .spot = 100.0,
+        .strike = 100.0,
+        .rate = 0.03,
+        .dividend = 0.01,
+        .vol = 0.2,
+        .time = 1.0,
+        .num_paths = 400000,
+        .seed = 987654321ULL,
+        .antithetic = true,
+        .control_variate = false // control variate not used for Greeks here
+    };
+    auto g = mc::greeks_european_call(mp);
+    double dc = bs::delta_call(mp.spot, mp.strike, mp.rate, mp.dividend, mp.vol, mp.time);
+    double vg = bs::vega(mp.spot, mp.strike, mp.rate, mp.dividend, mp.vol, mp.time);
+    double gm = bs::gamma(mp.spot, mp.strike, mp.rate, mp.dividend, mp.vol, mp.time);
+    EXPECT_NEAR(g.delta, dc, 3.0 * g.delta_se);
+    EXPECT_NEAR(g.vega,  vg, 3.0 * g.vega_se);
+    EXPECT_NEAR(g.gamma, gm, 3.0 * g.gamma_se);
+}
+
 

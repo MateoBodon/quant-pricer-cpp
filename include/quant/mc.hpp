@@ -28,6 +28,20 @@ struct McResult {
 // Price European call via terminal payoff; uses SoA-like streaming for cache friendliness.
 McResult price_european_call(const McParams& p);
 
+struct GreeksResult {
+    double delta;
+    double delta_se;
+    double vega;
+    double vega_se;
+    double gamma;
+    double gamma_se;
+};
+
+// Monte Carlo Greeks under GBM:
+// - Delta, Vega: pathwise estimators
+// - Gamma: Likelihood Ratio Method (LRM)
+GreeksResult greeks_european_call(const McParams& p);
+
 } // namespace quant::mc
 
 
