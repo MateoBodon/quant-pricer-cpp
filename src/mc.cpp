@@ -87,15 +87,17 @@ GreeksResult greeks_european_call(const McParams& p) {
         const double ST1 = S0 * std::exp(drift + volt * z);
         const double ST2 = use_antithetic ? S0 * std::exp(drift - volt * z) : ST1;
 
-        // Pathwise delta and vega
+        // Pathwise delta and vega using z inferred from ST to handle antithetic correctly
         auto pathwise = [&](double ST) {
             if (ST <= K) {
                 return std::pair<double,double>{0.0, 0.0};
             }
+            // Reconstruct the z that produced this ST
+            const double z_hat = (std::log(ST / S0) - drift) / volt;
             const double dST_dS0 = ST / S0; // dST/dS0
-            const double dST_dsigma = ST * ( -s * T + std::sqrt(T) * z ); // d/drift+d(volt*z) wrt sigma times ST
-            const double dPayoff_dS0 = dST_dS0; // d(ST-K)^+ / dS0 = 1_{ST>K} * dST/dS0
-            const double dPayoff_dsigma = dST_dsigma; // similarly
+            const double dST_dsigma = ST * (-s * T + std::sqrt(T) * z_hat);
+            const double dPayoff_dS0 = dST_dS0;
+            const double dPayoff_dsigma = dST_dsigma;
             const double delta = df_r * dPayoff_dS0;
             const double vega  = df_r * dPayoff_dsigma;
             return std::pair<double,double>{delta, vega};
@@ -113,14 +115,18 @@ GreeksResult greeks_european_call(const McParams& p) {
             vega_samp  = v1;
         }
 
-        // LRM gamma estimator
-        // For lognormal GBM terminal: log-likelihood derivative wrt S0: (z/(S0*volt))
-        // For gamma (second derivative), LRM weight for S0 is ((z*z - 1)/(S0*S0*volt*volt))
-        double payoff1 = std::max(0.0, ST1 - K);
-        double payoff2 = use_antithetic ? std::max(0.0, ST2 - K) : payoff1;
-        double pay = use_antithetic ? 0.5 * (payoff1 + payoff2) : payoff1;
-        const double lrm_weight = (z*z - 1.0) / (S0 * S0 * volt * volt);
-        const double gamma_samp = df_r * pay * lrm_weight;
+        // LRM gamma estimator with correct second derivative weight and antithetic averaging
+        const auto weight = [&](double zval) {
+            return ( (zval * zval) - 1.0 - s * std::sqrt(T) * zval ) / (S0 * S0 * s * s * T);
+        };
+        const double payoff1 = std::max(0.0, ST1 - K);
+        const double term1 = df_r * payoff1 * weight(z);
+        double gamma_samp = term1;
+        if (use_antithetic) {
+            const double payoff2 = std::max(0.0, ST2 - K);
+            const double term2 = df_r * payoff2 * weight(-z);
+            gamma_samp = 0.5 * (term1 + term2);
+        }
 
         sum_delta += delta_samp; sumsq_delta += delta_samp * delta_samp;
         sum_vega  += vega_samp;  sumsq_vega  += vega_samp  * vega_samp;
