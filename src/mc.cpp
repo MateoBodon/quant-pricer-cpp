@@ -116,6 +116,23 @@ GreeksResult greeks_european_call(const McParams& p) {
     double sum_vega  = 0.0, sumsq_vega  = 0.0;
     double sum_gamma = 0.0, sumsq_gamma = 0.0;
 
+    // Helpers available to both OpenMP and non-OpenMP paths
+    auto pathwise = [&](double ST) -> std::pair<double,double> {
+        if (ST <= K) {
+            return {0.0, 0.0};
+        }
+        const double z_hat = (std::log(ST / S0) - drift) / volt;
+        const double dST_dS0 = ST / S0;
+        const double dST_dsigma = ST * (-s * T + std::sqrt(T) * z_hat);
+        const double delta = df_r * dST_dS0;
+        const double vega  = df_r * dST_dsigma;
+        return {delta, vega};
+    };
+
+    auto weight = [&](double zval) {
+        return ((zval * zval) - 1.0 - s * std::sqrt(T) * zval) / (S0 * S0 * s * s * T);
+    };
+
 #ifdef QUANT_HAS_OPENMP
     #pragma omp parallel
     {
@@ -129,39 +146,19 @@ GreeksResult greeks_european_call(const McParams& p) {
             const double z = normal(rng_local);
             const double ST1 = S0 * std::exp(drift + volt * z);
             const double ST2 = use_antithetic ? S0 * std::exp(drift - volt * z) : ST1;
-
-        // Pathwise delta and vega using z inferred from ST to handle antithetic correctly
-        auto pathwise = [&](double ST) {
-            if (ST <= K) {
-                return std::pair<double,double>{0.0, 0.0};
-            }
-            // Reconstruct the z that produced this ST
-            const double z_hat = (std::log(ST / S0) - drift) / volt;
-            const double dST_dS0 = ST / S0; // dST/dS0
-            const double dST_dsigma = ST * (-s * T + std::sqrt(T) * z_hat);
-            const double dPayoff_dS0 = dST_dS0;
-            const double dPayoff_dsigma = dST_dsigma;
-            const double delta = df_r * dPayoff_dS0;
-            const double vega  = df_r * dPayoff_dsigma;
-            return std::pair<double,double>{delta, vega};
-        };
-
         double delta_samp, vega_samp;
         if (use_antithetic) {
-            auto [d1, v1] = pathwise(ST1);
-            auto [d2, v2] = pathwise(ST2);
-            delta_samp = 0.5 * (d1 + d2);
-            vega_samp  = 0.5 * (v1 + v2);
+                auto pv1 = pathwise(ST1);
+                auto pv2 = pathwise(ST2);
+                auto d1 = pv1.first; auto v1 = pv1.second;
+                auto d2 = pv2.first; auto v2 = pv2.second;
+                delta_samp = 0.5 * (d1 + d2);
+                vega_samp  = 0.5 * (v1 + v2);
         } else {
-            auto [d1, v1] = pathwise(ST1);
-            delta_samp = d1;
-            vega_samp  = v1;
+                auto pv1 = pathwise(ST1);
+                delta_samp = pv1.first;
+                vega_samp  = pv1.second;
         }
-
-        // LRM gamma estimator with correct second derivative weight and antithetic averaging
-        const auto weight = [&](double zval) {
-            return ( (zval * zval) - 1.0 - s * std::sqrt(T) * zval ) / (S0 * S0 * s * s * T);
-        };
             const double payoff1 = std::max(0.0, ST1 - K);
             const double term1 = df_r * payoff1 * weight(z);
             double gamma_samp = term1;
@@ -196,6 +193,19 @@ GreeksResult greeks_european_call(const McParams& p) {
             const double z = normal(rng);
             const double ST1 = S0 * std::exp(drift + volt * z);
             const double ST2 = use_antithetic ? S0 * std::exp(drift - volt * z) : ST1;
+            double delta_samp, vega_samp;
+            if (use_antithetic) {
+                auto pv1 = pathwise(ST1);
+                auto pv2 = pathwise(ST2);
+                auto d1 = pv1.first; auto v1 = pv1.second;
+                auto d2 = pv2.first; auto v2 = pv2.second;
+                delta_samp = 0.5 * (d1 + d2);
+                vega_samp  = 0.5 * (v1 + v2);
+            } else {
+                auto pv1 = pathwise(ST1);
+                delta_samp = pv1.first;
+                vega_samp  = pv1.second;
+            }
             const double payoff1 = std::max(0.0, ST1 - K);
             const double term1 = df_r * payoff1 * weight(z);
             double gamma_samp = term1;
