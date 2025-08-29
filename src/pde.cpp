@@ -83,8 +83,9 @@ double price_crank_nicolson(const PdeParams& p) {
 
         for (int i = 1; i < M - 1; ++i) {
             const double Si = S[i];
-            const double alpha = 0.5 * dt * (s * s * Si * Si / (dS * dS));
-            const double beta  = 0.5 * dt * ((r - q) * Si / (2.0 * dS));
+            // Crank–Nicolson coefficients (0.25 * dt factors)
+            const double alpha = 0.25 * dt * (s * s * Si * Si / (dS * dS));
+            const double beta  = 0.25 * dt * ((r - q) * Si / dS);
             // CN coefficients
             a[i - 1] = -alpha + beta;
             b[i]     = 1.0 + 2.0 * alpha + 0.5 * dt * r;
