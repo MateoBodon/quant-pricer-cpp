@@ -39,6 +39,8 @@ endif()
 
 # Options
 option(QUANT_ENABLE_OPENMP "Enable OpenMP parallelization" ON)
+option(QUANT_ENABLE_SANITIZERS "Enable Address/UB Sanitizers in supported compilers" OFF)
+option(QUANT_ENABLE_CLANG_TIDY "Enable clang-tidy static analysis (if available)" OFF)
 
 # OpenMP
 if(QUANT_ENABLE_OPENMP)
@@ -50,6 +52,24 @@ if(QUANT_ENABLE_OPENMP)
     message(STATUS "OpenMP not found: continuing without")
     set(HAS_OPENMP OFF)
   endif()
+endif()
+
+# Static analysis (clang-tidy)
+if(QUANT_ENABLE_CLANG_TIDY)
+  find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+  if(CLANG_TIDY_EXE)
+    message(STATUS "clang-tidy enabled: ${CLANG_TIDY_EXE}")
+    set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_EXE})
+  else()
+    message(WARNING "clang-tidy requested but not found")
+  endif()
+endif()
+
+# Sanitizers
+set(SANITIZER_FLAGS "")
+if(QUANT_ENABLE_SANITIZERS AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU"))
+  set(SANITIZER_FLAGS "-fsanitize=address,undefined -fno-omit-frame-pointer")
+  message(STATUS "Sanitizers enabled: ${SANITIZER_FLAGS}")
 endif()
 
 # Library target (will grow with pricers)
@@ -85,3 +105,13 @@ target_link_libraries(micro_bench PRIVATE quant_pricer benchmark::benchmark)
 
 add_executable(bench_mc benchmarks/bench_mc.cpp)
 target_link_libraries(bench_mc PRIVATE quant_pricer benchmark::benchmark)
+
+# Apply sanitizer flags to targets if requested
+if(SANITIZER_FLAGS)
+  foreach(tgt IN ITEMS quant_pricer quant_cli unit_tests micro_bench bench_mc)
+    if(TARGET ${tgt})
+      target_compile_options(${tgt} PRIVATE ${SANITIZER_FLAGS})
+      target_link_options(${tgt} PRIVATE ${SANITIZER_FLAGS})
+    endif()
+  endforeach()
+endif()

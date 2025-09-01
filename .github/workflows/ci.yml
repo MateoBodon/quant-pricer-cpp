@@ -22,14 +22,25 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build
+          sudo apt-get install -y cmake ninja-build clang-tidy doxygen graphviz
 
       - name: Configure (${{ matrix.compiler }}, ${{ matrix.build_type }})
         run: |
-          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DQUANT_ENABLE_CLANG_TIDY=ON
 
       - name: Build
         run: cmake --build build -j
 
       - name: Run tests
         run: ctest --test-dir build --output-on-failure | cat
+
+      - name: Configure with Sanitizers (clang, Debug)
+        if: matrix.compiler == 'clang' && matrix.build_type == 'Debug'
+        run: |
+          cmake -S . -B build-sani -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQUANT_ENABLE_SANITIZERS=ON
+          cmake --build build-sani -j
+          ctest --test-dir build-sani --output-on-failure | cat
+
+      - name: Generate Doxygen Docs
+        run: |
+          if [ -f Doxyfile ]; then doxygen Doxyfile; fi
