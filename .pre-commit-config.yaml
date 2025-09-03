@@ -1,0 +1,21 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-added-large-files
+  - repo: https://github.com/cpplint/cpplint
+    rev: 1.6.1
+    hooks:
+      - id: cpplint
+        files: \.(h|hpp|c|cc|cpp)$
+        args: ["--filter=-whitespace/braces,-build/include_subdir"]
+  - repo: local
+    hooks:
+      - id: clang-format
+        name: clang-format
+        entry: clang-format -i
+        language: system
+        files: \.(h|hpp|c|cc|cpp)$
