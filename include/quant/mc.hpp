@@ -19,6 +19,8 @@ struct McParams {
     std::uint64_t seed;      // RNG seed
     bool antithetic{true};
     bool control_variate{true}; // control variate on discounted S_T vs E[S_T]
+    enum class Sampler { Pseudorandom, QmcVdc };
+    Sampler sampler{Sampler::Pseudorandom};
 };
 
 /// Monte Carlo pricing result (mean and standard error)

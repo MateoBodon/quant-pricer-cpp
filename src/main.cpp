@@ -33,8 +33,8 @@ int main(int argc, char** argv) {
         }
         return 0;
     } else if (engine == "mc") {
-        if (argc < 11) {
-            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1>\n";
+        if (argc < 12) {
+            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc:0|1>\n";
             return 1;
         }
         quant::mc::McParams p{};
@@ -48,6 +48,7 @@ int main(int argc, char** argv) {
         p.seed = static_cast<std::uint64_t>(std::atoll(argv[9]));
         p.antithetic = std::atoi(argv[10]) != 0;
         p.control_variate = true;
+        p.sampler = (std::atoi(argv[11]) != 0) ? quant::mc::McParams::Sampler::QmcVdc : quant::mc::McParams::Sampler::Pseudorandom;
         auto res = quant::mc::price_european_call(p);
         std::cout << res.price << " (se=" << res.std_error << ")\n";
         return 0;

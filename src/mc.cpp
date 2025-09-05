@@ -38,7 +38,18 @@ McResult price_european_call(const McParams& p) {
         double local_sumsq = 0.0;
         #pragma omp for nowait
         for (std::int64_t i = 0; i < static_cast<std::int64_t>(N); ++i) {
-            const double z = normal(rng_local);
+            double z;
+            if (p.sampler == McParams::Sampler::Pseudorandom) {
+                z = normal(rng_local);
+            } else {
+                // van der Corput (base 2) in (0,1) -> inverse normal
+                auto vdc = [](std::uint64_t n) {
+                    double x = 0.0, f = 0.5; while (n) { x += f * (n & 1ULL); n >>= 1; f *= 0.5; } return x; };
+                // Map iteration index and thread id to sequence value
+                std::uint64_t idx = static_cast<std::uint64_t>(i) + 1ULL + static_cast<std::uint64_t>(omp_get_thread_num()) * N;
+                double u = std::max(1e-12, std::min(1.0 - 1e-12, vdc(idx)));
+                z = std::sqrt(2.0) * std::erfcinv(2.0 * (1.0 - u));
+            }
             const double ST1 = S0 * std::exp(drift + volt * z);
             const double payoff1 = std::max(0.0, ST1 - K);
             double sample = df_r * payoff1;
@@ -68,7 +79,15 @@ McResult price_european_call(const McParams& p) {
         pcg64 rng(p.seed);
         std::normal_distribution<double> normal(0.0, 1.0);
         for (std::uint64_t i = 0; i < N; ++i) {
-            const double z = normal(rng);
+            double z;
+            if (p.sampler == McParams::Sampler::Pseudorandom) {
+                z = normal(rng);
+            } else {
+                auto vdc = [](std::uint64_t n) {
+                    double x = 0.0, f = 0.5; while (n) { x += f * (n & 1ULL); n >>= 1; f *= 0.5; } return x; };
+                double u = std::max(1e-12, std::min(1.0 - 1e-12, vdc(i + 1ULL)));
+                z = std::sqrt(2.0) * std::erfcinv(2.0 * (1.0 - u));
+            }
             const double ST1 = S0 * std::exp(drift + volt * z);
             const double payoff1 = std::max(0.0, ST1 - K);
             double sample = df_r * payoff1;
