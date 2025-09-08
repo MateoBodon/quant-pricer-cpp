@@ -8,6 +8,62 @@
 
 namespace quant::mc {
 
+// Inverse normal CDF (Acklam's approximation)
+static inline double inverse_normal_cdf(double p) {
+    // Protect bounds
+    if (p <= 0.0) return -INFINITY;
+    if (p >= 1.0) return INFINITY;
+    // Coefficients
+    static const double a1 = -3.969683028665376e+01;
+    static const double a2 =  2.209460984245205e+02;
+    static const double a3 = -2.759285104469687e+02;
+    static const double a4 =  1.383577518672690e+02;
+    static const double a5 = -3.066479806614716e+01;
+    static const double a6 =  2.506628277459239e+00;
+
+    static const double b1 = -5.447609879822406e+01;
+    static const double b2 =  1.615858368580409e+02;
+    static const double b3 = -1.556989798598866e+02;
+    static const double b4 =  6.680131188771972e+01;
+    static const double b5 = -1.328068155288572e+01;
+
+    static const double c1 = -7.784894002430293e-03;
+    static const double c2 = -3.223964580411365e-01;
+    static const double c3 = -2.400758277161838e+00;
+    static const double c4 = -2.549732539343734e+00;
+    static const double c5 =  4.374664141464968e+00;
+    static const double c6 =  2.938163982698783e+00;
+
+    static const double d1 =  7.784695709041462e-03;
+    static const double d2 =  3.224671290700398e-01;
+    static const double d3 =  2.445134137142996e+00;
+    static const double d4 =  3.754408661907416e+00;
+
+    // Define break-points.
+    const double plow  = 0.02425;
+    const double phigh = 1 - plow;
+    double q, r, x;
+    if (p < plow) {
+        q = std::sqrt(-2.0 * std::log(p));
+        x = (((((c1*q + c2)*q + c3)*q + c4)*q + c5)*q + c6) /
+            ((((d1*q + d2)*q + d3)*q + d4)*q + 1.0);
+    } else if (p <= phigh) {
+        q = p - 0.5;
+        r = q * q;
+        x = (((((a1*r + a2)*r + a3)*r + a4)*r + a5)*r + a6) * q /
+            (((((b1*r + b2)*r + b3)*r + b4)*r + b5)*r + 1.0);
+    } else {
+        q = std::sqrt(-2.0 * std::log(1.0 - p));
+        x = -(((((c1*q + c2)*q + c3)*q + c4)*q + c5)*q + c6) /
+              ((((d1*q + d2)*q + d3)*q + d4)*q + 1.0);
+    }
+    // One step Halley refinement
+    double e = 0.5 * std::erfc(-x / std::sqrt(2.0)) - p;
+    double u = e * std::sqrt(2.0 * M_PI) * std::exp(0.5 * x * x);
+    x = x - u / (1.0 + 0.5 * x * u);
+    return x;
+}
+
 McResult price_european_call(const McParams& p) {
     const double S0 = p.spot;
     const double K  = p.strike;
@@ -48,7 +104,7 @@ McResult price_european_call(const McParams& p) {
                 // Map iteration index and thread id to sequence value
                 std::uint64_t idx = static_cast<std::uint64_t>(i) + 1ULL + static_cast<std::uint64_t>(omp_get_thread_num()) * N;
                 double u = std::max(1e-12, std::min(1.0 - 1e-12, vdc(idx)));
-                z = std::sqrt(2.0) * std::erfcinv(2.0 * (1.0 - u));
+                z = inverse_normal_cdf(u);
             }
             const double ST1 = S0 * std::exp(drift + volt * z);
             const double payoff1 = std::max(0.0, ST1 - K);
@@ -86,7 +142,7 @@ McResult price_european_call(const McParams& p) {
                 auto vdc = [](std::uint64_t n) {
                     double x = 0.0, f = 0.5; while (n) { x += f * (n & 1ULL); n >>= 1; f *= 0.5; } return x; };
                 double u = std::max(1e-12, std::min(1.0 - 1e-12, vdc(i + 1ULL)));
-                z = std::sqrt(2.0) * std::erfcinv(2.0 * (1.0 - u));
+                z = inverse_normal_cdf(u);
             }
             const double ST1 = S0 * std::exp(drift + volt * z);
             const double payoff1 = std::max(0.0, ST1 - K);

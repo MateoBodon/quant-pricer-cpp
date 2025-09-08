@@ -31,6 +31,9 @@ struct PdeParams {
     double time;
     OptionType type;
     GridSpec grid;
+    bool log_space{false};
+    enum class UpperBoundary { Dirichlet, Neumann };
+    UpperBoundary upper_boundary{UpperBoundary::Dirichlet};
 };
 
 /// Price European option via Crank–Nicolson in S-space
