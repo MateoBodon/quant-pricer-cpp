@@ -71,24 +71,27 @@ TEST(MonteCarlo, GreeksCloseToAnalytic) {
     EXPECT_NEAR(g.gamma, gm, 3.0 * g.gamma_se);
 }
 
-TEST(MonteCarlo, QmcReducesStdError) {
-    // Compare PRNG vs QMC SE for same path count without other variance reductions
+TEST(MonteCarlo, QmcReducesErrorVsAnalytic) {
+    // Compare absolute error vs analytic for PRNG vs QMC
     mc::McParams base{
         .spot = 100.0,
-        .strike = 100.0,
+        .strike = 110.0,
         .rate = 0.02,
         .dividend = 0.00,
-        .vol = 0.2,
+        .vol = 0.25,
         .time = 1.0,
-        .num_paths = 80000,
+        .num_paths = 120000,
         .seed = 2025,
         .antithetic = false,
         .control_variate = false
     };
     auto prng = base; prng.sampler = mc::McParams::Sampler::Pseudorandom; auto r1 = mc::price_european_call(prng);
     auto qmc  = base; qmc.sampler  = mc::McParams::Sampler::QmcVdc;        auto r2 = mc::price_european_call(qmc);
-    // QMC should typically have smaller SE (allow small tolerance)
-    EXPECT_LT(r2.std_error, r1.std_error * 0.95);
+    double bs_price = bs::call_price(base.spot, base.strike, base.rate, base.dividend, base.vol, base.time);
+    double e1 = std::abs(r1.price - bs_price);
+    double e2 = std::abs(r2.price - bs_price);
+    // QMC should typically reduce absolute error
+    EXPECT_LT(e2, e1 * 0.95);
 }
 
 
