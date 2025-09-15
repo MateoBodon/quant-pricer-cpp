@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
         return 0;
     } else if (engine == "pde") {
         if (argc < 12) {
-            std::cerr << "pde <S> <K> <r> <q> <sigma> <T> <call|put> <M> <N> <SmaxMult>\n";
+            std::cerr << "pde <S> <K> <r> <q> <sigma> <T> <call|put> <M> <N> <SmaxMult> [logspace:0|1] [neumann:0|1]\n";
             return 1;
         }
         quant::pde::PdeParams pp{};
@@ -70,6 +70,13 @@ int main(int argc, char** argv) {
         int N = std::atoi(argv[10]);
         double smax = std::atof(argv[11]);
         pp.grid = quant::pde::GridSpec{M, N, smax};
+        if (argc > 12) {
+            pp.log_space = std::atoi(argv[12]) != 0;
+        }
+        if (argc > 13) {
+            pp.upper_boundary = (std::atoi(argv[13]) != 0) ? quant::pde::PdeParams::UpperBoundary::Neumann
+                                                          : quant::pde::PdeParams::UpperBoundary::Dirichlet;
+        }
         double price = quant::pde::price_crank_nicolson(pp);
         std::cout << price << "\n";
         return 0;
