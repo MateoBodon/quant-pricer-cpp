@@ -34,8 +34,9 @@ ctest --test-dir build --output-on-failure | cat
 ## CLI Examples
 ```bash
 ./build/quant_cli bs 100 100 0.03 0.00 0.2 1.0 call
-./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 200000 42 1
-./build/quant_cli pde 100 100 0.03 0.00 0.2 1.0 call 201 200 4.0
+./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 200000 42 1 0   # PRNG
+./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 200000 42 1 1   # QMC
+./build/quant_cli pde 100 100 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1  # log-space + Neumann
 ```
 
 ## Benchmark (1e6 paths, Debug build)
@@ -43,3 +44,9 @@ ctest --test-dir build --output-on-failure | cat
 BM_MC_1e6   ~0.10-0.12 s
 ```
 Use Release for faster timings.
+
+## Reports
+```bash
+python3 scripts/qmc_vs_prng.py        # prints PRNG vs QMC absolute errors by paths
+python3 scripts/pde_convergence.py    # prints M,N,error table (log-space, Neumann)
+```
