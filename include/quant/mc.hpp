@@ -7,7 +7,9 @@
 
 namespace quant::mc {
 
-/// Monte Carlo parameters for European option pricing
+/// Monte Carlo parameters for European option pricing.
+///
+/// Configure the simulation engine, variance reduction, and RNG sampler.
 struct McParams {
     double spot;      // S0
     double strike;    // K
@@ -19,6 +21,7 @@ struct McParams {
     std::uint64_t seed;      // RNG seed
     bool antithetic{true};
     bool control_variate{true}; // control variate on discounted S_T vs E[S_T]
+    /// RNG sampler to generate standard normals.
     enum class Sampler { Pseudorandom, QmcVdc };
     Sampler sampler{Sampler::Pseudorandom};
 };
@@ -30,9 +33,13 @@ struct McResult {
 };
 
 /// Price European call via terminal payoff; uses streaming for cache friendliness.
+///
+/// Uses GBM analytic terminal distribution, optional antithetic and control variates.
+/// When sampler is QmcVdc, uses a van der Corput low-discrepancy sequence with
+/// Acklam inverse-normal transform.
 McResult price_european_call(const McParams& p);
 
-/// Monte Carlo Greeks result (value and standard error)
+/// Monte Carlo Greeks result (value and standard error).
 struct GreeksResult {
     double delta;
     double delta_se;
@@ -42,7 +49,7 @@ struct GreeksResult {
     double gamma_se;
 };
 
-/// Monte Carlo Greeks under GBM:
+/// Monte Carlo Greeks under GBM.
 /// - Delta, Vega: pathwise estimators
 /// - Gamma: Likelihood Ratio Method (LRM)
 GreeksResult greeks_european_call(const McParams& p);
