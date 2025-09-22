@@ -24,13 +24,13 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build clang-tidy doxygen graphviz lcov
+          sudo apt-get install -y cmake ninja-build clang-tidy doxygen graphviz lcov libomp-dev
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install cmake ninja clang-format doxygen graphviz lcov || true
+          brew install cmake ninja clang-format doxygen graphviz lcov libomp || true
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
