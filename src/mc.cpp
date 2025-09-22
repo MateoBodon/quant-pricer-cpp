@@ -1,5 +1,6 @@
 #include "quant/mc.hpp"
 #include <cmath>
+#include <numbers>
 #include <algorithm>
 #include <pcg_random.hpp>
 #ifdef QUANT_HAS_OPENMP
@@ -59,7 +60,7 @@ static inline double inverse_normal_cdf(double p) {
     }
     // One step Halley refinement
     double e = 0.5 * std::erfc(-x / std::sqrt(2.0)) - p;
-    double u = e * std::sqrt(2.0 * M_PI) * std::exp(0.5 * x * x);
+    double u = e * std::sqrt(2.0 * std::numbers::pi) * std::exp(0.5 * x * x);
     x = x - u / (1.0 + 0.5 * x * u);
     return x;
 }
