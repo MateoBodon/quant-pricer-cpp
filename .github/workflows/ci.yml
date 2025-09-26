@@ -14,6 +14,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         compiler: [gcc, clang]
         build_type: [Release, Debug]
+      fail-fast: false
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -30,12 +31,38 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install cmake ninja clang-format doxygen graphviz lcov libomp || true
+          brew install cmake ninja llvm doxygen graphviz libomp || true
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          choco install ninja doxygen.install graphviz.portable -y
+          choco install ninja doxygen.install graphviz.portable llvm -y
+
+      - name: Set up compiler environment (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          if [ "${{ matrix.compiler }}" = "gcc" ]; then
+            echo "CC=gcc" >> $GITHUB_ENV
+            echo "CXX=g++" >> $GITHUB_ENV
+          else
+            # Prefer llvm on macOS; on Ubuntu, clang is available
+            echo "CC=clang" >> $GITHUB_ENV
+            echo "CXX=clang++" >> $GITHUB_ENV
+          fi
+
+      - name: Set up compiler environment (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if ('${{ matrix.compiler }}' -eq 'gcc') {
+            echo "GCC is not supported on Windows runners; using clang instead"
+            echo "CC=clang" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            echo "CXX=clang++" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          } else {
+            echo "CC=clang" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            echo "CXX=clang++" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          }
 
       - name: Configure (${{ matrix.compiler }}, ${{ matrix.build_type }})
         run: |
@@ -59,15 +86,22 @@ jobs:
         shell: bash
 
       - name: Configure with Sanitizers (clang, Debug)
-        if: matrix.compiler == 'clang' && matrix.build_type == 'Debug'
+        if: runner.os != 'Windows' && matrix.compiler == 'clang' && matrix.build_type == 'Debug'
         run: |
           cmake -S . -B build-sani -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQUANT_ENABLE_SANITIZERS=ON
           cmake --build build-sani -j
           ctest --test-dir build-sani --output-on-failure | cat
 
-      - name: Generate Doxygen Docs
+      - name: Generate Doxygen Docs (Unix)
+        if: runner.os != 'Windows'
         run: |
           if [ -f Doxyfile ]; then doxygen Doxyfile; fi
+
+      - name: Generate Doxygen Docs (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (Test-Path Doxyfile) { doxygen Doxyfile }
 
       - name: Upload Docs Artifact
         if: always()
@@ -75,3 +109,4 @@ jobs:
         with:
           name: docs-html
           path: docs/html
+          if-no-files-found: ignore
