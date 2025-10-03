@@ -246,6 +246,18 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ```
 
+### Install & Package
+```bash
+cmake --install build --config Release --prefix "$PWD/install"
+```
+
+The install tree publishes the `quant_pricer` library, CLI, headers, and a CMake package configuration under `lib/cmake/quant-pricer`. Downstream projects can load it with:
+
+```cmake
+find_package(quant-pricer CONFIG REQUIRED)
+target_link_libraries(my_app PRIVATE quant_pricer::quant_pricer)
+```
+
 ### Advanced Configuration
 ```bash
 # Enable all features
@@ -443,6 +455,10 @@ python3 scripts/pde_convergence.py
 // C - P = S*e^(-qT) - K*e^(-rT)
 // Validated to machine precision (1e-15) ✓
 ```
+
+### Reproducible Demo Artifacts
+
+Run `./scripts/demo.sh` to produce a Release build, execute representative Black–Scholes, Monte Carlo, and PDE validations, and emit CSVs plus `artifacts/manifest.json` recording the git SHA, compiler metadata, and RNG settings. CI publishes the resulting `artifacts/` directory on every successful run via the `demo-artifacts` workflow job.
 
 ---
 
