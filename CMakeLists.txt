@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
 
 # Dependencies: prefer submodules in external/, fallback to FetchContent if missing
 set(GTEST_SOURCE_DIR ${CMAKE_SOURCE_DIR}/external/googletest)
@@ -12,6 +15,8 @@ set(BENCH_SOURCE_DIR ${CMAKE_SOURCE_DIR}/external/benchmark)
 
 if(EXISTS ${GTEST_SOURCE_DIR}/CMakeLists.txt)
   message(STATUS "Using submodule: GoogleTest")
+  set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+  set(INSTALL_GMOCK OFF CACHE BOOL "" FORCE)
   add_subdirectory(${GTEST_SOURCE_DIR} external/googletest-build)
 else()
   include(FetchContent)
@@ -20,11 +25,14 @@ else()
     URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
   )
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+  set(INSTALL_GMOCK OFF CACHE BOOL "" FORCE)
   FetchContent_MakeAvailable(googletest)
 endif()
 
 if(EXISTS ${BENCH_SOURCE_DIR}/CMakeLists.txt)
   message(STATUS "Using submodule: Google Benchmark")
+  set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
   add_subdirectory(${BENCH_SOURCE_DIR} external/benchmark-build)
 else()
   include(FetchContent)
@@ -34,6 +42,7 @@ else()
   )
   set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
   set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
   FetchContent_MakeAvailable(googlebenchmark)
 endif()
 
@@ -43,6 +52,7 @@ option(QUANT_ENABLE_SANITIZERS "Enable Address/UB Sanitizers in supported compil
 option(QUANT_ENABLE_CLANG_TIDY "Enable clang-tidy static analysis (if available)" OFF)
 
 # OpenMP
+set(HAS_OPENMP OFF)
 if(QUANT_ENABLE_OPENMP)
   find_package(OpenMP)
   if(OpenMP_CXX_FOUND)
@@ -82,8 +92,15 @@ add_library(quant_pricer
   src/pde.cpp
 )
 
-target_include_directories(quant_pricer PUBLIC include)
-target_include_directories(quant_pricer PUBLIC ${CMAKE_SOURCE_DIR}/external/pcg/include)
+add_library(quant_pricer::quant_pricer ALIAS quant_pricer)
+
+target_include_directories(quant_pricer
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/pcg/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/pcg>
+)
 
 if(HAS_OPENMP)
   target_compile_definitions(quant_pricer PUBLIC QUANT_HAS_OPENMP=1)
@@ -119,5 +136,49 @@ if(SANITIZER_COMPILE_FLAGS OR SANITIZER_LINK_FLAGS)
         target_link_options(${tgt} PRIVATE ${SANITIZER_LINK_FLAGS})
       endif()
     endif()
-  endforeach()
+endforeach()
 endif()
+
+# Install/export package metadata
+set(QUANT_PRICER_HAS_OPENMP ${HAS_OPENMP})
+
+install(TARGETS quant_pricer quant_cli
+  EXPORT quant_pricerTargets
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(DIRECTORY include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        PATTERN ".DS_Store" EXCLUDE)
+if(EXISTS ${CMAKE_SOURCE_DIR}/external/pcg/include)
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/external/pcg/include/
+          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/pcg
+          PATTERN ".DS_Store" EXCLUDE)
+endif()
+
+install(EXPORT quant_pricerTargets
+  FILE quant-pricer-targets.cmake
+  NAMESPACE quant_pricer::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quant-pricer
+)
+
+configure_package_config_file(
+  ${CMAKE_SOURCE_DIR}/cmake/quant-pricer-config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/quant-pricer-config.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quant-pricer
+)
+
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/quant-pricer-config-version.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/quant-pricer-config.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/quant-pricer-config-version.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quant-pricer
+)
