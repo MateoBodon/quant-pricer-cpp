@@ -62,7 +62,6 @@ The library follows a modular design with three independent pricing engines that
 
 ```
 
-`qmc_mode` accepts `none`, `sobol`, or `sobol_scrambled`; `bridge_mode` accepts `none` or `bb` (Brownian bridge). The final `num_steps` argument controls the number of time slices used when simulating the Brownian motion (defaults to 1 for direct terminal sampling).
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │ Black–Scholes   │    │   Monte Carlo    │    │   PDE Solver    │
 │                 │    │                  │    │                 │
@@ -307,6 +306,8 @@ cmake --build build -j
 # Output: 10.4506 (se~4.5e-5)
 ```
 
+`qmc_mode` accepts `none`, `sobol`, or `sobol_scrambled`; `bridge_mode` accepts `none` or `bb` (Brownian bridge). The final `num_steps` argument controls how many time slices are simulated (defaults to 1 for direct terminal sampling).
+
 ### PDE Pricing
 ```bash
 # Crank–Nicolson with log-space grid and Neumann boundary
@@ -320,7 +321,7 @@ cmake --build build -j
 for K in 90 95 100 105 110; do
   echo "Strike $K:"
   echo "  BS:  $(./build/quant_cli bs 100 $K 0.03 0.00 0.2 1.0 call)"
-  echo "  MC:  $(./build/quant_cli mc 100 $K 0.03 0.00 0.2 1.0 200000 42 1 0)"
+  echo "  MC:  $(./build/quant_cli mc 100 $K 0.03 0.00 0.2 1.0 200000 42 1 none none 1)"
   echo "  PDE: $(./build/quant_cli pde 100 $K 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1)"
 done
 ```
