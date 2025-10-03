@@ -167,7 +167,7 @@ quant::pde::PdeResult res = quant::pde::price_crank_nicolson(params);
 **Numerical Sophistication:**
 - **Crank–Nicolson + Rannacher**: Two fully implicit steps damp non-smooth payoffs before second-order timestepping
 - **Tanh/Sinh Stretching**: Optional clustering of nodes around the strike in S- or log-space to resolve Greeks more accurately
-- **Direct Greeks**: Central differences deliver Δ and Γ at the spot (with an optional backward Θ)
+- **Direct Greeks**: Three-point central differences deliver Δ and Γ at the spot with \(\mathcal{O}(\Delta S^2)\) truncation error; the optional backward \(\Theta\) uses a one-step backward difference \(\mathcal{O}(\Delta t)\)
 - **Flexible Boundaries**: Dirichlet and Neumann boundary conditions, with absorbing/reflecting enforcement for exotic payoffs
 - **Adaptive Gridding**: Configurable spatial/time resolution with tri-diagonal solves via the Thomas algorithm
 
