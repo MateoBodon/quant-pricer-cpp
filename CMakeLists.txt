@@ -90,6 +90,9 @@ add_library(quant_pricer
   src/black_scholes.cpp
   src/mc.cpp
   src/pde.cpp
+  src/bs_barrier_rr.cpp
+  src/mc_barrier.cpp
+  src/pde_barrier.cpp
   src/qmc/sobol.cpp
   src/qmc/brownian_bridge.cpp
 )
@@ -115,7 +118,7 @@ target_link_libraries(quant_cli PRIVATE quant_pricer)
 
 # Tests
 enable_testing()
-add_executable(unit_tests tests/test_sanity.cpp tests/test_black_scholes.cpp tests/test_mc.cpp tests/test_pde.cpp)
+add_executable(unit_tests tests/test_sanity.cpp tests/test_black_scholes.cpp tests/test_mc.cpp tests/test_pde.cpp tests/test_barrier.cpp)
 target_link_libraries(unit_tests PRIVATE quant_pricer GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests(unit_tests)
