@@ -1,6 +1,7 @@
 /// Finite-difference PDE pricer (Crank–Nicolson) for European options
 #pragma once
 
+#include <optional>
 #include <vector>
 
 namespace quant::pde {
@@ -10,6 +11,7 @@ struct GridSpec {
     int num_space;      // number of spatial nodes (including boundaries)
     int num_time;       // number of time steps
     double s_max_mult;  // S_max multiple of spot for upper boundary
+    double stretch{0.0}; // tanh stretching parameter (0 -> uniform)
 };
 
 /// Solve tridiagonal system Ax = d with Thomas algorithm.
@@ -37,12 +39,20 @@ struct PdeParams {
     /// Upper boundary condition type
     enum class UpperBoundary { Dirichlet, Neumann };
     UpperBoundary upper_boundary{UpperBoundary::Dirichlet};
+    /// Request backward-difference Theta in addition to price/Delta/Gamma
+    bool compute_theta{false};
+};
+
+struct PdeResult {
+    double price;
+    double delta;
+    double gamma;
+    std::optional<double> theta;
 };
 
 /// Price European option via Crank–Nicolson (S-space or log-space).
 /// Boundary conditions: Dirichlet at S=0, Dirichlet or Neumann at Smax.
-double price_crank_nicolson(const PdeParams& p);
+PdeResult price_crank_nicolson(const PdeParams& p);
 
 } // namespace quant::pde
-
 

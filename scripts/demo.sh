@@ -78,6 +78,7 @@ def run_cli(args):
     return result.strip()
 
 MC_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(se=([0-9eE+\-.]+)\)$")
+PDE_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(delta=([0-9eE+\-.]+), gamma=([0-9eE+\-.]+)(?:, theta=([0-9eE+\-.]+))?\)$")
 
 def mc_price_and_error(params):
     args = [
@@ -107,6 +108,26 @@ def mc_price_and_error(params):
     price = float(match.group(1))
     std_error = float(match.group(2))
     return price, std_error
+
+SQRT_2PI = math.sqrt(2.0 * math.pi)
+
+def normal_pdf(x: float) -> float:
+    return math.exp(-0.5 * x * x) / SQRT_2PI
+
+def normal_cdf(x: float) -> float:
+    return 0.5 * math.erfc(-x / math.sqrt(2.0))
+
+def bs_d1(S, K, r, q, sigma, T):
+    return (math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / (sigma * math.sqrt(T))
+
+def bs_delta_call(S, K, r, q, sigma, T):
+    return math.exp(-q * T) * normal_cdf(bs_d1(S, K, r, q, sigma, T))
+
+def bs_delta_put(S, K, r, q, sigma, T):
+    return bs_delta_call(S, K, r, q, sigma, T) - math.exp(-q * T)
+
+def bs_gamma(S, K, r, q, sigma, T):
+    return math.exp(-q * T) * normal_pdf(bs_d1(S, K, r, q, sigma, T)) / (S * sigma * math.sqrt(T))
 
 # Parse compiler info from CMake cache
 cache_entries = {}
@@ -310,7 +331,7 @@ pde_params = {
     "log_space": 1,
     "neumann": 1,
 }
-pde_price = float(run_cli([
+pde_output = run_cli([
     "pde",
     pde_params["spot"],
     pde_params["strike"],
@@ -324,7 +345,16 @@ pde_price = float(run_cli([
     pde_params["smax_mult"],
     pde_params["log_space"],
     pde_params["neumann"],
-]))
+    2.5,
+    1,
+])
+pde_match = PDE_OUTPUT_RE.match(pde_output)
+if not pde_match:
+    raise RuntimeError(f"Unexpected PDE output format: {pde_output}")
+pde_price = float(pde_match.group(1))
+pde_delta = float(pde_match.group(2))
+pde_gamma = float(pde_match.group(3))
+pde_theta = float(pde_match.group(4)) if pde_match.group(4) is not None else None
 pde_reference = float(run_cli([
     "bs",
     pde_params["spot"],
@@ -335,6 +365,24 @@ pde_reference = float(run_cli([
     pde_params["tenor"],
     pde_params["type"],
 ]))
+bs_delta_reference = bs_delta_call(
+    pde_params["spot"],
+    pde_params["strike"],
+    pde_params["rate"],
+    pde_params["dividend"],
+    pde_params["vol"],
+    pde_params["tenor"],
+)
+bs_gamma_reference = bs_gamma(
+    pde_params["spot"],
+    pde_params["strike"],
+    pde_params["rate"],
+    pde_params["dividend"],
+    pde_params["vol"],
+    pde_params["tenor"],
+)
+pde_delta_err = abs(pde_delta - bs_delta_reference)
+pde_gamma_err = abs(pde_gamma - bs_gamma_reference)
 
 # Write CSV artifacts
 with open(artifact_dir / "black_scholes.csv", "w", newline="") as fh:
@@ -383,7 +431,7 @@ with open(artifact_dir / "monte_carlo.csv", "w", newline="") as fh:
 
 with open(artifact_dir / "pde.csv", "w", newline="") as fh:
     writer = csv.DictWriter(fh, fieldnames=[
-        "engine", "spot", "strike", "rate", "dividend", "vol", "tenor", "type", "m", "n", "smax_mult", "log_space", "upper_boundary", "price", "reference", "abs_error"
+        "engine", "spot", "strike", "rate", "dividend", "vol", "tenor", "type", "m", "n", "smax_mult", "log_space", "upper_boundary", "stretch", "price", "delta", "gamma", "theta", "reference", "abs_error"
     ])
     writer.writeheader()
     writer.writerow({
@@ -400,10 +448,98 @@ with open(artifact_dir / "pde.csv", "w", newline="") as fh:
         "smax_mult": f"{pde_params['smax_mult']:.2f}",
         "log_space": bool(pde_params["log_space"]),
         "upper_boundary": "neumann" if pde_params["neumann"] else "dirichlet",
+        "stretch": 2.5,
         "price": f"{pde_price:.6f}",
+        "delta": f"{pde_delta:.6f}",
+        "gamma": f"{pde_gamma:.6f}",
+        "theta": f"{pde_theta:.6f}" if pde_theta is not None else "",
         "reference": f"{pde_reference:.6f}",
         "abs_error": f"{abs(pde_price - pde_reference):.6f}",
     })
+
+grids = [
+    (101, 100),
+    (201, 200),
+    (401, 400),
+    (801, 400),
+]
+pde_conv_rows = []
+price_errors = []
+for M_nodes, N_steps in grids:
+    output = run_cli([
+        "pde",
+        pde_params["spot"],
+        pde_params["strike"],
+        pde_params["rate"],
+        pde_params["dividend"],
+        pde_params["vol"],
+        pde_params["tenor"],
+        pde_params["type"],
+        M_nodes,
+        N_steps,
+        pde_params["smax_mult"],
+        1,
+        1,
+        2.5,
+        1,
+    ])
+    match = PDE_OUTPUT_RE.match(output)
+    if not match:
+        raise RuntimeError(f"Unexpected PDE output format in convergence study: {output}")
+    price = float(match.group(1))
+    delta_val = float(match.group(2))
+    gamma_val = float(match.group(3))
+    price_err = abs(price - pde_reference)
+    delta_err = abs(delta_val - bs_delta_reference)
+    gamma_err = abs(gamma_val - bs_gamma_reference)
+    price_errors.append(price_err)
+    pde_conv_rows.append({
+        "M": M_nodes,
+        "N": N_steps,
+        "price": price,
+        "delta": delta_val,
+        "gamma": gamma_val,
+        "price_err": price_err,
+        "delta_err": delta_err,
+        "gamma_err": gamma_err,
+    })
+
+with open(artifact_dir / "pde_convergence.csv", "w", newline="") as fh:
+    writer = csv.DictWriter(fh, fieldnames=["M", "N", "price", "delta", "gamma", "price_err", "delta_err", "gamma_err"])
+    writer.writeheader()
+    for row in pde_conv_rows:
+        writer.writerow({
+            "M": row["M"],
+            "N": row["N"],
+            "price": f"{row['price']:.6f}",
+            "delta": f"{row['delta']:.6f}",
+            "gamma": f"{row['gamma']:.6f}",
+            "price_err": f"{row['price_err']:.6e}",
+            "delta_err": f"{row['delta_err']:.6e}",
+            "gamma_err": f"{row['gamma_err']:.6e}",
+        })
+
+def log_slope(xs, ys):
+    logx = [math.log(x) for x in xs]
+    logy = [math.log(y) for y in ys]
+    x_mean = sum(logx) / len(logx)
+    y_mean = sum(logy) / len(logy)
+    numerator = sum((lx - x_mean) * (ly - y_mean) for lx, ly in zip(logx, logy))
+    denominator = sum((lx - x_mean) ** 2 for lx in logx)
+    return numerator / denominator if denominator > 0 else float("nan")
+
+slope = log_slope([row["M"] for row in pde_conv_rows], price_errors)
+
+plt.figure(figsize=(6.0, 4.0))
+plt.loglog([row["M"] for row in pde_conv_rows], price_errors, marker="o", label=f"Price error (slope~{slope:.2f})")
+plt.xlabel("Spatial nodes (M)")
+plt.ylabel("|Price - BS|")
+plt.title("Crank–Nicolson with Rannacher start")
+plt.grid(True, which="both", linestyle="--", alpha=0.4)
+plt.legend()
+plt.tight_layout()
+plt.savefig(artifact_dir / "pde_convergence.png", dpi=200)
+plt.close()
 
 barrier_cases = [
     {
@@ -566,6 +702,34 @@ manifest = {
         "prng_rmse": [round(v, 6) for v in prng_rmse_values],
         "qmc_rmse": [round(v, 6) for v in qmc_rmse_values],
         "rmse_ratio": [round(v, 3) for v in rmse_ratio_values],
+    },
+    "pde": {
+        "engine": "pde",
+        "spot": round(pde_params["spot"], 6),
+        "strike": round(pde_params["strike"], 6),
+        "rate": round(pde_params["rate"], 6),
+        "dividend": round(pde_params["dividend"], 6),
+        "vol": round(pde_params["vol"], 6),
+        "tenor": round(pde_params["tenor"], 6),
+        "type": pde_params["type"],
+        "m": pde_params["m"],
+        "n": pde_params["n"],
+        "smax_mult": round(pde_params["smax_mult"], 6),
+        "log_space": bool(pde_params["log_space"]),
+        "upper_boundary": "neumann" if pde_params["neumann"] else "dirichlet",
+        "stretch": 2.5,
+        "price": round(pde_price, 6),
+        "delta": round(pde_delta, 6),
+        "gamma": round(pde_gamma, 6),
+        "theta": round(pde_theta, 6) if pde_theta is not None else None,
+        "price_abs_error": round(abs(pde_price - pde_reference), 6),
+        "delta_abs_error": round(pde_delta_err, 6),
+        "gamma_abs_error": round(pde_gamma_err, 6),
+    },
+    "pde_convergence": {
+        "nodes": [row["M"] for row in pde_conv_rows],
+        "price_error": [round(v, 6) for v in price_errors],
+        "slope": round(slope, 2),
     },
     "barrier_validation": {
         "cases": barrier_labels,

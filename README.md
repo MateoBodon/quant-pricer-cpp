@@ -34,7 +34,7 @@
 ### 🚀 **Core Pricing Engines**
 - **Black–Scholes Analytics**: Complete European option pricing with all major Greeks (Delta, Gamma, Vega, Theta, Rho)
 - **Monte Carlo Engine**: High-performance GBM simulation with PCG64 RNG and OpenMP parallelization
-- **PDE Solver**: Crank–Nicolson finite-difference scheme with Thomas algorithm and log-space grids
+- **PDE Solver**: Crank–Nicolson with Rannacher start-up, optional tanh-stretched grids around the strike, and direct Δ/Γ/Θ extraction
 - **Barrier Options**: Continuous single-barrier (up/down, in/out) pricing via Reiner–Rubinstein closed-form, Brownian-bridge Monte Carlo, and absorbing-boundary PDE
 
 ### ⚡ **Advanced Monte Carlo**
@@ -147,21 +147,37 @@ Crank–Nicolson finite-difference scheme with sophisticated boundary handling:
 
 ```cpp
 quant::pde::PdeParams params{
-    .spot = 100.0, .strike = 100.0, .rate = 0.03, .dividend = 0.0,
-    .vol = 0.2, .time = 1.0, .type = quant::pde::OptionType::Call,
-    .grid = {201, 200, 4.0}, .log_space = true,
-    .upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann
+    .spot = 100.0,
+    .strike = 100.0,
+    .rate = 0.03,
+    .dividend = 0.0,
+    .vol = 0.2,
+    .time = 1.0,
+    .type = quant::pde::OptionType::Call,
+    .grid = {321, 320, 4.0, 2.5}, // M, N, Smax multiplier, tanh stretch
+    .log_space = true,
+    .upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann,
+    .compute_theta = true
 };
 
-double price = quant::pde::price_crank_nicolson(params);
+quant::pde::PdeResult res = quant::pde::price_crank_nicolson(params);
+// res.price, res.delta, res.gamma, res.theta
 ```
 
 **Numerical Sophistication:**
-- **Crank–Nicolson Scheme**: Second-order accuracy in time and space
-- **Thomas Algorithm**: Efficient tridiagonal system solver with pivot checking
-- **Log-Space Grids**: Improved stability near boundaries
-- **Flexible Boundaries**: Dirichlet and Neumann boundary conditions
-- **Adaptive Gridding**: Configurable spatial and temporal resolution
+- **Crank–Nicolson + Rannacher**: Two fully implicit steps damp non-smooth payoffs before second-order timestepping
+- **Tanh/Sinh Stretching**: Optional clustering of nodes around the strike in S- or log-space to resolve Greeks more accurately
+- **Direct Greeks**: Central differences deliver Δ and Γ at the spot (with an optional backward Θ)
+- **Flexible Boundaries**: Dirichlet and Neumann boundary conditions, with absorbing/reflecting enforcement for exotic payoffs
+- **Adaptive Gridding**: Configurable spatial/time resolution with tri-diagonal solves via the Thomas algorithm
+
+For the Neumann choice in log-space we explicitly discretise `∂V/∂S(S_max, t) = e^{-q(T-t)}` as
+
+```
+-U_{M-2} + U_{M-1} = Δx · S_max · e^{-q (T-t)}
+```
+
+which is exactly what the solver enforces by setting the final row of the linear system to `[-1, 1]` with the right-hand side `Δx · S_max · e^{-q (T-t)}`.
 
 ---
 
@@ -309,6 +325,8 @@ cmake --build build -j
 
 `qmc_mode` accepts `none`, `sobol`, or `sobol_scrambled`; `bridge_mode` accepts `none` or `bb` (Brownian bridge). The final `num_steps` argument controls how many time slices are simulated (defaults to 1 for direct terminal sampling).
 
+For the PDE command the optional arguments are `[logspace] [neumann] [stretch] [theta]`. Set `stretch>0` to concentrate nodes around the strike via a tanh mapping, and pass `theta=1` to request the backward-difference Θ alongside price/Δ/Γ.
+
 ### Barrier Options
 ```bash
 # Reiner–Rubinstein analytic price (down-and-out call)
@@ -325,8 +343,8 @@ cmake --build build -j
 ### PDE Pricing
 ```bash
 # Crank–Nicolson with log-space grid and Neumann boundary
-./build/quant_cli pde 100 100 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1
-# Output: 10.4506
+./build/quant_cli pde 100 100 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1 2.5 1
+# Output: 10.4506 (delta=0.6368, gamma=0.0188, theta=-6.41)
 ```
 
 ### Parameter Exploration
@@ -336,7 +354,7 @@ for K in 90 95 100 105 110; do
   echo "Strike $K:"
   echo "  BS:  $(./build/quant_cli bs 100 $K 0.03 0.00 0.2 1.0 call)"
   echo "  MC:  $(./build/quant_cli mc 100 $K 0.03 0.00 0.2 1.0 200000 42 1 none none 1)"
-  echo "  PDE: $(./build/quant_cli pde 100 $K 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1)"
+  echo "  PDE: $(./build/quant_cli pde 100 $K 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1 0 1)"
 done
 ```
 
@@ -457,6 +475,8 @@ python3 scripts/pde_convergence.py
 The demo harness also writes `artifacts/qmc_vs_prng.png`, showing that Sobol sequences with Brownian bridge (64 time steps) achieve roughly 2–3× lower RMSE than a pseudorandom Euler discretisation at equal path counts.
 
 Barrier validation is captured via `artifacts/barrier_validation.csv` and `artifacts/barrier_validation.png`, comparing Monte Carlo and PDE prices against Reiner–Rubinstein closed-form benchmarks for representative up/down knock-out cases.
+
+`artifacts/pde_convergence.csv` and `artifacts/pde_convergence.png` record log–log error curves versus grid size, demonstrating the expected ≈ second-order slope once the two Rannacher start-up steps have smoothed the payoff kink.
 
 ### Edge Case Validation
 

@@ -253,7 +253,7 @@ int main(int argc, char** argv) {
         return 1;
     } else if (engine == "pde") {
         if (argc < 12) {
-            std::cerr << "pde <S> <K> <r> <q> <sigma> <T> <call|put> <M> <N> <SmaxMult> [logspace:0|1] [neumann:0|1]\n";
+            std::cerr << "pde <S> <K> <r> <q> <sigma> <T> <call|put> <M> <N> <SmaxMult> [logspace:0|1] [neumann:0|1] [stretch] [theta:0|1]\n";
             return 1;
         }
         quant::pde::PdeParams pp{};
@@ -276,8 +276,21 @@ int main(int argc, char** argv) {
             pp.upper_boundary = (std::atoi(argv[13]) != 0) ? quant::pde::PdeParams::UpperBoundary::Neumann
                                                           : quant::pde::PdeParams::UpperBoundary::Dirichlet;
         }
-        double price = quant::pde::price_crank_nicolson(pp);
-        std::cout << price << "\n";
+        if (argc > 14) {
+            pp.grid.stretch = std::max(0.0, std::atof(argv[14]));
+        }
+        if (argc > 15) {
+            pp.compute_theta = std::atoi(argv[15]) != 0;
+        } else {
+            pp.compute_theta = true;
+        }
+
+        quant::pde::PdeResult res = quant::pde::price_crank_nicolson(pp);
+        std::cout << res.price << " (delta=" << res.delta << ", gamma=" << res.gamma;
+        if (res.theta.has_value()) {
+            std::cout << ", theta=" << *res.theta;
+        }
+        std::cout << ")\n";
         return 0;
     }
     std::cerr << "Unknown engine: " << engine << "\n";
