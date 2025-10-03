@@ -61,6 +61,8 @@
 The library follows a modular design with three independent pricing engines that can cross-validate results:
 
 ```
+
+`qmc_mode` accepts `none`, `sobol`, or `sobol_scrambled`; `bridge_mode` accepts `none` or `bb` (Brownian bridge). The final `num_steps` argument controls the number of time slices used when simulating the Brownian motion (defaults to 1 for direct terminal sampling).
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │ Black–Scholes   │    │   Monte Carlo    │    │   PDE Solver    │
 │                 │    │                  │    │                 │
@@ -122,7 +124,9 @@ quant::mc::McParams params{
     .spot = 100.0, .strike = 100.0, .rate = 0.03, .dividend = 0.0,
     .vol = 0.2, .time = 1.0, .num_paths = 1'000'000, .seed = 42,
     .antithetic = true, .control_variate = true,
-    .sampler = quant::mc::McParams::Sampler::QmcVdc
+    .qmc = quant::mc::McParams::Qmc::Sobol,
+    .bridge = quant::mc::McParams::Bridge::BrownianBridge,
+    .num_steps = 64
 };
 
 auto result = quant::mc::price_european_call(params);
@@ -133,7 +137,8 @@ auto result = quant::mc::price_european_call(params);
 - **PCG64 RNG**: High-quality pseudorandom number generation
 - **Antithetic Variates**: Automatic variance reduction through negative correlation
 - **Control Variates**: Uses discounted terminal stock price as control
-- **Quasi-Monte Carlo**: Van der Corput sequences for improved convergence
+- **Quasi-Monte Carlo**: Sobol (Joe–Kuo) sequences with optional Owen-style scramble
+- **Brownian Bridge**: Low effective dimension mapping for multi-step paths
 - **OpenMP Parallelization**: Multi-threaded path generation
 
 ### PDE Solver
@@ -294,12 +299,12 @@ cmake --build build -j
 ### Monte Carlo Pricing
 ```bash
 # Standard Monte Carlo (1M paths, antithetic + control variate)
-./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 0
-# Output: 10.4506 (se=0.0001)
+./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 none none 1
+# Output: 10.4506 (se~1.0e-4)
 
-# Quasi-Monte Carlo
-./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 1
-# Output: 10.4506 (se=0.00005)
+# Sobol QMC with Brownian bridge (64 time steps)
+./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 sobol bb 64
+# Output: 10.4506 (se~4.5e-5)
 ```
 
 ### PDE Pricing
@@ -434,6 +439,8 @@ python3 scripts/pde_convergence.py
 # 401 400 0.00005
 ```
 
+The demo harness also writes `artifacts/qmc_vs_prng.png`, showing that Sobol sequences with Brownian bridge (64 time steps) achieve roughly 2–3× lower RMSE than a pseudorandom Euler discretisation at equal path counts.
+
 ### Edge Case Validation
 
 **Zero Volatility:**
@@ -458,7 +465,7 @@ python3 scripts/pde_convergence.py
 
 ### Reproducible Demo Artifacts
 
-Run `./scripts/demo.sh` to produce a Release build, execute representative Black–Scholes, Monte Carlo, and PDE validations, and emit CSVs plus `artifacts/manifest.json` recording the git SHA, compiler metadata, and RNG settings. CI publishes the resulting `artifacts/` directory on every successful run via the `demo-artifacts` workflow job.
+Run `./scripts/demo.sh` to produce a Release build, execute representative Black–Scholes, Monte Carlo, and PDE validations, and emit CSVs plus `artifacts/manifest.json` recording the git SHA, compiler metadata, and RNG settings. The script also generates `artifacts/qmc_vs_prng.csv` and `artifacts/qmc_vs_prng.png`, comparing RMSE for PRNG vs Sobol+Brownian-bridge paths over 64 time steps. CI publishes the resulting `artifacts/` directory on every successful run via the `demo-artifacts` workflow job.
 
 ---
 

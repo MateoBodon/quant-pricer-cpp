@@ -51,10 +51,18 @@ python3 - <<'PY'
 import csv
 import datetime as dt
 import json
+import math
 import os
 import pathlib
 import re
 import subprocess
+import sys
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError:  # pragma: no cover - dependency bootstrap
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet", "matplotlib"])
+    import matplotlib.pyplot as plt
 
 root = pathlib.Path(os.environ["ROOT"])
 cli = pathlib.Path(os.environ["CLI"])
@@ -68,6 +76,37 @@ git_sha = os.environ["GIT_SHA"]
 def run_cli(args):
     result = subprocess.check_output([str(cli), *map(str, args)], text=True)
     return result.strip()
+
+MC_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(se=([0-9eE+\-.]+)\)$")
+
+def mc_price_and_error(params):
+    args = [
+        "mc",
+        params["spot"],
+        params["strike"],
+        params["rate"],
+        params["dividend"],
+        params["vol"],
+        params["tenor"],
+        params["paths"],
+        params["seed"],
+        1 if params.get("antithetic", 0) else 0,
+        params.get("qmc_mode", "none"),
+    ]
+    bridge_mode = params.get("bridge_mode", "none")
+    if bridge_mode is not None:
+        args.append(bridge_mode)
+    num_steps = params.get("num_steps", 1)
+    if num_steps is not None:
+        args.append(int(num_steps))
+
+    output = run_cli(args)
+    match = MC_OUTPUT_RE.match(output)
+    if not match:
+        raise RuntimeError(f"Unexpected Monte Carlo output format: {output}")
+    price = float(match.group(1))
+    std_error = float(match.group(2))
+    return price, std_error
 
 # Parse compiler info from CMake cache
 cache_entries = {}
@@ -141,27 +180,12 @@ mc_params = {
     "tenor": 0.75,
     "paths": mc_paths,
     "seed": mc_seed,
-    "antithetic": 1,
-    "qmc": 0,
+    "antithetic": True,
+    "qmc_mode": "none",
+    "bridge_mode": "none",
+    "num_steps": 1,
 }
-mc_output = run_cli([
-    "mc",
-    mc_params["spot"],
-    mc_params["strike"],
-    mc_params["rate"],
-    mc_params["dividend"],
-    mc_params["vol"],
-    mc_params["tenor"],
-    mc_params["paths"],
-    mc_params["seed"],
-    mc_params["antithetic"],
-    mc_params["qmc"],
-])
-mc_match = re.match(r"^([0-9eE+\-.]+) \(se=([0-9eE+\-.]+)\)$", mc_output)
-if not mc_match:
-    raise RuntimeError(f"Unexpected Monte Carlo output format: {mc_output}")
-mc_price = float(mc_match.group(1))
-mc_std_error = float(mc_match.group(2))
+mc_price, mc_std_error = mc_price_and_error(mc_params)
 mc_reference = float(run_cli([
     "bs",
     mc_params["spot"],
@@ -172,6 +196,104 @@ mc_reference = float(run_cli([
     mc_params["tenor"],
     "call",
 ]))
+
+atm_params = {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.02,
+    "dividend": 0.0,
+    "vol": 0.2,
+    "tenor": 1.0,
+}
+atm_reference = float(run_cli([
+    "bs",
+    atm_params["spot"],
+    atm_params["strike"],
+    atm_params["rate"],
+    atm_params["dividend"],
+    atm_params["vol"],
+    atm_params["tenor"],
+    "call",
+]))
+
+paths_grid = [20000, 40000, 80000, 160000, 320000]
+rmse_rows = []
+prng_rmse_values = []
+qmc_rmse_values = []
+
+for paths in paths_grid:
+    common = {
+        "spot": atm_params["spot"],
+        "strike": atm_params["strike"],
+        "rate": atm_params["rate"],
+        "dividend": atm_params["dividend"],
+        "vol": atm_params["vol"],
+        "tenor": atm_params["tenor"],
+        "paths": paths,
+        "seed": mc_seed,
+        "antithetic": True,
+        "num_steps": 64,
+    }
+
+    prng_params = dict(common)
+    prng_params["qmc_mode"] = "none"
+    prng_params["bridge_mode"] = "none"
+
+    qmc_params = dict(common)
+    qmc_params["qmc_mode"] = "sobol"
+    qmc_params["bridge_mode"] = "bb"
+
+    prng_price, prng_se = mc_price_and_error(prng_params)
+    qmc_price, qmc_se = mc_price_and_error(qmc_params)
+
+    prng_err = abs(prng_price - atm_reference)
+    qmc_err = abs(qmc_price - atm_reference)
+    prng_rmse = math.sqrt(prng_err * prng_err + prng_se * prng_se)
+    qmc_rmse = math.sqrt(qmc_err * qmc_err + qmc_se * qmc_se)
+
+    rmse_rows.append({
+        "paths": paths,
+        "prng_price": prng_price,
+        "prng_se": prng_se,
+        "qmc_price": qmc_price,
+        "qmc_se": qmc_se,
+        "prng_rmse": prng_rmse,
+        "qmc_rmse": qmc_rmse,
+        "rmse_ratio": prng_rmse / qmc_rmse if qmc_rmse > 0 else float("inf"),
+    })
+    prng_rmse_values.append(prng_rmse)
+    qmc_rmse_values.append(qmc_rmse)
+
+with open(artifact_dir / "qmc_vs_prng.csv", "w", newline="") as fh:
+    writer = csv.DictWriter(fh, fieldnames=[
+        "paths", "prng_price", "prng_se", "qmc_price", "qmc_se", "prng_rmse", "qmc_rmse", "rmse_ratio"
+    ])
+    writer.writeheader()
+    for row in rmse_rows:
+        writer.writerow({
+            "paths": row["paths"],
+            "prng_price": f"{row['prng_price']:.6f}",
+            "prng_se": f"{row['prng_se']:.6f}",
+            "qmc_price": f"{row['qmc_price']:.6f}",
+            "qmc_se": f"{row['qmc_se']:.6f}",
+            "prng_rmse": f"{row['prng_rmse']:.6f}",
+            "qmc_rmse": f"{row['qmc_rmse']:.6f}",
+            "rmse_ratio": f"{row['rmse_ratio']:.3f}",
+        })
+
+plt.figure(figsize=(6.0, 4.0))
+plt.loglog(paths_grid, prng_rmse_values, marker="o", label="PRNG (Euler)")
+plt.loglog(paths_grid, qmc_rmse_values, marker="o", label="Sobol + Brownian bridge")
+plt.xlabel("Paths")
+plt.ylabel("RMSE")
+plt.title("ATM call RMSE vs paths (num_steps=64)")
+plt.grid(True, which="both", linestyle="--", alpha=0.4)
+plt.legend()
+plt.tight_layout()
+plt.savefig(artifact_dir / "qmc_vs_prng.png", dpi=200)
+plt.close()
+
+rmse_ratio_values = [row["rmse_ratio"] for row in rmse_rows]
 
 # PDE validation
 pde_params = {
@@ -236,7 +358,7 @@ with open(artifact_dir / "black_scholes.csv", "w", newline="") as fh:
 
 with open(artifact_dir / "monte_carlo.csv", "w", newline="") as fh:
     writer = csv.DictWriter(fh, fieldnames=[
-        "engine", "spot", "strike", "rate", "dividend", "vol", "tenor", "paths", "seed", "antithetic", "rng", "price", "std_error", "reference", "abs_error"
+        "engine", "spot", "strike", "rate", "dividend", "vol", "tenor", "paths", "seed", "antithetic", "qmc_mode", "bridge", "num_steps", "price", "std_error", "reference", "abs_error"
     ])
     writer.writeheader()
     writer.writerow({
@@ -250,7 +372,9 @@ with open(artifact_dir / "monte_carlo.csv", "w", newline="") as fh:
         "paths": mc_params["paths"],
         "seed": mc_params["seed"],
         "antithetic": bool(mc_params["antithetic"]),
-        "rng": "pseudorandom",
+        "qmc_mode": mc_params["qmc_mode"],
+        "bridge": mc_params["bridge_mode"],
+        "num_steps": mc_params["num_steps"],
         "price": f"{mc_price:.6f}",
         "std_error": f"{mc_std_error:.6f}",
         "reference": f"{mc_reference:.6f}",
@@ -294,12 +418,20 @@ manifest = {
     "compiler": compiler_info,
     "flags": flags_info,
     "monte_carlo": {
-        "rng": "pseudorandom",
+        "qmc_mode": mc_params["qmc_mode"],
+        "bridge": mc_params["bridge_mode"],
         "seed": mc_seed,
         "paths": mc_paths,
         "antithetic": True,
+        "num_steps": mc_params["num_steps"],
         "price": round(mc_price, 6),
         "std_error": round(mc_std_error, 6),
+    },
+    "qmc_vs_prng": {
+        "paths": paths_grid,
+        "prng_rmse": [round(v, 6) for v in prng_rmse_values],
+        "qmc_rmse": [round(v, 6) for v in qmc_rmse_values],
+        "rmse_ratio": [round(v, 3) for v in rmse_ratio_values],
     },
     "executables": {
         "quant_cli": cli_rel,
