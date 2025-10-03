@@ -37,8 +37,8 @@ struct McResult {
 /// Price European call via terminal payoff; uses streaming for cache friendliness.
 ///
 /// Uses GBM analytic terminal distribution, optional antithetic and control variates.
-/// When sampler is QmcVdc, uses a van der Corput low-discrepancy sequence with
-/// Acklam inverse-normal transform.
+/// Supports Sobol quasi Monte Carlo sequences (with optional scramble) and Brownian
+/// bridge ordering when `num_steps > 1`.
 McResult price_european_call(const McParams& p);
 
 /// Monte Carlo Greeks result (value and standard error).
@@ -57,4 +57,3 @@ struct GreeksResult {
 GreeksResult greeks_european_call(const McParams& p);
 
 } // namespace quant::mc
-
