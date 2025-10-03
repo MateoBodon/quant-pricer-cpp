@@ -77,7 +77,7 @@ def run_cli(args):
     result = subprocess.check_output([str(cli), *map(str, args)], text=True)
     return result.strip()
 
-MC_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(se=([0-9eE+\-.]+)\)$")
+MC_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(se=([0-9eE+\-.]+), 95% CI=\[([0-9eE+\-.]+), ([0-9eE+\-.]+)\]\)$")
 PDE_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(delta=([0-9eE+\-.]+), gamma=([0-9eE+\-.]+)(?:, theta=([0-9eE+\-.]+))?\)$")
 
 def mc_price_and_error(params):
@@ -107,7 +107,9 @@ def mc_price_and_error(params):
         raise RuntimeError(f"Unexpected Monte Carlo output format: {output}")
     price = float(match.group(1))
     std_error = float(match.group(2))
-    return price, std_error
+    ci_low = float(match.group(3))
+    ci_high = float(match.group(4))
+    return price, std_error, ci_low, ci_high
 
 SQRT_2PI = math.sqrt(2.0 * math.pi)
 
@@ -206,7 +208,7 @@ mc_params = {
     "bridge_mode": "none",
     "num_steps": 1,
 }
-mc_price, mc_std_error = mc_price_and_error(mc_params)
+mc_price, mc_std_error, mc_ci_low, mc_ci_high = mc_price_and_error(mc_params)
 mc_reference = float(run_cli([
     "bs",
     mc_params["spot"],
@@ -264,8 +266,8 @@ for paths in paths_grid:
     qmc_params["qmc_mode"] = "sobol"
     qmc_params["bridge_mode"] = "bb"
 
-    prng_price, prng_se = mc_price_and_error(prng_params)
-    qmc_price, qmc_se = mc_price_and_error(qmc_params)
+    prng_price, prng_se, prng_ci_low, prng_ci_high = mc_price_and_error(prng_params)
+    qmc_price, qmc_se, qmc_ci_low, qmc_ci_high = mc_price_and_error(qmc_params)
 
     prng_err = abs(prng_price - atm_reference)
     qmc_err = abs(qmc_price - atm_reference)
@@ -278,6 +280,10 @@ for paths in paths_grid:
         "prng_se": prng_se,
         "qmc_price": qmc_price,
         "qmc_se": qmc_se,
+        "prng_ci_low": prng_ci_low,
+        "prng_ci_high": prng_ci_high,
+        "qmc_ci_low": qmc_ci_low,
+        "qmc_ci_high": qmc_ci_high,
         "prng_rmse": prng_rmse,
         "qmc_rmse": qmc_rmse,
         "rmse_ratio": prng_rmse / qmc_rmse if qmc_rmse > 0 else float("inf"),
@@ -287,7 +293,9 @@ for paths in paths_grid:
 
 with open(artifact_dir / "qmc_vs_prng.csv", "w", newline="") as fh:
     writer = csv.DictWriter(fh, fieldnames=[
-        "paths", "prng_price", "prng_se", "qmc_price", "qmc_se", "prng_rmse", "qmc_rmse", "rmse_ratio"
+        "paths", "prng_price", "prng_se", "prng_ci_low", "prng_ci_high",
+        "qmc_price", "qmc_se", "qmc_ci_low", "qmc_ci_high",
+        "prng_rmse", "qmc_rmse", "rmse_ratio"
     ])
     writer.writeheader()
     for row in rmse_rows:
@@ -297,6 +305,10 @@ with open(artifact_dir / "qmc_vs_prng.csv", "w", newline="") as fh:
             "prng_se": f"{row['prng_se']:.6f}",
             "qmc_price": f"{row['qmc_price']:.6f}",
             "qmc_se": f"{row['qmc_se']:.6f}",
+            "prng_ci_low": f"{row['prng_ci_low']:.6f}",
+            "prng_ci_high": f"{row['prng_ci_high']:.6f}",
+            "qmc_ci_low": f"{row['qmc_ci_low']:.6f}",
+            "qmc_ci_high": f"{row['qmc_ci_high']:.6f}",
             "prng_rmse": f"{row['prng_rmse']:.6f}",
             "qmc_rmse": f"{row['qmc_rmse']:.6f}",
             "rmse_ratio": f"{row['rmse_ratio']:.3f}",
@@ -406,7 +418,7 @@ with open(artifact_dir / "black_scholes.csv", "w", newline="") as fh:
 
 with open(artifact_dir / "monte_carlo.csv", "w", newline="") as fh:
     writer = csv.DictWriter(fh, fieldnames=[
-        "engine", "spot", "strike", "rate", "dividend", "vol", "tenor", "paths", "seed", "antithetic", "qmc_mode", "bridge", "num_steps", "price", "std_error", "reference", "abs_error"
+        "engine", "spot", "strike", "rate", "dividend", "vol", "tenor", "paths", "seed", "antithetic", "qmc_mode", "bridge", "num_steps", "price", "std_error", "ci_low", "ci_high", "reference", "abs_error"
     ])
     writer.writeheader()
     writer.writerow({
@@ -425,6 +437,8 @@ with open(artifact_dir / "monte_carlo.csv", "w", newline="") as fh:
         "num_steps": mc_params["num_steps"],
         "price": f"{mc_price:.6f}",
         "std_error": f"{mc_std_error:.6f}",
+        "ci_low": f"{mc_ci_low:.6f}",
+        "ci_high": f"{mc_ci_high:.6f}",
         "reference": f"{mc_reference:.6f}",
         "abs_error": f"{abs(mc_price - mc_reference):.6f}",
     })
@@ -597,6 +611,8 @@ for case in barrier_cases:
         raise RuntimeError(f"Unexpected barrier MC output: {mc_out}")
     mc_barrier = float(mc_match.group(1))
     mc_barrier_se = float(mc_match.group(2))
+    mc_barrier_ci_low = float(mc_match.group(3))
+    mc_barrier_ci_high = float(mc_match.group(4))
 
     pde_cli = [
         "barrier", "pde", case["opt"], case["dir"], case["style"],
@@ -628,6 +644,8 @@ for case in barrier_cases:
         "pde": pde_barrier,
         "mc_abs_err": mc_abs_err,
         "pde_abs_err": pde_abs_err,
+        "mc_ci_low": mc_barrier_ci_low,
+        "mc_ci_high": mc_barrier_ci_high,
     })
     barrier_labels.append(case["name"])
     barrier_mc_abs_errors.append(mc_abs_err)
@@ -636,7 +654,8 @@ for case in barrier_cases:
 with open(artifact_dir / "barrier_validation.csv", "w", newline="") as fh:
     writer = csv.DictWriter(fh, fieldnames=[
         "name", "option", "direction", "style", "spot", "strike", "barrier", "rebate",
-        "rate", "dividend", "vol", "tenor", "bs", "mc", "mc_se", "pde", "mc_abs_err", "pde_abs_err"
+        "rate", "dividend", "vol", "tenor", "bs", "mc", "mc_se", "mc_ci_low", "mc_ci_high",
+        "pde", "mc_abs_err", "pde_abs_err"
     ])
     writer.writeheader()
     for row in barrier_rows:
@@ -656,6 +675,8 @@ with open(artifact_dir / "barrier_validation.csv", "w", newline="") as fh:
             "bs": f"{row['bs']:.6f}",
             "mc": f"{row['mc']:.6f}",
             "mc_se": f"{row['mc_se']:.6f}",
+            "mc_ci_low": f"{row['mc_ci_low']:.6f}",
+            "mc_ci_high": f"{row['mc_ci_high']:.6f}",
             "pde": f"{row['pde']:.6f}",
             "mc_abs_err": f"{row['mc_abs_err']:.6f}",
             "pde_abs_err": f"{row['pde_abs_err']:.6f}",
@@ -696,12 +717,18 @@ manifest = {
         "num_steps": mc_params["num_steps"],
         "price": round(mc_price, 6),
         "std_error": round(mc_std_error, 6),
+        "ci_low": round(mc_ci_low, 6),
+        "ci_high": round(mc_ci_high, 6),
     },
     "qmc_vs_prng": {
         "paths": paths_grid,
         "prng_rmse": [round(v, 6) for v in prng_rmse_values],
         "qmc_rmse": [round(v, 6) for v in qmc_rmse_values],
         "rmse_ratio": [round(v, 3) for v in rmse_ratio_values],
+        "prng_ci_low": [round(row["prng_ci_low"], 6) for row in rmse_rows],
+        "prng_ci_high": [round(row["prng_ci_high"], 6) for row in rmse_rows],
+        "qmc_ci_low": [round(row["qmc_ci_low"], 6) for row in rmse_rows],
+        "qmc_ci_high": [round(row["qmc_ci_high"], 6) for row in rmse_rows],
     },
     "pde": {
         "engine": "pde",
@@ -735,6 +762,8 @@ manifest = {
         "cases": barrier_labels,
         "mc_abs_error": [round(v, 6) for v in barrier_mc_abs_errors],
         "pde_abs_error": [round(v, 6) for v in barrier_pde_abs_errors],
+        "mc_ci_low": [round(row["mc_ci_low"], 6) for row in barrier_rows],
+        "mc_ci_high": [round(row["mc_ci_high"], 6) for row in barrier_rows],
     },
     "executables": {
         "quant_cli": cli_rel,

@@ -130,7 +130,7 @@ quant::mc::McParams params{
 };
 
 auto result = quant::mc::price_european_call(params);
-// result.price, result.std_error
+// result.estimate.value, result.estimate.std_error, result.estimate.ci_low/ci_high
 ```
 
 **Advanced Features:**
@@ -140,6 +140,8 @@ auto result = quant::mc::price_european_call(params);
 - **Quasi-Monte Carlo**: Sobol (Joe–Kuo) sequences with optional Owen-style scramble
 - **Brownian Bridge**: Low effective dimension mapping for multi-step paths
 - **OpenMP Parallelization**: Multi-threaded path generation
+- **Streaming Statistics**: Welford accumulators produce numerically stable means, SEs, and 95% confidence intervals
+- **Mixed Γ Estimator**: Combines pathwise and LR for markedly lower gamma variance than pure LRM
 
 ### PDE Solver
 
@@ -189,14 +191,18 @@ The library implements both pathwise and likelihood-ratio estimators for compreh
 
 ```cpp
 auto greeks = quant::mc::greeks_european_call(params);
-// greeks.delta, greeks.vega (pathwise)
-// greeks.gamma (likelihood ratio)
-// All with standard errors: greeks.delta_se, etc.
+// Pathwise Δ/ν: greeks.delta.value, greeks.vega.value
+// Γ estimators: greeks.gamma_lrm.value (LRM), greeks.gamma_mixed.value (mixed)
+// Each statistic carries std_error and 95% CI bounds via ci_low/ci_high
 ```
 
 **Pathwise Estimators (Delta, Vega):**
 - **Delta**: `∂V/∂S = e^(-rT) * 1{S_T > K} * (S_T/S_0)`
 - **Vega**: `∂V/∂σ = e^(-rT) * 1{S_T > K} * S_T * (W_T/σ - σT)`
+
+**Gamma Estimators:**
+- **`gamma_lrm`**: Classic likelihood-ratio weight `((Z^2 - 1 - σ√T Z)/(S_0^2 σ^2 T))`
+- **`gamma_mixed`**: Pathwise Δ × LR score with the analytic correction `-Δ/S_0`, lowering the variance (see table below)
 
 **Likelihood Ratio Method (Gamma):**
 - **Gamma**: `∂²V/∂S² = e^(-rT) * 1{S_T > K} * S_T * (W_T² - T)/(S_0²σ²T)`
@@ -244,7 +250,7 @@ auto mc_result = quant::mc::price_european_call(mc_params);
 double pde_price = quant::pde::price_crank_nicolson(pde_params);
 
 // Results should agree within numerical precision
-assert(std::abs(bs_price - mc_result.price) < 3 * mc_result.std_error);
+assert(std::abs(bs_price - mc_result.estimate.value) < 3 * mc_result.estimate.std_error);
 assert(std::abs(bs_price - pde_price) < 1e-6);
 ```
 
@@ -334,7 +340,7 @@ For the PDE command the optional arguments are `[logspace] [neumann] [stretch] [
 
 # Sobol MC with Brownian bridge correction (64 steps)
 ./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 none bb 32
-# -> price (se=...)
+# -> price (se=..., 95% CI=[..., ...])
 
 # Crank–Nicolson PDE with absorbing boundary at S=B
 ./build/quant_cli barrier pde call down out 100 95 90 0 0.02 0.00 0.2 1.0 201 200 4.0
@@ -393,16 +399,29 @@ namespace quant::mc {
     struct McParams {
         double spot, strike, rate, dividend, vol, time;
         std::uint64_t num_paths, seed;
-        bool antithetic, control_variate;
-        enum class Sampler { Pseudorandom, QmcVdc } sampler;
+        bool antithetic;
+        bool control_variate;
+        enum class Qmc { None, Sobol, SobolScrambled } qmc;
+        enum class Bridge { None, BrownianBridge } bridge;
+        int num_steps;
     };
     
+    struct McStatistic {
+        double value;
+        double std_error;
+        double ci_low;
+        double ci_high;
+    };
+
     struct McResult {
-        double price, std_error;
+        McStatistic estimate;
     };
     
     struct GreeksResult {
-        double delta, delta_se, vega, vega_se, gamma, gamma_se;
+        McStatistic delta;
+        McStatistic vega;
+        McStatistic gamma_lrm;
+        McStatistic gamma_mixed;
     };
     
     McResult price_european_call(const McParams& p);
@@ -446,8 +465,17 @@ The library implements rigorous cross-validation between all three pricing metho
 |--------|-------------|---------------|---------------|
 | **Call Price** | 10.4506 ± 0.0001 | 10.4506 | 10.4506 |
 | **Put Price** | 5.5735 ± 0.0001 | 5.5735 | 5.5735 |
-| **Delta** | 0.6368 ± 0.0001 | N/A | 0.6368 |
-| **Vega** | 39.0606 ± 0.0001 | N/A | 39.0606 |
+
+#### MC Greeks vs Black–Scholes (800k paths, antithetic; S=K=100, r=3%, q=1%, σ=20%, T=1)
+
+| Greek | MC Mean | Std Err | 95% CI | Black–Scholes |
+|-------|---------|---------|--------|----------------|
+| **Δ (pathwise)** | 0.573485 | 8.24e-05 | [0.573323, 0.573646] | 0.573496 |
+| **ν (pathwise)** | 38.7084 | 4.97e-02 | [38.6110, 38.8058] | 38.7152 |
+| **Γ (LRM)** | 0.0193238 | 1.01e-04 | [0.0191250, 0.0195227] | 0.0193576 |
+| **Γ (mixed)** | 0.0193542 | 2.49e-05 | [0.0193055, 0.0194029] | 0.0193576 |
+
+The mixed gamma estimator trims the standard error by ~4× versus the pure LRM estimator while remaining unbiased, matching the Black–Scholes benchmark within the tighter confidence band.
 
 ### Convergence Analysis
 
@@ -639,14 +667,15 @@ quant::pde::PdeParams pde_params{S, K, r, q, sigma, T,
 double pde_price = quant::pde::price_crank_nicolson(pde_params);
 
 // Cross-validation
-assert(std::abs(bs_price - mc_result.price) < 3 * mc_result.std_error);
+assert(std::abs(bs_price - mc_result.estimate.value) < 3 * mc_result.estimate.std_error);
 assert(std::abs(bs_price - pde_price) < 1e-6);
 ```
 
 **Advanced Features:**
 ```cpp
 // Quasi-Monte Carlo with Greeks
-mc_params.sampler = quant::mc::McParams::Sampler::QmcVdc;
+mc_params.qmc = quant::mc::McParams::Qmc::Sobol;
+mc_params.bridge = quant::mc::McParams::Bridge::BrownianBridge;
 auto greeks = quant::mc::greeks_european_call(mc_params);
 
 // PDE with custom grid
