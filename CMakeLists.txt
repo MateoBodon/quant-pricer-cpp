@@ -90,6 +90,8 @@ add_library(quant_pricer
   src/black_scholes.cpp
   src/mc.cpp
   src/pde.cpp
+  src/qmc/sobol.cpp
+  src/qmc/brownian_bridge.cpp
 )
 
 add_library(quant_pricer::quant_pricer ALIAS quant_pricer)

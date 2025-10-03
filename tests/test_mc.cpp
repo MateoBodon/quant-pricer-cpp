@@ -85,13 +85,18 @@ TEST(MonteCarlo, QmcReducesErrorVsAnalytic) {
         .antithetic = false,
         .control_variate = false
     };
-    auto prng = base; prng.sampler = mc::McParams::Sampler::Pseudorandom; auto r1 = mc::price_european_call(prng);
-    auto qmc  = base; qmc.sampler  = mc::McParams::Sampler::QmcVdc;        auto r2 = mc::price_european_call(qmc);
+    base.num_steps = 64;
+    auto prng = base;
+    prng.qmc = mc::McParams::Qmc::None;
+    auto r1 = mc::price_european_call(prng);
+    auto qmc  = base;
+    qmc.qmc = mc::McParams::Qmc::Sobol;
+    qmc.bridge = mc::McParams::Bridge::BrownianBridge;
+    auto r2 = mc::price_european_call(qmc);
     double bs_price = bs::call_price(base.spot, base.strike, base.rate, base.dividend, base.vol, base.time);
     double e1 = std::abs(r1.price - bs_price);
     double e2 = std::abs(r2.price - bs_price);
     // QMC should typically reduce absolute error
     EXPECT_LT(e2, e1 * 0.95);
 }
-
 

@@ -21,9 +21,11 @@ struct McParams {
     std::uint64_t seed;      // RNG seed
     bool antithetic{true};
     bool control_variate{true}; // control variate on discounted S_T vs E[S_T]
-    /// RNG sampler to generate standard normals.
-    enum class Sampler { Pseudorandom, QmcVdc };
-    Sampler sampler{Sampler::Pseudorandom};
+    enum class Qmc { None, Sobol, SobolScrambled };
+    enum class Bridge { None, BrownianBridge };
+    Qmc qmc{Qmc::None};
+    Bridge bridge{Bridge::None};
+    int num_steps{1};
 };
 
 /// Monte Carlo pricing result (mean and standard error)
@@ -55,5 +57,4 @@ struct GreeksResult {
 GreeksResult greeks_european_call(const McParams& p);
 
 } // namespace quant::mc
-
 

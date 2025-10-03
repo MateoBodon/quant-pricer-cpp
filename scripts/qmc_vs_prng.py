@@ -17,8 +17,8 @@ bs_price = float(run(f'{build_dir}/quant_cli bs {S} {K} {r} {q} {sig} {T} call')
 
 rows = [("paths", "prng_err", "qmc_err")]
 for paths in [20000, 40000, 80000, 160000, 320000]:
-    prng = run(f'{build_dir}/quant_cli mc {S} {K} {r} {q} {sig} {T} {paths} 42 0 0')
-    qmc  = run(f'{build_dir}/quant_cli mc {S} {K} {r} {q} {sig} {T} {paths} 42 0 1')
+    prng = run(f'{build_dir}/quant_cli mc {S} {K} {r} {q} {sig} {T} {paths} 42 0 none none 64')
+    qmc  = run(f'{build_dir}/quant_cli mc {S} {K} {r} {q} {sig} {T} {paths} 42 0 sobol bb 64')
     prng_price = float(prng.split()[0])
     qmc_price  = float(qmc.split()[0])
     rows.append((paths, abs(prng_price - bs_price), abs(qmc_price - bs_price)))

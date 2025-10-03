@@ -1,6 +1,7 @@
+#include <cctype>
+#include <cstdlib>
 #include <iostream>
 #include <string>
-#include <cstdlib>
 #include "quant/version.hpp"
 #include "quant/black_scholes.hpp"
 #include "quant/mc.hpp"
@@ -34,7 +35,7 @@ int main(int argc, char** argv) {
         return 0;
     } else if (engine == "mc") {
         if (argc < 12) {
-            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc:0|1>\n";
+            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc_mode> [bridge_mode] [num_steps]\n";
             return 1;
         }
         quant::mc::McParams p{};
@@ -48,7 +49,41 @@ int main(int argc, char** argv) {
         p.seed = static_cast<std::uint64_t>(std::atoll(argv[9]));
         p.antithetic = std::atoi(argv[10]) != 0;
         p.control_variate = true;
-        p.sampler = (std::atoi(argv[11]) != 0) ? quant::mc::McParams::Sampler::QmcVdc : quant::mc::McParams::Sampler::Pseudorandom;
+        auto to_lower = [](std::string s) {
+            for (auto& ch : s) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+            return s;
+        };
+        auto parse_qmc = [&](const std::string& token) {
+            const std::string v = to_lower(token);
+            if (v == "0" || v == "none") return quant::mc::McParams::Qmc::None;
+            if (v == "1" || v == "sobol") return quant::mc::McParams::Qmc::Sobol;
+            if (v == "2" || v == "sobol_scrambled" || v == "scrambled") return quant::mc::McParams::Qmc::SobolScrambled;
+            throw std::runtime_error("Unknown QMC mode: " + token);
+        };
+        auto parse_bridge = [&](const std::string& token) {
+            const std::string v = to_lower(token);
+            if (v.empty() || v == "none" || v == "0") return quant::mc::McParams::Bridge::None;
+            if (v == "bb" || v == "brownian" || v == "bridge" || v == "brownianbridge" || v == "1")
+                return quant::mc::McParams::Bridge::BrownianBridge;
+            throw std::runtime_error("Unknown bridge mode: " + token);
+        };
+        try {
+            p.qmc = parse_qmc(argv[11]);
+        } catch (const std::exception& ex) {
+            std::cerr << ex.what() << "\n";
+            return 1;
+        }
+        if (argc > 12) {
+            try {
+                p.bridge = parse_bridge(argv[12]);
+            } catch (const std::exception& ex) {
+                std::cerr << ex.what() << "\n";
+                return 1;
+            }
+        }
+        if (argc > 13) {
+            p.num_steps = std::max(1, std::atoi(argv[13]));
+        }
         auto res = quant::mc::price_european_call(p);
         std::cout << res.price << " (se=" << res.std_error << ")\n";
         return 0;
