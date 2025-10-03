@@ -405,6 +405,140 @@ with open(artifact_dir / "pde.csv", "w", newline="") as fh:
         "abs_error": f"{abs(pde_price - pde_reference):.6f}",
     })
 
+barrier_cases = [
+    {
+        "name": "down_out_call",
+        "opt": "call",
+        "dir": "down",
+        "style": "out",
+        "spot": 100.0,
+        "strike": 95.0,
+        "barrier": 90.0,
+        "rebate": 0.0,
+        "rate": 0.02,
+        "dividend": 0.0,
+        "vol": 0.20,
+        "tenor": 1.0,
+    },
+    {
+        "name": "up_out_put",
+        "opt": "put",
+        "dir": "up",
+        "style": "out",
+        "spot": 100.0,
+        "strike": 105.0,
+        "barrier": 120.0,
+        "rebate": 0.0,
+        "rate": 0.02,
+        "dividend": 0.0,
+        "vol": 0.25,
+        "tenor": 1.0,
+    },
+]
+
+barrier_rows = []
+barrier_labels = []
+barrier_mc_abs_errors = []
+barrier_pde_abs_errors = []
+
+for case in barrier_cases:
+    args_bs = [
+        "barrier", "bs", case["opt"], case["dir"], case["style"],
+        case["spot"], case["strike"], case["barrier"], case["rebate"],
+        case["rate"], case["dividend"], case["vol"], case["tenor"],
+    ]
+    bs_barrier = float(run_cli(args_bs))
+
+    mc_cli = [
+        "barrier", "mc", case["opt"], case["dir"], case["style"],
+        case["spot"], case["strike"], case["barrier"], case["rebate"],
+        case["rate"], case["dividend"], case["vol"], case["tenor"],
+        mc_paths, mc_seed, 1, "none", "bb", 32,
+    ]
+    mc_out = run_cli(mc_cli)
+    mc_match = MC_OUTPUT_RE.match(mc_out)
+    if not mc_match:
+        raise RuntimeError(f"Unexpected barrier MC output: {mc_out}")
+    mc_barrier = float(mc_match.group(1))
+    mc_barrier_se = float(mc_match.group(2))
+
+    pde_cli = [
+        "barrier", "pde", case["opt"], case["dir"], case["style"],
+        case["spot"], case["strike"], case["barrier"], case["rebate"],
+        case["rate"], case["dividend"], case["vol"], case["tenor"],
+        201, 200, 4.0,
+    ]
+    pde_barrier = float(run_cli(pde_cli))
+
+    mc_abs_err = abs(mc_barrier - bs_barrier)
+    pde_abs_err = abs(pde_barrier - bs_barrier)
+
+    barrier_rows.append({
+        "name": case["name"],
+        "option": case["opt"],
+        "direction": case["dir"],
+        "style": case["style"],
+        "spot": case["spot"],
+        "strike": case["strike"],
+        "barrier": case["barrier"],
+        "rebate": case["rebate"],
+        "rate": case["rate"],
+        "dividend": case["dividend"],
+        "vol": case["vol"],
+        "tenor": case["tenor"],
+        "bs": bs_barrier,
+        "mc": mc_barrier,
+        "mc_se": mc_barrier_se,
+        "pde": pde_barrier,
+        "mc_abs_err": mc_abs_err,
+        "pde_abs_err": pde_abs_err,
+    })
+    barrier_labels.append(case["name"])
+    barrier_mc_abs_errors.append(mc_abs_err)
+    barrier_pde_abs_errors.append(pde_abs_err)
+
+with open(artifact_dir / "barrier_validation.csv", "w", newline="") as fh:
+    writer = csv.DictWriter(fh, fieldnames=[
+        "name", "option", "direction", "style", "spot", "strike", "barrier", "rebate",
+        "rate", "dividend", "vol", "tenor", "bs", "mc", "mc_se", "pde", "mc_abs_err", "pde_abs_err"
+    ])
+    writer.writeheader()
+    for row in barrier_rows:
+        writer.writerow({
+            "name": row["name"],
+            "option": row["option"],
+            "direction": row["direction"],
+            "style": row["style"],
+            "spot": f"{row['spot']:.2f}",
+            "strike": f"{row['strike']:.2f}",
+            "barrier": f"{row['barrier']:.2f}",
+            "rebate": f"{row['rebate']:.2f}",
+            "rate": f"{row['rate']:.4f}",
+            "dividend": f"{row['dividend']:.4f}",
+            "vol": f"{row['vol']:.4f}",
+            "tenor": f"{row['tenor']:.4f}",
+            "bs": f"{row['bs']:.6f}",
+            "mc": f"{row['mc']:.6f}",
+            "mc_se": f"{row['mc_se']:.6f}",
+            "pde": f"{row['pde']:.6f}",
+            "mc_abs_err": f"{row['mc_abs_err']:.6f}",
+            "pde_abs_err": f"{row['pde_abs_err']:.6f}",
+        })
+
+plt.figure(figsize=(6.0, 4.0))
+indices = range(len(barrier_labels))
+plt.bar([i - 0.15 for i in indices], barrier_mc_abs_errors, width=0.3, label="|MC - RR|")
+plt.bar([i + 0.15 for i in indices], barrier_pde_abs_errors, width=0.3, label="|PDE - RR|")
+plt.xticks(list(indices), barrier_labels, rotation=15)
+plt.ylabel("Absolute error")
+plt.title("Barrier pricing validation")
+plt.yscale("log")
+plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
+plt.legend()
+plt.tight_layout()
+plt.savefig(artifact_dir / "barrier_validation.png", dpi=200)
+plt.close()
+
 # Manifest JSON
 try:
     cli_rel = str(cli.relative_to(root))
@@ -432,6 +566,11 @@ manifest = {
         "prng_rmse": [round(v, 6) for v in prng_rmse_values],
         "qmc_rmse": [round(v, 6) for v in qmc_rmse_values],
         "rmse_ratio": [round(v, 3) for v in rmse_ratio_values],
+    },
+    "barrier_validation": {
+        "cases": barrier_labels,
+        "mc_abs_error": [round(v, 6) for v in barrier_mc_abs_errors],
+        "pde_abs_error": [round(v, 6) for v in barrier_pde_abs_errors],
     },
     "executables": {
         "quant_cli": cli_rel,

@@ -35,6 +35,7 @@
 - **Black–Scholes Analytics**: Complete European option pricing with all major Greeks (Delta, Gamma, Vega, Theta, Rho)
 - **Monte Carlo Engine**: High-performance GBM simulation with PCG64 RNG and OpenMP parallelization
 - **PDE Solver**: Crank–Nicolson finite-difference scheme with Thomas algorithm and log-space grids
+- **Barrier Options**: Continuous single-barrier (up/down, in/out) pricing via Reiner–Rubinstein closed-form, Brownian-bridge Monte Carlo, and absorbing-boundary PDE
 
 ### ⚡ **Advanced Monte Carlo**
 - **Variance Reduction**: Antithetic variates and control variates for improved convergence
@@ -308,6 +309,19 @@ cmake --build build -j
 
 `qmc_mode` accepts `none`, `sobol`, or `sobol_scrambled`; `bridge_mode` accepts `none` or `bb` (Brownian bridge). The final `num_steps` argument controls how many time slices are simulated (defaults to 1 for direct terminal sampling).
 
+### Barrier Options
+```bash
+# Reiner–Rubinstein analytic price (down-and-out call)
+./build/quant_cli barrier bs call down out 100 95 90 0 0.02 0.00 0.2 1.0
+
+# Sobol MC with Brownian bridge correction (64 steps)
+./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 none bb 32
+# -> price (se=...)
+
+# Crank–Nicolson PDE with absorbing boundary at S=B
+./build/quant_cli barrier pde call down out 100 95 90 0 0.02 0.00 0.2 1.0 201 200 4.0
+```
+
 ### PDE Pricing
 ```bash
 # Crank–Nicolson with log-space grid and Neumann boundary
@@ -441,6 +455,8 @@ python3 scripts/pde_convergence.py
 ```
 
 The demo harness also writes `artifacts/qmc_vs_prng.png`, showing that Sobol sequences with Brownian bridge (64 time steps) achieve roughly 2–3× lower RMSE than a pseudorandom Euler discretisation at equal path counts.
+
+Barrier validation is captured via `artifacts/barrier_validation.csv` and `artifacts/barrier_validation.png`, comparing Monte Carlo and PDE prices against Reiner–Rubinstein closed-form benchmarks for representative up/down knock-out cases.
 
 ### Edge Case Validation
 
