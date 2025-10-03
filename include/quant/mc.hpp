@@ -28,10 +28,17 @@ struct McParams {
     int num_steps{1};
 };
 
-/// Monte Carlo pricing result (mean and standard error)
+/// Summary of a Monte Carlo estimator (mean, standard error, 95% CI)
+struct McStatistic {
+    double value;       // sample mean
+    double std_error;   // standard error of the estimate
+    double ci_low;      // 95% confidence interval lower bound
+    double ci_high;     // 95% confidence interval upper bound
+};
+
+/// Monte Carlo pricing result
 struct McResult {
-    double price;      // estimated price
-    double std_error;  // standard error of the estimate
+    McStatistic estimate;  // price estimate and uncertainty
 };
 
 /// Price European call via terminal payoff; uses streaming for cache friendliness.
@@ -41,19 +48,17 @@ struct McResult {
 /// bridge ordering when `num_steps > 1`.
 McResult price_european_call(const McParams& p);
 
-/// Monte Carlo Greeks result (value and standard error).
+/// Monte Carlo Greeks result (mean/SE/CI per estimator).
 struct GreeksResult {
-    double delta;
-    double delta_se;
-    double vega;
-    double vega_se;
-    double gamma;
-    double gamma_se;
+    McStatistic delta;      // pathwise
+    McStatistic vega;       // pathwise
+    McStatistic gamma_lrm;  // likelihood-ratio
+    McStatistic gamma_mixed;// mixed (pathwise × LR)
 };
 
 /// Monte Carlo Greeks under GBM.
 /// - Delta, Vega: pathwise estimators
-/// - Gamma: Likelihood Ratio Method (LRM)
+/// - Gamma: exposes both pure LRM and the lower-variance mixed estimator
 GreeksResult greeks_european_call(const McParams& p);
 
 } // namespace quant::mc

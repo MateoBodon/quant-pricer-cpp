@@ -108,6 +108,63 @@ struct WelfordAccumulator {
     }
 };
 
+constexpr double kZ95 = 1.95996398454005423552;
+
+McStatistic summarize(const WelfordAccumulator& acc) {
+    McStatistic stat{};
+    if (acc.count == 0) {
+        stat.value = 0.0;
+        stat.std_error = 0.0;
+        stat.ci_low = 0.0;
+        stat.ci_high = 0.0;
+        return stat;
+    }
+    stat.value = acc.mean;
+    const double variance = acc.variance();
+    if (acc.count > 1 && variance >= 0.0) {
+        const double se = std::sqrt(variance / static_cast<double>(acc.count));
+        const double half_width = kZ95 * se;
+        stat.std_error = se;
+        stat.ci_low = stat.value - half_width;
+        stat.ci_high = stat.value + half_width;
+    } else {
+        stat.std_error = 0.0;
+        stat.ci_low = stat.value;
+        stat.ci_high = stat.value;
+    }
+    return stat;
+}
+
+struct GreekAccumulators {
+    WelfordAccumulator delta;
+    WelfordAccumulator vega;
+    WelfordAccumulator gamma_lrm;
+    WelfordAccumulator gamma_mixed;
+
+    void merge(const GreekAccumulators& other) {
+        delta.merge(other.delta);
+        vega.merge(other.vega);
+        gamma_lrm.merge(other.gamma_lrm);
+        gamma_mixed.merge(other.gamma_mixed);
+    }
+};
+
+struct GreeksContext {
+    double spot;
+    double strike;
+    double rate;
+    double dividend;
+    double vol;
+    double time;
+    bool antithetic;
+    double discount;
+    double drift;
+    double sqrt_time;
+    double vol_sqrt_time;
+    double inv_gamma_denom;
+    double score_coeff;
+};
+
 double evolve_terminal(double spot,
                        double rate,
                        double dividend,
@@ -256,11 +313,81 @@ WelfordAccumulator simulate_range(std::uint64_t begin,
     return acc;
 }
 
+GreekAccumulators simulate_greeks_range(std::uint64_t begin,
+                                        std::uint64_t end,
+                                        std::uint64_t seed_offset,
+                                        const GreeksContext& ctx) {
+    GreekAccumulators accum;
+    if (begin >= end) {
+        return accum;
+    }
+
+    pcg64 rng(seed_offset);
+    std::normal_distribution<double> normal(0.0, 1.0);
+
+    const auto gamma_weight = [&](double z) {
+        if (ctx.inv_gamma_denom == 0.0) {
+            return 0.0;
+        }
+        return ((z * z) - 1.0 - ctx.vol_sqrt_time * z) * ctx.inv_gamma_denom;
+    };
+
+    for (std::uint64_t idx = begin; idx < end; ++idx) {
+        const double z = normal(rng);
+        const double ST1 = ctx.spot * std::exp(ctx.drift + ctx.vol_sqrt_time * z);
+        const double payoff1 = std::max(0.0, ST1 - ctx.strike);
+
+        double delta1 = 0.0;
+        double vega1 = 0.0;
+        if (payoff1 > 0.0) {
+            delta1 = ctx.discount * (ST1 / ctx.spot);
+            const double dST_dsigma = ST1 * (-ctx.vol * ctx.time + ctx.sqrt_time * z);
+            vega1 = ctx.discount * dST_dsigma;
+        }
+        const double gamma_lrm1 = ctx.discount * payoff1 * gamma_weight(z);
+        const double gamma_mixed1 = delta1 * (ctx.score_coeff * z)
+                                    - (payoff1 > 0.0 ? ctx.discount * (ST1 / (ctx.spot * ctx.spot)) : 0.0);
+
+        double delta_sample = delta1;
+        double vega_sample = vega1;
+        double gamma_lrm_sample = gamma_lrm1;
+        double gamma_mixed_sample = gamma_mixed1;
+
+        if (ctx.antithetic) {
+            const double z2 = -z;
+            const double ST2 = ctx.spot * std::exp(ctx.drift + ctx.vol_sqrt_time * z2);
+            const double payoff2 = std::max(0.0, ST2 - ctx.strike);
+            double delta2 = 0.0;
+            double vega2 = 0.0;
+            if (payoff2 > 0.0) {
+                delta2 = ctx.discount * (ST2 / ctx.spot);
+                const double dST_dsigma2 = ST2 * (-ctx.vol * ctx.time + ctx.sqrt_time * z2);
+                vega2 = ctx.discount * dST_dsigma2;
+            }
+            const double gamma_lrm2 = ctx.discount * payoff2 * gamma_weight(z2);
+            const double gamma_mixed2 = delta2 * (ctx.score_coeff * z2)
+                                        - (payoff2 > 0.0 ? ctx.discount * (ST2 / (ctx.spot * ctx.spot)) : 0.0);
+
+            delta_sample = 0.5 * (delta1 + delta2);
+            vega_sample = 0.5 * (vega1 + vega2);
+            gamma_lrm_sample = 0.5 * (gamma_lrm1 + gamma_lrm2);
+            gamma_mixed_sample = 0.5 * (gamma_mixed1 + gamma_mixed2);
+        }
+
+        accum.delta.add(delta_sample);
+        accum.vega.add(vega_sample);
+        accum.gamma_lrm.add(gamma_lrm_sample);
+        accum.gamma_mixed.add(gamma_mixed_sample);
+    }
+
+    return accum;
+}
+
 } // namespace
 
 McResult price_european_call(const McParams& p) {
     if (p.num_paths == 0) {
-        return {0.0, 0.0};
+        return McResult{McStatistic{0.0, 0.0, 0.0, 0.0}};
     }
 
     const int steps = std::max(1, p.num_steps);
@@ -316,149 +443,72 @@ McResult price_european_call(const McParams& p) {
     total = simulate_range(0, p.num_paths, seed_offset, ctx);
 #endif
 
-    const double variance = total.variance();
-    const double mean = total.mean;
-    const double std_error = (total.count > 0)
-                                 ? std::sqrt(variance / static_cast<double>(total.count))
-                                 : 0.0;
-    return {mean, std_error};
+    return McResult{summarize(total)};
 }
 
 GreeksResult greeks_european_call(const McParams& p) {
-    // Existing implementation remains pseudorandom-focused and ignores QMC/bridge parameters.
-    const double S0 = p.spot;
-    const double K  = p.strike;
-    const double r  = p.rate;
-    const double q  = p.dividend;
-    const double s  = p.vol;
-    const double T  = p.time;
-    const std::uint64_t N = p.num_paths;
-    const bool use_antithetic = p.antithetic;
+    GreeksResult result{};
+    if (p.num_paths == 0) {
+        return result;
+    }
 
-    const double df_r = std::exp(-r * T);
-    const double drift = (r - q - 0.5 * s * s) * T;
-    const double volt = s * std::sqrt(T);
+    const double sqrt_time = std::sqrt(std::max(p.time, 0.0));
+    const double vol_sqrt_time = p.vol * sqrt_time;
+    const double discount = std::exp(-p.rate * p.time);
+    const double drift = (p.rate - p.dividend - 0.5 * p.vol * p.vol) * p.time;
+    const double inv_gamma_denom = (p.vol > 0.0 && p.time > 0.0)
+                                       ? 1.0 / (p.spot * p.spot * p.vol * p.vol * p.time)
+                                       : 0.0;
+    const double score_coeff = (p.vol > 0.0 && p.time > 0.0)
+                                   ? 1.0 / (p.spot * p.vol * sqrt_time)
+                                   : 0.0;
 
-    double sum_delta = 0.0, sumsq_delta = 0.0;
-    double sum_vega  = 0.0, sumsq_vega  = 0.0;
-    double sum_gamma = 0.0, sumsq_gamma = 0.0;
-
-    auto pathwise = [&](double ST) -> std::pair<double,double> {
-        if (ST <= K) {
-            return {0.0, 0.0};
-        }
-        const double z_hat = (std::log(ST / S0) - drift) / volt;
-        const double dST_dS0 = ST / S0;
-        const double dST_dsigma = ST * (-s * T + std::sqrt(T) * z_hat);
-        const double delta = df_r * dST_dS0;
-        const double vega  = df_r * dST_dsigma;
-        return {delta, vega};
+    GreeksContext ctx{
+        .spot = p.spot,
+        .strike = p.strike,
+        .rate = p.rate,
+        .dividend = p.dividend,
+        .vol = p.vol,
+        .time = p.time,
+        .antithetic = p.antithetic,
+        .discount = discount,
+        .drift = drift,
+        .sqrt_time = sqrt_time,
+        .vol_sqrt_time = vol_sqrt_time,
+        .inv_gamma_denom = inv_gamma_denom,
+        .score_coeff = score_coeff
     };
 
-    auto gamma_weight = [&](double zval) {
-        return ((zval * zval) - 1.0 - s * std::sqrt(T) * zval) / (S0 * S0 * s * s * T);
-    };
+    GreekAccumulators totals;
 
 #ifdef QUANT_HAS_OPENMP
+    const std::uint64_t N = p.num_paths;
+    const int max_threads = omp_get_max_threads();
+    std::vector<GreekAccumulators> partial(max_threads);
+
     #pragma omp parallel
     {
-        pcg64 rng_local(p.seed + static_cast<unsigned long long>(1 + omp_get_thread_num()));
-        std::normal_distribution<double> normal(0.0, 1.0);
-        double local_delta = 0.0, local_deltasq = 0.0;
-        double local_vega  = 0.0, local_vegasq  = 0.0;
-        double local_gamma = 0.0, local_gammasq = 0.0;
-        #pragma omp for nowait
-        for (std::int64_t i = 0; i < static_cast<std::int64_t>(N); ++i) {
-            const double z = normal(rng_local);
-            const double ST1 = S0 * std::exp(drift + volt * z);
-            const double ST2 = use_antithetic ? S0 * std::exp(drift - volt * z) : ST1;
-            double delta_samp, vega_samp;
-            if (use_antithetic) {
-                auto pv1 = pathwise(ST1);
-                auto pv2 = pathwise(ST2);
-                delta_samp = 0.5 * (pv1.first + pv2.first);
-                vega_samp  = 0.5 * (pv1.second + pv2.second);
-            } else {
-                auto pv1 = pathwise(ST1);
-                delta_samp = pv1.first;
-                vega_samp  = pv1.second;
-            }
-            const double payoff1 = std::max(0.0, ST1 - K);
-            const double term1 = df_r * payoff1 * gamma_weight(z);
-            double gamma_samp = term1;
-            if (use_antithetic) {
-                const double payoff2 = std::max(0.0, ST2 - K);
-                const double term2 = df_r * payoff2 * gamma_weight(-z);
-                gamma_samp = 0.5 * (term1 + term2);
-            }
-            local_delta += delta_samp;
-            local_deltasq += delta_samp * delta_samp;
-            local_vega += vega_samp;
-            local_vegasq += vega_samp * vega_samp;
-            local_gamma += gamma_samp;
-            local_gammasq += gamma_samp * gamma_samp;
-        }
-        #pragma omp atomic
-        sum_delta += local_delta;
-        #pragma omp atomic
-        sumsq_delta += local_deltasq;
-        #pragma omp atomic
-        sum_vega += local_vega;
-        #pragma omp atomic
-        sumsq_vega += local_vegasq;
-        #pragma omp atomic
-        sum_gamma += local_gamma;
-        #pragma omp atomic
-        sumsq_gamma += local_gammasq;
+        const int tid = omp_get_thread_num();
+        const int nthreads = omp_get_num_threads();
+        const std::uint64_t begin = (tid * N) / nthreads;
+        const std::uint64_t end = ((tid + 1) * N) / nthreads;
+        const std::uint64_t seed_offset = p.seed + 0x517cc1b727220a95ULL * static_cast<std::uint64_t>(tid + 1);
+        partial[tid] = simulate_greeks_range(begin, end, seed_offset, ctx);
+    }
+
+    for (const auto& part : partial) {
+        totals.merge(part);
     }
 #else
-    pcg64 rng(p.seed);
-    std::normal_distribution<double> normal(0.0, 1.0);
-    for (std::uint64_t i = 0; i < N; ++i) {
-        const double z = normal(rng);
-        const double ST1 = S0 * std::exp(drift + volt * z);
-        const double ST2 = use_antithetic ? S0 * std::exp(drift - volt * z) : ST1;
-        double delta_samp, vega_samp;
-        if (use_antithetic) {
-            auto pv1 = pathwise(ST1);
-            auto pv2 = pathwise(ST2);
-            delta_samp = 0.5 * (pv1.first + pv2.first);
-            vega_samp  = 0.5 * (pv1.second + pv2.second);
-        } else {
-            auto pv1 = pathwise(ST1);
-            delta_samp = pv1.first;
-            vega_samp  = pv1.second;
-        }
-        const double payoff1 = std::max(0.0, ST1 - K);
-        const double term1 = df_r * payoff1 * gamma_weight(z);
-        double gamma_samp = term1;
-        if (use_antithetic) {
-            const double payoff2 = std::max(0.0, ST2 - K);
-            const double term2 = df_r * payoff2 * gamma_weight(-z);
-            gamma_samp = 0.5 * (term1 + term2);
-        }
-
-        sum_delta += delta_samp;
-        sumsq_delta += delta_samp * delta_samp;
-        sum_vega += vega_samp;
-        sumsq_vega += vega_samp * vega_samp;
-        sum_gamma += gamma_samp;
-        sumsq_gamma += gamma_samp * gamma_samp;
-    }
+    const std::uint64_t seed_offset = p.seed ? p.seed : 0x517cc1b727220a95ULL;
+    totals = simulate_greeks_range(0, p.num_paths, seed_offset, ctx);
 #endif
 
-    auto finalize = [&](double sum, double sumsq) {
-        const double n = static_cast<double>(N);
-        const double mean = sum / n;
-        const double var = std::max(0.0, (sumsq / n) - mean * mean);
-        return std::make_pair(mean, std::sqrt(var / n));
-    };
-
-    auto [delta_mean, delta_se] = finalize(sum_delta, sumsq_delta);
-    auto [vega_mean, vega_se]   = finalize(sum_vega, sumsq_vega);
-    auto [gamma_mean, gamma_se] = finalize(sum_gamma, sumsq_gamma);
-
-    return {delta_mean, delta_se, vega_mean, vega_se, gamma_mean, gamma_se};
+    result.delta = summarize(totals.delta);
+    result.vega = summarize(totals.vega);
+    result.gamma_lrm = summarize(totals.gamma_lrm);
+    result.gamma_mixed = summarize(totals.gamma_mixed);
+    return result;
 }
 
 } // namespace quant::mc

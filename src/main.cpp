@@ -89,7 +89,8 @@ int main(int argc, char** argv) {
             p.num_steps = std::max(1, std::atoi(argv[13]));
         }
         auto res = quant::mc::price_european_call(p);
-        std::cout << res.price << " (se=" << res.std_error << ")\n";
+        std::cout << res.estimate.value << " (se=" << res.estimate.std_error
+                  << ", 95% CI=[" << res.estimate.ci_low << ", " << res.estimate.ci_high << "])\n";
         return 0;
     } else if (engine == "barrier") {
         if (argc < 4) {
@@ -203,7 +204,8 @@ int main(int argc, char** argv) {
                 else throw std::runtime_error("Unknown bridge mode: " + bridge_mode);
                 p.num_steps = std::max(1, num_steps);
                 auto res = quant::mc::price_barrier_option(p, K, opt, spec);
-                std::cout << res.price << " (se=" << res.std_error << ")\n";
+                std::cout << res.estimate.value << " (se=" << res.estimate.std_error
+                          << ", 95% CI=[" << res.estimate.ci_low << ", " << res.estimate.ci_high << "])\n";
             } catch (const std::exception& ex) {
                 std::cerr << ex.what() << "\n";
                 return 1;

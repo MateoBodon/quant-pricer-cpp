@@ -144,6 +144,33 @@ struct WelfordAccumulator {
     }
 };
 
+constexpr double kZ95 = 1.95996398454005423552;
+
+McStatistic summarize(const WelfordAccumulator& acc) {
+    McStatistic stat{};
+    if (acc.count == 0) {
+        stat.value = 0.0;
+        stat.std_error = 0.0;
+        stat.ci_low = 0.0;
+        stat.ci_high = 0.0;
+        return stat;
+    }
+    stat.value = acc.mean;
+    const double variance = acc.variance();
+    if (acc.count > 1 && variance >= 0.0) {
+        const double se = std::sqrt(variance / static_cast<double>(acc.count));
+        const double half_width = kZ95 * se;
+        stat.std_error = se;
+        stat.ci_low = stat.value - half_width;
+        stat.ci_high = stat.value + half_width;
+    } else {
+        stat.std_error = 0.0;
+        stat.ci_low = stat.value;
+        stat.ci_high = stat.value;
+    }
+    return stat;
+}
+
 struct BarrierMcContext {
     const McParams& params;
     double strike;
@@ -367,6 +394,9 @@ McResult price_barrier_option(const McParams& base,
                               double strike,
                               OptionType opt,
                               const BarrierSpec& barrier) {
+    if (base.num_paths == 0) {
+        return McResult{McStatistic{0.0, 0.0, 0.0, 0.0}};
+    }
     if (strike <= 0.0) {
         throw std::invalid_argument("Strike must be positive");
     }
@@ -380,12 +410,13 @@ McResult price_barrier_option(const McParams& base,
     const bool knocked = barrier_triggered(barrier, base.spot);
     if (knocked) {
         if (is_knock_out(barrier)) {
-            return {barrier.rebate, 0.0};
+            const double value = barrier.rebate;
+            return McResult{McStatistic{value, 0.0, value, value}};
         }
         const double vanilla = (opt == OptionType::Call)
                                    ? ::quant::bs::call_price(base.spot, strike, base.rate, base.dividend, base.vol, base.time)
                                    : ::quant::bs::put_price(base.spot, strike, base.rate, base.dividend, base.vol, base.time);
-        return {vanilla, 0.0};
+        return McResult{McStatistic{vanilla, 0.0, vanilla, vanilla}};
     }
 
     const int steps = std::max(1, base.num_steps);
@@ -451,12 +482,7 @@ McResult price_barrier_option(const McParams& base,
     total = simulate_range(0, base.num_paths, seed_offset, worker);
 #endif
 
-    const double variance = total.variance();
-    const double mean = total.mean;
-    const double std_error = (total.count > 0)
-                                 ? std::sqrt(variance / static_cast<double>(total.count))
-                                 : 0.0;
-    return {mean, std_error};
+    return McResult{summarize(total)};
 }
 
 } // namespace quant::mc

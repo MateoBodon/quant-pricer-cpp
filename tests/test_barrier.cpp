@@ -49,7 +49,7 @@ TEST(Barrier, MonteCarloMatchesAnalyticWithinError) {
     const double analytic = bs::reiner_rubinstein_price(OptionType::Call, spec, params.spot, params.strike,
                                                         params.rate, params.dividend, params.vol, params.time);
     auto res = mc::price_barrier_option(params, params.strike, OptionType::Call, spec);
-    EXPECT_LE(std::abs(res.price - analytic), 3.0 * res.std_error);
+    EXPECT_LE(std::abs(res.estimate.value - analytic), 3.0 * res.estimate.std_error);
 }
 
 TEST(Barrier, PdeMatchesAnalytic) {

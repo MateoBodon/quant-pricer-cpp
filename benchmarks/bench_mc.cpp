@@ -15,7 +15,7 @@ static void BM_MC_1e6(benchmark::State& state) {
       .control_variate = true};
   for (auto _ : state) {
     auto res = quant::mc::price_european_call(mp);
-    benchmark::DoNotOptimize(res.price);
+    benchmark::DoNotOptimize(res.estimate.value);
     benchmark::ClobberMemory();
   }
 }
@@ -23,5 +23,4 @@ static void BM_MC_1e6(benchmark::State& state) {
 BENCHMARK(BM_MC_1e6);
 
 BENCHMARK_MAIN();
-
 
