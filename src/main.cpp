@@ -1,7 +1,9 @@
 #include <cctype>
 #include <cstdlib>
+#include <iomanip>
 #include <iostream>
 #include <string>
+#include <vector>
 #include "quant/version.hpp"
 #include "quant/black_scholes.hpp"
 #include "quant/barrier.hpp"
@@ -10,18 +12,119 @@
 #include "quant/mc_barrier.hpp"
 #include "quant/pde.hpp"
 #include "quant/pde_barrier.hpp"
+#include "quant/american.hpp"
+
+#ifdef QUANT_HAS_OPENMP
+#include <omp.h>
+#endif
+
+namespace {
+
+std::string to_lower(std::string s) {
+    for (auto& ch : s) {
+        ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+    }
+    return s;
+}
+
+quant::OptionType parse_option(const std::string& token) {
+    std::string v = to_lower(token);
+    if (v == "call" || v == "c") return quant::OptionType::Call;
+    if (v == "put" || v == "p") return quant::OptionType::Put;
+    throw std::runtime_error("Unknown option type: " + token);
+}
+
+quant::pde::OptionType parse_pde_option(const std::string& token) {
+    auto opt = parse_option(token);
+    return (opt == quant::OptionType::Call) ? quant::pde::OptionType::Call : quant::pde::OptionType::Put;
+}
+
+quant::mc::McParams::Qmc parse_qmc_sampler(const std::string& token) {
+    std::string v = to_lower(token);
+    if (v == "none" || v == "0" || v.empty()) return quant::mc::McParams::Qmc::None;
+    if (v == "sobol" || v == "1") return quant::mc::McParams::Qmc::Sobol;
+    if (v == "sobol_scrambled" || v == "scrambled" || v == "2") return quant::mc::McParams::Qmc::SobolScrambled;
+    throw std::runtime_error("Unknown sampler: " + token);
+}
+
+quant::mc::McParams::Bridge parse_bridge_mode(const std::string& token) {
+    std::string v = to_lower(token);
+    if (v == "none" || v == "0" || v.empty()) return quant::mc::McParams::Bridge::None;
+    if (v == "bb" || v == "brownian" || v == "bridge" || v == "brownianbridge" || v == "1")
+        return quant::mc::McParams::Bridge::BrownianBridge;
+    throw std::runtime_error("Unknown bridge mode: " + token);
+}
+
+void apply_thread_override(int threads) {
+#ifdef QUANT_HAS_OPENMP
+    if (threads > 0) {
+        omp_set_num_threads(threads);
+    }
+#else
+    (void)threads;
+#endif
+}
+
+void print_mc_result(const quant::mc::McResult& res, bool json) {
+    if (json) {
+        std::cout << "{\"price\":" << res.estimate.value
+                  << ",\"std_error\":" << res.estimate.std_error
+                  << ",\"ci_low\":" << res.estimate.ci_low
+                  << ",\"ci_high\":" << res.estimate.ci_high
+                  << "}\n";
+    } else {
+        std::cout << res.estimate.value << " (se=" << res.estimate.std_error
+                  << ", 95% CI=[" << res.estimate.ci_low << ", " << res.estimate.ci_high << "])\n";
+    }
+}
+
+void print_scalar(double value, bool json) {
+    if (json) {
+        std::cout << "{\"price\":" << value << "}\n";
+    } else {
+        std::cout << value << "\n";
+    }
+}
+
+void print_psor(const quant::american::PsorResult& res, bool json) {
+    if (json) {
+        std::cout << "{\"price\":" << res.price
+                  << ",\"iterations\":" << res.total_iterations
+                  << ",\"max_residual\":" << res.max_residual
+                  << "}\n";
+    } else {
+        std::cout << res.price << " (iterations=" << res.total_iterations
+                  << ", residual=" << res.max_residual << ")\n";
+    }
+}
+
+void print_lsmc(const quant::american::LsmcResult& res, bool json) {
+    if (json) {
+        std::cout << "{\"price\":" << res.price
+                  << ",\"std_error\":" << res.std_error
+                  << "}\n";
+    } else {
+        std::cout << res.price << " (se=" << res.std_error << ")\n";
+    }
+}
+
+bool starts_with_dash(const char* arg) {
+    return arg != nullptr && arg[0] == '-';
+}
+
+} // namespace
 
 int main(int argc, char** argv) {
     if (argc <= 1) {
         std::cout << "quant-pricer-cpp " << quant::version_string() << "\n";
         std::cout << "Usage: quant_cli <engine> [params]\n";
-        std::cout << "Engines: bs, mc, pde\n";
+        std::cout << "Engines: bs, mc, barrier, pde, american\n";
         return 0;
     }
     std::string engine = argv[1];
     if (engine == "bs") {
         if (argc < 9) {
-            std::cerr << "bs <S> <K> <r> <q> <sigma> <T> <call|put>\n";
+            std::cerr << "bs <S> <K> <r> <q> <sigma> <T> <call|put> [--json]\n";
             return 1;
         }
         double S = std::atof(argv[2]);
@@ -31,15 +134,27 @@ int main(int argc, char** argv) {
         double sig = std::atof(argv[6]);
         double T = std::atof(argv[7]);
         std::string type = argv[8];
+        bool json = false;
+        for (int idx = 9; idx < argc; ++idx) {
+            std::string flag = argv[idx];
+            if (flag == "--json") {
+                json = true;
+            } else {
+                std::cerr << "Unknown flag " << flag << "\n";
+                return 1;
+            }
+        }
         if (type == "call") {
-            std::cout << quant::bs::call_price(S, K, r, q, sig, T) << "\n";
+            double price = quant::bs::call_price(S, K, r, q, sig, T);
+            print_scalar(price, json);
         } else {
-            std::cout << quant::bs::put_price(S, K, r, q, sig, T) << "\n";
+            double price = quant::bs::put_price(S, K, r, q, sig, T);
+            print_scalar(price, json);
         }
         return 0;
     } else if (engine == "mc") {
         if (argc < 12) {
-            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc_mode> [bridge_mode] [num_steps]\n";
+            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc_mode> [bridge_mode] [num_steps] [--sampler=] [--bridge=] [--steps=] [--threads=] [--json]\n";
             return 1;
         }
         quant::mc::McParams p{};
@@ -53,44 +168,63 @@ int main(int argc, char** argv) {
         p.seed = static_cast<std::uint64_t>(std::atoll(argv[9]));
         p.antithetic = std::atoi(argv[10]) != 0;
         p.control_variate = true;
-        auto to_lower = [](std::string s) {
-            for (auto& ch : s) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
-            return s;
-        };
-        auto parse_qmc = [&](const std::string& token) {
-            const std::string v = to_lower(token);
-            if (v == "0" || v == "none") return quant::mc::McParams::Qmc::None;
-            if (v == "1" || v == "sobol") return quant::mc::McParams::Qmc::Sobol;
-            if (v == "2" || v == "sobol_scrambled" || v == "scrambled") return quant::mc::McParams::Qmc::SobolScrambled;
-            throw std::runtime_error("Unknown QMC mode: " + token);
-        };
-        auto parse_bridge = [&](const std::string& token) {
-            const std::string v = to_lower(token);
-            if (v.empty() || v == "none" || v == "0") return quant::mc::McParams::Bridge::None;
-            if (v == "bb" || v == "brownian" || v == "bridge" || v == "brownianbridge" || v == "1")
-                return quant::mc::McParams::Bridge::BrownianBridge;
-            throw std::runtime_error("Unknown bridge mode: " + token);
-        };
         try {
-            p.qmc = parse_qmc(argv[11]);
+            p.qmc = parse_qmc_sampler(argv[11]);
         } catch (const std::exception& ex) {
             std::cerr << ex.what() << "\n";
             return 1;
         }
-        if (argc > 12) {
+        int next = 12;
+        if (argc > next && !starts_with_dash(argv[next])) {
             try {
-                p.bridge = parse_bridge(argv[12]);
+                p.bridge = parse_bridge_mode(argv[next]);
             } catch (const std::exception& ex) {
                 std::cerr << ex.what() << "\n";
                 return 1;
             }
+            ++next;
         }
-        if (argc > 13) {
-            p.num_steps = std::max(1, std::atoi(argv[13]));
+        if (argc > next && !starts_with_dash(argv[next])) {
+            p.num_steps = std::max(1, std::atoi(argv[next]));
+            ++next;
         }
+
+        bool json = false;
+        int thread_override = -1;
+
+        for (int idx = next; idx < argc; ++idx) {
+            std::string flag = argv[idx];
+            if (flag == "--json") {
+                json = true;
+            } else if (flag.rfind("--sampler=", 0) == 0) {
+                std::string value = flag.substr(10);
+                try {
+                    p.qmc = parse_qmc_sampler(value);
+                } catch (const std::exception& ex) {
+                    std::cerr << ex.what() << "\n";
+                    return 1;
+                }
+            } else if (flag.rfind("--bridge=", 0) == 0) {
+                std::string value = flag.substr(9);
+                try {
+                    p.bridge = parse_bridge_mode(value);
+                } catch (const std::exception& ex) {
+                    std::cerr << ex.what() << "\n";
+                    return 1;
+                }
+            } else if (flag.rfind("--steps=", 0) == 0) {
+                p.num_steps = std::max(1, std::atoi(flag.substr(8).c_str()));
+            } else if (flag.rfind("--threads=", 0) == 0) {
+                thread_override = std::max(1, std::atoi(flag.substr(10).c_str()));
+            } else {
+                std::cerr << "Unknown flag " << flag << "\n";
+                return 1;
+            }
+        }
+
+        apply_thread_override(thread_override);
         auto res = quant::mc::price_european_call(p);
-        std::cout << res.estimate.value << " (se=" << res.estimate.std_error
-                  << ", 95% CI=[" << res.estimate.ci_low << ", " << res.estimate.ci_high << "])\n";
+        print_mc_result(res, json);
         return 0;
     } else if (engine == "barrier") {
         if (argc < 4) {
@@ -98,16 +232,6 @@ int main(int argc, char** argv) {
             return 1;
         }
         std::string method = argv[2];
-        auto to_lower = [](std::string s) {
-            for (auto& ch : s) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
-            return s;
-        };
-        auto parse_option = [&](const std::string& s) -> quant::OptionType {
-            std::string v = to_lower(s);
-            if (v == "call" || v == "c") return quant::OptionType::Call;
-            if (v == "put" || v == "p") return quant::OptionType::Put;
-            throw std::runtime_error("Unknown option type: " + s);
-        };
         auto parse_barrier_dir = [&](const std::string& s) -> bool {
             std::string v = to_lower(s);
             if (v == "up") return true;
@@ -193,19 +317,32 @@ int main(int argc, char** argv) {
                 p.seed = seed;
                 p.antithetic = antithetic;
                 p.control_variate = true;
-                auto lower = to_lower(qmc_mode);
-                if (lower == "none" || lower == "0") p.qmc = quant::mc::McParams::Qmc::None;
-                else if (lower == "sobol" || lower == "1") p.qmc = quant::mc::McParams::Qmc::Sobol;
-                else if (lower == "sobol_scrambled" || lower == "scrambled" || lower == "2") p.qmc = quant::mc::McParams::Qmc::SobolScrambled;
-                else throw std::runtime_error("Unknown qmc mode: " + qmc_mode);
-                auto bridge_lower = to_lower(bridge_mode);
-                if (bridge_lower == "none" || bridge_lower == "0") p.bridge = quant::mc::McParams::Bridge::None;
-                else if (bridge_lower == "bb" || bridge_lower == "brownian" || bridge_lower == "1") p.bridge = quant::mc::McParams::Bridge::BrownianBridge;
-                else throw std::runtime_error("Unknown bridge mode: " + bridge_mode);
+                p.qmc = parse_qmc_sampler(qmc_mode);
+                p.bridge = parse_bridge_mode(bridge_mode);
                 p.num_steps = std::max(1, num_steps);
+
+                bool json = false;
+                int thread_override = -1;
+                for (int idx = 20; idx < argc; ++idx) {
+                    std::string flag = argv[idx];
+                    if (flag == "--json") {
+                        json = true;
+                    } else if (flag.rfind("--sampler=", 0) == 0) {
+                        p.qmc = parse_qmc_sampler(flag.substr(10));
+                    } else if (flag.rfind("--bridge=", 0) == 0) {
+                        p.bridge = parse_bridge_mode(flag.substr(9));
+                    } else if (flag.rfind("--steps=", 0) == 0) {
+                        p.num_steps = std::max(1, std::atoi(flag.substr(8).c_str()));
+                    } else if (flag.rfind("--threads=", 0) == 0) {
+                        thread_override = std::max(1, std::atoi(flag.substr(10).c_str()));
+                    } else {
+                        std::cerr << "Unknown flag " << flag << "\n";
+                        return 1;
+                    }
+                }
+                apply_thread_override(thread_override);
                 auto res = quant::mc::price_barrier_option(p, K, opt, spec);
-                std::cout << res.estimate.value << " (se=" << res.estimate.std_error
-                          << ", 95% CI=[" << res.estimate.ci_low << ", " << res.estimate.ci_high << "])\n";
+                print_mc_result(res, json);
             } catch (const std::exception& ex) {
                 std::cerr << ex.what() << "\n";
                 return 1;
@@ -253,9 +390,169 @@ int main(int argc, char** argv) {
         }
         std::cerr << "Unknown barrier method: " << method << "\n";
         return 1;
+    } else if (engine == "american") {
+        if (argc < 3) {
+            std::cerr << "american <binomial|psor|lsmc> ...\n";
+            return 1;
+        }
+        std::string method = argv[2];
+        if (method == "binomial") {
+            if (argc < 11) {
+                std::cerr << "american binomial <call|put> <S> <K> <r> <q> <sigma> <T> <steps> [--json]\n";
+                return 1;
+            }
+            quant::OptionType opt;
+            try {
+                opt = parse_option(argv[3]);
+            } catch (const std::exception& ex) {
+                std::cerr << ex.what() << "\n";
+                return 1;
+            }
+            quant::american::Params base{
+                .spot = std::atof(argv[4]),
+                .strike = std::atof(argv[5]),
+                .rate = std::atof(argv[6]),
+                .dividend = std::atof(argv[7]),
+                .vol = std::atof(argv[8]),
+                .time = std::atof(argv[9]),
+                .type = opt
+            };
+            int steps = std::max(1, std::atoi(argv[10]));
+            bool json = false;
+            for (int idx = 11; idx < argc; ++idx) {
+                std::string flag = argv[idx];
+                if (flag == "--json") {
+                    json = true;
+                } else {
+                    std::cerr << "Unknown flag " << flag << "\n";
+                    return 1;
+                }
+            }
+            double price = quant::american::price_binomial_crr(base, steps);
+            print_scalar(price, json);
+            return 0;
+        }
+        if (method == "psor") {
+            if (argc < 15) {
+                std::cerr << "american psor <call|put> <S> <K> <r> <q> <sigma> <T> <M> <N> <SmaxMult> [logspace:0|1] [neumann:0|1] [stretch] [omega] [max_iter] [tol] [--json]\n";
+                return 1;
+            }
+            quant::OptionType opt;
+            try {
+                opt = parse_option(argv[3]);
+            } catch (const std::exception& ex) {
+                std::cerr << ex.what() << "\n";
+                return 1;
+            }
+            quant::american::PsorParams params{
+                .base = {
+                    .spot = std::atof(argv[4]),
+                    .strike = std::atof(argv[5]),
+                    .rate = std::atof(argv[6]),
+                    .dividend = std::atof(argv[7]),
+                    .vol = std::atof(argv[8]),
+                    .time = std::atof(argv[9]),
+                    .type = opt
+                },
+                .grid = quant::pde::GridSpec{std::atoi(argv[10]), std::atoi(argv[11]), std::atof(argv[12])},
+                .log_space = true,
+                .upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann,
+                .stretch = 2.0,
+                .omega = 1.5,
+                .max_iterations = 8000,
+                .tolerance = 1e-8,
+                .use_rannacher = true
+            };
+            int idx = 13;
+            if (argc > idx) {
+                params.log_space = std::atoi(argv[idx]) != 0;
+                ++idx;
+            }
+            if (argc > idx) {
+                params.upper_boundary = (std::atoi(argv[idx]) != 0)
+                    ? quant::pde::PdeParams::UpperBoundary::Neumann
+                    : quant::pde::PdeParams::UpperBoundary::Dirichlet;
+                ++idx;
+            }
+            if (argc > idx) {
+                params.stretch = std::max(0.0, std::atof(argv[idx]));
+                ++idx;
+            }
+            if (argc > idx) {
+                params.omega = std::atof(argv[idx]);
+                ++idx;
+            }
+            if (argc > idx) {
+                params.max_iterations = std::max(100, std::atoi(argv[idx]));
+                ++idx;
+            }
+            if (argc > idx) {
+                params.tolerance = std::atof(argv[idx]);
+                ++idx;
+            }
+            bool json = false;
+            for (int flag_idx = idx; flag_idx < argc; ++flag_idx) {
+                std::string flag = argv[flag_idx];
+                if (flag == "--json") json = true;
+                else {
+                    std::cerr << "Unknown flag " << flag << "\n";
+                    return 1;
+                }
+            }
+            auto res = quant::american::price_psor(params);
+            print_psor(res, json);
+            return 0;
+        }
+        if (method == "lsmc") {
+            if (argc < 12) {
+                std::cerr << "american lsmc <call|put> <S> <K> <r> <q> <sigma> <T> <paths> <steps> <seed> [antithetic:0|1] [--json]\n";
+                return 1;
+            }
+            quant::OptionType opt;
+            try {
+                opt = parse_option(argv[3]);
+            } catch (const std::exception& ex) {
+                std::cerr << ex.what() << "\n";
+                return 1;
+            }
+            quant::american::LsmcParams params{
+                .base = {
+                    .spot = std::atof(argv[4]),
+                    .strike = std::atof(argv[5]),
+                    .rate = std::atof(argv[6]),
+                    .dividend = std::atof(argv[7]),
+                    .vol = std::atof(argv[8]),
+                    .time = std::atof(argv[9]),
+                    .type = opt
+                },
+                .num_paths = static_cast<std::uint64_t>(std::atoll(argv[10])),
+                .seed = static_cast<std::uint64_t>(std::atoll(argv[12])),
+                .num_steps = std::max(1, std::atoi(argv[11])),
+                .antithetic = false
+            };
+            int idx = 13;
+            if (argc > idx && !starts_with_dash(argv[idx])) {
+                params.antithetic = std::atoi(argv[idx]) != 0;
+                ++idx;
+            }
+            bool json = false;
+            for (int flag_idx = idx; flag_idx < argc; ++flag_idx) {
+                std::string flag = argv[flag_idx];
+                if (flag == "--json") json = true;
+                else {
+                    std::cerr << "Unknown flag " << flag << "\n";
+                    return 1;
+                }
+            }
+            auto res = quant::american::price_lsmc(params);
+            print_lsmc(res, json);
+            return 0;
+        }
+        std::cerr << "Unknown american method: " << method << "\n";
+        return 1;
     } else if (engine == "pde") {
         if (argc < 12) {
-            std::cerr << "pde <S> <K> <r> <q> <sigma> <T> <call|put> <M> <N> <SmaxMult> [logspace:0|1] [neumann:0|1] [stretch] [theta:0|1]\n";
+            std::cerr << "pde <S> <K> <r> <q> <sigma> <T> <call|put> <M> <N> <SmaxMult> [logspace:0|1] [neumann:0|1] [stretch] [theta:0|1] [rannacher:0|1] [--json]\n";
             return 1;
         }
         quant::pde::PdeParams pp{};
@@ -271,28 +568,60 @@ int main(int argc, char** argv) {
         int N = std::atoi(argv[10]);
         double smax = std::atof(argv[11]);
         pp.grid = quant::pde::GridSpec{M, N, smax};
-        if (argc > 12) {
-            pp.log_space = std::atoi(argv[12]) != 0;
+        int idx = 12;
+        if (argc > idx && !starts_with_dash(argv[idx])) {
+            pp.log_space = std::atoi(argv[idx]) != 0;
+            ++idx;
         }
-        if (argc > 13) {
-            pp.upper_boundary = (std::atoi(argv[13]) != 0) ? quant::pde::PdeParams::UpperBoundary::Neumann
-                                                          : quant::pde::PdeParams::UpperBoundary::Dirichlet;
+        if (argc > idx && !starts_with_dash(argv[idx])) {
+            pp.upper_boundary = (std::atoi(argv[idx]) != 0)
+                ? quant::pde::PdeParams::UpperBoundary::Neumann
+                : quant::pde::PdeParams::UpperBoundary::Dirichlet;
+            ++idx;
         }
-        if (argc > 14) {
-            pp.grid.stretch = std::max(0.0, std::atof(argv[14]));
+        if (argc > idx && !starts_with_dash(argv[idx])) {
+            pp.grid.stretch = std::max(0.0, std::atof(argv[idx]));
+            ++idx;
         }
-        if (argc > 15) {
-            pp.compute_theta = std::atoi(argv[15]) != 0;
+        if (argc > idx && !starts_with_dash(argv[idx])) {
+            pp.compute_theta = std::atoi(argv[idx]) != 0;
+            ++idx;
         } else {
             pp.compute_theta = true;
         }
+        if (argc > idx && !starts_with_dash(argv[idx])) {
+            pp.use_rannacher = std::atoi(argv[idx]) != 0;
+            ++idx;
+        }
+
+        bool json = false;
+        for (int flag_idx = idx; flag_idx < argc; ++flag_idx) {
+            std::string flag = argv[flag_idx];
+            if (flag == "--json") json = true;
+            else {
+                std::cerr << "Unknown flag " << flag << "\n";
+                return 1;
+            }
+        }
 
         quant::pde::PdeResult res = quant::pde::price_crank_nicolson(pp);
-        std::cout << res.price << " (delta=" << res.delta << ", gamma=" << res.gamma;
-        if (res.theta.has_value()) {
-            std::cout << ", theta=" << *res.theta;
+        if (json) {
+            std::cout << "{\"price\":" << res.price
+                      << ",\"delta\":" << res.delta
+                      << ",\"gamma\":" << res.gamma;
+            if (res.theta.has_value()) {
+                std::cout << ",\"theta\":" << *res.theta;
+            } else {
+                std::cout << ",\"theta\":null";
+            }
+            std::cout << "}\n";
+        } else {
+            std::cout << res.price << " (delta=" << res.delta << ", gamma=" << res.gamma;
+            if (res.theta.has_value()) {
+                std::cout << ", theta=" << *res.theta;
+            }
+            std::cout << ")\n";
         }
-        std::cout << ")\n";
         return 0;
     }
     std::cerr << "Unknown engine: " << engine << "\n";

@@ -87,4 +87,53 @@ TEST(PDE, GreeksCloseToBS) {
     ASSERT_TRUE(res.theta.has_value());
 }
 
+TEST(PDE, BoundaryConditionsMatchAnalytics) {
+    pde::PdeParams base{
+        .spot = 110.0,
+        .strike = 100.0,
+        .rate = 0.04,
+        .dividend = 0.01,
+        .vol = 0.22,
+        .time = 0.75,
+        .type = pde::OptionType::Call,
+        .grid = pde::GridSpec{241, 240, 5.0, 1.5},
+        .log_space = true,
+        .upper_boundary = pde::PdeParams::UpperBoundary::Dirichlet,
+        .compute_theta = false,
+        .use_rannacher = true
+    };
+    double analytic = bs::call_price(base.spot, base.strike, base.rate, base.dividend, base.vol, base.time);
 
+    auto dirichlet = pde::price_crank_nicolson(base);
+    base.upper_boundary = pde::PdeParams::UpperBoundary::Neumann;
+    auto neumann = pde::price_crank_nicolson(base);
+
+    EXPECT_NEAR(dirichlet.price, analytic, 5e-3);
+    EXPECT_NEAR(neumann.price, analytic, 5e-3);
+}
+
+TEST(PDE, RannacherImprovesAccuracy) {
+    pde::PdeParams base{
+        .spot = 100.0,
+        .strike = 100.0,
+        .rate = 0.01,
+        .dividend = 0.00,
+        .vol = 0.18,
+        .time = 1.0,
+        .type = pde::OptionType::Put,
+        .grid = pde::GridSpec{51, 10, 4.0, 0.0},
+        .log_space = false,
+        .upper_boundary = pde::PdeParams::UpperBoundary::Dirichlet,
+        .compute_theta = false,
+        .use_rannacher = false
+    };
+
+    double analytic = bs::put_price(base.spot, base.strike, base.rate, base.dividend, base.vol, base.time);
+    auto no_rannacher = pde::price_crank_nicolson(base);
+    base.use_rannacher = true;
+    auto with_rannacher = pde::price_crank_nicolson(base);
+
+    double err_no = std::abs(no_rannacher.price - analytic);
+    double err_yes = std::abs(with_rannacher.price - analytic);
+    EXPECT_LT(err_yes, err_no);
+}

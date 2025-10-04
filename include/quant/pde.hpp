@@ -41,6 +41,8 @@ struct PdeParams {
     UpperBoundary upper_boundary{UpperBoundary::Dirichlet};
     /// Request backward-difference Theta in addition to price/Delta/Gamma
     bool compute_theta{false};
+    /// Apply two-step Rannacher start-up when true
+    bool use_rannacher{true};
 };
 
 struct PdeResult {
@@ -55,4 +57,3 @@ struct PdeResult {
 PdeResult price_crank_nicolson(const PdeParams& p);
 
 } // namespace quant::pde
-

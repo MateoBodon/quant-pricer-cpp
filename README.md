@@ -181,6 +181,28 @@ For the Neumann choice in log-space we explicitly discretise `∂V/∂S(S_max, t
 
 which is exactly what the solver enforces by setting the final row of the linear system to `[-1, 1]` with the right-hand side `Δx · S_max · e^{-q (T-t)}`.
 
+### American Options
+
+Early-exercise contracts are handled by three complementary engines:
+
+```cpp
+quant::american::Params put{
+    .spot = 95.0, .strike = 100.0, .rate = 0.03, .dividend = 0.01,
+    .vol = 0.20, .time = 1.0, .type = quant::OptionType::Put
+};
+
+double tree_price = quant::american::price_binomial_crr(put, 512);         // CRR binomial
+auto psor = quant::american::price_psor({put, {201, 200, 4.0, 2.0}});      // PSOR with stretching
+auto lsmc = quant::american::price_lsmc({put, 400'000, 20250217ULL, 64});  // Longstaff–Schwartz
+```
+
+**Why three methods?**
+- **Binomial CRR**: Reliable benchmark for coarse grids and regression targets.
+- **PSOR**: Finite-difference solve with contact enforcement and ω over-relaxation (benchmarked in `bench_pde`).
+- **LSMC**: Regression Monte Carlo with orthogonal polynomial basis (scaled at-the-money) and streaming SEs.
+
+The `american` CLI engine exposes all three solvers, honours `--json` output, and supports thread overrides shared with the MC engine.
+
 ---
 
 ## Variance Reduction & Greeks
@@ -321,26 +343,22 @@ cmake --build build -j
 ### Monte Carlo Pricing
 ```bash
 # Standard Monte Carlo (1M paths, antithetic + control variate)
-./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 none none 1
-# Output: 10.4506 (se~1.0e-4)
+./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 none none 1 --json
+# Output: {"price": 10.4506, "std_error": 1.0e-4, ...}
 
-# Sobol QMC with Brownian bridge (64 time steps)
-./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 sobol bb 64
-# Output: 10.4506 (se~4.5e-5)
+# Sobol QMC with Brownian bridge (64 time steps, explicit flags)
+./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 none none 1   --sampler=sobol_scrambled --bridge=bb --steps=64 --threads=4
 ```
 
-`qmc_mode` accepts `none`, `sobol`, or `sobol_scrambled`; `bridge_mode` accepts `none` or `bb` (Brownian bridge). The final `num_steps` argument controls how many time slices are simulated (defaults to 1 for direct terminal sampling).
-
-For the PDE command the optional arguments are `[logspace] [neumann] [stretch] [theta]`. Set `stretch>0` to concentrate nodes around the strike via a tanh mapping, and pass `theta=1` to request the backward-difference Θ alongside price/Δ/Γ.
+`--sampler` accepts `prng`, `sobol`, or `sobol_scrambled`; `--bridge` accepts `none` or `bb`. `--steps` controls the number of time slices (defaults to 1 for terminal sampling) and `--threads` overrides OpenMP thread counts when available. Append `--json` on any engine to receive structured output.
 
 ### Barrier Options
 ```bash
 # Reiner–Rubinstein analytic price (down-and-out call)
 ./build/quant_cli barrier bs call down out 100 95 90 0 0.02 0.00 0.2 1.0
 
-# Sobol MC with Brownian bridge correction (64 steps)
-./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 none bb 32
-# -> price (se=..., 95% CI=[..., ...])
+# Sobol MC with Brownian bridge correction (64 steps + JSON)
+./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 none bb 32   --sampler=sobol --bridge=bb --steps=64 --json
 
 # Crank–Nicolson PDE with absorbing boundary at S=B
 ./build/quant_cli barrier pde call down out 100 95 90 0 0.02 0.00 0.2 1.0 201 200 4.0
@@ -348,9 +366,17 @@ For the PDE command the optional arguments are `[logspace] [neumann] [stretch] [
 
 ### PDE Pricing
 ```bash
-# Crank–Nicolson with log-space grid and Neumann boundary
-./build/quant_cli pde 100 100 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1 2.5 1
-# Output: 10.4506 (delta=0.6368, gamma=0.0188, theta=-6.41)
+# Crank–Nicolson with log-space grid, Neumann boundary, and Rannacher damping
+./build/quant_cli pde 100 100 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1 2.5 1 1 --json
+```
+
+### American Options
+```bash
+# PSOR benchmark (log-space, Neumann boundary)
+./build/quant_cli american psor put 95 100 0.03 0.01 0.2 1.0 201 200 4.0 1 1 2.0 1.5 8000 1e-7 --json
+
+# Longstaff–Schwartz Monte Carlo (antithetic off for basis stability)
+./build/quant_cli american lsmc put 95 100 0.03 0.01 0.2 1.0 200000 64 2025 0 --json
 ```
 
 ### Parameter Exploration
@@ -688,7 +714,6 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 ## Limitations
 
 ### Current Constraints
-- **European Options Only**: No American or exotic option support
 - **Single Asset**: No multi-asset or basket options
 - **Constant Parameters**: No time-dependent volatility or rates
 - **No Dividends**: Continuous dividend yield only (no discrete dividends)
@@ -708,8 +733,7 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 ## Roadmap
 
 ### Near Term (v0.2)
-- [ ] **American Options**: Early exercise boundary detection
-- [ ] **Barrier Options**: Monte Carlo and PDE implementations
+- [ ] **Barrier Options**: Higher-order schemes in PDE / bridge variance analysis
 - [ ] **Multi-Asset**: Basket and spread options
 - [ ] **Time-Dependent Parameters**: Volatility surfaces and yield curves
 

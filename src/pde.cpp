@@ -300,19 +300,37 @@ PdeResult price_crank_nicolson(const PdeParams& p) {
     const int M = p.grid.num_space;
     const int N = p.grid.num_time;
     const double dt = p.time / static_cast<double>(N);
-    const int rannacher_steps = std::min(2, N);
 
     std::vector<double> V_prev_for_theta;
     bool capture_theta = p.compute_theta && N > 0;
 
-    for (int step = 0; step < N; ++step) {
-        const double theta = (step < rannacher_steps) ? 1.0 : 0.5;
-        const double tau_next = p.time - static_cast<double>(step + 1) * dt;
+    int start_step = 0;
+    double time_elapsed = 0.0;
+
+    if (p.use_rannacher && N > 0) {
+        double dt_half = dt / 2.0;
+        int half_iters = std::min(2, std::max(0, N) * 2);
+        for (int k = 0; k < half_iters; ++k) {
+            double tau_next = p.time - (time_elapsed + dt_half);
+            build_system(p, grid, V, dt_half, 1.0, tau_next, op);
+            V = solve_tridiagonal(op.lower, op.diag, op.upper, op.rhs);
+            time_elapsed += dt_half;
+        }
+        start_step = std::min(N, 1);
+    }
+
+    if (capture_theta && start_step == N) {
+        V_prev_for_theta = V;
+    }
+
+    for (int step = start_step; step < N; ++step) {
+        const double tau_next = p.time - (time_elapsed + dt);
         if (capture_theta && step == N - 1) {
             V_prev_for_theta = V;
         }
-        build_system(p, grid, V, dt, theta, tau_next, op);
+        build_system(p, grid, V, dt, 0.5, tau_next, op);
         V = solve_tridiagonal(op.lower, op.diag, op.upper, op.rhs);
+        time_elapsed += dt;
     }
 
     InterpResult interp = interpolate_greeks(grid.S, V, p.spot);

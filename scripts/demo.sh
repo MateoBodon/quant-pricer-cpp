@@ -60,9 +60,13 @@ import sys
 
 try:
     import matplotlib.pyplot as plt
+    import matplotlib.image as mpimg
+    from matplotlib.backends.backend_pdf import PdfPages
 except ImportError:  # pragma: no cover - dependency bootstrap
     subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet", "matplotlib"])
     import matplotlib.pyplot as plt
+    import matplotlib.image as mpimg
+    from matplotlib.backends.backend_pdf import PdfPages
 
 root = pathlib.Path(os.environ["ROOT"])
 cli = pathlib.Path(os.environ["CLI"])
@@ -76,6 +80,10 @@ git_sha = os.environ["GIT_SHA"]
 def run_cli(args):
     result = subprocess.check_output([str(cli), *map(str, args)], text=True)
     return result.strip()
+
+def run_cli_json(args):
+    output = run_cli([*args, "--json"])
+    return json.loads(output)
 
 MC_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(se=([0-9eE+\-.]+), 95% CI=\[([0-9eE+\-.]+), ([0-9eE+\-.]+)\]\)$")
 PDE_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(delta=([0-9eE+\-.]+), gamma=([0-9eE+\-.]+)(?:, theta=([0-9eE+\-.]+))?\)$")
@@ -555,6 +563,122 @@ plt.tight_layout()
 plt.savefig(artifact_dir / "pde_convergence.png", dpi=200)
 plt.close()
 
+american_params = {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend": 0.02,
+    "vol": 0.25,
+    "tenor": 1.0,
+    "type": "put",
+}
+
+psor_reference = run_cli_json([
+    "american", "psor", american_params["type"],
+    american_params["spot"], american_params["strike"], american_params["rate"],
+    american_params["dividend"], american_params["vol"], american_params["tenor"],
+    241, 240, 5.0, 1, 1, 2.5, 1.5, 9000, 1e-8,
+])
+psor_ref_price = psor_reference["price"]
+psor_ref_iterations = psor_reference["iterations"]
+psor_ref_residual = psor_reference["max_residual"]
+
+binomial_steps = [32, 64, 128, 256, 512]
+binomial_rows = []
+for steps in binomial_steps:
+    result = run_cli_json([
+        "american", "binomial", american_params["type"],
+        american_params["spot"], american_params["strike"], american_params["rate"],
+        american_params["dividend"], american_params["vol"], american_params["tenor"],
+        steps,
+    ])
+    price = result["price"]
+    error = abs(price - psor_ref_price)
+    binomial_rows.append({"steps": steps, "price": price, "abs_err": error})
+
+psor_configs = [
+    (121, 120, 1.8),
+    (181, 180, 2.0),
+    (241, 240, 2.5),
+]
+psor_rows = []
+for M_nodes, N_steps, stretch in psor_configs:
+    result = run_cli_json([
+        "american", "psor", american_params["type"],
+        american_params["spot"], american_params["strike"], american_params["rate"],
+        american_params["dividend"], american_params["vol"], american_params["tenor"],
+        M_nodes, N_steps, 5.0, 1, 1, stretch, 1.5, 9000, 1e-8,
+    ])
+    price = result["price"]
+    error = abs(price - psor_ref_price)
+    psor_rows.append({
+        "M": M_nodes,
+        "N": N_steps,
+        "stretch": stretch,
+        "price": price,
+        "abs_err": error,
+        "iterations": result["iterations"],
+        "residual": result["max_residual"],
+    })
+
+lsmc_result = run_cli_json([
+    "american", "lsmc", american_params["type"],
+    american_params["spot"], american_params["strike"], american_params["rate"],
+    american_params["dividend"], american_params["vol"], american_params["tenor"],
+    200000, 50, 20250217, 0,
+])
+lsmc_price = lsmc_result["price"]
+lsmc_std_error = lsmc_result["std_error"]
+
+with open(artifact_dir / "american_validation.csv", "w", newline="") as fh:
+    writer = csv.DictWriter(fh, fieldnames=[
+        "method", "resolution", "price", "abs_error", "extra"
+    ])
+    writer.writeheader()
+    writer.writerow({
+        "method": "psor_reference",
+        "resolution": "241x240",
+        "price": f"{psor_ref_price:.6f}",
+        "abs_error": "0.000000",
+        "extra": f"iterations={psor_ref_iterations}, residual={psor_ref_residual:.2e}",
+    })
+    for row in psor_rows:
+        writer.writerow({
+            "method": "psor",
+            "resolution": f"{row['M']}x{row['N']}",
+            "price": f"{row['price']:.6f}",
+            "abs_error": f"{row['abs_err']:.6f}",
+            "extra": f"iterations={row['iterations']}, residual={row['residual']:.2e}",
+        })
+    for row in binomial_rows:
+        writer.writerow({
+            "method": "binomial",
+            "resolution": row["steps"],
+            "price": f"{row['price']:.6f}",
+            "abs_error": f"{row['abs_err']:.6f}",
+            "extra": "",
+        })
+    writer.writerow({
+        "method": "lsmc",
+        "resolution": 200000,
+        "price": f"{lsmc_price:.6f}",
+        "abs_error": f"{abs(lsmc_price - psor_ref_price):.6f}",
+        "extra": f"std_error={lsmc_std_error:.6f}",
+    })
+
+plt.figure(figsize=(6.0, 4.0))
+plt.loglog([row["steps"] for row in binomial_rows], [row["abs_err"] for row in binomial_rows], marker="o", label="Binomial |error|")
+plt.loglog([row["M"] for row in psor_rows], [row["abs_err"] for row in psor_rows], marker="s", label="PSOR |error|")
+plt.axhline(lsmc_std_error, color="tab:green", linestyle="--", label="LSMC SE")
+plt.xlabel("Resolution (steps or spatial nodes)")
+plt.ylabel("|Price - PSOR_ref|")
+plt.title("American put convergence")
+plt.grid(True, which="both", linestyle="--", alpha=0.4)
+plt.legend()
+plt.tight_layout()
+plt.savefig(artifact_dir / "american_convergence.png", dpi=200)
+plt.close()
+
 barrier_cases = [
     {
         "name": "down_out_call",
@@ -696,6 +820,23 @@ plt.tight_layout()
 plt.savefig(artifact_dir / "barrier_validation.png", dpi=200)
 plt.close()
 
+pdf_path = artifact_dir / "onepager.pdf"
+with PdfPages(pdf_path) as pdf:
+    fig, axes = plt.subplots(2, 2, figsize=(11.0, 8.5))
+    plots = [
+        (artifact_dir / "qmc_vs_prng.png", "MC RMSE (PRNG vs Sobol)"),
+        (artifact_dir / "pde_convergence.png", "PDE convergence"),
+        (artifact_dir / "american_convergence.png", "American convergence"),
+        (artifact_dir / "barrier_validation.png", "Barrier validation"),
+    ]
+    for ax, (img_path, title) in zip(axes.flatten(), plots):
+        img = mpimg.imread(img_path)
+        ax.imshow(img)
+        ax.set_title(title)
+        ax.axis("off")
+    pdf.savefig(fig)
+    plt.close(fig)
+
 # Manifest JSON
 try:
     cli_rel = str(cli.relative_to(root))
@@ -757,6 +898,17 @@ manifest = {
         "nodes": [row["M"] for row in pde_conv_rows],
         "price_error": [round(v, 6) for v in price_errors],
         "slope": round(slope, 2),
+    },
+    "american": {
+        "reference_price": round(psor_ref_price, 6),
+        "reference_iterations": psor_ref_iterations,
+        "reference_residual": psor_ref_residual,
+        "binomial_steps": [row["steps"] for row in binomial_rows],
+        "binomial_abs_error": [round(row["abs_err"], 6) for row in binomial_rows],
+        "psor_nodes": [row["M"] for row in psor_rows],
+        "psor_abs_error": [round(row["abs_err"], 6) for row in psor_rows],
+        "lsmc_price": round(lsmc_price, 6),
+        "lsmc_std_error": round(lsmc_std_error, 6),
     },
     "barrier_validation": {
         "cases": barrier_labels,

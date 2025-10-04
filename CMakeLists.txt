@@ -93,6 +93,7 @@ add_library(quant_pricer
   src/bs_barrier_rr.cpp
   src/mc_barrier.cpp
   src/pde_barrier.cpp
+  src/american.cpp
   src/qmc/sobol.cpp
   src/qmc/brownian_bridge.cpp
 )
@@ -118,7 +119,7 @@ target_link_libraries(quant_cli PRIVATE quant_pricer)
 
 # Tests
 enable_testing()
-add_executable(unit_tests tests/test_sanity.cpp tests/test_black_scholes.cpp tests/test_mc.cpp tests/test_pde.cpp tests/test_barrier.cpp)
+add_executable(unit_tests tests/test_sanity.cpp tests/test_black_scholes.cpp tests/test_mc.cpp tests/test_pde.cpp tests/test_barrier.cpp tests/test_american.cpp)
 target_link_libraries(unit_tests PRIVATE quant_pricer GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests(unit_tests)
@@ -130,9 +131,12 @@ target_link_libraries(micro_bench PRIVATE quant_pricer benchmark::benchmark)
 add_executable(bench_mc benchmarks/bench_mc.cpp)
 target_link_libraries(bench_mc PRIVATE quant_pricer benchmark::benchmark)
 
+add_executable(bench_pde benchmarks/bench_pde.cpp)
+target_link_libraries(bench_pde PRIVATE quant_pricer benchmark::benchmark)
+
 # Apply sanitizer flags to targets if requested
 if(SANITIZER_COMPILE_FLAGS OR SANITIZER_LINK_FLAGS)
-  foreach(tgt IN ITEMS quant_pricer quant_cli unit_tests micro_bench bench_mc)
+  foreach(tgt IN ITEMS quant_pricer quant_cli unit_tests micro_bench bench_mc bench_pde)
     if(TARGET ${tgt})
       if(SANITIZER_COMPILE_FLAGS)
         target_compile_options(${tgt} PRIVATE ${SANITIZER_COMPILE_FLAGS})
