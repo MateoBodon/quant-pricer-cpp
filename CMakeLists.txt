@@ -152,7 +152,7 @@ endif()
 set(QUANT_PRICER_HAS_OPENMP ${HAS_OPENMP})
 
 install(TARGETS quant_pricer quant_cli
-  EXPORT quant_pricerTargets
+  EXPORT quant-pricer-targets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -168,7 +168,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/external/pcg/include)
           PATTERN ".DS_Store" EXCLUDE)
 endif()
 
-install(EXPORT quant_pricerTargets
+install(EXPORT quant-pricer-targets
   FILE quant-pricer-targets.cmake
   NAMESPACE quant_pricer::
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quant-pricer
