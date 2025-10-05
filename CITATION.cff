@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+title: "quant-pricer-cpp"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Bodon
+    given-names: Mateo
+repository-code: "https://github.com/MateoBodon/quant-pricer-cpp"
+license: MIT
+version: 0.2.0
+date-released: 2025-10-05
+keywords:
+  - Monte Carlo
+  - Quasi-Monte Carlo
+  - Sobol
+  - Brownian bridge
+  - PDE
+  - Crank–Nicolson
+  - American options
+identifiers:
+  - type: url
+    value: "https://mateobodon.github.io/quant-pricer-cpp/"
+
