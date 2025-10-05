@@ -36,6 +36,7 @@
 - **Monte Carlo Engine**: High-performance GBM simulation with PCG64 RNG and OpenMP parallelization
 - **PDE Solver**: Crank–Nicolson with Rannacher start-up, optional tanh-stretched grids around the strike, and direct Δ/Γ/Θ extraction
 - **Barrier Options**: Continuous single-barrier (up/down, in/out) pricing via Reiner–Rubinstein closed-form, Brownian-bridge Monte Carlo, and absorbing-boundary PDE
+- **American Options**: PSOR (finite-difference LCP) and Longstaff–Schwartz Monte Carlo with polynomial basis; see `artifacts/american_convergence.png` for agreement and grid/path convergence.
 
 ### ⚡ **Advanced Monte Carlo**
 - **Variance Reduction**: Antithetic variates and control variates for improved convergence
@@ -570,6 +571,15 @@ Barrier validation is captured via `artifacts/barrier_validation.csv` and `artif
 ### Reproducible Demo Artifacts
 
 Run `./scripts/demo.sh` to produce a Release build, execute representative Black–Scholes, Monte Carlo, and PDE validations, and emit CSVs plus `artifacts/manifest.json` recording the git SHA, compiler metadata, and RNG settings. The script also generates `artifacts/qmc_vs_prng.csv` and `artifacts/qmc_vs_prng.png`, comparing RMSE for PRNG vs Sobol+Brownian-bridge paths over 64 time steps. CI publishes the resulting `artifacts/` directory on every successful run via the `demo-artifacts` workflow job.
+
+### Artifact index
+File | What it shows
+---|---
+`qmc_vs_prng.png` | RMSE vs wall‑time, **Sobol+BB** ≈ 2–3× lower error than PRNG (ATM, 64 steps).
+`pde_convergence.png` | CN + **Rannacher** ~2nd‑order slope on log–log error; Δ/Γ truncation behavior.
+`barrier_validation.png` | MC (≤3σ) and PDE (≤1e‑4) vs **Reiner–Rubinstein** closed forms.
+`american_convergence.png` | **PSOR** vs **LSMC** agreement and convergence on a standard grid.
+`onepager.pdf` | One‑page summary with the four plots and validation tables.
 
 ---
 
