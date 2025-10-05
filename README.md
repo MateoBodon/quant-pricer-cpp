@@ -589,7 +589,7 @@ File | What it shows
 
 **Monte Carlo (1M paths, Release build):**
 ```bash
-./build/bench_mc --benchmark_min_time=0.01s
+./build/bench_mc --benchmark_min_time=0.2s
 # BM_MC_1e6: ~0.10-0.12s (Debug)
 # BM_MC_1e6: ~0.05-0.08s (Release)
 ```
