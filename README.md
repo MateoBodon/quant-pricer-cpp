@@ -566,7 +566,7 @@ Run `./scripts/demo.sh` to produce a Release build, execute representative Black
 
 **Monte Carlo (1M paths, Release build):**
 ```bash
-./build/bench_mc --benchmark_min_time=0.01
+./build/bench_mc --benchmark_min_time=0.01s
 # BM_MC_1e6: ~0.10-0.12s (Debug)
 # BM_MC_1e6: ~0.05-0.08s (Release)
 ```
