@@ -719,7 +719,7 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 - **No Dividends**: Continuous dividend yield only (no discrete dividends)
 
 ### Known Limitations
-- **PDE Greeks**: Not implemented (finite-difference approximation required)
+- **PDE Greeks**: Implemented for CN grids (Δ, Γ via three‑point central differences around \(S_0\); optional Θ via one‑step backward differencing). Accuracy depends on grid resolution and payoff smoothness; prefer MC Greeks near discontinuities (digitals/barriers) or when variance‑reduction is available.
 - **Memory Usage**: Large Monte Carlo simulations may require significant RAM
 - **Convergence**: QMC benefits diminish with very high dimensions
 
