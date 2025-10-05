@@ -39,7 +39,7 @@
 
 ### ⚡ **Advanced Monte Carlo**
 - **Variance Reduction**: Antithetic variates and control variates for improved convergence
-- **Quasi-Monte Carlo**: Van der Corput low-discrepancy sequences with Acklam inverse-normal transform
+- **Quasi-Monte Carlo**: **Sobol** (optional Owen/digital shift) **+ Brownian bridge** path construction; antithetic and control variates. *Legacy:* an earlier version used a Van der Corput scalar sequence with inverse-normal transform for single-step paths.
 - **MC Greeks**: Pathwise estimators (Delta, Vega) and Likelihood Ratio Method (Gamma)
 - **Streaming Architecture**: Cache-friendly memory access patterns for optimal performance
 
