@@ -329,6 +329,19 @@ cmake --build build -j
 
 ## CLI Usage
 
+**Modern flags (recommended)**
+```bash
+# Monte Carlo (Sobol + Brownian bridge), 64 steps, 8 threads, JSON output
+./build/quant_cli mc \
+  --S=100 --K=100 --r=0.03 --q=0.01 --sigma=0.20 --T=1 \
+  --paths=1000000 --seed=42 \
+  --sampler=sobol --bridge=bb --steps=64 --threads=8 \
+  --json
+```
+
+**Legacy positional (backward compatible)**
+`./build/quant_cli mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc:0|1>`
+
 ### Black–Scholes Pricing
 ```bash
 # European call option
