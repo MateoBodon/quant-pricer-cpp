@@ -1,6 +1,6 @@
 # quant-pricer-cpp
 
-**Modern C++20 option-pricing library with Black–Scholes analytics, Monte Carlo (variance reduction, pathwise/LR Greeks, QMC), and PDE (Crank–Nicolson)—with tests, benchmarks, clang-tidy, sanitizers, and CI.**
+**Modern C++20 option-pricing library with Black–Scholes analytics, Monte Carlo (variance reduction, pathwise/LR Greeks, QMC), and PDE (Crank–Nicolson)—with tests, benchmarks, clang-tidy, sanitizers, and CI.** [API Docs](https://mateobodon.github.io/quant-pricer-cpp/)
 
 [![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
