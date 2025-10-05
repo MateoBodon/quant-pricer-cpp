@@ -100,6 +100,8 @@ add_library(quant_pricer
 
 add_library(quant_pricer::quant_pricer ALIAS quant_pricer)
 
+target_compile_features(quant_pricer PUBLIC cxx_std_20)
+
 target_include_directories(quant_pricer
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
