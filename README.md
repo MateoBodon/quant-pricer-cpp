@@ -39,6 +39,9 @@
 - **PDE Solver**: Crank–Nicolson with Rannacher start-up, optional tanh-stretched grids around the strike, and direct Δ/Γ/Θ extraction
 - **Barrier Options**: Continuous single-barrier (up/down, in/out) pricing via Reiner–Rubinstein closed-form, Brownian-bridge Monte Carlo, and absorbing-boundary PDE
 - **American Options**: PSOR (finite-difference LCP) and Longstaff–Schwartz Monte Carlo with polynomial basis; see `artifacts/american_convergence.png` for agreement and grid/path convergence.
+- **Exotics**: Arithmetic Asian MC with geometric CV, lookback MC (fixed/floating), digitals (analytic and MC hooks)
+- **Heston**: Analytic European call via characteristic-function Gauss–Laguerre; Andersen QE MC with antithetic
+- **Risk**: VaR/CVaR via MC and historical backtesting with Kupiec test
 
 ### ⚡ **Advanced Monte Carlo**
 - **Variance Reduction**: Antithetic variates and control variates for improved convergence
@@ -57,6 +60,7 @@
 - **CMake Build System**: Cross-platform support with optional dependencies
 - **CI/CD Pipeline**: Multi-compiler, multi-OS testing with sanitizers and static analysis
 - **Documentation**: Doxygen-generated API docs with mathematical formulations
+- **Python Bindings**: Optional `pyquant_pricer` module (pybind11), wheels via cibuildwheel
 
 ---
 
@@ -381,6 +385,48 @@ cmake --build build -j
 ```
 
 ### PDE Pricing
+### Exotics
+```bash
+# Asian arithmetic (geometric CV on by default)
+./build/quant_cli asian arith fixed 100 100 0.03 0.00 0.2 1.0 200000 64 42 --json
+
+# Lookback (fixed strike call)
+./build/quant_cli lookback fixed call 100 100 0.03 0.00 0.2 1.0 120000 64 4242 --json
+
+# Digital (cash-or-nothing call)
+./build/quant_cli digital cash call 100 100 0.03 0.00 0.2 1.0 --json
+```
+
+### Heston
+```bash
+# Analytic Heston via CF + Gauss–Laguerre
+./build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04  100 100 0.01 0.00 1.0  0 1 0 --analytic --json
+
+# QE MC (100k paths, 64 steps)
+./build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04  100 100 0.01 0.00 1.0  100000 64 2025 --mc --json
+```
+
+### Risk
+```bash
+# GBM VaR/CVaR for a long 1x position over 1 day
+./build/quant_cli risk gbm 100 0.0 0.2 0.004 1.0 200000 4242 0.99 --json
+```
+
+### Reports & Calibration
+```bash
+# Fetch and calibrate for a single date
+python3 scripts/data/wrds_fetch_options.py --date 2023-06-01 --underlying SPX --out data/options_2023-06-01.csv
+python3 scripts/calibrate_heston.py --csv data/options_2023-06-01.csv --out artifacts/heston_calib_20230601.json
+
+# Build report (error heatmap, IV surface, VaR backtest, param series)
+python3 scripts/report.py \
+  --options_csv data/options_2023-06-01.csv \
+  --calib_json artifacts/heston_calib_20230601.json \
+  --returns_csv data/spy_returns.csv \
+  --series_csv artifacts/heston_series.csv \
+  --artifacts_dir artifacts
+```
+
 ```bash
 # Crank–Nicolson with log-space grid, Neumann boundary, and Rannacher damping
 ./build/quant_cli pde 100 100 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1 2.5 1 1 --json
@@ -657,18 +703,7 @@ TEST(PDE, BoundaryConditions) { /* Dirichlet vs Neumann */ }
 - **Sanitizers**: AddressSanitizer, UBSanitizer
 - **Static Analysis**: clang-tidy
 
-**Quality Gates:**
-```yaml
-# .github/workflows/ci.yml
-- name: Configure with Sanitizers
-  run: cmake -DQUANT_ENABLE_SANITIZERS=ON
-  
-- name: Run tests
-  run: ctest --test-dir build --output-on-failure
-  
-- name: Coverage
-  run: lcov --capture --output-file coverage.info
-```
+Wheels for Python bindings are built on tag pushes via cibuildwheel (Linux/macOS/Windows).
 
 **Code Quality:**
 - **Formatting**: clang-format with LLVM style
