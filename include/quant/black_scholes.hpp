@@ -100,6 +100,11 @@ double theta_put(double S, double K, double r, double q, double sigma, double T)
 double rho_call(double S, double K, double r, double q, double sigma, double T);
 double rho_put(double S, double K, double r, double q, double sigma, double T);
 
+/// Implied volatility from price using a robust bracketed solver.
+/// Returns NaN if no solution is found within [1e-6, 5.0].
+double implied_vol_call(double S, double K, double r, double q, double T, double price);
+double implied_vol_put(double S, double K, double r, double q, double T, double price);
+
 } // namespace quant::bs
 
 

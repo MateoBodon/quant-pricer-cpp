@@ -79,4 +79,14 @@ TEST(BlackScholesGreeks, SignsAndKnown) {
     EXPECT_NEAR(vega(S, K, r, q, sigma, T), (c_upV - c0) / epsV, 2e-3);
 }
 
+TEST(BlackScholes, ImpliedVolCallPut) {
+    double S = 100.0, K = 100.0, r = 0.01, q = 0.0, T = 1.0, sigma = 0.2;
+    double pc = call_price(S, K, r, q, sigma, T);
+    double pp = put_price(S, K, r, q, sigma, T);
+    double ivc = implied_vol_call(S, K, r, q, T, pc);
+    double ivp = implied_vol_put(S, K, r, q, T, pp);
+    EXPECT_NEAR(ivc, sigma, 1e-6);
+    EXPECT_NEAR(ivp, sigma, 1e-6);
+}
+
 

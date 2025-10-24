@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
     if (argc <= 1) {
         std::cout << "quant-pricer-cpp " << quant::version_string() << "\n";
         std::cout << "Usage: quant_cli <engine> [params]\n";
-        std::cout << "Engines: bs, mc, barrier, pde, american, digital, asian, heston, risk\n";
+        std::cout << "Engines: bs, iv, mc, barrier, pde, american, digital, asian, heston, risk\n";
         return 0;
     }
     std::string engine = argv[1];
@@ -156,6 +156,24 @@ int main(int argc, char** argv) {
             double price = quant::bs::put_price(S, K, r, q, sig, T);
             print_scalar(price, json);
         }
+        return 0;
+    } else if (engine == "iv") {
+        if (argc < 9) {
+            std::cerr << "iv <call|put> <S> <K> <r> <q> <T> <price> [--json]\n";
+            return 1;
+        }
+        std::string type = argv[2];
+        double S = std::atof(argv[3]);
+        double K = std::atof(argv[4]);
+        double r = std::atof(argv[5]);
+        double q = std::atof(argv[6]);
+        double T = std::atof(argv[7]);
+        double price = std::atof(argv[8]);
+        bool json = false;
+        for (int idx = 9; idx < argc; ++idx) { std::string flag = argv[idx]; if (flag == "--json") json = true; else { std::cerr << "Unknown flag " << flag << "\n"; return 1; } }
+        double iv = (type == "call") ? quant::bs::implied_vol_call(S,K,r,q,T,price)
+                                      : quant::bs::implied_vol_put(S,K,r,q,T,price);
+        if (json) std::cout << "{\"iv\":" << iv << "}\n"; else std::cout << iv << "\n";
         return 0;
     } else if (engine == "mc") {
         if (argc < 12) {
