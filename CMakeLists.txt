@@ -50,6 +50,7 @@ endif()
 option(QUANT_ENABLE_OPENMP "Enable OpenMP parallelization" ON)
 option(QUANT_ENABLE_SANITIZERS "Enable Address/UB Sanitizers in supported compilers" OFF)
 option(QUANT_ENABLE_CLANG_TIDY "Enable clang-tidy static analysis (if available)" OFF)
+option(QUANT_ENABLE_PYBIND "Build Python bindings" OFF)
 
 # OpenMP
 set(HAS_OPENMP OFF)
@@ -162,6 +163,10 @@ if(SANITIZER_COMPILE_FLAGS OR SANITIZER_LINK_FLAGS)
       endif()
     endif()
 endforeach()
+endif()
+
+if(QUANT_ENABLE_PYBIND)
+  add_subdirectory(python)
 endif()
 
 # Install/export package metadata
