@@ -100,6 +100,7 @@ add_library(quant_pricer
   src/asian.cpp
   src/lookback.cpp
   src/heston.cpp
+  src/risk.cpp
 )
 
 add_library(quant_pricer::quant_pricer ALIAS quant_pricer)

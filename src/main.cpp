@@ -17,6 +17,7 @@
 #include "quant/asian.hpp"
 #include "quant/lookback.hpp"
 #include "quant/heston.hpp"
+#include "quant/risk.hpp"
 
 #ifdef QUANT_HAS_OPENMP
 #include <omp.h>
@@ -122,7 +123,7 @@ int main(int argc, char** argv) {
     if (argc <= 1) {
         std::cout << "quant-pricer-cpp " << quant::version_string() << "\n";
         std::cout << "Usage: quant_cli <engine> [params]\n";
-        std::cout << "Engines: bs, mc, barrier, pde, american, digital, asian, heston\n";
+        std::cout << "Engines: bs, mc, barrier, pde, american, digital, asian, heston, risk\n";
         return 0;
     }
     std::string engine = argv[1];
@@ -756,6 +757,27 @@ int main(int argc, char** argv) {
                 std::cout << res.price << " (se=" << res.std_error << ")\n";
             }
         }
+        return 0;
+    } else if (engine == "risk") {
+        if (argc < 10) {
+            std::cerr << "risk gbm <S> <mu> <sigma> <T_years> <position> <sims> <seed> <alpha> [--json]\n";
+            return 1;
+        }
+        std::string method = argv[2];
+        if (method != "gbm") { std::cerr << "Unknown risk method\n"; return 1; }
+        double S = std::atof(argv[3]);
+        double mu = std::atof(argv[4]);
+        double sig = std::atof(argv[5]);
+        double T = std::atof(argv[6]);
+        double pos = std::atof(argv[7]);
+        unsigned long sims = static_cast<unsigned long>(std::atol(argv[8]));
+        unsigned long seed = static_cast<unsigned long>(std::atol(argv[9]));
+        double alpha = std::atof(argv[10]);
+        bool json = false;
+        for (int idx = 11; idx < argc; ++idx) { std::string flag = argv[idx]; if (flag == "--json") json = true; else { std::cerr << "Unknown flag " << flag << "\n"; return 1; } }
+        auto res = quant::risk::var_cvar_gbm(S, mu, sig, T, pos, sims, seed, alpha);
+        if (json) std::cout << "{\"var\":" << res.var << ",\"cvar\":" << res.cvar << "}\n";
+        else std::cout << "VaR=" << res.var << ", CVaR=" << res.cvar << "\n";
         return 0;
     }
     std::cerr << "Unknown engine: " << engine << "\n";
