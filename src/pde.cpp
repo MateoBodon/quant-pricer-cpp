@@ -92,10 +92,12 @@ void build_system(const PdeParams& p,
     op.upper.assign(std::max(0, M - 1), 0.0);
     op.rhs.assign(M, 0.0);
 
-    const double sigma = p.vol;
+    // Time at middle of the step (absolute time from 0 to T)
+    const double t_mid = std::clamp(p.time - tau_next - 0.5 * dt, 0.0, p.time);
+    const double r = p.rate_schedule ? p.rate_schedule->value(t_mid) : p.rate;
+    const double q = p.dividend_schedule ? p.dividend_schedule->value(t_mid) : p.dividend;
+    const double sigma = p.vol_schedule ? p.vol_schedule->value(t_mid) : p.vol;
     const double sigma2 = sigma * sigma;
-    const double r = p.rate;
-    const double q = p.dividend;
 
     auto payoff_bc = [&](bool lower) {
         const double tau = tau_next;

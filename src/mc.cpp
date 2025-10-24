@@ -134,6 +134,12 @@ struct WorkerContext {
     bool scrambled;
     bool use_bridge;
     const qmc::SobolSequence* sobol;
+    // Piecewise-constant schedules (if used)
+    bool use_schedule{false};
+    std::vector<double> dt;
+    std::vector<double> drift_step;
+    std::vector<double> sigma;
+    std::vector<double> sqrt_dt;
 };
 
 quant::stats::Welford simulate_range(std::uint64_t begin,
@@ -161,7 +167,7 @@ quant::stats::Welford simulate_range(std::uint64_t begin,
     }
 
     std::unique_ptr<qmc::BrownianBridge> bridge;
-    if (ctx.use_bridge && ctx.steps > 1) {
+    if (!ctx.use_schedule && ctx.use_bridge && ctx.steps > 1) {
         bridge = std::make_unique<qmc::BrownianBridge>(ctx.steps, ctx.params.time);
     }
 
@@ -189,29 +195,49 @@ quant::stats::Welford simulate_range(std::uint64_t begin,
             }
         }
 
-        const double ST1 = evolve_terminal(ctx.params.spot,
-                                           ctx.params.rate,
-                                           ctx.params.dividend,
-                                           ctx.params.vol,
-                                           ctx.params.time,
-                                           ctx.steps,
-                                           inputs.normals.data(),
-                                           inputs.increments,
-                                           bridge.get());
+        double ST1;
+        if (ctx.use_schedule) {
+            double logS = std::log(ctx.params.spot);
+            for (int i = 0; i < ctx.steps; ++i) {
+                const double z = inputs.normals[i];
+                logS += ctx.drift_step[i] + ctx.sigma[i] * ctx.sqrt_dt[i] * z;
+            }
+            ST1 = std::exp(logS);
+        } else {
+            ST1 = evolve_terminal(ctx.params.spot,
+                                  ctx.params.rate,
+                                  ctx.params.dividend,
+                                  ctx.params.vol,
+                                  ctx.params.time,
+                                  ctx.steps,
+                                  inputs.normals.data(),
+                                  inputs.increments,
+                                  bridge.get());
+        }
         const double payoff1 = std::max(0.0, ST1 - ctx.params.strike);
         double sample = ctx.discount * payoff1;
         double cv_obs = ctx.discount * ST1;
 
         if (ctx.params.antithetic) {
-            const double ST2 = evolve_terminal(ctx.params.spot,
-                                               ctx.params.rate,
-                                               ctx.params.dividend,
-                                               ctx.params.vol,
-                                               ctx.params.time,
-                                               ctx.steps,
-                                               inputs.normals_antithetic.data(),
-                                               inputs.increments_antithetic,
-                                               bridge.get());
+            double ST2;
+            if (ctx.use_schedule) {
+                double logS2 = std::log(ctx.params.spot);
+                for (int i = 0; i < ctx.steps; ++i) {
+                    const double z2 = inputs.normals_antithetic[i];
+                    logS2 += ctx.drift_step[i] + ctx.sigma[i] * ctx.sqrt_dt[i] * z2;
+                }
+                ST2 = std::exp(logS2);
+            } else {
+                ST2 = evolve_terminal(ctx.params.spot,
+                                      ctx.params.rate,
+                                      ctx.params.dividend,
+                                      ctx.params.vol,
+                                      ctx.params.time,
+                                      ctx.steps,
+                                      inputs.normals_antithetic.data(),
+                                      inputs.increments_antithetic,
+                                      bridge.get());
+            }
             const double payoff2 = std::max(0.0, ST2 - ctx.params.strike);
             sample = 0.5 * (sample + ctx.discount * payoff2);
             cv_obs = 0.5 * ctx.discount * (ST1 + ST2);
@@ -331,6 +357,27 @@ McResult price_european_call(const McParams& p) {
         .use_bridge = use_bridge,
         .sobol = sobol.get()
     };
+
+    // If schedules provided, build per-step coefficients on uniform grid over [0,T]
+    if (p.rate_schedule.has_value() || p.dividend_schedule.has_value() || p.vol_schedule.has_value()) {
+        ctx.use_schedule = true;
+        ctx.dt.resize(steps);
+        ctx.drift_step.resize(steps);
+        ctx.sigma.resize(steps);
+        ctx.sqrt_dt.resize(steps);
+        for (int i = 0; i < steps; ++i) {
+            const double t0 = (static_cast<double>(i) / steps) * p.time;
+            const double t1 = (static_cast<double>(i + 1) / steps) * p.time;
+            const double dt = t1 - t0;
+            const double r = p.rate_schedule ? p.rate_schedule->value(0.5 * (t0 + t1)) : p.rate;
+            const double q = p.dividend_schedule ? p.dividend_schedule->value(0.5 * (t0 + t1)) : p.dividend;
+            const double sig = p.vol_schedule ? p.vol_schedule->value(0.5 * (t0 + t1)) : p.vol;
+            ctx.dt[i] = dt;
+            ctx.sqrt_dt[i] = std::sqrt(dt);
+            ctx.sigma[i] = sig;
+            ctx.drift_step[i] = (r - q - 0.5 * sig * sig) * dt;
+        }
+    }
 
     quant::stats::Welford total;
 

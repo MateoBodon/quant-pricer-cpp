@@ -13,6 +13,8 @@
 #include "quant/pde.hpp"
 #include "quant/pde_barrier.hpp"
 #include "quant/american.hpp"
+#include "quant/digital.hpp"
+#include "quant/asian.hpp"
 
 #ifdef QUANT_HAS_OPENMP
 #include <omp.h>
@@ -118,7 +120,7 @@ int main(int argc, char** argv) {
     if (argc <= 1) {
         std::cout << "quant-pricer-cpp " << quant::version_string() << "\n";
         std::cout << "Usage: quant_cli <engine> [params]\n";
-        std::cout << "Engines: bs, mc, barrier, pde, american\n";
+        std::cout << "Engines: bs, mc, barrier, pde, american, digital, asian\n";
         return 0;
     }
     std::string engine = argv[1];
@@ -621,6 +623,68 @@ int main(int argc, char** argv) {
                 std::cout << ", theta=" << *res.theta;
             }
             std::cout << ")\n";
+        }
+        return 0;
+    } else if (engine == "digital") {
+        if (argc < 10) {
+            std::cerr << "digital <cash|asset> <call|put> <S> <K> <r> <q> <sigma> <T> [--json]\n";
+            return 1;
+        }
+        std::string kind = argv[2];
+        std::string type = argv[3];
+        quant::digital::Params p{
+            .spot = std::atof(argv[4]),
+            .strike = std::atof(argv[5]),
+            .rate = std::atof(argv[6]),
+            .dividend = std::atof(argv[7]),
+            .vol = std::atof(argv[8]),
+            .time = std::atof(argv[9]),
+            .call = (type == "call")
+        };
+        bool json = false;
+        for (int idx = 10; idx < argc; ++idx) {
+            std::string flag = argv[idx];
+            if (flag == "--json") json = true; else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
+        }
+        quant::digital::Type t = (kind == "cash") ? quant::digital::Type::CashOrNothing : quant::digital::Type::AssetOrNothing;
+        double price = quant::digital::price_bs(p, t);
+        print_scalar(price, json);
+        return 0;
+    } else if (engine == "asian") {
+        if (argc < 15) {
+            std::cerr << "asian <arith|geom> <fixed|float> <S> <K> <r> <q> <sigma> <T> <paths> <steps> <seed> [--no_cv] [--json]\n";
+            return 1;
+        }
+        std::string avg = argv[2];
+        std::string pay = argv[3];
+        quant::asian::McParams p{
+            .spot = std::atof(argv[4]),
+            .strike = std::atof(argv[5]),
+            .rate = std::atof(argv[6]),
+            .dividend = std::atof(argv[7]),
+            .vol = std::atof(argv[8]),
+            .time = std::atof(argv[9]),
+            .num_paths = static_cast<std::uint64_t>(std::atoll(argv[10])),
+            .seed = static_cast<std::uint64_t>(std::atoll(argv[12])),
+            .num_steps = std::max(1, std::atoi(argv[11])),
+            .antithetic = true,
+            .use_geometric_cv = true,
+            .payoff = (pay == "fixed") ? quant::asian::Payoff::FixedStrike : quant::asian::Payoff::FloatingStrike,
+            .avg = (avg == "arith") ? quant::asian::Average::Arithmetic : quant::asian::Average::Geometric
+        };
+        bool json = false;
+        for (int idx = 13; idx < argc; ++idx) {
+            std::string flag = argv[idx];
+            if (flag == "--no_cv") p.use_geometric_cv = false;
+            else if (flag == "--json") json = true;
+            else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
+        }
+        auto res = quant::asian::price_mc(p);
+        if (json) {
+            std::cout << "{\"price\":" << res.value << ",\"std_error\":" << res.std_error
+                      << ",\"ci_low\":" << res.ci_low << ",\"ci_high\":" << res.ci_high << "}\n";
+        } else {
+            std::cout << res.value << " (se=" << res.std_error << ", 95% CI=[" << res.ci_low << ", " << res.ci_high << "])\n";
         }
         return 0;
     }
