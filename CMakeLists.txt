@@ -98,6 +98,7 @@ add_library(quant_pricer
   src/qmc/brownian_bridge.cpp
   src/digital.cpp
   src/asian.cpp
+  src/lookback.cpp
 )
 
 add_library(quant_pricer::quant_pricer ALIAS quant_pricer)

@@ -15,6 +15,7 @@
 #include "quant/american.hpp"
 #include "quant/digital.hpp"
 #include "quant/asian.hpp"
+#include "quant/lookback.hpp"
 
 #ifdef QUANT_HAS_OPENMP
 #include <omp.h>
@@ -680,6 +681,43 @@ int main(int argc, char** argv) {
             else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
         }
         auto res = quant::asian::price_mc(p);
+        if (json) {
+            std::cout << "{\"price\":" << res.value << ",\"std_error\":" << res.std_error
+                      << ",\"ci_low\":" << res.ci_low << ",\"ci_high\":" << res.ci_high << "}\n";
+        } else {
+            std::cout << res.value << " (se=" << res.std_error << ", 95% CI=[" << res.ci_low << ", " << res.ci_high << "])\n";
+        }
+        return 0;
+    } else if (engine == "lookback") {
+        if (argc < 14) {
+            std::cerr << "lookback <fixed|float> <call|put> <S> <K> <r> <q> <sigma> <T> <paths> <steps> <seed> [--no_anti] [--json]\n";
+            return 1;
+        }
+        std::string kind = argv[2];
+        quant::OptionType opt = parse_option(argv[3]);
+        quant::lookback::McParams p{
+            .spot = std::atof(argv[4]),
+            .strike = std::atof(argv[5]),
+            .rate = std::atof(argv[6]),
+            .dividend = std::atof(argv[7]),
+            .vol = std::atof(argv[8]),
+            .time = std::atof(argv[9]),
+            .num_paths = static_cast<std::uint64_t>(std::atoll(argv[10])),
+            .seed = static_cast<std::uint64_t>(std::atoll(argv[12])),
+            .num_steps = std::max(1, std::atoi(argv[11])),
+            .antithetic = true,
+            .use_bridge = true,
+            .opt = opt,
+            .type = (kind == "fixed") ? quant::lookback::Type::FixedStrike : quant::lookback::Type::FloatingStrike
+        };
+        bool json = false;
+        for (int idx = 13; idx < argc; ++idx) {
+            std::string flag = argv[idx];
+            if (flag == "--no_anti") p.antithetic = false;
+            else if (flag == "--json") json = true;
+            else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
+        }
+        auto res = quant::lookback::price_mc(p);
         if (json) {
             std::cout << "{\"price\":" << res.value << ",\"std_error\":" << res.std_error
                       << ",\"ci_low\":" << res.ci_low << ",\"ci_high\":" << res.ci_high << "}\n";
