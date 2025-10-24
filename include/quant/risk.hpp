@@ -25,6 +25,17 @@ VarEs var_cvar_gbm(double spot,
                    unsigned long seed,
                    double alpha);
 
+// Portfolio VaR/CVaR under joint normal/Gaussian copula (Cholesky)
+// mu, sigma, weights have size N; corr is N x N row-major correlation matrix
+VarEs var_cvar_portfolio(const std::vector<double>& mu,
+                         const std::vector<double>& sigma,
+                         const std::vector<double>& corr,
+                         const std::vector<double>& weights,
+                         double horizon_years,
+                         unsigned long num_sims,
+                         unsigned long seed,
+                         double alpha);
+
 }
 
 
