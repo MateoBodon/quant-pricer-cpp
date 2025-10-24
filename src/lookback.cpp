@@ -23,16 +23,40 @@ McStatistic price_mc(const McParams& p) {
     pcg64 rng(p.seed ? p.seed : 0xBADC0FFEEULL);
     std::normal_distribution<double> normal(0.0, 1.0);
 
+    // Optional Brownian bridge for better path statistics of extrema
+    std::unique_ptr<quant::qmc::BrownianBridge> bridge;
+    if (p.use_bridge) {
+        bridge = std::make_unique<quant::qmc::BrownianBridge>(static_cast<std::size_t>(p.num_steps), p.time);
+    }
+
+    std::vector<double> normals;
+    std::vector<double> increments;
+    if (bridge) {
+        normals.resize(static_cast<std::size_t>(p.num_steps));
+        increments.resize(static_cast<std::size_t>(p.num_steps));
+    }
+
     for (std::uint64_t i = 0; i < p.num_paths; ++i) {
         auto simulate_once = [&](int sign) {
             double S = p.spot;
             double S_min = S;
             double S_max = S;
-            for (int t = 0; t < p.num_steps; ++t) {
-                double z = normal(rng) * sign;
-                S = S * std::exp(drift_dt + vol_sdt * z);
-                S_min = std::min(S_min, S);
-                S_max = std::max(S_max, S);
+            if (bridge) {
+                for (int t = 0; t < p.num_steps; ++t) normals[static_cast<std::size_t>(t)] = normal(rng) * sign;
+                bridge->transform(normals.data(), increments.data());
+                for (int t = 0; t < p.num_steps; ++t) {
+                    const double dw = increments[static_cast<std::size_t>(t)]; // N(0, dt)
+                    S = S * std::exp(drift_dt + p.vol * dw);
+                    S_min = std::min(S_min, S);
+                    S_max = std::max(S_max, S);
+                }
+            } else {
+                for (int t = 0; t < p.num_steps; ++t) {
+                    double z = normal(rng) * sign;
+                    S = S * std::exp(drift_dt + vol_sdt * z);
+                    S_min = std::min(S_min, S);
+                    S_max = std::max(S_max, S);
+                }
             }
             double payoff = 0.0;
             if (p.type == Type::FixedStrike) {
