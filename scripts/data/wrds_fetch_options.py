@@ -33,22 +33,37 @@ def main():
     date = pd.to_datetime(args.date).date()
     db = wrds.Connection()
 
-    # Fetch underlying spot and rates/dividends proxies (simplified placeholders)
-    # Users can post-process the CSV to refine r and q per maturity.
-    # OptionMetrics schema can vary; adjust as needed.
-    query = f"""
-        select o.exdate, o.strike_price/1000.0 as strike,
-               o.best_bid, o.best_offer, o.cp_flag,
-               o.under_cusip, o.date, o.impl_volatility, o.volume,
-               s.under_price
-        from optionm.opprcd as o
-        join optionm.secprd as s on o.secid = s.secid and o.date = s.date
-        where o.symbol = '{args.underlying}' and o.date = '{date}'
-    """
-    try:
-        df = db.raw_sql(query)
-    except Exception as e:
-        print('WRDS query failed: {}'.format(e), file=sys.stderr)
+    # OptionMetrics is year-partitioned at many institutions.
+    # Prefer opprcdYYYY/secprdYYYY, fallback to non-partitioned or standardized views.
+    year = str(date.year)
+    candidates = [
+        (f"optionm.opprcd{year}", f"optionm.secprd{year}", 's.under_price'),
+        (f"optionm.option_price_{year}", "optionm.security_price", 's.under_price'),
+        ("optionm.opprcd", "optionm.secprd", 's.under_price'),
+    ]
+
+    df = None
+    last_err = None
+    for op_tbl, sec_tbl, under_col in candidates:
+        query = f"""
+            select o.exdate,
+                   o.strike_price/1000.0 as strike,
+                   o.best_bid, o.best_offer, o.cp_flag,
+                   o.date,
+                   {under_col}
+            from {op_tbl} as o
+            join {sec_tbl} as s on o.secid = s.secid and o.date = s.date
+            where o.symbol = '{args.underlying}' and o.date = '{date}'
+        """
+        try:
+            df = db.raw_sql(query)
+            break
+        except Exception as e:
+            last_err = e
+            continue
+
+    if df is None or df.empty:
+        print('WRDS query failed or returned no rows: {}'.format(last_err), file=sys.stderr)
         sys.exit(2)
 
     if df.empty:
@@ -56,7 +71,17 @@ def main():
         sys.exit(3)
 
     df['mid'] = (df['best_bid'].fillna(0) + df['best_offer'].fillna(0)) / 2.0
-    df['spot'] = df['under_price']
+    # Some sites store as UNDER_PRICE or other case variations
+    under_candidates = [c for c in df.columns if c.lower() == 'under_price']
+    if under_candidates:
+        df['spot'] = df[under_candidates[0]]
+    else:
+        # Fallback: use forward price if present, otherwise abort
+        if 'under_price' in df.columns:
+            df['spot'] = df['under_price']
+        else:
+            print('Could not locate under_price column in security price table', file=sys.stderr)
+            sys.exit(4)
     df['maturity_years'] = (pd.to_datetime(df['exdate']).dt.date - pd.to_datetime(df['date']).dt.date).dt.days / 365.0
     df = df[(df['maturity_years'] > 1/365.0) & (df['mid'] > 0)]
     df['call_put'] = df['cp_flag'].map({'C': 'call', 'P': 'put'})
