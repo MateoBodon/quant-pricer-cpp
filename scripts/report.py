@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-Generate figures and a PDF report from options CSV, calibration JSON, and returns CSV.
+Generate figures and a PDF report from options CSV, calibration JSON, Heston series CSV, and returns CSV.
 
 Outputs to artifacts/ by default:
   - heston_error_heatmap.png (price error in bps across moneyness×tenor)
+  - iv_surface.png (market IV scatter by moneyness×tenor)
+  - heston_params.png (parameter time series)
   - var_backtest.png (rolling VaR and exceptions)
   - onepager.pdf / twopager.pdf (stitched overview)
 
@@ -12,6 +14,7 @@ Usage:
     --options_csv data/options.csv \
     --calib_json artifacts/heston_calib.json \
     --returns_csv data/returns.csv \
+    --series_csv artifacts/heston_series.csv \
     --artifacts_dir artifacts
 """
 import argparse
@@ -94,6 +97,61 @@ def build_error_heatmap(cli_path, options_csv, calib_json, out_png):
     plt.close(fig)
 
 
+def build_iv_surface(options_csv, out_png):
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    # derive IV via bisection on call parity
+    def bs_call(S, K, r, q, sigma, T):
+        if T <= 0 or sigma <= 0:
+            return max(0.0, S * np.exp(-q*T) - K * np.exp(-r*T))
+        d1 = (np.log(S/K) + (r - q + 0.5*sigma*sigma)*T)/(sigma*np.sqrt(T))
+        d2 = d1 - sigma*np.sqrt(T)
+        from math import erf, sqrt
+        N1 = 0.5*(1+erf(d1/np.sqrt(2)))
+        N2 = 0.5*(1+erf(d2/np.sqrt(2)))
+        return S*np.exp(-q*T)*N1 - K*np.exp(-r*T)*N2
+    def iv_from_price(S,K,r,q,T,price):
+        lo,hi=1e-6,5.0
+        for _ in range(50):
+            mid=0.5*(lo+hi)
+            val=bs_call(S,K,r,q,mid,T)
+            if val>price: hi=mid
+            else: lo=mid
+        return 0.5*(lo+hi)
+    df = pd.read_csv(options_csv)
+    df = df[(df['maturity_years'] > 1/365.0) & (df['mid'] > 0)]
+    rows=[]
+    for _,r in df.iterrows():
+        S=r['spot']; K=r['strike']; rr=r['rate']; qq=r['q']; T=r['maturity_years']; P=r['mid']
+        if r['call_put']=='put':
+            P = P + S*np.exp(-qq*T) - K*np.exp(-rr*T)
+        iv = iv_from_price(S,K,rr,qq,T,P)
+        rows.append({'moneyness':K/S, 'T':T, 'iv':iv})
+    ivdf = pd.DataFrame(rows)
+    fig, ax = plt.subplots(figsize=(7,4))
+    sc = ax.scatter(ivdf['moneyness'], ivdf['T'], c=ivdf['iv'], cmap='viridis', s=10)
+    ax.set_xlabel('K/S'); ax.set_ylabel('T (years)'); ax.set_title('Market IV surface (scatter)')
+    cbar = plt.colorbar(sc, ax=ax); cbar.set_label('implied vol')
+    plt.tight_layout(); plt.savefig(out_png, dpi=200); plt.close(fig)
+
+
+def build_param_series(series_csv, out_png):
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    df = pd.read_csv(series_csv)
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'])
+        df = df.sort_values('date')
+    fig, axes = plt.subplots(3,2, figsize=(10,6))
+    axes = axes.flatten()
+    keys = ['kappa','theta','sigma','rho','v0','cost']
+    for ax,k in zip(axes, keys):
+        if k in df.columns:
+            ax.plot(df['date'] if 'date' in df.columns else range(len(df)), df[k])
+            ax.set_title(k)
+    plt.tight_layout(); plt.savefig(out_png, dpi=200); plt.close(fig)
+
 def build_var_plot(returns_csv, out_png, alpha=0.99):
     import pandas as pd
     import numpy as np
@@ -157,6 +215,7 @@ def main():
     ap.add_argument('--returns_csv', required=True)
     ap.add_argument('--artifacts_dir', default='artifacts')
     ap.add_argument('--cli', default=os.path.join('build', 'quant_cli'))
+    ap.add_argument('--series_csv', required=False)
     args = ap.parse_args()
 
     os.makedirs(args.artifacts_dir, exist_ok=True)
@@ -166,8 +225,19 @@ def main():
     var_png = os.path.join(args.artifacts_dir, 'var_backtest.png')
     build_var_plot(args.returns_csv, var_png)
 
+    iv_png = os.path.join(args.artifacts_dir, 'iv_surface.png')
+    build_iv_surface(args.options_csv, iv_png)
+
+    series_png = None
+    if args.series_csv:
+        series_png = os.path.join(args.artifacts_dir, 'heston_params.png')
+        build_param_series(args.series_csv, series_png)
+
     # stitch
-    stitch_pdf(args.artifacts_dir, [heatmap, var_png], 'onepager.pdf')
+    images = [heatmap, var_png, iv_png]
+    if series_png:
+        images.append(series_png)
+    stitch_pdf(args.artifacts_dir, images[:4], 'onepager.pdf')
 
 
 if __name__ == '__main__':
