@@ -1,0 +1,12 @@
+{
+  "name": "quant-pricer-cpp",
+  "version-string": "0.2.0",
+  "homepage": "https://github.com/MateoBodon/quant-pricer-cpp",
+  "description": "C++20 option pricing library: BS, MC, PDE, barriers, Heston",
+  "dependencies": [
+    { "name": "gtest" },
+    { "name": "benchmark" }
+  ]
+}
+
+
