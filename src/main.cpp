@@ -16,6 +16,7 @@
 #include "quant/digital.hpp"
 #include "quant/asian.hpp"
 #include "quant/lookback.hpp"
+#include "quant/heston.hpp"
 
 #ifdef QUANT_HAS_OPENMP
 #include <omp.h>
@@ -121,7 +122,7 @@ int main(int argc, char** argv) {
     if (argc <= 1) {
         std::cout << "quant-pricer-cpp " << quant::version_string() << "\n";
         std::cout << "Usage: quant_cli <engine> [params]\n";
-        std::cout << "Engines: bs, mc, barrier, pde, american, digital, asian\n";
+        std::cout << "Engines: bs, mc, barrier, pde, american, digital, asian, heston\n";
         return 0;
     }
     std::string engine = argv[1];
@@ -723,6 +724,37 @@ int main(int argc, char** argv) {
                       << ",\"ci_low\":" << res.ci_low << ",\"ci_high\":" << res.ci_high << "}\n";
         } else {
             std::cout << res.value << " (se=" << res.std_error << ", 95% CI=[" << res.ci_low << ", " << res.ci_high << "])\n";
+        }
+        return 0;
+    } else if (engine == "heston") {
+        if (argc < 15) {
+            std::cerr << "heston <kappa> <theta> <sigma_v> <rho> <v0> <S> <K> <r> <q> <T> <paths> <steps> <seed> [--mc|--analytic] [--json]\n";
+            return 1;
+        }
+        quant::heston::Params h{std::atof(argv[2]), std::atof(argv[3]), std::atof(argv[4]), std::atof(argv[5]), std::atof(argv[6])};
+        quant::heston::MarketParams mkt{std::atof(argv[7]), std::atof(argv[8]), std::atof(argv[9]), std::atof(argv[10]), std::atof(argv[11])};
+        std::uint64_t paths = static_cast<std::uint64_t>(std::atoll(argv[12]));
+        int steps = std::max(1, std::atoi(argv[13]));
+        std::uint64_t seed = static_cast<std::uint64_t>(std::atoll(argv[14]));
+        bool use_mc = true;
+        bool json = false;
+        for (int idx = 15; idx < argc; ++idx) {
+            std::string flag = argv[idx];
+            if (flag == "--analytic") use_mc = false;
+            else if (flag == "--mc") use_mc = true;
+            else if (flag == "--json") json = true;
+            else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
+        }
+        if (!use_mc) {
+            double price = quant::heston::call_analytic(mkt, h);
+            print_scalar(price, json);
+        } else {
+            auto res = quant::heston::call_qe_mc(quant::heston::McParams{mkt, h, paths, seed, steps, true});
+            if (json) {
+                std::cout << "{\"price\":" << res.price << ",\"std_error\":" << res.std_error << "}\n";
+            } else {
+                std::cout << res.price << " (se=" << res.std_error << ")\n";
+            }
         }
         return 0;
     }

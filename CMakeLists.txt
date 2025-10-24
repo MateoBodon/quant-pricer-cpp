@@ -99,6 +99,7 @@ add_library(quant_pricer
   src/digital.cpp
   src/asian.cpp
   src/lookback.cpp
+  src/heston.cpp
 )
 
 add_library(quant_pricer::quant_pricer ALIAS quant_pricer)
