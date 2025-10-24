@@ -134,6 +134,7 @@ add_executable(unit_tests
   tests/test_american.cpp
   tests/test_digital.cpp
   tests/test_asian.cpp)
+target_sources(unit_tests PRIVATE tests/test_lookback.cpp)
 target_link_libraries(unit_tests PRIVATE quant_pricer GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests(unit_tests)
