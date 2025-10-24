@@ -37,23 +37,25 @@ def main():
     # Prefer opprcdYYYY/secprdYYYY, fallback to non-partitioned or standardized views.
     year = str(date.year)
     candidates = [
-        (f"optionm.opprcd{year}", f"optionm.secprd{year}", 's.under_price'),
-        (f"optionm.option_price_{year}", "optionm.security_price", 's.under_price'),
-        ("optionm.opprcd", "optionm.secprd", 's.under_price'),
+        (f"optionm.opprcd{year}", f"optionm.secprd{year}"),
+        (f"optionm.option_price_{year}", "optionm.security_price"),
+        ("optionm.opprcd", "optionm.secprd"),
     ]
 
     df = None
     last_err = None
-    for op_tbl, sec_tbl, under_col in candidates:
+    security_tbl = "optionm.security"
+    for op_tbl, sec_tbl in candidates:
         query = f"""
             select o.exdate,
                    o.strike_price/1000.0 as strike,
                    o.best_bid, o.best_offer, o.cp_flag,
                    o.date,
-                   {under_col}
+                   sp.under_price
             from {op_tbl} as o
-            join {sec_tbl} as s on o.secid = s.secid and o.date = s.date
-            where o.symbol = '{args.underlying}' and o.date = '{date}'
+            join {security_tbl} as sec on o.secid = sec.secid
+            join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
+            where sec.symbol = '{args.underlying}' and o.date = '{date}'
         """
         try:
             df = db.raw_sql(query)
