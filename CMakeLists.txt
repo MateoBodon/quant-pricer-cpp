@@ -96,6 +96,8 @@ add_library(quant_pricer
   src/american.cpp
   src/qmc/sobol.cpp
   src/qmc/brownian_bridge.cpp
+  src/digital.cpp
+  src/asian.cpp
 )
 
 add_library(quant_pricer::quant_pricer ALIAS quant_pricer)
@@ -121,7 +123,15 @@ target_link_libraries(quant_cli PRIVATE quant_pricer)
 
 # Tests
 enable_testing()
-add_executable(unit_tests tests/test_sanity.cpp tests/test_black_scholes.cpp tests/test_mc.cpp tests/test_pde.cpp tests/test_barrier.cpp tests/test_american.cpp)
+add_executable(unit_tests
+  tests/test_sanity.cpp
+  tests/test_black_scholes.cpp
+  tests/test_mc.cpp
+  tests/test_pde.cpp
+  tests/test_barrier.cpp
+  tests/test_american.cpp
+  tests/test_digital.cpp
+  tests/test_asian.cpp)
 target_link_libraries(unit_tests PRIVATE quant_pricer GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests(unit_tests)

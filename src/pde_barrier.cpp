@@ -10,7 +10,14 @@ namespace quant::pde {
 
 namespace {
 
-double solve_knockout(const BarrierPdeParams& params, ::quant::OptionType opt) {
+struct GridResult {
+    std::vector<double> S;
+    std::vector<double> V;
+    double x_min;
+    double dx;
+};
+
+GridResult solve_knockout_grid(const BarrierPdeParams& params, ::quant::OptionType opt) {
     const int M = params.grid.num_space;
     const int N = params.grid.num_time;
     if (M < 3 || N < 1) {
@@ -133,14 +140,8 @@ double solve_knockout(const BarrierPdeParams& params, ::quant::OptionType opt) {
 
         V = solve_tridiagonal(a, b, c, d);
     }
-
-    const double x0 = std::log(S0);
-    const double idx = (x0 - x_min) / dx;
-    if (idx <= 0.0) return V.front();
-    if (idx >= static_cast<double>(M - 1)) return V.back();
-    const int i0 = static_cast<int>(std::floor(idx));
-    const double w = idx - i0;
-    return (1.0 - w) * V[i0] + w * V[i0 + 1];
+    GridResult out{S, V, x_min, dx};
+    return out;
 }
 
 } // namespace
@@ -150,14 +151,23 @@ double price_barrier_crank_nicolson(const BarrierPdeParams& params,
     switch (params.barrier.type) {
         case BarrierType::DownOut:
         case BarrierType::UpOut:
-            return solve_knockout(params, opt);
+            {
+                auto g = solve_knockout_grid(params, opt);
+                const double x0 = std::log(params.spot);
+                const double idx = (x0 - g.x_min) / g.dx;
+                if (idx <= 0.0) return g.V.front();
+                if (idx >= static_cast<double>(g.S.size() - 1)) return g.V.back();
+                const int i0 = static_cast<int>(std::floor(idx));
+                const double w = idx - i0;
+                return (1.0 - w) * g.V[i0] + w * g.V[i0 + 1];
+            }
         case BarrierType::DownIn:
         case BarrierType::UpIn: {
             BarrierPdeParams parity_params = params;
             parity_params.barrier.type = (params.barrier.type == BarrierType::DownIn)
                                              ? BarrierType::DownOut
                                              : BarrierType::UpOut;
-            const double ko_price = solve_knockout(parity_params, opt);
+            const double ko_price = price_barrier_crank_nicolson(parity_params, opt);
             const double vanilla = (opt == ::quant::OptionType::Call)
                                        ? ::quant::bs::call_price(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time)
                                        : ::quant::bs::put_price(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time);
@@ -166,6 +176,48 @@ double price_barrier_crank_nicolson(const BarrierPdeParams& params,
         }
     }
     throw std::logic_error("Unknown barrier type");
+}
+
+BarrierPdeGreeksResult price_barrier_crank_nicolson_greeks(const BarrierPdeParams& params,
+                                                           ::quant::OptionType opt) {
+    if (params.barrier.type == BarrierType::DownIn || params.barrier.type == BarrierType::UpIn) {
+        // Use parity for price; Greeks via small centered bump around spot on KO grid
+        auto ko_params = params;
+        ko_params.barrier.type = (params.barrier.type == BarrierType::DownIn) ? BarrierType::DownOut : BarrierType::UpOut;
+        auto grid = solve_knockout_grid(ko_params, opt);
+        const double x0 = std::log(params.spot);
+        const double idx = (x0 - grid.x_min) / grid.dx;
+        if (idx <= 1.0 || idx >= static_cast<double>(grid.S.size() - 2)) {
+            double p = price_barrier_crank_nicolson(params, opt);
+            return BarrierPdeGreeksResult{p, 0.0, 0.0};
+        }
+        int i1 = static_cast<int>(std::floor(idx));
+        int i0 = i1 - 1;
+        int i2 = i1 + 1;
+        double S0 = params.spot;
+        double price = price_barrier_crank_nicolson(params, opt);
+        double delta = (grid.V[i2] - grid.V[i0]) / (grid.S[i2] - grid.S[i0]);
+        double gamma = 2.0 * ( (grid.V[i2] - price) / (grid.S[i2] - S0) - (price - grid.V[i0]) / (S0 - grid.S[i0]) ) / (grid.S[i2] - grid.S[i0]);
+        return BarrierPdeGreeksResult{price, delta, gamma};
+    }
+    // Knock-out case: directly compute on knock-out grid
+    auto grid = solve_knockout_grid(params, opt);
+    const double x0 = std::log(params.spot);
+    const double idx = (x0 - grid.x_min) / grid.dx;
+    if (idx <= 1.0 || idx >= static_cast<double>(grid.S.size() - 2)) {
+        double p = price_barrier_crank_nicolson(params, opt);
+        return BarrierPdeGreeksResult{p, 0.0, 0.0};
+    }
+    int i1 = static_cast<int>(std::floor(idx));
+    int i0 = i1 - 1;
+    int i2 = i1 + 1;
+    double S0 = params.spot;
+    // Quadratic interpolation for price at S0
+    const double w = (S0 - grid.S[i1]) / (grid.S[i2] - grid.S[i1]);
+    const double price = (1.0 - w) * grid.V[i1] + w * grid.V[i2];
+    const double delta = (grid.V[i2] - grid.V[i0]) / (grid.S[i2] - grid.S[i0]);
+    const double gamma = 2.0 * ( (grid.V[i2] - price) / (grid.S[i2] - S0) - (price - grid.V[i0]) / (S0 - grid.S[i0]) ) / (grid.S[i2] - grid.S[i0]);
+    return BarrierPdeGreeksResult{price, delta, gamma};
 }
 
 } // namespace quant::pde

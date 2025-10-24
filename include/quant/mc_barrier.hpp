@@ -11,5 +11,8 @@ McResult price_barrier_option(const McParams& base,
                               OptionType opt,
                               const BarrierSpec& barrier);
 
+/// Note: barrier MC respects McParams.control_variate to enable/disable
+/// the terminal stock control variate in the path payoff.
+
 }
 

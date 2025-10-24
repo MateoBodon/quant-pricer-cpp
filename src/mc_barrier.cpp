@@ -3,6 +3,8 @@
 #include "quant/black_scholes.hpp"
 #include "quant/qmc/brownian_bridge.hpp"
 #include "quant/qmc/sobol.hpp"
+#include "quant/math.hpp"
+#include "quant/stats.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -22,59 +24,6 @@
 namespace quant::mc {
 
 namespace {
-
-double inverse_normal_cdf(double p) {
-    if (p <= 0.0) return -INFINITY;
-    if (p >= 1.0) return INFINITY;
-
-    static const double a1 = -3.969683028665376e+01;
-    static const double a2 =  2.209460984245205e+02;
-    static const double a3 = -2.759285104469687e+02;
-    static const double a4 =  1.383577518672690e+02;
-    static const double a5 = -3.066479806614716e+01;
-    static const double a6 =  2.506628277459239e+00;
-
-    static const double b1 = -5.447609879822406e+01;
-    static const double b2 =  1.615858368580409e+02;
-    static const double b3 = -1.556989798598866e+02;
-    static const double b4 =  6.680131188771972e+01;
-    static const double b5 = -1.328068155288572e+01;
-
-    static const double c1 = -7.784894002430293e-03;
-    static const double c2 = -3.223964580411365e-01;
-    static const double c3 = -2.400758277161838e+00;
-    static const double c4 = -2.549732539343734e+00;
-    static const double c5 =  4.374664141464968e+00;
-    static const double c6 =  2.938163982698783e+00;
-
-    static const double d1 =  7.784695709041462e-03;
-    static const double d2 =  3.224671290700398e-01;
-    static const double d3 =  2.445134137142996e+00;
-    static const double d4 =  3.754408661907416e+00;
-
-    const double plow  = 0.02425;
-    const double phigh = 1 - plow;
-    double q, r, x;
-    if (p < plow) {
-        q = std::sqrt(-2.0 * std::log(p));
-        x = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
-            ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0);
-    } else if (p <= phigh) {
-        q = p - 0.5;
-        r = q * q;
-        x = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q /
-            (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1.0);
-    } else {
-        q = std::sqrt(-2.0 * std::log(1.0 - p));
-        x = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
-              ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0);
-    }
-
-    double e = 0.5 * std::erfc(-x / std::sqrt(2.0)) - p;
-    double u = e * std::sqrt(2.0 * std::numbers::pi) * std::exp(0.5 * x * x);
-    x = x - u / (1.0 + 0.5 * x * u);
-    return x;
-}
 
 bool is_knock_out(const BarrierSpec& spec) {
     return spec.type == BarrierType::DownOut || spec.type == BarrierType::UpOut;
@@ -113,40 +62,7 @@ double crossing_probability(double S_prev,
     }
 }
 
-struct WelfordAccumulator {
-    std::uint64_t count{0};
-    double mean{0.0};
-    double m2{0.0};
-
-    void add(double value) {
-        ++count;
-        const double delta = value - mean;
-        mean += delta / static_cast<double>(count);
-        const double delta2 = value - mean;
-        m2 += delta * delta2;
-    }
-
-    void merge(const WelfordAccumulator& other) {
-        if (other.count == 0) return;
-        if (count == 0) {
-            *this = other;
-            return;
-        }
-        const double total = static_cast<double>(count + other.count);
-        const double delta = other.mean - mean;
-        mean += delta * static_cast<double>(other.count) / total;
-        m2 += other.m2 + delta * delta * (static_cast<double>(count) * other.count / total);
-        count += other.count;
-    }
-
-    double variance() const {
-        return (count > 1) ? m2 / static_cast<double>(count - 1) : 0.0;
-    }
-};
-
-constexpr double kZ95 = 1.95996398454005423552;
-
-McStatistic summarize(const WelfordAccumulator& acc) {
+McStatistic summarize(const quant::stats::Welford& acc) {
     McStatistic stat{};
     if (acc.count == 0) {
         stat.value = 0.0;
@@ -159,7 +75,7 @@ McStatistic summarize(const WelfordAccumulator& acc) {
     const double variance = acc.variance();
     if (acc.count > 1 && variance >= 0.0) {
         const double se = std::sqrt(variance / static_cast<double>(acc.count));
-        const double half_width = kZ95 * se;
+        const double half_width = quant::math::kZ95 * se;
         stat.std_error = se;
         stat.ci_low = stat.value - half_width;
         stat.ci_high = stat.value + half_width;
@@ -301,11 +217,11 @@ double run_path(const BarrierMcContext& ctx,
     return ctx.barrier.rebate * ctx.discount;
 }
 
-WelfordAccumulator simulate_range(std::uint64_t begin,
+quant::stats::Welford simulate_range(std::uint64_t begin,
                                   std::uint64_t end,
                                   std::uint64_t seed_offset,
                                   const WorkerContext& worker) {
-    WelfordAccumulator acc;
+    quant::stats::Welford acc;
     if (begin >= end) {
         return acc;
     }
@@ -345,7 +261,7 @@ WelfordAccumulator simulate_range(std::uint64_t begin,
                 const double maxu = 1.0 - std::numeric_limits<double>::epsilon();
                 double u_norm = std::clamp(workspace.sobol_point[j], eps, maxu);
                 double u_hit = std::clamp(workspace.sobol_point[ctx.steps + j], eps, maxu);
-                workspace.normals[j] = inverse_normal_cdf(u_norm);
+                workspace.normals[j] = quant::math::inverse_normal_cdf(u_norm);
                 workspace.uniforms[j] = u_hit;
                 if (ctx.params.antithetic) {
                     workspace.normals_antithetic[j] = -workspace.normals[j];
@@ -447,7 +363,7 @@ McResult price_barrier_option(const McParams& base,
         base.spot * std::exp(-base.dividend * base.time),
         is_knock_out(barrier),
         is_up_barrier(barrier),
-        false
+        base.control_variate
     };
 
     std::unique_ptr<qmc::SobolSequence> sobol;
@@ -457,12 +373,12 @@ McResult price_barrier_option(const McParams& base,
 
     WorkerContext worker{ctx, sobol.get(), sobol_dim};
 
-    WelfordAccumulator total;
+    quant::stats::Welford total;
 
 #ifdef QUANT_HAS_OPENMP
     const std::uint64_t N = base.num_paths;
     const int max_threads = omp_get_max_threads();
-    std::vector<WelfordAccumulator> partial(max_threads);
+    std::vector<quant::stats::Welford> partial(max_threads);
 
     #pragma omp parallel
     {

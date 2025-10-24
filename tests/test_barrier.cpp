@@ -69,3 +69,20 @@ TEST(Barrier, PdeMatchesAnalytic) {
     const double pde_price = quant::pde::price_barrier_crank_nicolson(params, OptionType::Put);
     EXPECT_NEAR(pde_price, analytic, 1e-3);
 }
+
+TEST(Barrier, PdeGreeksProduceFiniteValues) {
+    BarrierSpec spec{BarrierType::UpOut, 120.0, 0.0};
+    quant::pde::BarrierPdeParams params{};
+    params.spot = 100.0;
+    params.strike = 105.0;
+    params.rate = 0.02;
+    params.dividend = 0.0;
+    params.vol = 0.25;
+    params.time = 1.0;
+    params.barrier = spec;
+    params.grid = quant::pde::GridSpec{201, 200, 4.0};
+    auto res = quant::pde::price_barrier_crank_nicolson_greeks(params, OptionType::Put);
+    EXPECT_TRUE(std::isfinite(res.price));
+    EXPECT_TRUE(std::isfinite(res.delta));
+    EXPECT_TRUE(std::isfinite(res.gamma));
+}

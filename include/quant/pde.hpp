@@ -3,6 +3,8 @@
 
 #include <optional>
 #include <vector>
+#include <optional>
+#include "quant/term_structures.hpp"
 
 namespace quant::pde {
 
@@ -43,6 +45,10 @@ struct PdeParams {
     bool compute_theta{false};
     /// Apply two-step Rannacher start-up when true
     bool use_rannacher{true};
+    // Optional piecewise-constant schedules; when set, override scalars
+    std::optional<quant::PiecewiseConstant> rate_schedule{};
+    std::optional<quant::PiecewiseConstant> dividend_schedule{};
+    std::optional<quant::PiecewiseConstant> vol_schedule{};
 };
 
 struct PdeResult {

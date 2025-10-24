@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <vector>
 #include <random>
+#include <optional>
+#include "quant/term_structures.hpp"
 
 namespace quant::mc {
 
@@ -26,6 +28,10 @@ struct McParams {
     Qmc qmc{Qmc::None};
     Bridge bridge{Bridge::None};
     int num_steps{1};
+    // Optional piecewise-constant schedules; when set, override scalar rate/div/vol
+    std::optional<quant::PiecewiseConstant> rate_schedule{};
+    std::optional<quant::PiecewiseConstant> dividend_schedule{};
+    std::optional<quant::PiecewiseConstant> vol_schedule{};
 };
 
 /// Summary of a Monte Carlo estimator (mean, standard error, 95% CI)
