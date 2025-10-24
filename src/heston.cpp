@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <complex>
+#include <limits>
 #include <random>
 
 namespace quant::heston {
