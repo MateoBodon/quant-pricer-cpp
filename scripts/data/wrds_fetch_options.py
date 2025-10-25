@@ -46,14 +46,14 @@ def main():
     for op_tbl, sec_tbl in candidates:
         try:
             # Discover traded secids for the date matching the requested root
-            sym_query = f"
+            sym_query = f"""
                 select distinct sec.secid, sec.symbol
                 from optionm.security as sec
                 join {sec_tbl} as sp on sec.secid = sp.secid
                 where sp.date = '{date}'
                   and (sec.symbol = '{args.underlying}' or sec.symbol ilike '{args.underlying}%')
                 limit 500
-            ""
+            """
             sym_df = db.raw_sql(sym_query)
             secids = []
             if sym_df is not None and not sym_df.empty and 'secid' in sym_df.columns:
@@ -66,7 +66,7 @@ def main():
             else:
                 where_clause = f"(sec.symbol = '{args.underlying}' or sec.symbol ilike '{args.underlying}%')"
 
-            query = f"
+            query = f"""
                 select o.exdate,
                        o.strike_price/1000.0 as strike,
                        o.best_bid, o.best_offer, o.cp_flag,
@@ -76,7 +76,7 @@ def main():
                 join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
                 join optionm.security as sec on o.secid = sec.secid
                 where o.date = '{date}' and {where_clause}
-            ""
+            """
             df_try = db.raw_sql(query)
             if df_try is not None and not df_try.empty:
                 df = df_try
