@@ -174,6 +174,15 @@ def build_var_plot(returns_csv, out_png, alpha=0.99):
         exc.append(1.0 if df['ret'].iloc[i] < -v else 0.0)
     df['var'] = var
     df['exc'] = exc
+    # Kupiec/Christoffersen using our CLI risk backtest or local formula
+    # Build exception sequence as ints
+    exc_seq = [int(x == 1.0) for x in df['exc'].dropna().tolist()]
+    try:
+        # If pyquant_pricer available, use binding for exact stats
+        import pyquant_pricer as qp  # type: ignore
+        stats = qp.kupiec_christoffersen(exc_seq, alpha) if hasattr(qp, 'kupiec_christoffersen') else None
+    except Exception:
+        stats = None
     fig, ax = plt.subplots(figsize=(8, 3))
     ax.plot(df['var'], label='VaR (1d, 99%)')
     ax.plot(-df['ret'], alpha=0.5, label='-Return')
@@ -183,6 +192,8 @@ def build_var_plot(returns_csv, out_png, alpha=0.99):
     plt.tight_layout()
     plt.savefig(out_png, dpi=200)
     plt.close(fig)
+    if stats:
+        print('VaR backtest: POF p={:.3g}, IND p={:.3g}, CC p={:.3g}'.format(stats['p_pof'], stats['p_ind'], stats['p_cc']))
 
 
 def stitch_pdf(artifacts_dir, images, pdf_name):

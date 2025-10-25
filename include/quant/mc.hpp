@@ -60,11 +60,13 @@ struct GreeksResult {
     McStatistic vega;       // pathwise
     McStatistic gamma_lrm;  // likelihood-ratio
     McStatistic gamma_mixed;// mixed (pathwise × LR)
+    McStatistic theta;      // finite-difference in time with common RNG
 };
 
 /// Monte Carlo Greeks under GBM.
 /// - Delta, Vega: pathwise estimators
 /// - Gamma: exposes both pure LRM and the lower-variance mixed estimator
+/// - Theta: finite-difference in time using common random numbers
 GreeksResult greeks_european_call(const McParams& p);
 
 } // namespace quant::mc

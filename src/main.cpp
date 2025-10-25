@@ -247,7 +247,28 @@ int main(int argc, char** argv) {
 
         apply_thread_override(thread_override);
         auto res = quant::mc::price_european_call(p);
-        print_mc_result(res, json);
+        if (json) {
+            int threads_used = 1;
+#ifdef QUANT_HAS_OPENMP
+            threads_used = (thread_override > 0) ? thread_override : omp_get_max_threads();
+#else
+            (void)thread_override;
+#endif
+            std::cout << "{\"price\":" << res.estimate.value
+                      << ",\"std_error\":" << res.estimate.std_error
+                      << ",\"ci_low\":" << res.estimate.ci_low
+                      << ",\"ci_high\":" << res.estimate.ci_high
+                      << ",\"paths\":" << p.num_paths
+                      << ",\"seed\":" << p.seed
+                      << ",\"antithetic\":" << (p.antithetic ? 1 : 0)
+                      << ",\"sampler\":\"" << (p.qmc == quant::mc::McParams::Qmc::None ? "prng" : (p.qmc == quant::mc::McParams::Qmc::Sobol ? "sobol" : "sobol_scrambled")) << "\""
+                      << ",\"bridge\":\"" << (p.bridge == quant::mc::McParams::Bridge::None ? "none" : "bb") << "\""
+                      << ",\"steps\":" << p.num_steps
+                      << ",\"threads\":" << threads_used
+                      << "}\n";
+        } else {
+            print_mc_result(res, false);
+        }
         return 0;
     } else if (engine == "barrier") {
         if (argc < 4) {
@@ -365,7 +386,28 @@ int main(int argc, char** argv) {
                 }
                 apply_thread_override(thread_override);
                 auto res = quant::mc::price_barrier_option(p, K, opt, spec);
-                print_mc_result(res, json);
+                if (json) {
+                    int threads_used = 1;
+#ifdef QUANT_HAS_OPENMP
+                    threads_used = (thread_override > 0) ? thread_override : omp_get_max_threads();
+#else
+                    (void)thread_override;
+#endif
+                    std::cout << "{\"price\":" << res.estimate.value
+                              << ",\"std_error\":" << res.estimate.std_error
+                              << ",\"ci_low\":" << res.estimate.ci_low
+                              << ",\"ci_high\":" << res.estimate.ci_high
+                              << ",\"paths\":" << p.num_paths
+                              << ",\"seed\":" << p.seed
+                              << ",\"antithetic\":" << (p.antithetic ? 1 : 0)
+                              << ",\"sampler\":\"" << (p.qmc == quant::mc::McParams::Qmc::None ? "prng" : (p.qmc == quant::mc::McParams::Qmc::Sobol ? "sobol" : "sobol_scrambled")) << "\""
+                              << ",\"bridge\":\"" << (p.bridge == quant::mc::McParams::Bridge::None ? "none" : "bb") << "\""
+                              << ",\"steps\":" << p.num_steps
+                              << ",\"threads\":" << threads_used
+                              << "}\n";
+                } else {
+                    print_mc_result(res, false);
+                }
             } catch (const std::exception& ex) {
                 std::cerr << ex.what() << "\n";
                 return 1;
@@ -374,7 +416,7 @@ int main(int argc, char** argv) {
         }
         if (method == "pde") {
             if (argc < 17) {
-                std::cerr << "barrier pde <call|put> <up|down> <in|out> <S> <K> <B> <rebate> <r> <q> <sigma> <T> <space_nodes> <time_steps> <smax_mult>\n";
+                std::cerr << "barrier pde <call|put> <up|down> <in|out> <S> <K> <B> <rebate> <r> <q> <sigma> <T> <space_nodes> <time_steps> <smax_mult> [--json]\n";
                 return 1;
             }
             try {
@@ -403,8 +445,21 @@ int main(int argc, char** argv) {
                 p.time = T;
                 p.barrier = spec;
                 p.grid = quant::pde::GridSpec{space_nodes, time_steps, smax_mult};
-                double value = quant::pde::price_barrier_crank_nicolson(p, opt);
-                std::cout << value << "\n";
+                bool json = false;
+                for (int idx = 17; idx < argc; ++idx) {
+                    std::string flag = argv[idx];
+                    if (flag == "--json") json = true; else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
+                }
+                if (json) {
+                    auto gres = quant::pde::price_barrier_crank_nicolson_greeks(p, opt);
+                    std::cout << "{\"price\":" << gres.price
+                              << ",\"delta\":" << gres.delta
+                              << ",\"gamma\":" << gres.gamma
+                              << "}\n";
+                } else {
+                    double value = quant::pde::price_barrier_crank_nicolson(p, opt);
+                    std::cout << value << "\n";
+                }
             } catch (const std::exception& ex) {
                 std::cerr << ex.what() << "\n";
                 return 1;

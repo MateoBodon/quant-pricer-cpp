@@ -500,3 +500,21 @@ LsmcResult price_lsmc(const LsmcParams& params) {
 }
 
 } // namespace quant::american
+
+namespace quant::american {
+
+Greeks greeks_psor_bump(PsorParams params, double rel_bump) {
+    const double S0 = params.base.spot;
+    const double h = std::max(1e-6, std::abs(rel_bump) * std::max(1.0, S0));
+    params.base.spot = S0 + h;
+    const double up = price_psor(params).price;
+    params.base.spot = S0 - h;
+    const double dn = price_psor(params).price;
+    params.base.spot = S0;
+    const double mid = price_psor(params).price;
+    const double delta = (up - dn) / (2.0 * h);
+    const double gamma = (up - 2.0 * mid + dn) / (h * h);
+    return Greeks{delta, gamma};
+}
+
+} // namespace quant::american

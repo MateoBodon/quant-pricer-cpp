@@ -21,6 +21,9 @@ def main():
     ap.add_argument('--date', required=True, help='Trade date YYYY-MM-DD')
     ap.add_argument('--underlying', default='SPX', help='Underlying symbol (e.g., SPX)')
     ap.add_argument('--out', required=True, help='Output CSV path')
+    ap.add_argument('--min_moneyness', type=float, default=0.6, help='Minimum K/S to retain')
+    ap.add_argument('--max_moneyness', type=float, default=1.4, help='Maximum K/S to retain')
+    ap.add_argument('--min_days', type=int, default=2, help='Minimum calendar days to expiry')
     args = ap.parse_args()
 
     try:
@@ -112,7 +115,19 @@ def main():
         print('No rows returned for date {}'.format(date), file=sys.stderr)
         sys.exit(3)
 
-    df['mid'] = (df['best_bid'].fillna(0) + df['best_offer'].fillna(0)) / 2.0
+    # Robust mid: if one side missing, use the other; drop if both missing
+    import numpy as np
+    bb = df['best_bid'].astype(float)
+    bo = df['best_offer'].astype(float)
+    # Fix crossed markets by swapping where needed
+    mask_cross = (bb.notna()) & (bo.notna()) & (bb > bo)
+    if mask_cross.any():
+        tmp = bb[mask_cross].copy()
+        bb.loc[mask_cross] = bo[mask_cross]
+        bo.loc[mask_cross] = tmp
+    mid = np.where(bb.notna() & bo.notna(), 0.5 * (bb.to_numpy() + bo.to_numpy()),
+                   np.where(bb.notna(), bb.to_numpy(), np.where(bo.notna(), bo.to_numpy(), np.nan)))
+    df['mid'] = mid
     # Some sites store as UNDER_PRICE or other case variations
     under_candidates = [c for c in df.columns if c.lower() == 'under_price']
     if under_candidates:
@@ -124,13 +139,19 @@ def main():
         else:
             print('Could not locate under_price column in security price table', file=sys.stderr)
             sys.exit(4)
-    df['maturity_years'] = (df['exdate'] - df['date']).dt.days / 365.0
-    df = df[(df['maturity_years'] > 1/365.0) & (df['mid'] > 0)]
+    days = (df['exdate'] - df['date']).dt.days
+    df['maturity_years'] = days / 365.0
+    df = df[(days >= args.min_days)]
+    df = df[np.isfinite(df['mid']) & (df['mid'] > 0)]
     df['call_put'] = df['cp_flag'].map({'C': 'call', 'P': 'put'})
 
     # Simplified flat r and q (user may post-edit). Set q=0 for index, r from FRED or 2% placeholder.
     df['rate'] = 0.02
     df['q'] = 0.00
+
+    # Moneyness filter
+    df['moneyness'] = df['strike'] / df['spot']
+    df = df[(df['moneyness'] >= args.min_moneyness) & (df['moneyness'] <= args.max_moneyness)]
 
     out = df[['call_put', 'strike', 'mid', 'rate', 'q', 'spot', 'maturity_years']].copy()
     os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)

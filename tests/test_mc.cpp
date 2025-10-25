@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include "quant/mc.hpp"
 #include "quant/black_scholes.hpp"
+#include "quant/pde.hpp"
 
 using namespace quant;
 
@@ -117,6 +118,42 @@ TEST(MonteCarlo, GreeksAcrossMoneynessAndAntithetic) {
         EXPECT_NEAR(g.gamma_lrm.value, gamma_ref, kSigmaFactor * g.gamma_lrm.std_error);
         EXPECT_NEAR(g.gamma_mixed.value, gamma_ref, kSigmaFactor * g.gamma_mixed.std_error);
     }
+}
+
+TEST(MonteCarlo, ThetaCloseToPDE) {
+    mc::McParams mp{
+        .spot = 100.0,
+        .strike = 100.0,
+        .rate = 0.02,
+        .dividend = 0.01,
+        .vol = 0.2,
+        .time = 1.0,
+        .num_paths = 400000,
+        .seed = 13579ULL,
+        .antithetic = true,
+        .control_variate = false
+    };
+    auto g = mc::greeks_european_call(mp);
+
+    // PDE theta reference (backward difference from price)
+    quant::pde::PdeParams pp{
+        .spot = mp.spot,
+        .strike = mp.strike,
+        .rate = mp.rate,
+        .dividend = mp.dividend,
+        .vol = mp.vol,
+        .time = mp.time,
+        .type = quant::pde::OptionType::Call,
+        .grid = quant::pde::GridSpec{321, 320, 4.0, 2.0},
+        .log_space = true,
+        .upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann,
+        .compute_theta = true,
+        .use_rannacher = true
+    };
+    auto res = quant::pde::price_crank_nicolson(pp);
+    ASSERT_TRUE(res.theta.has_value());
+    double theta_ref = *res.theta;
+    EXPECT_NEAR(g.theta.value, theta_ref, 5.0 * g.theta.std_error + std::abs(theta_ref) * 0.05);
 }
 
 TEST(MonteCarlo, GammaMixedVarianceLowerThanLR) {
