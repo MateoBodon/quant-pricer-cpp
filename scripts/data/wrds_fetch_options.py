@@ -124,7 +124,7 @@ def main():
         else:
             print('Could not locate under_price column in security price table', file=sys.stderr)
             sys.exit(4)
-    df['maturity_years'] = (pd.to_datetime(df['exdate']).dt.date - pd.to_datetime(df['date']).dt.date).dt.days / 365.0
+    df['maturity_years'] = (df['exdate'] - df['date']).dt.days / 365.0
     df = df[(df['maturity_years'] > 1/365.0) & (df['mid'] > 0)]
     df['call_put'] = df['cp_flag'].map({'C': 'call', 'P': 'put'})
 
