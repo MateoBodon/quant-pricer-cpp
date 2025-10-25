@@ -97,6 +97,9 @@ def main():
             sys.exit(2)
         # Align column expected downstream
         df = df.rename(columns={'close': 'under_price', 'strike_price': 'strike'})
+        # Ensure dates are datetime
+        df['exdate'] = pd.to_datetime(df['exdate'])
+        df['date'] = pd.to_datetime(df['date'])
     except Exception as e:
         last_err = e
         df = None
