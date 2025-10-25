@@ -46,13 +46,19 @@ def main():
     try:
         def sql_df(engine, q):
             # Bypass pandas+sqlalchemy param issues using raw cursor
-            with engine.raw_connection() as conn:
-                with conn.cursor() as cur:
+            conn = engine.raw_connection()
+            try:
+                cur = conn.cursor()
+                try:
                     cur.execute(q)
                     cols = [c[0] for c in cur.description]
                     rows = cur.fetchall()
                     import pandas as _pd
                     return _pd.DataFrame(rows, columns=cols)
+                finally:
+                    cur.close()
+            finally:
+                conn.close()
 
         opt_query = f"""
             select secid, symbol, exdate, cp_flag, strike_price, best_bid, best_offer, date
