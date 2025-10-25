@@ -15,10 +15,11 @@ struct PiecewiseConstant {
         if (times.empty() || values.empty() || times.size() != values.size()) {
             throw std::runtime_error("PiecewiseConstant: invalid schedule");
         }
+        // Right-closed intervals: value is constant on (t_{i-1}, t_i],
+        // and for t <= times.front() we return the first value.
         if (t <= times.front()) return values.front();
-        auto it = std::upper_bound(times.begin(), times.end(), t);
+        auto it = std::lower_bound(times.begin(), times.end(), t); // first time >= t
         std::size_t idx = static_cast<std::size_t>(std::distance(times.begin(), it));
-        if (idx == 0) return values.front();
         if (idx >= values.size()) return values.back();
         return values[idx];
     }

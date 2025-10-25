@@ -55,5 +55,14 @@ struct LsmcResult {
 
 LsmcResult price_lsmc(const LsmcParams& params);
 
+struct Greeks {
+    double delta;
+    double gamma;
+};
+
+// Compute Greeks via bump-and-reprice around spot using PSOR as pricer.
+// rel_bump is a small relative bump (e.g., 1e-3)
+Greeks greeks_psor_bump( PsorParams params, double rel_bump );
+
 } // namespace quant::american
 

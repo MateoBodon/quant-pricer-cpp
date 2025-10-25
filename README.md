@@ -42,6 +42,7 @@
 - **Exotics**: Arithmetic Asian MC with geometric CV, lookback MC (fixed/floating), digitals (analytic and MC hooks)
 - **Heston**: Analytic European call via characteristic-function Gauss–Laguerre; Andersen QE MC with antithetic
 - **Risk**: VaR/CVaR via MC and historical backtesting with Kupiec test
+ - **Multi‑Asset & Jumps**: Basket MC with Cholesky correlation; Merton jump‑diffusion MC for European options
 
 ### ⚡ **Advanced Monte Carlo**
 - **Variance Reduction**: Antithetic variates and control variates for improved convergence
@@ -222,6 +223,7 @@ The library implements both pathwise and likelihood-ratio estimators for compreh
 auto greeks = quant::mc::greeks_european_call(params);
 // Pathwise Δ/ν: greeks.delta.value, greeks.vega.value
 // Γ estimators: greeks.gamma_lrm.value (LRM), greeks.gamma_mixed.value (mixed)
+// Θ (time decay): greeks.theta.value (backward difference with common RNG)
 // Each statistic carries std_error and 95% CI bounds via ci_low/ci_high
 ```
 
@@ -234,6 +236,7 @@ auto greeks = quant::mc::greeks_european_call(params);
 - **`gamma_mixed`**: Pathwise Δ × LR score with the analytic correction `-Δ/S_0`, lowering the variance (see table below)
 
 **Likelihood Ratio Method (Gamma):**
+The library also provides a robust Θ estimator via a backward calendar‑time finite difference with common random numbers, which matches PDE Θ in unit tests.
 - **Gamma**: `∂²V/∂S² = e^(-rT) * 1{S_T > K} * S_T * (W_T² - T)/(S_0²σ²T)`
 
 ### Variance Reduction Techniques
@@ -425,6 +428,13 @@ python3 scripts/report.py \
   --returns_csv data/spy_returns.csv \
   --series_csv artifacts/heston_series.csv \
   --artifacts_dir artifacts
+```
+
+### Python bindings (dev workflow)
+```bash
+# Use the in-tree module during development
+PYTHONPATH=build/python python3 scripts/greeks_variance.py --artifacts artifacts
+PYTHONPATH=build/python python3 scripts/multiasset_figures.py --artifacts artifacts
 ```
 
 ```bash
@@ -627,7 +637,11 @@ File | What it shows
 `pde_convergence.png` | CN + **Rannacher** ~2nd‑order slope on log–log error; Δ/Γ truncation behavior.
 `barrier_validation.png` | MC (≤3σ) and PDE (≤1e‑4) vs **Reiner–Rubinstein** closed forms.
 `american_convergence.png` | **PSOR** vs **LSMC** agreement and convergence on a standard grid.
+`greeks_variance.png` | Γ estimator std error vs paths: mixed Γ ≪ LRM.
+`basket_correlation.png` | 2‑asset basket call price vs correlation ρ.
+`merton_lambda.png` | Merton jump‑diffusion price vs jump intensity λ.
 `onepager.pdf` | One‑page summary with the four plots and validation tables.
+`twopager.pdf` | Two‑page summary including Greeks variance and multi‑asset/jumps plots.
 
 ---
 
@@ -774,7 +788,7 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 ## Limitations
 
 ### Current Constraints
-- **Single Asset**: No multi-asset or basket options
+- **Multi‑Asset**: Basket MC supported; spreads and multi‑step path Greeks forthcoming
 - **Constant Parameters**: No time-dependent volatility or rates
 - **No Dividends**: Continuous dividend yield only (no discrete dividends)
 
@@ -800,7 +814,7 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 ### Medium Term (v0.3)
 - [ ] **Exotic Options**: Asian, lookback, and digital options
 - [ ] **Stochastic Volatility**: Heston and SABR models
-- [ ] **Jump Processes**: Merton and Kou jump-diffusion
+- [ ] **Jump Processes**: Extend Merton (done) with Kou and Bates; Greeks
 - [ ] **GPU Acceleration**: CUDA/OpenCL Monte Carlo
 
 ### Long Term (v1.0)

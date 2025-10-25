@@ -36,6 +36,32 @@ VarEs var_cvar_portfolio(const std::vector<double>& mu,
                          unsigned long seed,
                          double alpha);
 
+// Backtest statistics for VaR exceptions
+struct BacktestStats {
+    double alpha;           // VaR confidence
+    unsigned long T;        // total trials
+    unsigned long N;        // number of exceptions
+    double lr_pof;          // Kupiec POF LR statistic (df=1)
+    double p_pof;           // p-value for POF
+    double lr_ind;          // Christoffersen independence LR (df=1)
+    double p_ind;           // p-value for independence
+    double lr_cc;           // Combined conditional coverage LR (df=2)
+    double p_cc;            // p-value for combined
+};
+
+// Compute Kupiec (POF) and Christoffersen (independence) tests from exception sequence (0/1)
+BacktestStats kupiec_christoffersen(const std::vector<int>& exceptions, double alpha);
+
+// t-Student VaR/CVaR for a single asset P&L over a horizon
+VarEs var_cvar_t(double mu,
+                 double sigma,
+                 double nu,
+                 double horizon_years,
+                 double position,
+                 unsigned long num_sims,
+                 unsigned long seed,
+                 double alpha);
+
 }
 
 

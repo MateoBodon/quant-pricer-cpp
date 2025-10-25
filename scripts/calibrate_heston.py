@@ -60,14 +60,30 @@ def main():
                 df_r = math.exp(-r * T)
                 df_q = math.exp(-q * T)
                 model = model - S * df_q + K * df_r
+            # Weight by 1/mid to approximate relative error; add outlier downweighting
             w = 1.0 / max(row['mid'], 1e-8)
-            res.append(w * (model - row['mid']))
+            err = (model - row['mid']) * w
+            # Huber-like squashing to reduce outsized influence
+            c = 3.0
+            if abs(err) > c:
+                err = c * (1 if err > 0 else -1)
+            res.append(err)
         return np.array(res)
 
     x0 = np.array([1.5, 0.04, 0.5, -0.5, 0.04])
     lb = np.array([1e-4, 1e-6, 1e-6, -0.999, 1e-6])
     ub = np.array([10.0, 2.00, 5.0, 0.999, 2.0])
-    sol = least_squares(residuals, x0, bounds=(lb, ub), max_nfev=100)
+    # Penalty: Feller proximity and extreme rho
+    def objective(x):
+        res = residuals(x)
+        kappa, theta, sigma, rho, v0 = x
+        # Feller penalty: max(0, 2*kappa*theta - sigma^2) encourages >= 0
+        feller = max(0.0, 1e-3 - (2.0 * kappa * max(theta,1e-8) - sigma * sigma))
+        rho_pen = max(0.0, abs(rho) - 0.95)
+        pen = 1e2 * feller + 1e1 * rho_pen
+        return np.concatenate([res, np.array([pen])])
+
+    sol = least_squares(objective, x0, bounds=(lb, ub), max_nfev=300)
 
     params = {
         'kappa': float(sol.x[0]),
@@ -75,7 +91,7 @@ def main():
         'sigma': float(sol.x[2]),
         'rho': float(sol.x[3]),
         'v0': float(sol.x[4]),
-        'cost': float(np.sum(sol.fun**2)),
+        'cost': float(np.sum(residuals(sol.x)**2)),
         'num_obs': int(len(df)),
         'csv': args.csv,
     }

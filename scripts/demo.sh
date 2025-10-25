@@ -109,14 +109,12 @@ def mc_price_and_error(params):
     if num_steps is not None:
         args.append(int(num_steps))
 
-    output = run_cli(args)
-    match = MC_OUTPUT_RE.match(output)
-    if not match:
-        raise RuntimeError(f"Unexpected Monte Carlo output format: {output}")
-    price = float(match.group(1))
-    std_error = float(match.group(2))
-    ci_low = float(match.group(3))
-    ci_high = float(match.group(4))
+    # Prefer JSON output for determinism metadata and robust parsing
+    res = run_cli_json(args)
+    price = float(res.get("price"))
+    std_error = float(res.get("std_error", 0.0))
+    ci_low = float(res.get("ci_low", price))
+    ci_high = float(res.get("ci_high", price))
     return price, std_error, ci_low, ci_high
 
 SQRT_2PI = math.sqrt(2.0 * math.pi)
@@ -837,6 +835,55 @@ with PdfPages(pdf_path) as pdf:
     pdf.savefig(fig)
     plt.close(fig)
 
+# Generate extra figures (Greeks variance, multi-asset)
+try:
+    # Greeks variance (requires bindings)
+    subprocess.check_call([sys.executable, str(root / 'scripts' / 'greeks_variance.py'), '--artifacts', str(artifact_dir)])
+except Exception as e:
+    print('warn: greeks variance figure failed:', e)
+
+try:
+    # Multi-asset (requires bindings)
+    subprocess.check_call([sys.executable, str(root / 'scripts' / 'multiasset_figures.py'), '--artifacts', str(artifact_dir)])
+except Exception as e:
+    print('warn: multiasset figures failed:', e)
+
+# Two-pager PDF with extra figures (if present)
+twopager = artifact_dir / 'twopager.pdf'
+with PdfPages(twopager) as pdf2:
+    # Page 1: reuse onepager content
+    fig, axes = plt.subplots(2, 2, figsize=(11.0, 8.5))
+    for ax, (img_path, title) in zip(axes.flatten(), plots):
+        img = mpimg.imread(img_path)
+        ax.imshow(img)
+        ax.set_title(title)
+        ax.axis('off')
+    pdf2.savefig(fig)
+    plt.close(fig)
+    # Page 2: new figures if available
+    extra_imgs = []
+    for name, title in [
+        ('greeks_variance.png', 'Gamma estimator variance'),
+        ('basket_correlation.png', 'Basket price vs correlation'),
+        ('merton_lambda.png', 'Merton price vs lambda'),
+    ]:
+        path = artifact_dir / name
+        if path.exists():
+            extra_imgs.append((path, title))
+    if extra_imgs:
+        rows = 1
+        cols = len(extra_imgs)
+        fig, axes = plt.subplots(rows, cols, figsize=(11.0, 4.5))
+        if cols == 1:
+            axes = [axes]
+        for ax, (img_path, title) in zip(axes, extra_imgs):
+            img = mpimg.imread(img_path)
+            ax.imshow(img)
+            ax.set_title(title)
+            ax.axis('off')
+        pdf2.savefig(fig)
+        plt.close(fig)
+
 # Manifest JSON
 try:
     cli_rel = str(cli.relative_to(root))
@@ -860,6 +907,12 @@ manifest = {
         "std_error": round(mc_std_error, 6),
         "ci_low": round(mc_ci_low, 6),
         "ci_high": round(mc_ci_high, 6),
+        # capture threads used via JSON query
+        "threads": run_cli_json([
+            "mc",
+            mc_params["spot"], mc_params["strike"], mc_params["rate"], mc_params["dividend"], mc_params["vol"], mc_params["tenor"],
+            mc_params["paths"], mc_params["seed"], 1, mc_params["qmc_mode"], mc_params["bridge_mode"], mc_params["num_steps"],
+        ]).get("threads", 1),
     },
     "qmc_vs_prng": {
         "paths": paths_grid,

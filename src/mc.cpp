@@ -54,12 +54,14 @@ struct GreekAccumulators {
     quant::stats::Welford vega;
     quant::stats::Welford gamma_lrm;
     quant::stats::Welford gamma_mixed;
+    quant::stats::Welford theta;
 
     void merge(const GreekAccumulators& other) {
         delta.merge(other.delta);
         vega.merge(other.vega);
         gamma_lrm.merge(other.gamma_lrm);
         gamma_mixed.merge(other.gamma_mixed);
+        theta.merge(other.theta);
     }
 };
 
@@ -276,6 +278,7 @@ GreekAccumulators simulate_greeks_range(std::uint64_t begin,
         const double z = normal(rng);
         const double ST1 = ctx.spot * std::exp(ctx.drift + ctx.vol_sqrt_time * z);
         const double payoff1 = std::max(0.0, ST1 - ctx.strike);
+        const double priceT1 = ctx.discount * payoff1;
 
         double delta1 = 0.0;
         double vega1 = 0.0;
@@ -292,6 +295,27 @@ GreekAccumulators simulate_greeks_range(std::uint64_t begin,
         double vega_sample = vega1;
         double gamma_lrm_sample = gamma_lrm1;
         double gamma_mixed_sample = gamma_mixed1;
+        double theta_sample;
+
+        // Theta: backward difference in calendar time to match PDE convention
+        if (ctx.time > 0.0) {
+            const double h = std::max(1e-4, 1e-3 * ctx.time);
+            const double T_minus = (ctx.time > h) ? (ctx.time - h) : ctx.time;
+            auto price_at_T = [&](double T, double zval) {
+                if (T <= 0.0) return 0.0;
+                const double disc = std::exp(-ctx.rate * T);
+                const double driftT = (ctx.rate - ctx.dividend - 0.5 * ctx.vol * ctx.vol) * T;
+                const double ST = ctx.spot * std::exp(driftT + ctx.vol * std::sqrt(T) * zval);
+                const double payoff = std::max(0.0, ST - ctx.strike);
+                return disc * payoff;
+            };
+            const double p_curr = priceT1;
+            const double p_minus = (T_minus < ctx.time) ? price_at_T(T_minus, z) : priceT1;
+            const double denom = (T_minus < ctx.time) ? (ctx.time - T_minus) : 1.0;
+            theta_sample = (p_minus - p_curr) / denom;
+        } else {
+            theta_sample = 0.0;
+        }
 
         if (ctx.antithetic) {
             const double z2 = -z;
@@ -307,17 +331,36 @@ GreekAccumulators simulate_greeks_range(std::uint64_t begin,
             const double gamma_lrm2 = ctx.discount * payoff2 * gamma_weight(z2);
             const double gamma_mixed2 = delta2 * (ctx.score_coeff * z2)
                                         - (payoff2 > 0.0 ? ctx.discount * (ST2 / (ctx.spot * ctx.spot)) : 0.0);
+            double theta2 = 0.0;
+            if (ctx.time > 0.0) {
+                const double h = std::max(1e-4, 1e-3 * ctx.time);
+                const double T_minus = (ctx.time > h) ? (ctx.time - h) : ctx.time;
+                auto price_at_T = [&](double T, double zval) {
+                    if (T <= 0.0) return 0.0;
+                    const double disc = std::exp(-ctx.rate * T);
+                    const double driftT = (ctx.rate - ctx.dividend - 0.5 * ctx.vol * ctx.vol) * T;
+                    const double ST = ctx.spot * std::exp(driftT + ctx.vol * std::sqrt(T) * zval);
+                    const double payoff = std::max(0.0, ST - ctx.strike);
+                    return disc * payoff;
+                };
+                const double p_curr2 = ctx.discount * payoff2;
+                const double p_minus2 = (T_minus < ctx.time) ? price_at_T(T_minus, z2) : p_curr2;
+                const double denom2 = (T_minus < ctx.time) ? (ctx.time - T_minus) : 1.0;
+                theta2 = (p_minus2 - p_curr2) / denom2;
+            }
 
             delta_sample = 0.5 * (delta1 + delta2);
             vega_sample = 0.5 * (vega1 + vega2);
             gamma_lrm_sample = 0.5 * (gamma_lrm1 + gamma_lrm2);
             gamma_mixed_sample = 0.5 * (gamma_mixed1 + gamma_mixed2);
+            theta_sample = 0.5 * (theta_sample + theta2);
         }
 
         accum.delta.add(delta_sample);
         accum.vega.add(vega_sample);
         accum.gamma_lrm.add(gamma_lrm_sample);
         accum.gamma_mixed.add(gamma_mixed_sample);
+        accum.theta.add(theta_sample);
     }
 
     return accum;
@@ -469,6 +512,7 @@ GreeksResult greeks_european_call(const McParams& p) {
     result.vega = summarize(totals.vega);
     result.gamma_lrm = summarize(totals.gamma_lrm);
     result.gamma_mixed = summarize(totals.gamma_mixed);
+    result.theta = summarize(totals.theta);
     return result;
 }
 
