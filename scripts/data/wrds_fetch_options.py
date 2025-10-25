@@ -40,21 +40,46 @@ def main():
     op_tbl = f"optionm.opprcd{year}"
     sec_tbl = f"optionm.secprd{year}"
 
-    df = None
+    # Strategy: (1) pull options slice; (2) pull underlying closes for those secids; (3) merge in pandas
     last_err = None
     try:
-        query = f"""
-            select o.exdate,
-                   o.strike_price/1000.0 as strike,
-                   o.best_bid, o.best_offer, o.cp_flag,
-                   o.date,
-                   sp.close as under_price
-            from {op_tbl} as o
-            join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
-            where o.date = '{date}'
-              and (o.symbol = '{args.underlying}' or o.symbol ilike '{args.underlying}%')
+        opt_query = f"""
+            select secid, symbol, exdate, cp_flag, strike_price, best_bid, best_offer, date
+            from {op_tbl}
+            where date = '{date}'
+              and (symbol = '{args.underlying}' or symbol ilike '{args.underlying}%')
         """
-        df = db.raw_sql(query)
+        opt = db.raw_sql(opt_query)
+        if opt is None or opt.empty:
+            print('No option quotes for given date/symbol', file=sys.stderr)
+            sys.exit(2)
+
+        # Pull secprd for these secids in chunks
+        import math
+        secids = sorted({int(x) for x in opt['secid'].dropna().astype(int).tolist()})
+        closes = []
+        chunk_size = 200
+        for i in range(0, len(secids), chunk_size):
+            chunk = ",".join(str(s) for s in secids[i:i+chunk_size])
+            sp_query = f"""
+                select secid, date, close
+                from {sec_tbl}
+                where date = '{date}' and secid in ({chunk})
+            """
+            part = db.raw_sql(sp_query)
+            if part is not None and not part.empty:
+                closes.append(part)
+        import pandas as pd
+        if not closes:
+            print('No underlying close prices for selected secids/date', file=sys.stderr)
+            sys.exit(2)
+        sp = pd.concat(closes, ignore_index=True)
+        df = opt.merge(sp, on=['secid', 'date'], how='inner')
+        if df.empty:
+            print('Join produced no rows (secid/date mismatch)', file=sys.stderr)
+            sys.exit(2)
+        # Align column expected downstream
+        df = df.rename(columns={'close': 'under_price', 'strike_price': 'strike'})
     except Exception as e:
         last_err = e
         df = None
