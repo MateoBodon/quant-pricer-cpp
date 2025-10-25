@@ -33,43 +33,31 @@ def main():
     date = pd.to_datetime(args.date).date()
     db = wrds.Connection()
 
-    # OptionMetrics is year-partitioned; institutions may expose different schemas.
-    # Try multiple schema prefixes in order.
+    # OptionMetrics is year-partitioned; use the tables visible in your site:
+    # - optionm.opprcdYYYY (option quotes with symbol, cp_flag, strike_price, bids/offers)
+    # - optionm.secprdYYYY (security prices with close)
     year = str(date.year)
-    schema_prefixes = [
-        "optionm",
-        "optionm_all",
-        "optionmsamp_us",
-    ]
-    candidates = []
-    for spfx in schema_prefixes:
-        candidates.append((f"{spfx}.option_price_{year}", f"{spfx}.security_price"))
-        # As a last resort, the non-year view may exist
-        candidates.append((f"{spfx}.option_price_view", f"{spfx}.security_price"))
+    op_tbl = f"optionm.opprcd{year}"
+    sec_tbl = f"optionm.secprd{year}"
 
     df = None
     last_err = None
-    for op_tbl, sec_tbl in candidates:
-        try:
-            query = f"""
-                select o.exdate,
-                       o.strike_price/1000.0 as strike,
-                       o.best_bid, o.best_offer, o.cp_flag,
-                       o.date,
-                       sp.under_price
-                from {op_tbl} as o
-                join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
-                where o.date = '{date}'
-                  and (o.symbol = '{args.underlying}' or o.symbol ilike '{args.underlying}%')
-            """
-            df_try = db.raw_sql(query)
-            if df_try is not None and not df_try.empty:
-                df = df_try
-                break
-        except Exception as e:
-            last_err = e
-            df = None
-            continue
+    try:
+        query = f"""
+            select o.exdate,
+                   o.strike_price/1000.0 as strike,
+                   o.best_bid, o.best_offer, o.cp_flag,
+                   o.date,
+                   sp.close as under_price
+            from {op_tbl} as o
+            join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
+            where o.date = '{date}'
+              and (o.symbol = '{args.underlying}' or o.symbol ilike '{args.underlying}%')
+        """
+        df = db.raw_sql(query)
+    except Exception as e:
+        last_err = e
+        df = None
 
     if df is None or df.empty:
         print('WRDS query failed or returned no rows: {}'.format(last_err), file=sys.stderr)
