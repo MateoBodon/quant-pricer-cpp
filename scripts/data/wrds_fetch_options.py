@@ -26,6 +26,7 @@ def main():
     try:
         import wrds
         import pandas as pd
+        import psycopg2
     except Exception as e:
         print('error: requires wrds and pandas packages: {}'.format(e), file=sys.stderr)
         sys.exit(1)
@@ -43,13 +44,23 @@ def main():
     # Strategy: (1) pull options slice; (2) pull underlying closes for those secids; (3) merge in pandas
     last_err = None
     try:
+        def sql_df(engine, q):
+            # Bypass pandas+sqlalchemy param issues using raw cursor
+            with engine.raw_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(q)
+                    cols = [c[0] for c in cur.description]
+                    rows = cur.fetchall()
+                    import pandas as _pd
+                    return _pd.DataFrame(rows, columns=cols)
+
         opt_query = f"""
             select secid, symbol, exdate, cp_flag, strike_price, best_bid, best_offer, date
             from {op_tbl}
             where date = '{date}'
               and (symbol = '{args.underlying}' or symbol ilike '{args.underlying}%')
         """
-        opt = db.raw_sql(opt_query)
+        opt = sql_df(db.engine, opt_query)
         if opt is None or opt.empty:
             print('No option quotes for given date/symbol', file=sys.stderr)
             sys.exit(2)
@@ -66,7 +77,7 @@ def main():
                 from {sec_tbl}
                 where date = '{date}' and secid in ({chunk})
             """
-            part = db.raw_sql(sp_query)
+            part = sql_df(db.engine, sp_query)
             if part is not None and not part.empty:
                 closes.append(part)
         import pandas as pd
