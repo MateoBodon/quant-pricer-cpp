@@ -39,29 +39,47 @@ def main():
     candidates = [
         (f"optionm.opprcd{year}", f"optionm.secprd{year}"),
         (f"optionm.option_price_{year}", "optionm.security_price"),
-        ("optionm.opprcd", "optionm.secprd"),
     ]
 
     df = None
     last_err = None
-    security_tbl = "optionm.security"
     for op_tbl, sec_tbl in candidates:
-        query = f"""
-            select o.exdate,
-                   o.strike_price/1000.0 as strike,
-                   o.best_bid, o.best_offer, o.cp_flag,
-                   o.date,
-                   sp.under_price
-            from {op_tbl} as o
-            join {security_tbl} as sec on o.secid = sec.secid
-            join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
-            where sec.symbol = '{args.underlying}' and o.date = '{date}'
-        """
         try:
+            # Discover actual traded symbols for the date that match the requested root
+            sym_query = f"""
+                select distinct sec.symbol
+                from optionm.security as sec
+                join {sec_tbl} as sp on sec.secid = sp.secid
+                where sp.date = '{date}'
+                  and (sec.symbol = '{args.underlying}' or sec.symbol ilike '{args.underlying}%')
+                limit 20
+            """
+            symbols = db.raw_sql(sym_query)
+            symbol_list = [str(s) for s in symbols['symbol'].tolist()] if not symbols.empty else []
+
+            # Build main price query; prefer exact symbol if available, else ILIKE root%
+            if symbol_list:
+                sym_in = ",".join([f"'{s}'" for s in symbol_list])
+                where_sym = f"o.symbol in ({sym_in})"
+            else:
+                where_sym = f"(o.symbol = '{args.underlying}' or o.symbol ilike '{args.underlying}%')"
+
+            query = f"""
+                select o.exdate,
+                       o.strike_price/1000.0 as strike,
+                       o.best_bid, o.best_offer, o.cp_flag,
+                       o.date,
+                       sp.under_price
+                from {op_tbl} as o
+                join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
+                where {where_sym} and o.date = '{date}'
+            """
             df = db.raw_sql(query)
-            break
+            if not df.empty:
+                break
         except Exception as e:
             last_err = e
+            df = None
             continue
 
     if df is None or df.empty:
