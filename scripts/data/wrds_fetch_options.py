@@ -33,13 +33,19 @@ def main():
     date = pd.to_datetime(args.date).date()
     db = wrds.Connection()
 
-    # OptionMetrics is year-partitioned at many institutions.
-    # Prefer opprcdYYYY/secprdYYYY, fallback to non-partitioned or standardized views.
+    # OptionMetrics is year-partitioned; institutions may expose different schemas.
+    # Try multiple schema prefixes in order.
     year = str(date.year)
-    candidates = [
-        (f"optionm.opprcd{year}", f"optionm.secprd{year}"),
-        (f"optionm.option_price_{year}", "optionm.security_price"),
+    schema_prefixes = [
+        "optionm",
+        "optionm_all",
+        "optionmsamp_us",
     ]
+    candidates = []
+    for spfx in schema_prefixes:
+        candidates.append((f"{spfx}.option_price_{year}", f"{spfx}.security_price"))
+        # As a last resort, the non-year view may exist
+        candidates.append((f"{spfx}.option_price_view", f"{spfx}.security_price"))
 
     df = None
     last_err = None
@@ -52,10 +58,9 @@ def main():
                        o.date,
                        sp.under_price
                 from {op_tbl} as o
-                join optionm.security as sec on o.secid = sec.secid
                 join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
                 where o.date = '{date}'
-                  and (sec.symbol = '{args.underlying}' or sec.symbol ilike '{args.underlying}%')
+                  and (o.symbol = '{args.underlying}' or o.symbol ilike '{args.underlying}%')
             """
             df_try = db.raw_sql(query)
             if df_try is not None and not df_try.empty:
