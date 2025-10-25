@@ -45,27 +45,6 @@ def main():
     last_err = None
     for op_tbl, sec_tbl in candidates:
         try:
-            # Discover traded secids for the date matching the requested root
-            sym_query = f"""
-                select distinct sec.secid, sec.symbol
-                from optionm.security as sec
-                join {sec_tbl} as sp on sec.secid = sp.secid
-                where sp.date = '{date}'
-                  and (sec.symbol = '{args.underlying}' or sec.symbol ilike '{args.underlying}%')
-                limit 500
-            """
-            sym_df = db.raw_sql(sym_query)
-            secids = []
-            if sym_df is not None and not sym_df.empty and 'secid' in sym_df.columns:
-                # ensure plain Python list of ints/strings
-                secids = [str(int(x)) for x in sym_df['secid'].tolist() if pd.notna(x)]
-
-            if secids:
-                secid_in = ",".join(secids)
-                where_clause = f"o.secid in ({secid_in})"
-            else:
-                where_clause = f"(sec.symbol = '{args.underlying}' or sec.symbol ilike '{args.underlying}%')"
-
             query = f"""
                 select o.exdate,
                        o.strike_price/1000.0 as strike,
@@ -73,9 +52,10 @@ def main():
                        o.date,
                        sp.under_price
                 from {op_tbl} as o
-                join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
                 join optionm.security as sec on o.secid = sec.secid
-                where o.date = '{date}' and {where_clause}
+                join {sec_tbl} as sp on o.secid = sp.secid and o.date = sp.date
+                where o.date = '{date}'
+                  and (sec.symbol = '{args.underlying}' or sec.symbol ilike '{args.underlying}%')
             """
             df_try = db.raw_sql(query)
             if df_try is not None and not df_try.empty:
