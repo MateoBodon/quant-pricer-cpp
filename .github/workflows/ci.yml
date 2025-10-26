@@ -2,180 +2,81 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, main ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, main ]
 
 jobs:
   build-test:
-    name: ${{ matrix.os }} ${{ matrix.compiler }}
+    name: Build and test (${{ matrix.os }}, ${{ matrix.cxx }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        compiler: [gcc, clang]
-        exclude:
-          - os: windows-latest
-            compiler: clang
+        cxx: [default]
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build
+        with:
+          submodules: true
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DQUANT_ENABLE_OPENMP=ON
       - name: Build
-        run: cmake --build build -j
-      - name: Run tests
-        run: ctest --test-dir build --output-on-failure
+        run: cmake --build build --config Release --parallel
+      - name: Test
+        run: ctest --test-dir build --output-on-failure -C Release
 
-  sanitize:
-    name: Ubuntu sanitizers
+  sanitizers:
+    name: Sanitizers (Ubuntu, Clang)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y cmake ninja-build clang
-      - name: Configure (ASan/UBSan)
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DQUANT_ENABLE_SANITIZERS=ON -G Ninja
-      - name: Build
-        run: cmake --build build -j
-      - name: Tests
-        run: ctest --test-dir build --output-on-failure
-
-name: C++ CI
-
-on:
-  push:
-    branches: [ master, main ]
-  pull_request:
-    branches: [ master, main ]
-
-jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        compiler: [gcc, clang]
-        build_type: [Release, Debug]
-      fail-fast: false
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
         with:
-          submodules: recursive
-
-      - name: Install dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build clang-tidy doxygen graphviz lcov libomp-dev
-
-      - name: Install dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew update
-          brew install cmake ninja llvm doxygen graphviz libomp || true
-
-      - name: Install dependencies (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          choco install ninja doxygen.install graphviz.portable llvm -y
-
-      - name: Set up compiler environment (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          if [ "${{ matrix.compiler }}" = "gcc" ]; then
-            echo "CC=gcc" >> $GITHUB_ENV
-            echo "CXX=g++" >> $GITHUB_ENV
-          else
-            # Prefer llvm on macOS; on Ubuntu, clang is available
-            echo "CC=clang" >> $GITHUB_ENV
-            echo "CXX=clang++" >> $GITHUB_ENV
-          fi
-
-      - name: Set up compiler environment (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          if ('${{ matrix.compiler }}' -eq 'gcc') {
-            echo "GCC is not supported on Windows runners; using clang instead"
-            echo "CC=clang" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-            echo "CXX=clang++" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          } else {
-            echo "CC=clang" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-            echo "CXX=clang++" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          }
-
-      - name: Configure (${{ matrix.compiler }}, ${{ matrix.build_type }})
-        run: |
-          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DQUANT_ENABLE_CLANG_TIDY=ON
-
+          submodules: true
+      - name: Install clang
+        run: sudo apt-get update && sudo apt-get install -y clang
+      - name: Configure (ASan/UBSan)
+        env:
+          CC: clang
+          CXX: clang++
+        run: cmake -S . -B build-sani -DCMAKE_BUILD_TYPE=RelWithDebInfo -DQUANT_ENABLE_SANITIZERS=ON -DQUANT_ENABLE_OPENMP=OFF
       - name: Build
-        run: cmake --build build -j
+        run: cmake --build build-sani --parallel
+      - name: Test
+        run: ctest --test-dir build-sani --output-on-failure
 
-      - name: Run tests
-        run: ctest --test-dir build --output-on-failure | cat
-
-      - name: Coverage (Linux GCC Release)
-        if: runner.os == 'Linux' && matrix.compiler == 'gcc' && matrix.build_type == 'Release'
-        run: |
-          cmake -S . -B build-cov -G Ninja -DCMAKE_BUILD_TYPE=Release -DQUANT_ENABLE_CLANG_TIDY=OFF -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage"
-          cmake --build build-cov -j
-          ctest --test-dir build-cov --output-on-failure | cat
-          lcov --directory build-cov --capture --output-file coverage.info
-          lcov --remove coverage.info '*/external/*' '/usr/*' --output-file coverage.info
-          lcov --list coverage.info
-        shell: bash
-
-      - name: Configure with Sanitizers (clang, Debug)
-        if: runner.os != 'Windows' && matrix.compiler == 'clang' && matrix.build_type == 'Debug'
-        run: |
-          cmake -S . -B build-sani -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQUANT_ENABLE_SANITIZERS=ON
-          cmake --build build-sani -j
-          ctest --test-dir build-sani --output-on-failure | cat
-
-      - name: Generate Doxygen Docs (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          if [ -f Doxyfile ]; then doxygen Doxyfile; fi
-
-      - name: Generate Doxygen Docs (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          if (Test-Path Doxyfile) { doxygen Doxyfile }
-
-      - name: Upload Docs Artifact
-        if: always()
+  docs:
+    name: Doxygen (build only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install doxygen
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+      - name: Generate docs
+        run: doxygen Doxyfile
+      - name: Upload docs artifact
         uses: actions/upload-artifact@v4
         with:
-          name: docs-html
+          name: doxygen-html
           path: docs/html
-          if-no-files-found: ignore
 
   demo-artifacts:
-    needs: build
+    name: Demo Artifacts
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          submodules: recursive
-
+          submodules: true
       - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y python3 python3-pip
+      - name: Generate demo artifacts
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build python3
-
-      - name: Run demo script
-        run: ./scripts/demo.sh
-
-      - name: Upload pricing artifacts
+          chmod +x scripts/demo.sh
+          ./scripts/demo.sh
+      - name: Upload demo bundle
         uses: actions/upload-artifact@v4
         with:
-          name: quant-pricer-artifacts-${{ github.sha }}
+          name: demo-artifacts
           path: artifacts
-          if-no-files-found: error

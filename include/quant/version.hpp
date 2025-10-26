@@ -8,7 +8,7 @@ namespace quant {
 /// Project semantic version components
 constexpr int kVersionMajor = 0;
 /// Minor version
-constexpr int kVersionMinor = 1;
+constexpr int kVersionMinor = 2;
 /// Patch version
 constexpr int kVersionPatch = 0;
 
@@ -20,5 +20,4 @@ inline std::string version_string() {
 }
 
 }  // namespace quant
-
 

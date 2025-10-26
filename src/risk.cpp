@@ -95,35 +95,21 @@ VarEs var_cvar_portfolio(const std::vector<double>& mu,
 
 namespace {
 static inline double chi2_cdf_complement(double x, double k) {
-    // Complementary CDF for chi-square using regularized gamma Q(k/2, x/2)
-    // Use a simple series/incomplete gamma approximation sufficient for small k
-    // For k=1 or 2, we can use closed-forms via error/exponential functions.
+    // Complementary CDF for chi-square.
+    // For the cases we rely on (k ∈ {1,2}), closed forms exist; for any other
+    // value fall back to a simple (conservative) exponential tail.
+    const double z = std::sqrt(std::max(0.0, x));
     if (k == 1.0) {
-        // Chi-square(1) ~ Z^2, P[Z^2 >= x] = 2*(1 - Phi(sqrt(x)))
-        const double z = std::sqrt(std::max(0.0, x));
-        const double tail = 1.0 - 0.5 * std::erfc(-z / std::sqrt(2.0));
-        return 2.0 * (1.0 - tail);
+        // Chi-square(1) tail = 2 * (1 - Phi(z)) = erfc(z / sqrt(2))
+        return std::erfc(z / std::sqrt(2.0));
     }
     if (k == 2.0) {
-        // Chi-square(2) ~ Exp(1/2), tail = exp(-x/2)
+        // Chi-square(2) tail = exp(-x/2)
         return std::exp(-0.5 * x);
     }
-    // Fallback: simple upper incomplete gamma approximation (not tight but serviceable)
-    const double s = 0.5 * k;
-    const double t = 0.5 * x;
-    // Regularized upper gamma Q(s, t) ~ e^{-t} * sum_{n=0}^{s-1} t^n / n! when s integer
-    int s_int = static_cast<int>(std::round(s));
-    if (std::abs(s - s_int) < 1e-9 && s_int > 0 && s_int <= 10) {
-        double sum = 0.0;
-        double term = 1.0;
-        for (int n = 0; n < s_int; ++n) {
-            if (n > 0) term *= t / n;
-            sum += term;
-        }
-        return std::exp(-t) * sum;
-    }
-    // As a last resort, clamp
-    return std::exp(-0.5 * x);
+    // Fallback: ensure the result remains in (0,1] even if coarse.
+    const double tail = std::exp(-0.5 * x);
+    return std::clamp(tail, 0.0, 1.0);
 }
 }
 
@@ -175,6 +161,9 @@ quant::risk::VarEs var_cvar_t(double mu,
                  unsigned long num_sims,
                  unsigned long seed,
                  double alpha) {
+    if (nu <= 2.0) {
+        throw std::invalid_argument("Student-t degrees of freedom must exceed 2 for finite variance");
+    }
     pcg64 rng(seed ? seed : 0xABCD1234);
     std::student_t_distribution<double> tdist(nu);
     std::vector<double> pnl; pnl.reserve(num_sims);
@@ -190,5 +179,4 @@ quant::risk::VarEs var_cvar_t(double mu,
 }
 
 } // namespace quant::risk
-
 

@@ -14,7 +14,7 @@ static void BM_PDE_WallTime(benchmark::State& state) {
       .dividend = 0.01,
       .vol = 0.2,
       .time = 1.0,
-      .type = quant::pde::OptionType::Call,
+      .type = quant::OptionType::Call,
       .grid = quant::pde::GridSpec{M, N, 4.0, 2.0},
       .log_space = true,
       .upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann,
@@ -63,4 +63,3 @@ BENCHMARK(BM_PDE_WallTime)->Args({101, 100})->Args({201, 200})->Args({321, 320})
 BENCHMARK(BM_PSOR_Iterations)->DenseRange(110, 190, 20);
 
 BENCHMARK_MAIN();
-
