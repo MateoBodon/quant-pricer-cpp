@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(quant_pricer_cpp VERSION 0.1.0 LANGUAGES CXX)
+project(quant_pricer_cpp VERSION 0.2.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -136,7 +136,12 @@ add_executable(unit_tests
   tests/test_barrier.cpp
   tests/test_american.cpp
   tests/test_digital.cpp
-  tests/test_asian.cpp)
+  tests/test_asian.cpp
+  tests/test_term_structures.cpp
+  tests/test_multi.cpp
+  tests/test_barrier_mc_regression.cpp
+  tests/test_risk.cpp
+  tests/test_heston.cpp)
 target_sources(unit_tests PRIVATE tests/test_lookback.cpp)
 target_link_libraries(unit_tests PRIVATE quant_pricer GTest::gtest_main)
 include(GoogleTest)

@@ -725,7 +725,7 @@ for case in barrier_cases:
         "barrier", "mc", case["opt"], case["dir"], case["style"],
         case["spot"], case["strike"], case["barrier"], case["rebate"],
         case["rate"], case["dividend"], case["vol"], case["tenor"],
-        mc_paths, mc_seed, 1, "none", "bb", 32,
+        mc_paths, mc_seed, 1, "sobol", "bb", 32,
     ]
     mc_out = run_cli(mc_cli)
     mc_match = MC_OUTPUT_RE.match(mc_out)

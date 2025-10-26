@@ -143,7 +143,7 @@ TEST(MonteCarlo, ThetaCloseToPDE) {
         .dividend = mp.dividend,
         .vol = mp.vol,
         .time = mp.time,
-        .type = quant::pde::OptionType::Call,
+        .type = quant::OptionType::Call,
         .grid = quant::pde::GridSpec{321, 320, 4.0, 2.0},
         .log_space = true,
         .upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann,

@@ -5,6 +5,11 @@
 - **Monte Carlo (MC)**: GBM path simulator with variance reduction (antithetic, control variate) and QMC acceleration (Sobol with Brownian bridge). Directly exposes streaming statistics (mean/SE/CI) for prices and Greeks.
 - **Finite-Difference PDE**: Crank–Nicolson in S- or log-space with optional tanh stretching near the strike. Supports Dirichlet and Neumann upper boundaries plus Rannacher start-up to stabilise non-smooth payoffs.
 - **Barrier PDE/MC/BS**: Shared abstractions around `quant::BarrierSpec` drive analytic, PDE, and Monte Carlo barrier pricing for consistency checks.
+
+### Barrier MC crossing correction
+- For discrete monitoring, Monte Carlo uses a Brownian-bridge correction per step: given `(S_t, S_{t+Δt})` in log-space, the within-step barrier hit probability is `p = exp(-2 log(B/S_t) log(B/S_{t+Δt}) / (σ^2 Δt))` (clamped to [0,1]) for up/down barriers. We sample a uniform `u` and mark a hit if `u < p`. This approach removes most discretization bias without shrinking the step.
+- With multiple steps, enabling `bridge=bb` plus `sobol` QMC improves variance considerably for barrier problems.
+- When pairing Sobol with Brownian bridge we map each step to **two** quasi dimensions (normal draw + uniform hit check), so stay within `num_steps ≤ 32` to respect the 64-dimension Sobol table.
 - **American Options**: Threefold implementation—binomial (CRR), PSOR finite-difference, and LSMC—allowing cross-validation between tree, PDE, and Monte Carlo approaches.
 
 ## Grid Construction

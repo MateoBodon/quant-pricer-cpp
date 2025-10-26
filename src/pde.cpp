@@ -103,7 +103,7 @@ void build_system(const PdeParams& p,
         const double tau = tau_next;
         if (!p.log_space) {
             const double S_val = lower ? grid.S.front() : grid.S.back();
-            if (p.type == OptionType::Call) {
+            if (p.type == ::quant::OptionType::Call) {
                 if (lower) return 0.0;
                 return S_val * std::exp(-q * tau) - p.strike * std::exp(-r * tau);
             } else {
@@ -112,7 +112,7 @@ void build_system(const PdeParams& p,
             }
         } else {
             const double S_val = lower ? grid.S.front() : grid.S.back();
-            if (p.type == OptionType::Call) {
+            if (p.type == ::quant::OptionType::Call) {
                 if (lower) return 0.0;
                 return S_val * std::exp(-q * tau) - p.strike * std::exp(-r * tau);
             } else {

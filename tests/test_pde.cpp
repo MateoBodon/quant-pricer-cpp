@@ -13,7 +13,7 @@ TEST(PDE, PriceMatchesBS_Call) {
         .dividend = 0.00,
         .vol = 0.2,
         .time = 1.0,
-        .type = pde::OptionType::Call,
+        .type = quant::OptionType::Call,
         .grid = pde::GridSpec{201, 200, 4.0}
     };
     auto res = pde::price_crank_nicolson(pp);
@@ -29,7 +29,7 @@ TEST(PDE, PriceMatchesBS_Put) {
         .dividend = 0.00,
         .vol = 0.25,
         .time = 0.5,
-        .type = pde::OptionType::Put,
+        .type = quant::OptionType::Put,
         .grid = pde::GridSpec{201, 200, 4.0}
     };
     auto res = pde::price_crank_nicolson(pp);
@@ -45,7 +45,7 @@ TEST(PDE, Convergence) {
         .dividend = 0.00,
         .vol = 0.2,
         .time = 1.0,
-        .type = pde::OptionType::Call,
+        .type = quant::OptionType::Call,
         .grid = pde::GridSpec{0, 0, 4.0}
     };
 
@@ -71,7 +71,7 @@ TEST(PDE, GreeksCloseToBS) {
         .dividend = 0.01,
         .vol = 0.2,
         .time = 1.0,
-        .type = pde::OptionType::Call,
+        .type = quant::OptionType::Call,
         .grid = pde::GridSpec{321, 320, 4.0, 2.5},
         .log_space = true,
         .upper_boundary = pde::PdeParams::UpperBoundary::Neumann,
@@ -95,7 +95,7 @@ TEST(PDE, BoundaryConditionsMatchAnalytics) {
         .dividend = 0.01,
         .vol = 0.22,
         .time = 0.75,
-        .type = pde::OptionType::Call,
+        .type = quant::OptionType::Call,
         .grid = pde::GridSpec{241, 240, 5.0, 1.5},
         .log_space = true,
         .upper_boundary = pde::PdeParams::UpperBoundary::Dirichlet,
@@ -120,7 +120,7 @@ TEST(PDE, RannacherImprovesAccuracy) {
         .dividend = 0.00,
         .vol = 0.18,
         .time = 1.0,
-        .type = pde::OptionType::Put,
+        .type = quant::OptionType::Put,
         .grid = pde::GridSpec{51, 10, 4.0, 0.0},
         .log_space = false,
         .upper_boundary = pde::PdeParams::UpperBoundary::Dirichlet,

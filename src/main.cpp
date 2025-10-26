@@ -39,9 +39,8 @@ quant::OptionType parse_option(const std::string& token) {
     throw std::runtime_error("Unknown option type: " + token);
 }
 
-quant::pde::OptionType parse_pde_option(const std::string& token) {
-    auto opt = parse_option(token);
-    return (opt == quant::OptionType::Call) ? quant::pde::OptionType::Call : quant::pde::OptionType::Put;
+quant::OptionType parse_pde_option(const std::string& token) {
+    return parse_option(token);
 }
 
 quant::mc::McParams::Qmc parse_qmc_sampler(const std::string& token) {
@@ -641,7 +640,7 @@ int main(int argc, char** argv) {
         pp.vol = std::atof(argv[6]);
         pp.time = std::atof(argv[7]);
         std::string type = argv[8];
-        pp.type = (type == "call") ? quant::pde::OptionType::Call : quant::pde::OptionType::Put;
+        pp.type = (type == "call") ? quant::OptionType::Call : quant::OptionType::Put;
         int M = std::atoi(argv[9]);
         int N = std::atoi(argv[10]);
         double smax = std::atof(argv[11]);

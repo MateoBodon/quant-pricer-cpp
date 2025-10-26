@@ -382,18 +382,23 @@ McResult price_european_call(const McParams& p) {
         throw std::invalid_argument("Sobol sequence limited to 64 dimensions");
     }
 
-    const double discount = std::exp(-p.rate * p.time);
-    const double cv_expectation = p.spot * std::exp(-p.dividend * p.time);
-
     std::unique_ptr<qmc::SobolSequence> sobol;
     if (use_qmc) {
         sobol = std::make_unique<qmc::SobolSequence>(steps, scrambled, p.seed);
     }
 
+    const bool has_schedule = p.rate_schedule.has_value() ||
+                              p.dividend_schedule.has_value() ||
+                              p.vol_schedule.has_value();
+
+    double int_rate = p.rate * p.time;
+    double int_div = p.dividend * p.time;
+    double integrated_var = p.vol * p.vol * p.time;
+
     WorkerContext ctx{
         .params = p,
-        .discount = discount,
-        .cv_expectation = cv_expectation,
+        .discount = 0.0,
+        .cv_expectation = 0.0,
         .steps = steps,
         .use_qmc = use_qmc,
         .scrambled = scrambled,
@@ -402,12 +407,15 @@ McResult price_european_call(const McParams& p) {
     };
 
     // If schedules provided, build per-step coefficients on uniform grid over [0,T]
-    if (p.rate_schedule.has_value() || p.dividend_schedule.has_value() || p.vol_schedule.has_value()) {
+    if (has_schedule) {
         ctx.use_schedule = true;
         ctx.dt.resize(steps);
         ctx.drift_step.resize(steps);
         ctx.sigma.resize(steps);
         ctx.sqrt_dt.resize(steps);
+        int_rate = 0.0;
+        int_div = 0.0;
+        integrated_var = 0.0;
         for (int i = 0; i < steps; ++i) {
             const double t0 = (static_cast<double>(i) / steps) * p.time;
             const double t1 = (static_cast<double>(i + 1) / steps) * p.time;
@@ -415,11 +423,22 @@ McResult price_european_call(const McParams& p) {
             const double r = p.rate_schedule ? p.rate_schedule->value(0.5 * (t0 + t1)) : p.rate;
             const double q = p.dividend_schedule ? p.dividend_schedule->value(0.5 * (t0 + t1)) : p.dividend;
             const double sig = p.vol_schedule ? p.vol_schedule->value(0.5 * (t0 + t1)) : p.vol;
+            int_rate += r * dt;
+            int_div += q * dt;
+            integrated_var += sig * sig * dt;
             ctx.dt[i] = dt;
             ctx.sqrt_dt[i] = std::sqrt(dt);
             ctx.sigma[i] = sig;
             ctx.drift_step[i] = (r - q - 0.5 * sig * sig) * dt;
         }
+    }
+
+    ctx.discount = std::exp(-int_rate);
+    ctx.cv_expectation = p.spot * std::exp(-int_div);
+
+    if (!ctx.use_schedule) {
+        // Ensure vectors remain empty for the non-schedule path
+        integrated_var = std::max(0.0, integrated_var);
     }
 
     quant::stats::Welford total;
@@ -456,24 +475,58 @@ GreeksResult greeks_european_call(const McParams& p) {
         return result;
     }
 
-    const double sqrt_time = std::sqrt(std::max(p.time, 0.0));
-    const double vol_sqrt_time = p.vol * sqrt_time;
-    const double discount = std::exp(-p.rate * p.time);
-    const double drift = (p.rate - p.dividend - 0.5 * p.vol * p.vol) * p.time;
-    const double inv_gamma_denom = (p.vol > 0.0 && p.time > 0.0)
-                                       ? 1.0 / (p.spot * p.spot * p.vol * p.vol * p.time)
+    const double T = p.time;
+    const double sqrt_time = std::sqrt(std::max(T, 0.0));
+
+    const bool has_schedule = p.rate_schedule.has_value() ||
+                              p.dividend_schedule.has_value() ||
+                              p.vol_schedule.has_value();
+
+    double int_rate = p.rate * T;
+    double int_div = p.dividend * T;
+    double integrated_var = p.vol * p.vol * T;
+
+    if (has_schedule) {
+        const int steps = std::max(1, p.num_steps);
+        int_rate = 0.0;
+        int_div = 0.0;
+        integrated_var = 0.0;
+        for (int i = 0; i < steps; ++i) {
+            const double t0 = (static_cast<double>(i) / steps) * T;
+            const double t1 = (static_cast<double>(i + 1) / steps) * T;
+            const double dt = t1 - t0;
+            const double r = p.rate_schedule ? p.rate_schedule->value(0.5 * (t0 + t1)) : p.rate;
+            const double q = p.dividend_schedule ? p.dividend_schedule->value(0.5 * (t0 + t1)) : p.dividend;
+            const double sig = p.vol_schedule ? p.vol_schedule->value(0.5 * (t0 + t1)) : p.vol;
+            int_rate += r * dt;
+            int_div += q * dt;
+            integrated_var += sig * sig * dt;
+        }
+    }
+
+    const double discount = std::exp(-int_rate);
+    const double vol_sqrt_time = (integrated_var > 0.0) ? std::sqrt(integrated_var) : 0.0;
+    const double drift = int_rate - int_div - 0.5 * integrated_var;
+    const double inv_gamma_denom = (integrated_var > 0.0)
+                                       ? 1.0 / (p.spot * p.spot * integrated_var)
                                        : 0.0;
-    const double score_coeff = (p.vol > 0.0 && p.time > 0.0)
-                                   ? 1.0 / (p.spot * p.vol * sqrt_time)
+    const double score_coeff = (vol_sqrt_time > 0.0)
+                                   ? 1.0 / (p.spot * vol_sqrt_time)
                                    : 0.0;
+
+    const double rate_eff = (T > 0.0) ? int_rate / T : p.rate;
+    const double div_eff = (T > 0.0) ? int_div / T : p.dividend;
+    const double sigma_eff = (T > 0.0 && integrated_var > 0.0)
+                                 ? std::sqrt(integrated_var / T)
+                                 : 0.0;
 
     GreeksContext ctx{
         .spot = p.spot,
         .strike = p.strike,
-        .rate = p.rate,
-        .dividend = p.dividend,
-        .vol = p.vol,
-        .time = p.time,
+        .rate = rate_eff,
+        .dividend = div_eff,
+        .vol = sigma_eff,
+        .time = T,
         .antithetic = p.antithetic,
         .discount = discount,
         .drift = drift,

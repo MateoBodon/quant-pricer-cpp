@@ -12,6 +12,9 @@
 - `pde_convergence.png`: Price error vs grid nodes validating ≈2nd order slope and Rannacher smoothing.
 - `american_convergence.png`: PSOR versus binomial convergence plus LSMC scatter overlay (3σ band) for early-exercise options.
 - `barrier_validation.png`: Log-scale absolute error comparison for barrier MC/PDE vs Reiner–Rubinstein benchmarks.
+
+### Barrier MC accuracy notes
+- The Brownian-bridge crossing correction greatly reduces time-discretization bias for continuously-monitored single barriers. Residual error is dominated by Monte Carlo variance; increase `num_steps` (e.g., 64–256) and `paths` to tighten agreement with RR analytics. Prefer `--sampler=sobol --bridge=bb` for faster convergence on multi-step paths.
 - `onepager.pdf`: Single-page summary combining the above plots, a Greeks variance table, and benchmark stats for quick reviewer digestion.
 
 ## Benchmarks

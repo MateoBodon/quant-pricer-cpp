@@ -76,10 +76,6 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readwrite("s_max_mult", &quant::pde::GridSpec::s_max_mult)
         .def_readwrite("stretch", &quant::pde::GridSpec::stretch);
 
-    py::enum_<quant::pde::OptionType>(m, "PdeOptionType")
-        .value("Call", quant::pde::OptionType::Call)
-        .value("Put", quant::pde::OptionType::Put);
-
     py::class_<quant::pde::PdeParams>(m, "PdeParams")
         .def(py::init<>())
         .def_readwrite("spot", &quant::pde::PdeParams::spot)
@@ -258,5 +254,4 @@ PYBIND11_MODULE(pyquant_pricer, m) {
 
     m.def("merton_call_mc", &quant::multi::merton_call_mc, py::arg("params"));
 }
-
 

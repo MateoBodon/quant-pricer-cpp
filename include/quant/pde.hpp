@@ -5,6 +5,7 @@
 #include <vector>
 #include <optional>
 #include "quant/term_structures.hpp"
+#include "quant/barrier.hpp" // for ::quant::OptionType
 
 namespace quant::pde {
 
@@ -24,8 +25,6 @@ std::vector<double> solve_tridiagonal(const std::vector<double>& a,
                                       const std::vector<double>& c,
                                       const std::vector<double>& d);
 
-enum class OptionType { Call, Put };
-
 /// PDE pricing parameters and grid configuration.
 struct PdeParams {
     double spot;
@@ -34,7 +33,7 @@ struct PdeParams {
     double dividend;
     double vol;
     double time;
-    OptionType type;
+    ::quant::OptionType type;
     GridSpec grid;
     /// Use log-space grid x = ln(S) for improved stability near boundaries
     bool log_space{false};

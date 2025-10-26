@@ -5,6 +5,7 @@
 #include <random>
 #include <stdexcept>
 #include <vector>
+#include "quant/stats.hpp"
 
 #include <pcg_random.hpp>
 
@@ -36,12 +37,11 @@ McStat basket_european_call_mc(const BasketMcParams& p) {
     auto L = cholesky_lower(p.corr, n);
     pcg64 rng(p.seed ? p.seed : 0xCAFEBABEULL);
     std::normal_distribution<double> normal(0.0, 1.0);
-    const double dt = p.time;
-    const double disc = std::exp(-p.rate * p.time);
-    double mean = 0.0, m2 = 0.0;
-    auto accumulate = [&](double x){ double delta = x - mean; mean += delta; m2 += delta * (x - mean); };
-    std::vector<double> z(n), y(n);
-    for (std::uint64_t i = 0; i < p.num_paths; ++i) {
+  const double dt = p.time;
+  const double disc = std::exp(-p.rate * p.time);
+  quant::stats::Welford acc;
+  std::vector<double> z(n), y(n);
+  for (std::uint64_t i = 0; i < p.num_paths; ++i) {
         for (std::size_t k = 0; k < n; ++k) z[k] = normal(rng);
         for (std::size_t irow = 0; irow < n; ++irow) {
             double v = 0.0; for (std::size_t k = 0; k <= irow; ++k) v += L[irow*n + k] * z[k];
@@ -54,23 +54,22 @@ McStat basket_european_call_mc(const BasketMcParams& p) {
             basket += p.weights[k] * S;
         }
         const double payoff = std::max(0.0, basket - p.strike);
-        const double pv = disc * payoff;
-        accumulate((pv - mean) / static_cast<double>(i + 1));
-    }
-    double value = mean;
-    double var = (p.num_paths > 1) ? (m2 / static_cast<double>(p.num_paths - 1)) : 0.0;
-    double se = std::sqrt(std::max(0.0, var / static_cast<double>(p.num_paths)));
-    return {value, se};
+    const double pv = disc * payoff;
+    acc.add(pv);
+  }
+  double value = acc.mean;
+  double var = acc.variance();
+  double se = (acc.count > 0) ? std::sqrt(std::max(0.0, var / static_cast<double>(acc.count))) : 0.0;
+  return {value, se};
 }
 
 McStat merton_call_mc(const MertonParams& p) {
     pcg64 rng(p.seed ? p.seed : 0xDEADC0DEULL);
     std::normal_distribution<double> normal(0.0, 1.0);
     std::poisson_distribution<unsigned> pois(p.lambda * p.time);
-    const double disc = std::exp(-p.rate * p.time);
-    double mean = 0.0, m2 = 0.0;
-    auto accumulate = [&](double x){ double delta = x - mean; mean += delta; m2 += delta * (x - mean); };
-    for (std::uint64_t i = 0; i < p.num_paths; ++i) {
+  const double disc = std::exp(-p.rate * p.time);
+  quant::stats::Welford acc;
+  for (std::uint64_t i = 0; i < p.num_paths; ++i) {
         unsigned N = pois(rng);
         double jump_sum = 0.0;
         for (unsigned j = 0; j < N; ++j) {
@@ -81,15 +80,14 @@ McStat merton_call_mc(const MertonParams& p) {
         const double diff = p.vol * std::sqrt(p.time) * normal(rng);
         const double ST = p.spot * std::exp(drift + diff + jump_sum);
         const double payoff = std::max(0.0, ST - p.strike);
-        const double pv = disc * payoff;
-        accumulate((pv - mean) / static_cast<double>(i + 1));
-    }
-    double value = mean;
-    double var = (p.num_paths > 1) ? (m2 / static_cast<double>(p.num_paths - 1)) : 0.0;
-    double se = std::sqrt(std::max(0.0, var / static_cast<double>(p.num_paths)));
-    return {value, se};
+    const double pv = disc * payoff;
+    acc.add(pv);
+  }
+  double value = acc.mean;
+  double var = acc.variance();
+  double se = (acc.count > 0) ? std::sqrt(std::max(0.0, var / static_cast<double>(acc.count))) : 0.0;
+  return {value, se};
 }
 
 }
-
 

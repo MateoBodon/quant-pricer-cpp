@@ -40,7 +40,7 @@
 - **Barrier Options**: Continuous single-barrier (up/down, in/out) pricing via Reiner–Rubinstein closed-form, Brownian-bridge Monte Carlo, and absorbing-boundary PDE
 - **American Options**: PSOR (finite-difference LCP) and Longstaff–Schwartz Monte Carlo with polynomial basis; see `artifacts/american_convergence.png` for agreement and grid/path convergence.
 - **Exotics**: Arithmetic Asian MC with geometric CV, lookback MC (fixed/floating), digitals (analytic and MC hooks)
-- **Heston**: Analytic European call via characteristic-function Gauss–Laguerre; Andersen QE MC with antithetic
+- **Heston**: Analytic European call via characteristic-function Gauss–Laguerre (Monte Carlo path engine currently marked experimental)
 - **Risk**: VaR/CVaR via MC and historical backtesting with Kupiec test
  - **Multi‑Asset & Jumps**: Basket MC with Cholesky correlation; Merton jump‑diffusion MC for European options
 
@@ -349,6 +349,10 @@ cmake --build build -j
   --json
 ```
 
+- New: time‑dependent schedules for MC: `--rate_csv=path`, `--div_csv=path`, `--vol_csv=path` (CSV with `time,value`, strictly increasing times). When provided, they override scalar `r,q,σ`.
+- New: same schedule flags are supported in `pde` mode for piecewise‑constant coefficients.
+- New: Barrier MC accepts `--no_cv` to disable the terminal‑stock control variate.
+
 **Legacy positional (backward compatible)**
 `./build/quant_cli mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc:0|1>`
 
@@ -380,14 +384,29 @@ cmake --build build -j
 # Reiner–Rubinstein analytic price (down-and-out call)
 ./build/quant_cli barrier bs call down out 100 95 90 0 0.02 0.00 0.2 1.0
 
-# Sobol MC with Brownian bridge correction (64 steps + JSON)
-./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 none bb 32   --sampler=sobol --bridge=bb --steps=64 --json
+# Sobol MC with Brownian bridge correction (32 steps + JSON)
+# Note: Sobol supports up to 64 dimensions; barrier MC uses 2 dims/step → use ≤ 32 steps
+./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 none bb 32   --sampler=sobol --bridge=bb --steps=32 --json
+
+# Disable control variate for barrier MC (optional)
+./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 sobol bb 32 --no_cv --json
 
 # Crank–Nicolson PDE with absorbing boundary at S=B
 ./build/quant_cli barrier pde call down out 100 95 90 0 0.02 0.00 0.2 1.0 201 200 4.0
 ```
 
+See “Barrier MC crossing correction” in docs/Design.md for the within‑step hit probability and tuning tips (steps, QMC, bridge) to reduce bias/variance.
+
 ### PDE Pricing
+```bash
+# Crank–Nicolson with log-space grid, Neumann boundary, and Rannacher damping
+./build/quant_cli pde 100 100 0.03 0.00 0.2 1.0 call 201 200 4.0 1 1 2.5 1 1 --json
+
+# With time‑dependent schedules for r(t), q(t), σ(t)
+# Each CSV has two columns: time,value (strictly increasing times)
+./build/quant_cli pde 100 100 0.03 0.00 0.2 1.0 call 241 240 4.0 1 1 2.5 1 1 \
+  --rate_csv=data/r.csv --div_csv=data/q.csv --vol_csv=data/sigma.csv --json
+```
 ### Exotics
 ```bash
 # Asian arithmetic (geometric CV on by default)
@@ -405,9 +424,17 @@ cmake --build build -j
 # Analytic Heston via CF + Gauss–Laguerre
 ./build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04  100 100 0.01 0.00 1.0  0 1 0 --analytic --json
 
-# QE MC (100k paths, 64 steps)
+# Experimental QE MC (bias not yet corrected – prefer analytic result)
 ./build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04  100 100 0.01 0.00 1.0  100000 64 2025 --mc --json
 ```
+
+> **Note:** The current Heston Monte Carlo path engine is a placeholder. Until the Andersen QE scheme (with proper martingale correction and control variate) is reintroduced, rely on the analytic pricing routine above.
+
+### Next Steps
+
+- Port a complete Andersen QE implementation (or reuse a vetted library) to restore an unbiased Heston Monte Carlo pricer.
+- Add analytic-vs-MC regression tests and expose the analytic control variate in the CLI/Python bindings.
+- Keep publishing deterministic demo artifacts via `scripts/demo.sh` and the `demo-artifacts` CI job for recruiters.
 
 ### Risk
 ```bash
@@ -629,6 +656,9 @@ Barrier validation is captured via `artifacts/barrier_validation.csv` and `artif
 ### Reproducible Demo Artifacts
 
 Run `./scripts/demo.sh` to produce a Release build, execute representative Black–Scholes, Monte Carlo, and PDE validations, and emit CSVs plus `artifacts/manifest.json` recording the git SHA, compiler metadata, and RNG settings. The script also generates `artifacts/qmc_vs_prng.csv` and `artifacts/qmc_vs_prng.png`, comparing RMSE for PRNG vs Sobol+Brownian-bridge paths over 64 time steps. CI publishes the resulting `artifacts/` directory on every successful run via the `demo-artifacts` workflow job.
+
+- Want resume-ready figures? Run `./scripts/demo.sh`, then open `artifacts/onepager.pdf` for a one-page summary that cross-references the PNGs in the same directory.
+- Need to regenerate individual plots interactively? Each helper under `scripts/` (e.g., `qmc_vs_prng.py`, `pde_convergence.py`, `risk_backtest.py`) reads the CSVs emitted by the demo and can be re-run with `PYTHONPATH=build/python` to use the in-tree bindings.
 
 ### Artifact index
 File | What it shows
