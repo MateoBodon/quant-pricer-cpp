@@ -5,7 +5,7 @@ Calibrate the Heston model to a single-day options surface in normalized schema.
 The input CSV must follow `scripts/data/schema.md`. Outputs:
   * artifacts/heston/params_<date>.json  - fitted parameters and metrics
   * artifacts/heston/fit_<date>.png     - market vs model implied vol smiles
-  * artifacts/heston/fit_<date>.csv     - table backing the figure
+  * artifacts/heston/fit_<date>.csv     - table backing the figure (strike, ttm, market_iv, model_iv, abs_error)
 
 Usage:
   ./scripts/calibrate_heston.py --input data/normalized/spx_20240614.csv
@@ -274,12 +274,27 @@ def calibrate_surface(df: pd.DataFrame, config: CalibrationConfig) -> tuple[dict
             np.sqrt(np.mean((np.array(model_vols) - df_prepared["mid_iv"].to_numpy()) ** 2))
         )
         feller = 2.0 * fitted[0] * fitted[1] - fitted[2] * fitted[2]
+        market_iv = df_prepared["mid_iv"].to_numpy()
+        abs_vol_error = np.abs(np.array(model_vols) - market_iv)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            rel_vol_error = abs_vol_error / np.maximum(market_iv, 1e-8)
+        rmspe_vol = float(np.sqrt(np.mean(rel_vol_error * rel_vol_error)))
+        abs_price_error = np.abs(model_prices - market_prices)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            rel_price_error = abs_price_error / np.maximum(market_prices, 1e-4)
+        rmspe_price = float(np.sqrt(np.mean(rel_price_error * rel_price_error)))
         metrics = {
             "params": params,
             "rmse_price": rmse_price,
             "rmse_vol": rmse_vol,
+            "rmspe_price": rmspe_price,
+            "rmspe_price_pct": rmspe_price * 100.0,
+            "rmspe_vol": rmspe_vol,
+            "rmspe_vol_pct": rmspe_vol * 100.0,
             "feller": float(feller),
-            "n_obs": int(len(df)),
+            "n_obs": int(len(df_prepared)),
+            "n_strikes": int(df_prepared["strike"].nunique()),
+            "n_maturities": int(df_prepared["ttm_years"].nunique()),
             "converged": bool(result.success),
             "cost": float(result.cost),
             "nit": int(result.nfev),
@@ -350,24 +365,19 @@ def save_calibration_outputs(
 
     _plot_smiles(df, model_vols, fig_path)
 
-    market_prices, _ = _surface_market_prices(df)
-    abs_vol_error = np.abs(np.array(model_vols) - df["mid_iv"].to_numpy())
-    abs_price_error = np.abs(model_prices - market_prices)
+    market_iv = df["mid_iv"].to_numpy()
+    abs_vol_error = np.abs(np.array(model_vols) - market_iv)
     table = pd.DataFrame(
         {
             "strike": df["strike"].to_numpy(),
             "ttm": df["ttm_years"].to_numpy(),
-            "put_call": df["put_call"].to_numpy(),
-            "market_iv": df["mid_iv"].to_numpy(),
+            "market_iv": market_iv,
             "model_iv": model_vols,
-            "abs_vol_error": abs_vol_error,
-            "market_price": market_prices,
-            "model_price": model_prices,
-            "abs_price_error": abs_price_error,
+            "abs_error": abs_vol_error,
         }
     )
     csv_path.parent.mkdir(parents=True, exist_ok=True)
-    table.to_csv(csv_path, index=False, float_format="%.8f")
+    table.to_csv(csv_path, index=False, float_format="%.6f")
 
     metrics_out = dict(metrics)
     metrics_out["figure"] = str(fig_path)
@@ -392,12 +402,14 @@ def main() -> None:
     ap.add_argument("--fast", action="store_true", help="Reduce strikes/maturities for CI speed")
     ap.add_argument("--seed", type=int, default=7, help="Random seed for restarts")
     ap.add_argument("--retries", type=int, default=4, help="Number of random restarts")
+    ap.add_argument("--max-evals", type=int, default=200, help="Max function evaluations per restart")
     ap.add_argument("--skip-manifest", action="store_true", help="Suppress manifest updates")
     args = ap.parse_args()
 
     df = pd.read_csv(args.input)
     config = CalibrationConfig(
         fast=args.fast,
+        max_evals=args.max_evals,
         retries=args.retries,
         seed=args.seed,
         metric=args.metric,
@@ -418,10 +430,17 @@ def main() -> None:
         "metric": args.metric,
         "seed": args.seed,
         "retries": args.retries,
+        "max_evals": args.max_evals,
         "rmse_price": float(metrics["rmse_price"]),
         "rmse_vol": float(metrics["rmse_vol"]),
+        "rmspe_price": float(metrics["rmspe_price"]),
+        "rmspe_price_pct": float(metrics["rmspe_price_pct"]),
+        "rmspe_vol": float(metrics["rmspe_vol"]),
+        "rmspe_vol_pct": float(metrics["rmspe_vol_pct"]),
         "feller": float(metrics["feller"]),
         "n_obs": int(metrics["n_obs"]),
+        "n_strikes": int(metrics["n_strikes"]),
+        "n_maturities": int(metrics["n_maturities"]),
         "cost": float(metrics["cost"]),
         "nit": int(metrics["nit"]),
         "params": metrics["params"],

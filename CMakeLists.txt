@@ -193,6 +193,18 @@ add_test(
 )
 set_tests_properties(qmc_vs_prng_fast PROPERTIES LABELS "FAST")
 
+add_test(
+  NAME greeks_reliability_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_greeks_reliability_fast.py
+)
+set_tests_properties(greeks_reliability_fast PROPERTIES LABELS "FAST")
+
+add_test(
+  NAME heston_series_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_heston_series_fast.py
+)
+set_tests_properties(heston_series_fast PROPERTIES LABELS "FAST")
+
 # Apply sanitizer flags to targets if requested
 if(SANITIZER_COMPILE_FLAGS OR SANITIZER_LINK_FLAGS)
   foreach(tgt IN ITEMS quant_pricer quant_cli unit_tests micro_bench bench_mc bench_pde)

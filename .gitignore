@@ -9,6 +9,17 @@
 !/artifacts/american_consistency.csv
 /artifacts/heston/*
 !/artifacts/heston/fit_20240614.csv
+!/artifacts/heston/fit_20240614.png
+!/artifacts/heston/fit_20230601.csv
+!/artifacts/heston/fit_20230601.png
+!/artifacts/heston/params_20230601.json
+!/artifacts/heston/params_20240614.json
+!/artifacts/heston/params_series.csv
+!/artifacts/heston/params_series.png
+!/artifacts/heston/series_runs/
+!/artifacts/heston/series_runs/*
+!/artifacts/greeks_reliability.csv
+!/artifacts/greeks_reliability.png
 examples/consumer-cmake/build/
 CMakeCache.txt
 CMakeFiles/

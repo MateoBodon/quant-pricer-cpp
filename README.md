@@ -24,10 +24,10 @@ Curated figures with reproduction commands live in [docs/Results.md](docs/Result
   **American Consistency** – PSOR and CRR agree within the LSMC ±2σ band across spot/vol grids.  
   Reproduce: `python scripts/american_consistency.py --fast`  
   Data: [artifacts/american_consistency.csv](artifacts/american_consistency.csv)
-- <a href="docs/Results.md#heston-smile-calibration-2024-06-14"><img src="artifacts/heston/fit_20240614.png" alt="Heston calibration" width="220"></a><br>
-  **Heston Smile Fit (14-Jun-2024)** – calibrated smile tracks the synthetic SPX surface within 20 vol bps.  
-  Reproduce: `python scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast`  
-  Data: [artifacts/heston/fit_20240614.csv](artifacts/heston/fit_20240614.csv)
+- <a href="docs/Results.md#heston-smile-calibration-spy-2023-06-01"><img src="artifacts/heston/fit_20230601.png" alt="Heston calibration" width="220"></a><br>
+  **Heston Smile Fit (SPY 2023-06-01)** – real CBOE surface (40 quotes | 23 strikes × 2 maturities) with price RMSPE 5.7%.  
+  Reproduce: `python scripts/calibrate_heston.py --input data/normalized/spy_20230601.csv --metric price --max-evals 1200 --retries 6`  
+  Data: [artifacts/heston/fit_20230601.csv](artifacts/heston/fit_20230601.csv) · Manifest: [artifacts/manifest.json](artifacts/manifest.json) (`runs.heston`, date `2023-06-01`)
 
 ---
 
@@ -492,6 +492,24 @@ python3 scripts/report.py \
 ```
 
 ### Python bindings (dev workflow)
+
+### Python Quickstart
+```python
+import subprocess, sys
+from pathlib import Path
+import pyquant_pricer as qp
+
+spot = 100.0
+print(f"Call price: {qp.bs_call(spot, 105.0, 0.02, 0.01, 0.25, 0.5):.4f}")
+barrier = qp.BarrierSpec(); barrier.type = qp.BarrierType.DownOut; barrier.B = 95.0
+print(f"Down-and-out call: {qp.barrier_bs(qp.OptionType.Call, barrier, spot, 100.0, 0.03, 0.0, 0.2, 1.0):.4f}")
+repo_root = Path(__file__).resolve().parents[2]
+surface = next((repo_root / "data" / "samples").glob("spx_*.csv"), None)
+if surface:
+    subprocess.run([sys.executable, repo_root / "scripts" / "calibrate_heston.py",
+                    "--input", surface, "--fast", "--metric", "price"], check=True)
+```
+
 ```bash
 # Use the in-tree module during development
 PYTHONPATH=build/python python3 scripts/greeks_variance.py --artifacts artifacts
