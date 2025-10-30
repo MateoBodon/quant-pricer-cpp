@@ -12,6 +12,7 @@ python scripts/calibrate_heston.py \
 - Params: [`artifacts/heston/params_20230601.json`](../artifacts/heston/params_20230601.json)
 - Table: [`artifacts/heston/fit_20230601.csv`](../artifacts/heston/fit_20230601.csv)
 - Manifest slice: [`artifacts/manifest.json`](../artifacts/manifest.json) → `runs.heston`, date `2023-06-01`
+- Safety: weight_mode=`iv`, param_transform=`none`, Feller residual `-2.45e-03` (emit `--feller-warn` to surface the violation)
 
 ![Heston fit (SPY 2023-06-01)](../artifacts/heston/fit_20230601.png)
 
@@ -24,6 +25,7 @@ python scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv 
 
 - Params: [`artifacts/heston/params_20240614.json`](../artifacts/heston/params_20240614.json)
 - Table: [`artifacts/heston/fit_20240614.csv`](../artifacts/heston/fit_20240614.csv)
+- Safety: weight_mode=`iv`, param_transform=`none`, Feller residual recorded in `manifest.json` (FAST run keeps warnings informational)
 
 ![Heston fit (sample)](../artifacts/heston/fit_20240614.png)
 
@@ -40,6 +42,18 @@ python scripts/heston_series_plot.py \
 - Manifest slice: [`artifacts/manifest.json`](../artifacts/manifest.json) → `runs.heston_params_series`
 
 ![Heston parameter series](../artifacts/heston/params_series.png)
+
+## Put–Call Parity Micro-Checks (FAST)
+Parity residuals sit at machine precision and the digital finite-difference overlay tracks the analytic Black–Scholes digital price within 1e-4 across the grid.
+
+```bash
+python scripts/parity_checks.py --fast
+```
+
+- CSV: [`artifacts/parity_checks.csv`](../artifacts/parity_checks.csv)
+- Manifest slice: [`artifacts/manifest.json`](../artifacts/manifest.json) → `runs.parity_checks`
+
+![Parity checks](../artifacts/parity_checks.png)
 
 ## Greeks Reliability (FAST)
 Pathwise Delta stays at ≈0.004 standard error by 20k paths, about **2× tighter** than the likelihood-ratio estimator; finite-difference Delta tracks closely thanks to common random numbers. Gamma shows the LR estimator still ~30% noisier than the bump-and-revalue approach even at 20k paths. The CSV records both variance and standard error per estimator so the micro-figure is auditable.

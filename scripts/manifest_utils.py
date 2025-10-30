@@ -30,7 +30,9 @@ def _cpu_brand() -> str:
     system = platform.system()
     try:
         if system == "Darwin":
-            return subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"], text=True).strip()
+            return subprocess.check_output(
+                ["sysctl", "-n", "machdep.cpu.brand_string"], text=True
+            ).strip()
         if system == "Linux":
             with open("/proc/cpuinfo", "r", encoding="utf-8", errors="ignore") as fh:
                 for line in fh:
@@ -128,7 +130,7 @@ def ensure_metadata(manifest: Dict[str, Any]) -> Dict[str, Any]:
 def save_manifest(manifest: Dict[str, Any]) -> None:
     manifest = ensure_metadata(manifest)
     MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
-    MANIFEST_PATH.write_text(json.dumps(manifest, separators=(",", ":"), sort_keys=True) + "\n")
+    MANIFEST_PATH.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 
 
 def describe_inputs(paths: Iterable[str | Path]) -> List[Dict[str, Any]]:

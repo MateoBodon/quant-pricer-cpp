@@ -28,15 +28,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.optimize import brentq, least_squares
-
 from manifest_utils import describe_inputs, update_run
-
+from scipy.optimize import brentq, least_squares
 
 Params = Tuple[float, float, float, float, float]  # kappa, theta, sigma, rho, v0
 
 
-def black_scholes_call(spot: float, strike: float, r: float, q: float, sigma: float, T: float) -> float:
+def black_scholes_call(
+    spot: float, strike: float, r: float, q: float, sigma: float, T: float
+) -> float:
     if T <= 0:
         return max(spot - strike, 0.0)
     sigma = max(1e-12, sigma)
@@ -48,12 +48,22 @@ def black_scholes_call(spot: float, strike: float, r: float, q: float, sigma: fl
     return spot * math.exp(-q * T) * nd1 - strike * math.exp(-r * T) * nd2
 
 
-def black_scholes_put(spot: float, strike: float, r: float, q: float, sigma: float, T: float) -> float:
+def black_scholes_put(
+    spot: float, strike: float, r: float, q: float, sigma: float, T: float
+) -> float:
     call_price = black_scholes_call(spot, strike, r, q, sigma, T)
     return call_price - spot * math.exp(-q * T) + strike * math.exp(-r * T)
 
 
-def implied_vol_from_price(price: float, spot: float, strike: float, r: float, q: float, T: float, is_call: bool) -> float:
+def implied_vol_from_price(
+    price: float,
+    spot: float,
+    strike: float,
+    r: float,
+    q: float,
+    T: float,
+    is_call: bool,
+) -> float:
     if price <= 0.0 or T <= 0.0:
         return 0.0
 
@@ -68,8 +78,10 @@ def implied_vol_from_price(price: float, spot: float, strike: float, r: float, q
         return brentq(objective, 1e-6, 4.0, maxiter=100)
     except ValueError:
         # Fallback to approximate variance ratio if bracket fails
-        intrinsic = max(0.0, spot * math.exp(-q * T) - strike * math.exp(-r * T)) if is_call else max(
-            0.0, strike * math.exp(-r * T) - spot * math.exp(-q * T)
+        intrinsic = (
+            max(0.0, spot * math.exp(-q * T) - strike * math.exp(-r * T))
+            if is_call
+            else max(0.0, strike * math.exp(-r * T) - spot * math.exp(-q * T))
         )
         if target <= intrinsic + 1e-6:
             return 1e-6
@@ -91,13 +103,20 @@ def _heston_characteristic(
     a = kappa * theta
     phi = np.asarray(phi, dtype=np.complex128)
     i = 1j
-    d = np.sqrt((rho * sigma * i * phi - b) ** 2 - sigma * sigma * (2.0 * u * i * phi - phi * phi))
-    denom = (b - rho * sigma * i * phi - d)
+    d = np.sqrt(
+        (rho * sigma * i * phi - b) ** 2
+        - sigma * sigma * (2.0 * u * i * phi - phi * phi)
+    )
+    denom = b - rho * sigma * i * phi - d
     g = (b - rho * sigma * i * phi + d) / (denom + 1e-16)
     exp_minus_dT = np.exp(-d * T)
     log_term = np.log((1.0 - g * exp_minus_dT) / (1.0 - g + 1e-16))
-    C = (r - q) * i * phi * T + (a / (sigma * sigma)) * ((b - rho * sigma * i * phi + d) * T - 2.0 * log_term)
-    D = ((b - rho * sigma * i * phi + d) / (sigma * sigma)) * ((1.0 - exp_minus_dT) / (1.0 - g * exp_minus_dT + 1e-16))
+    C = (r - q) * i * phi * T + (a / (sigma * sigma)) * (
+        (b - rho * sigma * i * phi + d) * T - 2.0 * log_term
+    )
+    D = ((b - rho * sigma * i * phi + d) / (sigma * sigma)) * (
+        (1.0 - exp_minus_dT) / (1.0 - g * exp_minus_dT + 1e-16)
+    )
     return np.exp(C + D * v0 + i * phi * log_spot)
 
 
@@ -134,6 +153,82 @@ class CalibrationConfig:
     retries: int = 4
     seed: int = 7
     metric: str = "price"  # "price" or "vol"
+    weight_mode: str = "iv"
+    feller_warn: bool = False
+    param_transform: str = "none"
+
+
+def _sigmoid_forward(
+    value: float | np.ndarray, lb: float, ub: float
+) -> float | np.ndarray:
+    return lb + (ub - lb) / (1.0 + np.exp(-value))
+
+
+def _sigmoid_inverse(
+    value: float | np.ndarray, lb: float, ub: float
+) -> float | np.ndarray:
+    clipped = np.clip((np.asarray(value) - lb) / (ub - lb + 1e-16), 1e-9, 1 - 1e-9)
+    return np.log(clipped / (1.0 - clipped))
+
+
+class ParameterTransform:
+    def __init__(self, mode: str, lb: np.ndarray, ub: np.ndarray):
+        if mode not in {"none", "exp", "sigmoid"}:
+            raise ValueError(f"Unsupported param-transform '{mode}'")
+        self.mode = mode
+        self.lb = lb
+        self.ub = ub
+
+    def to_internal(self, params: np.ndarray) -> np.ndarray:
+        params = np.asarray(params, dtype=float)
+        if self.mode == "none":
+            return params
+        internal = np.empty_like(params)
+        if self.mode == "exp":
+            positive_idx = [0, 1, 2, 4]
+            for idx in positive_idx:
+                internal[idx] = math.log(max(params[idx], 1e-10))
+            internal[3] = float(_sigmoid_inverse(params[3], self.lb[3], self.ub[3]))
+            return internal
+        # sigmoid
+        for i in range(len(params)):
+            internal[i] = float(_sigmoid_inverse(params[i], self.lb[i], self.ub[i]))
+        return internal
+
+    def from_internal(self, internal: np.ndarray) -> np.ndarray:
+        internal = np.asarray(internal, dtype=float)
+        if self.mode == "none":
+            return internal
+        params = np.empty_like(internal)
+        if self.mode == "exp":
+            positive_idx = [0, 1, 2, 4]
+            for idx in positive_idx:
+                params[idx] = float(
+                    np.clip(np.exp(internal[idx]), self.lb[idx], self.ub[idx])
+                )
+            params[3] = float(_sigmoid_forward(internal[3], self.lb[3], self.ub[3]))
+            return params
+        # sigmoid
+        for i in range(len(internal)):
+            params[i] = float(_sigmoid_forward(internal[i], self.lb[i], self.ub[i]))
+        return params
+
+    def within_bounds(self, params: np.ndarray) -> bool:
+        return bool(np.all(params >= self.lb) and np.all(params <= self.ub))
+
+
+def _compute_weight_vector(
+    df: pd.DataFrame, market_prices: np.ndarray, vegas: np.ndarray, mode: str
+) -> np.ndarray:
+    mode = mode.lower()
+    if mode == "vega":
+        return 1.0 / np.maximum(vegas, 1e-6)
+    if mode == "bidask" and {"bid", "ask"}.issubset(df.columns):
+        spread = df["ask"].to_numpy() - df["bid"].to_numpy()
+        return 1.0 / np.maximum(spread, 1e-4)
+    # default to implied-vol weighting
+    iv = df["mid_iv"].to_numpy()
+    return 1.0 / np.maximum(iv, 1e-3)
 
 
 def _prepare_surface(df: pd.DataFrame, fast: bool) -> pd.DataFrame:
@@ -169,7 +264,12 @@ def _surface_market_prices(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
         prices.append(price)
         sqrtT = math.sqrt(max(T, 1e-8))
         d1 = (math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / (sigma * sqrtT)
-        vega = S * math.exp(-q * T) * math.sqrt(T) * (math.exp(-0.5 * d1 * d1) / math.sqrt(2 * math.pi))
+        vega = (
+            S
+            * math.exp(-q * T)
+            * math.sqrt(T)
+            * (math.exp(-0.5 * d1 * d1) / math.sqrt(2 * math.pi))
+        )
         vegas.append(max(vega, 1e-8))
     return np.array(prices), np.array(vegas)
 
@@ -184,7 +284,9 @@ def _model_prices(df: pd.DataFrame, params: Params, fast: bool) -> np.ndarray:
         r = float(row["r"])
         q = float(row["q"])
         T = float(row["ttm_years"])
-        call_price = heston_call_price(S, K, r, q, T, params, n_points=n_points, phi_max=phi_max)
+        call_price = heston_call_price(
+            S, K, r, q, T, params, n_points=n_points, phi_max=phi_max
+        )
         if row["put_call"].lower() == "call":
             model_prices.append(call_price)
         else:
@@ -193,10 +295,15 @@ def _model_prices(df: pd.DataFrame, params: Params, fast: bool) -> np.ndarray:
     return np.array(model_prices)
 
 
-def calibrate_surface(df: pd.DataFrame, config: CalibrationConfig) -> tuple[dict, pd.DataFrame]:
+def calibrate_surface(
+    df: pd.DataFrame, config: CalibrationConfig
+) -> tuple[dict, pd.DataFrame, dict]:
     df_prepared = _prepare_surface(df, config.fast)
     market_prices, vegas = _surface_market_prices(df_prepared)
-    weights = 1.0 / np.maximum(market_prices, 1.0)
+    price_weights = _compute_weight_vector(
+        df_prepared, market_prices, vegas, config.weight_mode
+    )
+    vol_weights = 1.0 / np.maximum(df_prepared["mid_iv"].to_numpy(), 1e-3)
 
     lb = np.array([0.05, 0.0005, 0.05, -0.95, 0.0005])
     ub = np.array([8.0, 0.5, 2.5, -0.05, 0.5])
@@ -206,19 +313,25 @@ def calibrate_surface(df: pd.DataFrame, config: CalibrationConfig) -> tuple[dict
         np.array([0.8, 0.03, 0.3, -0.4, 0.02]),
     ]
 
+    transform = ParameterTransform(config.param_transform, lb, ub)
     rng = np.random.default_rng(config.seed)
     best = None
     best_metrics = None
+    best_internal = None
+    attempts: list[dict] = []
 
-    def residuals(x: np.ndarray) -> np.ndarray:
-        kappa, theta, sigma, rho, v0 = x
-        if theta <= 0 or sigma <= 0 or kappa <= 0 or v0 <= 0:
+    def residuals(z: np.ndarray) -> np.ndarray:
+        params_vec = transform.from_internal(z)
+        if not transform.within_bounds(params_vec):
             return np.ones_like(market_prices) * 1e4
-        params: Params = (kappa, theta, sigma, rho, v0)
+        if np.any(~np.isfinite(params_vec)):
+            return np.ones_like(market_prices) * 1e4
+        params: Params = tuple(float(v) for v in params_vec)  # type: ignore
+        kappa, theta, sigma, rho, v0 = params
         model_prices = _model_prices(df_prepared, params, fast=config.fast)
         if np.any(~np.isfinite(model_prices)):
             return np.ones_like(market_prices) * 1e4
-        price_res = weights * (model_prices - market_prices)
+        price_res = price_weights * (model_prices - market_prices)
         if config.metric == "vol":
             implied_model = [
                 implied_vol_from_price(
@@ -232,7 +345,9 @@ def calibrate_surface(df: pd.DataFrame, config: CalibrationConfig) -> tuple[dict
                 )
                 for i in range(len(df_prepared))
             ]
-            price_res = (np.array(implied_model) - df_prepared["mid_iv"].to_numpy()) * vegas
+            price_res = vol_weights * (
+                np.array(implied_model) - df_prepared["mid_iv"].to_numpy()
+            )
         feller_violation = max(0.0, sigma * sigma - 2.0 * kappa * theta)
         rho_penalty = max(0.0, abs(rho) - 0.93)
         return np.concatenate(
@@ -244,18 +359,19 @@ def calibrate_surface(df: pd.DataFrame, config: CalibrationConfig) -> tuple[dict
         )
 
     for trial in range(config.retries):
-        base = seeds[trial % len(seeds)]
+        base = np.clip(seeds[trial % len(seeds)], lb, ub)
         perturb = 1.0 + 0.15 * rng.standard_normal(size=5)
-        x0 = np.clip(base * perturb, lb, ub)
+        candidate = np.clip(base * perturb, lb, ub)
+        z0 = transform.to_internal(candidate)
         result = least_squares(
             residuals,
-            x0,
-            bounds=(lb, ub),
+            z0,
             max_nfev=config.max_evals,
             verbose=0,
         )
-        fitted = result.x
-        params: Params = tuple(float(v) for v in fitted)  # type: ignore
+        fitted_vec = transform.from_internal(result.x)
+        params: Params = tuple(float(v) for v in fitted_vec)  # type: ignore
+        kappa, theta, sigma, rho, v0 = params
         model_prices = _model_prices(df_prepared, params, fast=config.fast)
         rmse_price = float(np.sqrt(np.mean((model_prices - market_prices) ** 2)))
         model_vols = [
@@ -271,9 +387,11 @@ def calibrate_surface(df: pd.DataFrame, config: CalibrationConfig) -> tuple[dict
             for i in range(len(df_prepared))
         ]
         rmse_vol = float(
-            np.sqrt(np.mean((np.array(model_vols) - df_prepared["mid_iv"].to_numpy()) ** 2))
+            np.sqrt(
+                np.mean((np.array(model_vols) - df_prepared["mid_iv"].to_numpy()) ** 2)
+            )
         )
-        feller = 2.0 * fitted[0] * fitted[1] - fitted[2] * fitted[2]
+        feller = 2.0 * kappa * theta - sigma * sigma
         market_iv = df_prepared["mid_iv"].to_numpy()
         abs_vol_error = np.abs(np.array(model_vols) - market_iv)
         with np.errstate(divide="ignore", invalid="ignore"):
@@ -299,11 +417,21 @@ def calibrate_surface(df: pd.DataFrame, config: CalibrationConfig) -> tuple[dict
             "cost": float(result.cost),
             "nit": int(result.nfev),
         }
+        attempts.append(
+            {
+                "success": bool(result.success),
+                "rmse_price": rmse_price,
+                "rmse_vol": rmse_vol,
+                "feller": float(feller),
+                "nit": int(result.nfev),
+            }
+        )
         if best is None or rmse_vol < best_metrics["rmse_vol"]:
             best = params
             best_metrics = metrics
+            best_internal = result.x
 
-    assert best is not None and best_metrics is not None
+    assert best is not None and best_metrics is not None and best_internal is not None
     best_metrics["params"] = {
         "kappa": best[0],
         "theta": best[1],
@@ -313,10 +441,24 @@ def calibrate_surface(df: pd.DataFrame, config: CalibrationConfig) -> tuple[dict
     }
     best_metrics["fast_mode"] = config.fast
     best_metrics["metric"] = config.metric
-    return best_metrics, df_prepared
+    residual_norm = float(np.linalg.norm(residuals(best_internal)))
+    diagnostics = {
+        "weight_mode": config.weight_mode,
+        "param_transform": config.param_transform,
+        "attempts": attempts,
+        "residual_norm": residual_norm,
+        "feller_violation": float(best_metrics["feller"]) < 0.0,
+    }
+    diagnostics["retry_failures"] = sum(
+        1 for attempt in attempts if not attempt["success"]
+    )
+    diagnostics["warnings"] = []
+    return best_metrics, df_prepared, diagnostics
 
 
-def _plot_smiles(df: pd.DataFrame, model_vols: Iterable[float], output_path: Path) -> None:
+def _plot_smiles(
+    df: pd.DataFrame, model_vols: Iterable[float], output_path: Path
+) -> None:
     df = df.copy()
     df["model_iv"] = list(model_vols)
     fig, ax = plt.subplots(figsize=(6, 4))
@@ -397,13 +539,48 @@ def save_calibration_outputs(
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True, help="Normalized option surface CSV")
-    ap.add_argument("--output-dir", default="artifacts/heston", help="Directory for calibration artifacts")
-    ap.add_argument("--metric", choices=["price", "vol"], default="price", help="Calibration loss metric")
-    ap.add_argument("--fast", action="store_true", help="Reduce strikes/maturities for CI speed")
+    ap.add_argument(
+        "--output-dir",
+        default="artifacts/heston",
+        help="Directory for calibration artifacts",
+    )
+    ap.add_argument(
+        "--metric",
+        choices=["price", "vol"],
+        default="price",
+        help="Calibration loss metric",
+    )
+    ap.add_argument(
+        "--fast", action="store_true", help="Reduce strikes/maturities for CI speed"
+    )
     ap.add_argument("--seed", type=int, default=7, help="Random seed for restarts")
     ap.add_argument("--retries", type=int, default=4, help="Number of random restarts")
-    ap.add_argument("--max-evals", type=int, default=200, help="Max function evaluations per restart")
-    ap.add_argument("--skip-manifest", action="store_true", help="Suppress manifest updates")
+    ap.add_argument(
+        "--max-evals",
+        type=int,
+        default=200,
+        help="Max function evaluations per restart",
+    )
+    ap.add_argument(
+        "--weight",
+        choices=["iv", "vega", "bidask"],
+        default="iv",
+        help="Residual weighting scheme",
+    )
+    ap.add_argument(
+        "--feller-warn",
+        action="store_true",
+        help="Emit warning if Feller condition is violated",
+    )
+    ap.add_argument(
+        "--param-transform",
+        choices=["none", "exp", "sigmoid"],
+        default="none",
+        help="Internal transform used for optimizer stability",
+    )
+    ap.add_argument(
+        "--skip-manifest", action="store_true", help="Suppress manifest updates"
+    )
     args = ap.parse_args()
 
     df = pd.read_csv(args.input)
@@ -413,14 +590,30 @@ def main() -> None:
         retries=args.retries,
         seed=args.seed,
         metric=args.metric,
+        weight_mode=args.weight,
+        feller_warn=args.feller_warn,
+        param_transform=args.param_transform,
     )
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    metrics, surface = calibrate_surface(df, config)
+    metrics, surface, diagnostics = calibrate_surface(df, config)
+    metrics["weight_mode"] = config.weight_mode
+    metrics["param_transform"] = config.param_transform
+    metrics["diagnostics"] = diagnostics
+
+    warnings: list[str] = []
+    if config.feller_warn and float(metrics["feller"]) < 0.0:
+        warnings.append(
+            f"WARNING: Feller condition violated ({metrics['feller']:.4f}) for {surface['date'].iloc[0]}"
+        )
+        print(warnings[-1])
+
     metrics_with_input = dict(metrics)
     metrics_with_input["input"] = args.input
-    outputs = save_calibration_outputs(surface, metrics_with_input, output_dir, args.fast)
+    outputs = save_calibration_outputs(
+        surface, metrics_with_input, output_dir, args.fast
+    )
 
     command = shlex.join([sys.executable] + sys.argv)
     manifest_entry = {
@@ -431,6 +624,8 @@ def main() -> None:
         "seed": args.seed,
         "retries": args.retries,
         "max_evals": args.max_evals,
+        "weight_mode": config.weight_mode,
+        "param_transform": config.param_transform,
         "rmse_price": float(metrics["rmse_price"]),
         "rmse_vol": float(metrics["rmse_vol"]),
         "rmspe_price": float(metrics["rmspe_price"]),
@@ -450,6 +645,8 @@ def main() -> None:
         "inputs": describe_inputs([args.input]),
         "csv_rows": int(len(surface)),
         "command": command,
+        "diagnostics": diagnostics,
+        "warnings": warnings,
     }
     if not args.skip_manifest:
         update_run("heston", manifest_entry, append=True, id_field="date")
@@ -460,6 +657,17 @@ def main() -> None:
     print(f"Calibrated Heston params -> {params_path}")
     print(f"Smile figure -> {fig_path}")
     print(f"Data table -> {csv_path}")
+
+    severe_failure = not config.fast and (
+        float(metrics["rmse_vol"]) > 0.5
+        or float(metrics["rmspe_price_pct"]) > 50.0
+        or not bool(metrics["converged"])
+    )
+    if severe_failure:
+        sys.stderr.write(
+            "ERROR: Heston calibration did not meet accuracy thresholds.\n"
+        )
+        sys.exit(2)
 
 
 if __name__ == "__main__":

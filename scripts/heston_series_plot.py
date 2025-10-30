@@ -26,14 +26,19 @@ matplotlib.use("Agg")
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pandas as pd
-
-from calibrate_heston import CalibrationConfig, calibrate_surface, save_calibration_outputs
+from calibrate_heston import (
+    CalibrationConfig,
+    calibrate_surface,
+    save_calibration_outputs,
+)
 from calibrate_heston_series import resolve_inputs
 from manifest_utils import describe_inputs, update_run
 
 
 def _parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description="Generate Heston parameter series plot and CSV.")
+    ap = argparse.ArgumentParser(
+        description="Generate Heston parameter series plot and CSV."
+    )
     ap.add_argument(
         "--inputs",
         nargs="*",
@@ -60,11 +65,49 @@ def _parse_args() -> argparse.Namespace:
         default="artifacts/heston/params_series.png",
         help="Destination PNG summarising the parameter series.",
     )
-    ap.add_argument("--metric", choices=["price", "vol"], default="vol", help="Calibration error metric.")
-    ap.add_argument("--fast", action="store_true", help="FAST mode trims strikes/maturities per expiry.")
-    ap.add_argument("--seed", type=int, default=41, help="Base seed; incremented per surface.")
-    ap.add_argument("--retries", type=int, default=3, help="Random restarts per surface.")
-    ap.add_argument("--skip-manifest", action="store_true", help="Suppress manifest logging.")
+    ap.add_argument(
+        "--metric",
+        choices=["price", "vol"],
+        default="vol",
+        help="Calibration error metric.",
+    )
+    ap.add_argument(
+        "--fast",
+        action="store_true",
+        help="FAST mode trims strikes/maturities per expiry.",
+    )
+    ap.add_argument(
+        "--seed", type=int, default=41, help="Base seed; incremented per surface."
+    )
+    ap.add_argument(
+        "--retries", type=int, default=3, help="Random restarts per surface."
+    )
+    ap.add_argument(
+        "--max-evals",
+        type=int,
+        default=200,
+        help="Max function evaluations per surface.",
+    )
+    ap.add_argument(
+        "--weight",
+        choices=["iv", "vega", "bidask"],
+        default="iv",
+        help="Weighting mode.",
+    )
+    ap.add_argument(
+        "--feller-warn",
+        action="store_true",
+        help="Warn when Feller condition is violated.",
+    )
+    ap.add_argument(
+        "--param-transform",
+        choices=["none", "exp", "sigmoid"],
+        default="none",
+        help="Internal transform for optimizer stability.",
+    )
+    ap.add_argument(
+        "--skip-manifest", action="store_true", help="Suppress manifest logging."
+    )
     return ap.parse_args()
 
 
@@ -104,7 +147,9 @@ def main() -> None:
     args = _parse_args()
     repo_inputs: List[Path] = resolve_inputs(args.inputs, args.pattern, args.input_dir)
     if len(repo_inputs) < 1:
-        raise ValueError("Need at least one normalized surface to build a parameter series.")
+        raise ValueError(
+            "Need at least one normalized surface to build a parameter series."
+        )
 
     rows = []
     output_dir = Path(args.output_csv).parent
@@ -119,19 +164,29 @@ def main() -> None:
             metric=args.metric,
             seed=args.seed + idx,
             retries=args.retries,
+            max_evals=args.max_evals,
+            weight_mode=args.weight,
+            feller_warn=args.feller_warn,
+            param_transform=args.param_transform,
         )
-        metrics, surface = calibrate_surface(df, config)
+        metrics, surface, diagnostics = calibrate_surface(df, config)
+        metrics["weight_mode"] = config.weight_mode
+        metrics["param_transform"] = config.param_transform
+        metrics["diagnostics"] = diagnostics
         metrics["input"] = str(csv_path)
         artifacts = save_calibration_outputs(surface, metrics, per_run_dir, args.fast)
 
         params = metrics["params"]
         trade_date = surface["date"].iloc[0].isoformat()
+        diagnostics.setdefault("warnings", [])
         rows.append(
             {
                 "date": trade_date,
                 "input_csv": str(csv_path),
                 "fast_mode": bool(args.fast),
                 "metric": args.metric,
+                "weight_mode": config.weight_mode,
+                "param_transform": config.param_transform,
                 "kappa": params["kappa"],
                 "theta": params["theta"],
                 "sigma_v": params["sigma"],
@@ -146,6 +201,7 @@ def main() -> None:
                 "params_json": str(artifacts["params_path"]),
                 "figure_png": str(artifacts["figure_path"]),
                 "table_csv": str(artifacts["table_path"]),
+                "diagnostics": diagnostics,
             }
         )
 
@@ -164,6 +220,9 @@ def main() -> None:
         "metric": args.metric,
         "seed": args.seed,
         "retries": args.retries,
+        "max_evals": args.max_evals,
+        "weight_mode": args.weight,
+        "param_transform": args.param_transform,
         "inputs": [str(p) for p in repo_inputs],
         "input_descriptors": describe_inputs(repo_inputs),
         "output_csv": str(output_csv),
