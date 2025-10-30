@@ -187,6 +187,12 @@ add_test(
 )
 set_tests_properties(heston_calibration_fast PROPERTIES LABELS "FAST")
 
+add_test(
+  NAME qmc_vs_prng_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_qmc_fast.py
+)
+set_tests_properties(qmc_vs_prng_fast PROPERTIES LABELS "FAST")
+
 # Apply sanitizer flags to targets if requested
 if(SANITIZER_COMPILE_FLAGS OR SANITIZER_LINK_FLAGS)
   foreach(tgt IN ITEMS quant_pricer quant_cli unit_tests micro_bench bench_mc bench_pde)

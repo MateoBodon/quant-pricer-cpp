@@ -156,7 +156,7 @@ def main() -> None:
         path_grid = [512, 1024, 2048, 4096, 8192, 16384]
         reps = 12
 
-    records: List[Dict] = []
+    plot_rows: List[Dict[str, float | str]] = []
     results_summary: Dict[str, Dict[str, Dict[str, float]]] = {}
 
     for kind, mkt, steps in [
@@ -179,17 +179,6 @@ def main() -> None:
                 )
                 rmses.append(rmse)
                 means.append(mean_est)
-                records.append(
-                    {
-                        "payoff": kind,
-                        "method": method,
-                        "paths": paths,
-                        "rmse": rmse,
-                        "estimate_mean": mean_est,
-                        "reps": reps,
-                        "seed": args.seed + idx * 199,
-                    }
-                )
             log_paths = np.log(path_grid)
             log_rmse = np.log(rmses)
             slope, intercept = np.polyfit(log_paths, log_rmse, 1)
@@ -200,10 +189,46 @@ def main() -> None:
                 "means": means,
             }
 
-    df = pd.DataFrame(records)
+    summary_rows: List[Dict[str, float | str]] = []
+    for kind in ["call", "asian"]:
+        slope_prng = results_summary[kind]["prng"]["slope"]
+        slope_qmc = results_summary[kind]["qmc"]["slope"]
+        prng_rmse = results_summary[kind]["prng"]["rmse"]
+        qmc_rmse = results_summary[kind]["qmc"]["rmse"]
+        for idx, paths in enumerate(path_grid):
+            summary_rows.append(
+                {
+                    "payoff": kind,
+                    "paths": paths,
+                    "rmse_prng": prng_rmse[idx],
+                    "rmse_qmc": qmc_rmse[idx],
+                    "slope_prng": slope_prng,
+                    "slope_qmc": slope_qmc,
+                }
+            )
+            plot_rows.append(
+                {
+                    "payoff": kind,
+                    "method": "prng",
+                    "paths": paths,
+                    "rmse": prng_rmse[idx],
+                }
+            )
+            plot_rows.append(
+                {
+                    "payoff": kind,
+                    "method": "qmc",
+                    "paths": paths,
+                    "rmse": qmc_rmse[idx],
+                }
+            )
+
+    summary_df = pd.DataFrame(summary_rows)
     csv_path = Path(args.csv)
     csv_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(csv_path, index=False)
+    summary_df.to_csv(csv_path, index=False, float_format="%.8f")
+
+    plot_df = pd.DataFrame(plot_rows)
 
     fig_path = Path(args.output)
     fig_path.parent.mkdir(parents=True, exist_ok=True)
@@ -213,7 +238,7 @@ def main() -> None:
         ["call", "asian"],
         ["GBM European Call", "Arithmetic Asian Call"],
     ):
-        subset = df[df["payoff"] == kind]
+        subset = plot_df[plot_df["payoff"] == kind]
         for method, marker, color in [
             ("prng", "o-", "#1f77b4"),
             ("qmc", "s--", "#ff7f0e"),
@@ -239,6 +264,14 @@ def main() -> None:
     fig.savefig(fig_path, dpi=180)
     plt.close(fig)
 
+    slopes = {
+        kind: {
+            "prng": results_summary[kind]["prng"]["slope"],
+            "qmc": results_summary[kind]["qmc"]["slope"],
+        }
+        for kind in ["call", "asian"]
+    }
+
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "fast": bool(args.fast),
@@ -248,7 +281,9 @@ def main() -> None:
         "asian_steps": steps_asian,
         "csv": str(csv_path),
         "figure": str(fig_path),
-        "summary": results_summary,
+        "slopes": slopes,
+        "csv_rows": int(len(summary_df)),
+        "inputs": [],
     }
     payload["command"] = shlex.join([sys.executable] + sys.argv)
     update_run("qmc_vs_prng", payload)

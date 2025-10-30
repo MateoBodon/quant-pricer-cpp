@@ -26,7 +26,7 @@ from calibrate_heston import (
     calibrate_surface,
     save_calibration_outputs,
 )
-from manifest_utils import update_run
+from manifest_utils import describe_inputs, update_run
 
 
 def resolve_inputs(inputs: Iterable[str], pattern: str, input_dir: str) -> List[Path]:
@@ -133,6 +133,7 @@ def main() -> None:
         "seed": args.seed,
         "retries": args.retries,
         "inputs": [str(p) for p in inputs],
+        "input_descriptors": describe_inputs(inputs),
         "artifacts_dir": str(output_dir),
         "series_csv": str(out_path),
         "num_dates": int(len(rows)),

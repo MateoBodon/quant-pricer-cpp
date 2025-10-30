@@ -6,6 +6,7 @@
 [![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag)](https://github.com/MateoBodon/quant-pricer-cpp/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-Doxygen-blue)](https://mateobodon.github.io/quant-pricer-cpp/)
+[![Reproducibility](https://img.shields.io/badge/reproducibility-manifest-blue)](artifacts/manifest.json)
 
 **TL;DR:** A fast, tested C++ pricer that cross-checks three independent methods (analytic / MC / PDE), exposes Greeks via pathwise & likelihood-ratio estimators, and ships with benchmarks and convergence reports so results are both correct and reproducible.
 
@@ -15,9 +16,18 @@
 
 Curated figures with reproduction commands live in [docs/Results.md](docs/Results.md).
 
-<a href="docs/Results.md#heston-smile-calibration-2024-06-14"><img src="artifacts/heston/fit_20240614.png" alt="Heston calibration" width="220"></a>
-<a href="docs/Results.md#qmc-vs-prng-rmse-scaling"><img src="artifacts/qmc_vs_prng.png" alt="QMC vs PRNG" width="220"></a>
-<a href="docs/Results.md#american-pricing-consistency"><img src="artifacts/american_consistency.png" alt="American consistency" width="220"></a>
+- <a href="docs/Results.md#qmc-vs-prng-rmse-scaling"><img src="artifacts/qmc_vs_prng.png" alt="QMC vs PRNG" width="220"></a><br>
+  **QMC vs PRNG RMSE Scaling** – log–log convergence shows Sobol QMC beating PRNG on both European and Asian payoffs.  
+  Reproduce: `python scripts/qmc_vs_prng.py --fast`  
+  Data: [artifacts/qmc_vs_prng.csv](artifacts/qmc_vs_prng.csv)
+- <a href="docs/Results.md#american-pricing-consistency"><img src="artifacts/american_consistency.png" alt="American consistency" width="220"></a><br>
+  **American Consistency** – PSOR and CRR agree within the LSMC ±2σ band across spot/vol grids.  
+  Reproduce: `python scripts/american_consistency.py --fast`  
+  Data: [artifacts/american_consistency.csv](artifacts/american_consistency.csv)
+- <a href="docs/Results.md#heston-smile-calibration-2024-06-14"><img src="artifacts/heston/fit_20240614.png" alt="Heston calibration" width="220"></a><br>
+  **Heston Smile Fit (14-Jun-2024)** – calibrated smile tracks the synthetic SPX surface within 20 vol bps.  
+  Reproduce: `python scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast`  
+  Data: [artifacts/heston/fit_20240614.csv](artifacts/heston/fit_20240614.csv)
 
 ---
 

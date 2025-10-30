@@ -2,7 +2,13 @@
 /build/
 /build-*/
 /install/
-/artifacts/
+/artifacts/*
+!/artifacts/manifest.json
+!/artifacts/heston/
+!/artifacts/qmc_vs_prng.csv
+!/artifacts/american_consistency.csv
+/artifacts/heston/*
+!/artifacts/heston/fit_20240614.csv
 examples/consumer-cmake/build/
 CMakeCache.txt
 CMakeFiles/
