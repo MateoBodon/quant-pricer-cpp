@@ -30,7 +30,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import brentq, least_squares
 
-from manifest_utils import update_run
+from manifest_utils import describe_inputs, update_run
 
 
 Params = Tuple[float, float, float, float, float]  # kappa, theta, sigma, rho, v0
@@ -350,10 +350,22 @@ def save_calibration_outputs(
 
     _plot_smiles(df, model_vols, fig_path)
 
-    table = df[["date", "ttm_years", "strike", "put_call", "mid_iv"]].copy()
-    table["model_iv"] = model_vols
-    table["market_price"] = _surface_market_prices(df)[0]
-    table["model_price"] = model_prices
+    market_prices, _ = _surface_market_prices(df)
+    abs_vol_error = np.abs(np.array(model_vols) - df["mid_iv"].to_numpy())
+    abs_price_error = np.abs(model_prices - market_prices)
+    table = pd.DataFrame(
+        {
+            "strike": df["strike"].to_numpy(),
+            "ttm": df["ttm_years"].to_numpy(),
+            "put_call": df["put_call"].to_numpy(),
+            "market_iv": df["mid_iv"].to_numpy(),
+            "model_iv": model_vols,
+            "abs_vol_error": abs_vol_error,
+            "market_price": market_prices,
+            "model_price": model_prices,
+            "abs_price_error": abs_price_error,
+        }
+    )
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     table.to_csv(csv_path, index=False, float_format="%.8f")
 
@@ -416,6 +428,8 @@ def main() -> None:
         "params_json": str(outputs["params_path"]),
         "figure": str(outputs["figure_path"]),
         "table": str(outputs["table_path"]),
+        "inputs": describe_inputs([args.input]),
+        "csv_rows": int(len(surface)),
         "command": command,
     }
     if not args.skip_manifest:

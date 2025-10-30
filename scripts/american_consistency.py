@@ -203,13 +203,14 @@ def main() -> None:
             lsmc_price, lsmc_se = american_put_lsmc(spec, lsmc_paths, lsmc_steps, args.seed)
             rows.append(
                 {
+                    "params": f"S/K={ratio:.1f};sigma={sigma:.2f}",
                     "spot": spot,
                     "strike": strike,
                     "ratio": ratio,
                     "sigma": sigma,
                     "psor": psor_price,
                     "crr": crr_price,
-                    "lsmc": lsmc_price,
+                    "lsmc_mean": lsmc_price,
                     "lsmc_se": lsmc_se,
                     "lsmc_lo": lsmc_price - 2.0 * lsmc_se,
                     "lsmc_hi": lsmc_price + 2.0 * lsmc_se,
@@ -235,7 +236,7 @@ def main() -> None:
         ax.plot(subset["ratio"], subset["crr"], "s--", label="CRR", color="#2ca02c")
         ax.errorbar(
             subset["ratio"],
-            subset["lsmc"],
+            subset["lsmc_mean"],
             yerr=2.0 * subset["lsmc_se"],
             fmt="^",
             label="LSMC ±2σ",
@@ -263,7 +264,9 @@ def main() -> None:
         "lsmc_steps": lsmc_steps,
         "csv": str(csv_path),
         "figure": str(fig_path),
-        "grid": rows,
+        "scenarios": len(rows),
+        "csv_rows": int(len(df)),
+        "inputs": [],
     }
     payload["command"] = shlex.join([sys.executable] + sys.argv)
     update_run("american_consistency", payload)
