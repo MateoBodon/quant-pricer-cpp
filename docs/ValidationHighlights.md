@@ -10,8 +10,9 @@ cmake --build build -j
 ```
 
 All raw CSVs/PNGs/PDFs live in `artifacts/`, while `artifacts/manifest.json`
-captures the git SHA, compiler, build flags, RNG mode, OpenMP thread count,
-and summary statistics for every run.
+now records the git SHA, compiler, build flags, platform details, every CLI
+command executed by the demo script, and the seeds/resolutions used for each
+pricing sweep.
 
 ## Highlights at a glance
 
@@ -56,8 +57,10 @@ log-scale comparison against the PDE benchmark.
 ## American option validation
 
 `artifacts/american_validation.csv` logs PSOR residuals/iteration counts,
-binomial convergence, and LSMC standard errors—handy for regression testing and
-resume-ready plots.
+binomial convergence, and LSMC standard errors. The manifest mirrors the run
+metadata (paths, steps, seed) alongside the per-exercise ITM counts and basis
+condition numbers produced by the new diagnostics—handy for regression testing
+and resume-ready plots.
 
 ## Heston QE
 
@@ -74,8 +77,8 @@ comparison with Black–Scholes analytics.
 
 ## Artifact index
 
-- `artifacts/manifest.json` – reproducibility metadata (compiler, flags, RNG,
-  thread count, MC/Heston/Greeks summaries).
+- `artifacts/manifest.json` – reproducibility metadata (compiler, flags,
+  platform, executed commands, MC/Heston/Greeks/American seeds & summaries).
 - `qmc_vs_prng.csv` / `.png` – MC RMSE comparison.
 - `heston_qe_convergence.csv` / `.png` – Andersen QE vs Euler convergence.
 - `greeks_ci.csv` / `.png` – LR/pathwise Greeks with confidence bands.
@@ -85,4 +88,3 @@ comparison with Black–Scholes analytics.
 
 > Regenerate with `./scripts/demo.sh` whenever pricing engines or RNGs change
 > so recruiters and reviewers always see current evidence.
-

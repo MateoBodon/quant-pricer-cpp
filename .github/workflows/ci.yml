@@ -5,9 +5,12 @@ on:
     branches: [ master, main ]
   pull_request:
     branches: [ master, main ]
+  schedule:
+    - cron: '0 6 * * *'
 
 jobs:
   build-test:
+    if: github.event_name != 'schedule'
     name: Build and test (${{ matrix.os }}, ${{ matrix.cxx }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -25,10 +28,11 @@ jobs:
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DQUANT_ENABLE_OPENMP=ON
       - name: Build
         run: cmake --build build --config Release --parallel
-      - name: Test
-        run: ctest --test-dir build --output-on-failure -C Release
+      - name: Test (FAST tier)
+        run: ctest --test-dir build --output-on-failure -C Release -L FAST
 
   sanitizers:
+    if: github.event_name != 'schedule'
     name: Sanitizers (Ubuntu, Clang)
     runs-on: ubuntu-latest
     steps:
@@ -44,10 +48,11 @@ jobs:
         run: cmake -S . -B build-sani -DCMAKE_BUILD_TYPE=RelWithDebInfo -DQUANT_ENABLE_SANITIZERS=ON -DQUANT_ENABLE_OPENMP=OFF
       - name: Build
         run: cmake --build build-sani --parallel
-      - name: Test
-        run: ctest --test-dir build-sani --output-on-failure
+      - name: Test (FAST tier)
+        run: ctest --test-dir build-sani --output-on-failure -L FAST
 
   docs:
+    if: github.event_name != 'schedule'
     name: Doxygen (build only)
     runs-on: ubuntu-latest
     steps:
@@ -62,21 +67,32 @@ jobs:
           name: doxygen-html
           path: docs/html
 
-  demo-artifacts:
-    name: Demo Artifacts
+  nightly:
+    if: github.event_name == 'schedule'
+    name: Nightly Slow Tests and Artifacts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install dependencies
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
+      - name: Install extras
         run: sudo apt-get update && sudo apt-get install -y python3 python3-pip
+      - name: Configure (Release)
+        run: cmake -S . -B build-nightly -DCMAKE_BUILD_TYPE=Release -DQUANT_ENABLE_OPENMP=ON
+      - name: Build
+        run: cmake --build build-nightly --config Release --parallel
+      - name: Run SLOW tier
+        run: ctest --test-dir build-nightly --output-on-failure -C Release -L SLOW
+      - name: Run BENCH tier
+        run: ctest --test-dir build-nightly --output-on-failure -C Release -L BENCH
       - name: Generate demo artifacts
         run: |
           chmod +x scripts/demo.sh
           ./scripts/demo.sh
-      - name: Upload demo bundle
+      - name: Upload nightly bundle
         uses: actions/upload-artifact@v4
         with:
-          name: demo-artifacts
+          name: nightly-artifacts
           path: artifacts
