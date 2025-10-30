@@ -54,6 +54,7 @@ import json
 import math
 import os
 import pathlib
+import platform
 import re
 import subprocess
 import sys
@@ -78,8 +79,12 @@ mc_paths = int(os.environ["MC_PATHS"])
 mc_seed = int(os.environ["MC_SEED"])
 git_sha = os.environ["GIT_SHA"]
 
+command_log = []
+
 def run_cli(args):
-    result = subprocess.check_output([str(cli), *map(str, args)], text=True)
+    cmd = [str(cli), *map(str, args)]
+    command_log.append(cmd)
+    result = subprocess.check_output(cmd, text=True)
     return result.strip()
 
 def run_cli_json(args):
@@ -781,14 +786,22 @@ for M_nodes, N_steps, stretch in psor_configs:
         "residual": result["max_residual"],
     })
 
-lsmc_result = run_cli_json([
+lsmc_paths = 200000
+lsmc_steps = 50
+lsmc_seed = 20250217
+lsmc_antithetic = 0
+lsmc_args = [
     "american", "lsmc", american_params["type"],
     american_params["spot"], american_params["strike"], american_params["rate"],
     american_params["dividend"], american_params["vol"], american_params["tenor"],
-    200000, 50, 20250217, 0,
-])
+    lsmc_paths, lsmc_steps, lsmc_seed, lsmc_antithetic,
+]
+lsmc_result = run_cli_json(lsmc_args)
 lsmc_price = lsmc_result["price"]
 lsmc_std_error = lsmc_result["std_error"]
+lsmc_itm_counts = lsmc_result.get("itm_counts", [])
+lsmc_regression_counts = lsmc_result.get("regression_counts", [])
+lsmc_condition_numbers = lsmc_result.get("condition_numbers", [])
 
 with open(artifact_dir / "american_validation.csv", "w", newline="") as fh:
     writer = csv.DictWriter(fh, fieldnames=[
@@ -820,7 +833,7 @@ with open(artifact_dir / "american_validation.csv", "w", newline="") as fh:
         })
     writer.writerow({
         "method": "lsmc",
-        "resolution": 200000,
+        "resolution": lsmc_paths,
         "price": f"{lsmc_price:.6f}",
         "abs_error": f"{abs(lsmc_price - psor_ref_price):.6f}",
         "extra": f"std_error={lsmc_std_error:.6f}",
@@ -1078,12 +1091,24 @@ try:
 except ValueError:
     cli_rel = str(cli)
 
+platform_info = {
+    "system": platform.system(),
+    "release": platform.release(),
+    "machine": platform.machine(),
+    "python": platform.python_version(),
+}
+
 manifest = {
     "generated_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
     "git_sha": git_sha,
     "build_type": build_type,
+    "platform": platform_info,
     "compiler": compiler_info,
     "flags": flags_info,
+    "commands": [
+        " ".join(([cli_rel] + cmd[1:]) if cmd and cmd[0] == str(cli) else cmd)
+        for cmd in command_log
+    ],
     "monte_carlo": {
         "qmc_mode": mc_params["qmc_mode"],
         "bridge": mc_params["bridge_mode"],
@@ -1162,6 +1187,17 @@ manifest = {
         "psor_abs_error": [round(row["abs_err"], 6) for row in psor_rows],
         "lsmc_price": round(lsmc_price, 6),
         "lsmc_std_error": round(lsmc_std_error, 6),
+        "lsmc_paths": lsmc_paths,
+        "lsmc_steps": lsmc_steps,
+        "lsmc_seed": lsmc_seed,
+        "lsmc_antithetic": bool(lsmc_antithetic),
+        "lsmc_itm_counts": lsmc_itm_counts,
+        "lsmc_regression_counts": lsmc_regression_counts,
+        "lsmc_condition_numbers": [
+            (round(c, 6) if isinstance(c, (int, float)) and math.isfinite(c)
+             else ("inf" if isinstance(c, float) and math.isinf(c) else c))
+            for c in lsmc_condition_numbers
+        ],
     },
     "barrier_validation": {
         "cases": barrier_labels,
