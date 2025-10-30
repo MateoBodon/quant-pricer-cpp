@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cmath>
 #include <cctype>
 #include <cstdlib>
 #include <iomanip>
@@ -119,10 +121,40 @@ void print_psor(const quant::american::PsorResult& res, bool json) {
 void print_lsmc(const quant::american::LsmcResult& res, bool json) {
     if (json) {
         std::cout << "{\"price\":" << res.price
-                  << ",\"std_error\":" << res.std_error
-                  << "}\n";
+                  << ",\"std_error\":" << res.std_error;
+        const auto& diag = res.diagnostics;
+        auto emit_array = [](const auto& arr) {
+            std::cout << "[";
+            for (std::size_t i = 0; i < arr.size(); ++i) {
+                if (i) std::cout << ",";
+                std::cout << arr[i];
+            }
+            std::cout << "]";
+        };
+        std::cout << ",\"itm_counts\":";
+        emit_array(diag.itm_counts);
+        std::cout << ",\"regression_counts\":";
+        emit_array(diag.regression_counts);
+        std::cout << ",\"condition_numbers\":";
+        emit_array(diag.condition_numbers);
+        std::cout << "}\n";
     } else {
-        std::cout << res.price << " (se=" << res.std_error << ")\n";
+        std::cout << res.price << " (se=" << res.std_error;
+        if (!res.diagnostics.itm_counts.empty()) {
+            const auto& diag = res.diagnostics;
+            std::size_t max_itm = *std::max_element(diag.itm_counts.begin(), diag.itm_counts.end());
+            double max_cond = 0.0;
+            for (double c : diag.condition_numbers) {
+                if (std::isfinite(c)) {
+                    max_cond = std::max(max_cond, c);
+                }
+            }
+            std::cout << ", max_itm=" << max_itm;
+            if (max_cond > 0.0) {
+                std::cout << ", max_cond=" << max_cond;
+            }
+        }
+        std::cout << ")\n";
     }
 }
 

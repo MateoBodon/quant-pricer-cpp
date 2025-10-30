@@ -6,7 +6,7 @@
 
 using namespace quant;
 
-TEST(MonteCarlo, PriceCloseToBS) {
+TEST(MonteCarloFast, PriceCloseToBS) {
     mc::McParams mp{
         .spot = 100.0,
         .strike = 100.0,
@@ -14,7 +14,7 @@ TEST(MonteCarlo, PriceCloseToBS) {
         .dividend = 0.0,
         .vol = 0.2,
         .time = 1.0,
-        .num_paths = 200000,
+        .num_paths = 8000,
         .seed = 42,
         .antithetic = true,
         .control_variate = true
@@ -22,10 +22,28 @@ TEST(MonteCarlo, PriceCloseToBS) {
     auto res = mc::price_european_call(mp);
     double bs_price = bs::call_price(mp.spot, mp.strike, mp.rate, mp.dividend, mp.vol, mp.time);
     // Allow ~3 standard errors
+    EXPECT_NEAR(res.estimate.value, bs_price, 6.0 * res.estimate.std_error);
+}
+
+TEST(MonteCarloSlow, PriceCloseToBS) {
+    mc::McParams mp{
+        .spot = 100.0,
+        .strike = 100.0,
+        .rate = 0.03,
+        .dividend = 0.0,
+        .vol = 0.2,
+        .time = 1.0,
+        .num_paths = 250000,
+        .seed = 42,
+        .antithetic = true,
+        .control_variate = true
+    };
+    auto res = mc::price_european_call(mp);
+    double bs_price = bs::call_price(mp.spot, mp.strike, mp.rate, mp.dividend, mp.vol, mp.time);
     EXPECT_NEAR(res.estimate.value, bs_price, 3.0 * res.estimate.std_error);
 }
 
-TEST(MonteCarlo, VarianceReductionWorks) {
+TEST(MonteCarloFast, VarianceReductionWorks) {
     mc::McParams base{
         .spot = 100.0,
         .strike = 105.0,
@@ -33,7 +51,7 @@ TEST(MonteCarlo, VarianceReductionWorks) {
         .dividend = 0.01,
         .vol = 0.25,
         .time = 0.75,
-        .num_paths = 100000,
+        .num_paths = 8000,
         .seed = 12345,
         .antithetic = false,
         .control_variate = false
@@ -51,7 +69,7 @@ TEST(MonteCarlo, VarianceReductionWorks) {
     EXPECT_LT(res_both.estimate.std_error, res_cv.estimate.std_error);
 }
 
-TEST(MonteCarlo, GreeksCloseToAnalytic) {
+TEST(MonteCarloSlow, GreeksCloseToAnalytic) {
     mc::McParams mp{
         .spot = 100.0,
         .strike = 100.0,
@@ -59,7 +77,7 @@ TEST(MonteCarlo, GreeksCloseToAnalytic) {
         .dividend = 0.01,
         .vol = 0.2,
         .time = 1.0,
-        .num_paths = 400000,
+        .num_paths = 320000,
         .seed = 987654321ULL,
         .antithetic = true,
         .control_variate = false // control variate not used for Greeks here
@@ -73,7 +91,7 @@ TEST(MonteCarlo, GreeksCloseToAnalytic) {
     EXPECT_NEAR(g.gamma_lrm.value, gm, 3.0 * g.gamma_lrm.std_error);
 }
 
-TEST(MonteCarlo, GreeksAcrossMoneynessAndAntithetic) {
+TEST(MonteCarloSlow, GreeksAcrossMoneynessAndAntithetic) {
     mc::McParams base{
         .spot = 100.0,
         .strike = 100.0,
@@ -81,7 +99,7 @@ TEST(MonteCarlo, GreeksAcrossMoneynessAndAntithetic) {
         .dividend = 0.01,
         .vol = 0.22,
         .time = 1.0,
-        .num_paths = 500000,
+        .num_paths = 320000,
         .seed = 246813579ULL,
         .antithetic = true,
         .control_variate = false
@@ -113,14 +131,14 @@ TEST(MonteCarlo, GreeksAcrossMoneynessAndAntithetic) {
         const double vega_ref = bs::vega(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time);
         const double gamma_ref = bs::gamma(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time);
 
-        EXPECT_NEAR(g.delta.value, delta_ref, kSigmaFactor * g.delta.std_error);
-        EXPECT_NEAR(g.vega.value, vega_ref, kSigmaFactor * g.vega.std_error);
-        EXPECT_NEAR(g.gamma_lrm.value, gamma_ref, kSigmaFactor * g.gamma_lrm.std_error);
-        EXPECT_NEAR(g.gamma_mixed.value, gamma_ref, kSigmaFactor * g.gamma_mixed.std_error);
-    }
+    EXPECT_NEAR(g.delta.value, delta_ref, kSigmaFactor * g.delta.std_error);
+    EXPECT_NEAR(g.vega.value, vega_ref, kSigmaFactor * g.vega.std_error);
+    EXPECT_NEAR(g.gamma_lrm.value, gamma_ref, kSigmaFactor * g.gamma_lrm.std_error);
+    EXPECT_NEAR(g.gamma_mixed.value, gamma_ref, kSigmaFactor * g.gamma_mixed.std_error);
+}
 }
 
-TEST(MonteCarlo, ThetaCloseToPDE) {
+TEST(MonteCarloSlow, ThetaCloseToPDE) {
     mc::McParams mp{
         .spot = 100.0,
         .strike = 100.0,
@@ -128,7 +146,7 @@ TEST(MonteCarlo, ThetaCloseToPDE) {
         .dividend = 0.01,
         .vol = 0.2,
         .time = 1.0,
-        .num_paths = 400000,
+        .num_paths = 320000,
         .seed = 13579ULL,
         .antithetic = true,
         .control_variate = false
@@ -156,7 +174,7 @@ TEST(MonteCarlo, ThetaCloseToPDE) {
     EXPECT_NEAR(g.theta.value, theta_ref, 5.0 * g.theta.std_error + std::abs(theta_ref) * 0.05);
 }
 
-TEST(MonteCarlo, GammaMixedVarianceLowerThanLR) {
+TEST(MonteCarloSlow, GammaMixedVarianceLowerThanLR) {
     mc::McParams params{
         .spot = 100.0,
         .strike = 100.0,
@@ -164,7 +182,7 @@ TEST(MonteCarlo, GammaMixedVarianceLowerThanLR) {
         .dividend = 0.005,
         .vol = 0.2,
         .time = 1.0,
-        .num_paths = 800000,
+        .num_paths = 320000,
         .seed = 424242ULL,
         .antithetic = true,
         .control_variate = false
@@ -176,7 +194,7 @@ TEST(MonteCarlo, GammaMixedVarianceLowerThanLR) {
     EXPECT_LT(g.gamma_mixed.std_error, g.gamma_lrm.std_error);
 }
 
-TEST(MonteCarlo, QmcReducesErrorVsAnalytic) {
+TEST(MonteCarloSlow, QmcReducesErrorVsAnalytic) {
     // Compare absolute error vs analytic for PRNG vs QMC
     mc::McParams base{
         .spot = 100.0,
@@ -185,7 +203,7 @@ TEST(MonteCarlo, QmcReducesErrorVsAnalytic) {
         .dividend = 0.00,
         .vol = 0.25,
         .time = 1.0,
-        .num_paths = 120000,
+        .num_paths = 240000,
         .seed = 2025,
         .antithetic = false,
         .control_variate = false

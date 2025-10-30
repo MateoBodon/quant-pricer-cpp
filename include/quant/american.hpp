@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <vector>
 
 #include "quant/barrier.hpp"
 #include "quant/pde.hpp"
@@ -46,11 +48,21 @@ struct LsmcParams {
     std::uint64_t seed;
     int num_steps;
     bool antithetic{true};
+    double ridge_lambda{0.0};
+    double itm_moneyness_eps{0.0};
+    std::size_t min_itm{32};
+};
+
+struct LsmcDiagnostics {
+    std::vector<std::size_t> itm_counts;          // number of truly ITM paths per exercise date
+    std::vector<std::size_t> regression_counts;   // number of samples entering regression per date
+    std::vector<double> condition_numbers;        // condition number of normal equations matrix per date
 };
 
 struct LsmcResult {
     double price;
     double std_error;
+    LsmcDiagnostics diagnostics{};
 };
 
 LsmcResult price_lsmc(const LsmcParams& params);
@@ -65,4 +77,3 @@ struct Greeks {
 Greeks greeks_psor_bump( PsorParams params, double rel_bump );
 
 } // namespace quant::american
-

@@ -1,4 +1,5 @@
 #include "quant/american.hpp"
+#include "quant/grid_utils.hpp"
 
 #include <algorithm>
 #include <array>
@@ -19,75 +20,33 @@ using quant::OptionType;
 namespace quant::american {
 namespace {
 
-struct SpaceGrid {
-    std::vector<double> x;
-    std::vector<double> S;
-};
+using quant::grid_utils::OperatorWorkspace;
+using quant::grid_utils::SpaceGrid;
 
-struct OperatorWorkspace {
-    std::vector<double> lower;
-    std::vector<double> diag;
-    std::vector<double> upper;
-    std::vector<double> rhs;
-};
-
-double stretch_map(double xi, double xi0, double stretch) {
-    if (stretch <= 0.0) {
-        return xi;
-    }
-    const double eps = 1e-10;
-    xi0 = std::clamp(xi0, eps, 1.0 - eps);
-    if (xi <= xi0) {
-        double ratio = xi / xi0;
-        return xi0 * std::tanh(stretch * ratio) / std::tanh(stretch);
-    }
-    double ratio = (1.0 - xi) / (1.0 - xi0);
-    return 1.0 - (1.0 - xi0) * std::tanh(stretch * ratio) / std::tanh(stretch);
-}
-
-SpaceGrid build_space_grid(const PsorParams& params) {
+SpaceGrid make_space_grid(const PsorParams& params) {
     if (params.grid.num_space < 3) {
         throw std::invalid_argument("PSOR grid requires at least 3 spatial nodes");
     }
-    SpaceGrid grid;
-    grid.x.resize(params.grid.num_space);
-    grid.S.resize(params.grid.num_space);
-
+    quant::grid_utils::StretchedGridParams gp{};
+    gp.nodes = params.grid.num_space;
+    gp.stretch = params.stretch;
+    gp.log_space = params.log_space;
+    gp.anchor = params.base.strike;
     if (!params.log_space) {
-        const double S_lower = 0.0;
-        const double S_upper = std::max(params.base.spot * params.grid.s_max_mult,
-                                        params.base.strike * params.grid.s_max_mult);
-        if (S_upper <= 0.0) {
+        gp.lower = 0.0;
+        gp.upper = std::max(params.base.spot * params.grid.s_max_mult,
+                            params.base.strike * params.grid.s_max_mult);
+        if (!(gp.upper > gp.lower)) {
             throw std::invalid_argument("Invalid S_max for American grid");
         }
-        const double xi0 = std::clamp((params.base.strike - S_lower) / (S_upper - S_lower), 0.0, 1.0);
-        for (int i = 0; i < params.grid.num_space; ++i) {
-            double xi = (params.grid.num_space == 1) ? 0.0
-                                                    : static_cast<double>(i) / static_cast<double>(params.grid.num_space - 1);
-            double mapped = stretch_map(xi, xi0, params.stretch);
-            double S_val = S_lower + (S_upper - S_lower) * mapped;
-            grid.x[i] = S_val;
-            grid.S[i] = S_val;
-        }
     } else {
-        const double S_lower = std::max(1e-8, params.base.spot / params.grid.s_max_mult);
-        const double S_upper = params.base.spot * params.grid.s_max_mult;
-        if (S_upper <= S_lower) {
+        gp.lower = std::max(1e-8, params.base.spot / params.grid.s_max_mult);
+        gp.upper = params.base.spot * params.grid.s_max_mult;
+        if (!(gp.upper > gp.lower)) {
             throw std::invalid_argument("Invalid log-space bounds for American grid");
         }
-        const double x_min = std::log(S_lower);
-        const double x_max = std::log(S_upper);
-        const double xi0 = std::clamp((std::log(params.base.strike) - x_min) / (x_max - x_min), 0.0, 1.0);
-        for (int i = 0; i < params.grid.num_space; ++i) {
-            double xi = (params.grid.num_space == 1) ? 0.0
-                                                    : static_cast<double>(i) / static_cast<double>(params.grid.num_space - 1);
-            double mapped = stretch_map(xi, xi0, params.stretch);
-            double x_val = x_min + (x_max - x_min) * mapped;
-            grid.x[i] = x_val;
-            grid.S[i] = std::exp(x_val);
-        }
     }
-    return grid;
+    return quant::grid_utils::build_space_grid(gp);
 }
 
 double intrinsic_value(OptionType type, double strike, double S) {
@@ -105,79 +64,33 @@ void build_system(const PsorParams& params,
                   double tau_next,
                   OperatorWorkspace& op) {
     const int M = params.grid.num_space;
-    op.lower.assign(std::max(0, M - 1), 0.0);
-    op.diag.assign(M, 0.0);
-    op.upper.assign(std::max(0, M - 1), 0.0);
-    op.rhs.assign(M, 0.0);
+    if (static_cast<int>(grid.spot.size()) != M) {
+        throw std::invalid_argument("grid size mismatch for PSOR operator");
+    }
 
-    const double sigma = params.base.vol;
-    const double sigma2 = sigma * sigma;
-    const double r = params.base.rate;
-    const double q = params.base.dividend;
+    quant::grid_utils::DiffusionCoefficients coeffs{
+        params.base.vol,
+        params.base.rate,
+        params.base.dividend,
+        params.log_space
+    };
+    quant::grid_utils::assemble_operator(grid, coeffs, dt, theta, V_curr, op);
 
-    auto payoff_bc = [&](bool lower) {
-        const double S_val = lower ? grid.S.front() : grid.S.back();
-        const double df_r = std::exp(-r * tau_next);
-        const double df_q = std::exp(-q * tau_next);
-        if (params.base.type == OptionType::Call) {
-            if (lower) {
-                return 0.0;
-            }
-            return S_val * df_q - params.base.strike * df_r;
-        }
-        if (lower) {
-            return params.base.strike * df_r - S_val * df_q;
-        }
-        return 0.0;
+    quant::grid_utils::PayoffBoundaryParams boundary_params{
+        params.base.type,
+        params.base.strike,
+        params.base.rate,
+        params.base.dividend,
+        tau_next
     };
 
-    const double lower_bc = payoff_bc(true);
-    const double upper_bc = payoff_bc(false);
+    const double lower_bc = quant::grid_utils::dirichlet_boundary(boundary_params, grid.spot.front(), true);
+    const double upper_bc = quant::grid_utils::dirichlet_boundary(boundary_params, grid.spot.back(), false);
 
     op.diag[0] = 1.0;
     op.rhs[0] = lower_bc;
     if (M > 1) {
         op.upper[0] = 0.0;
-    }
-
-    for (int i = 1; i < M - 1; ++i) {
-        const double h_minus = grid.x[i] - grid.x[i - 1];
-        const double h_plus = grid.x[i + 1] - grid.x[i];
-        if (h_minus <= 0.0 || h_plus <= 0.0) {
-            throw std::runtime_error("Non-increasing spatial grid encountered in PSOR");
-        }
-        const double denom = h_minus + h_plus;
-
-        double a_i, b_i, c_i;
-        if (!params.log_space) {
-            const double S_i = grid.S[i];
-            a_i = 0.5 * sigma2 * S_i * S_i;
-            b_i = (r - q) * S_i;
-            c_i = -r;
-        } else {
-            a_i = 0.5 * sigma2;
-            b_i = (r - q - 0.5 * sigma2);
-            c_i = -r;
-        }
-
-        const double diff_im1 = 2.0 * a_i / (h_minus * denom);
-        const double diff_ip1 = 2.0 * a_i / (h_plus * denom);
-        const double diff_i = -diff_im1 - diff_ip1;
-
-        const double conv_im1 = -b_i * h_plus / (h_minus * denom);
-        const double conv_ip1 = b_i * h_minus / (h_plus * denom);
-        const double conv_i = -conv_im1 - conv_ip1 + c_i;
-
-        const double L_im1 = diff_im1 + conv_im1;
-        const double L_i = diff_i + conv_i;
-        const double L_ip1 = diff_ip1 + conv_ip1;
-
-        op.lower[i - 1] = -theta * dt * L_im1;
-        op.diag[i] = 1.0 - theta * dt * L_i;
-        op.upper[i] = -theta * dt * L_ip1;
-
-        op.rhs[i] = V_curr[i] + (1.0 - theta) * dt *
-            (L_im1 * V_curr[i - 1] + L_i * V_curr[i] + L_ip1 * V_curr[i + 1]);
     }
 
     if (M > 1) {
@@ -186,9 +99,10 @@ void build_system(const PsorParams& params,
             op.lower[M - 2] = 0.0;
             op.rhs[M - 1] = upper_bc;
         } else {
-            const double dx = grid.x[M - 1] - grid.x[M - 2];
-            double dVdS = (params.base.type == OptionType::Call) ? std::exp(-q * tau_next) : 0.0;
-            double dUdx = grid.S.back() * dVdS;
+            const double dx = grid.coordinate.back() - grid.coordinate[static_cast<std::size_t>(M - 2)];
+            const double df_q = std::exp(-params.base.dividend * tau_next);
+            double dVdS = (params.base.type == OptionType::Call) ? df_q : 0.0;
+            double dUdx = grid.spot.back() * dVdS;
             op.diag[M - 1] = 1.0;
             op.lower[M - 2] = -1.0;
             op.rhs[M - 1] = dx * dUdx;
@@ -249,14 +163,52 @@ struct NormalEquations {
     }
 };
 
-std::array<double, 4> solve_normal_equations(NormalEquations eq) {
-    eq.symmetrize();
+struct RegressionSolution {
+    std::array<double, 4> beta{};
+    double condition_number{0.0};
+    bool success{false};
+};
+
+namespace {
+
+std::array<double, 4> mat_vec(const double mat[4][4], const std::array<double, 4>& v) {
+    std::array<double, 4> out{};
+    for (int i = 0; i < 4; ++i) {
+        double sum = 0.0;
+        for (int j = 0; j < 4; ++j) {
+            sum += mat[i][j] * v[j];
+        }
+        out[i] = sum;
+    }
+    return out;
+}
+
+double dot(const std::array<double, 4>& a, const std::array<double, 4>& b) {
+    double sum = 0.0;
+    for (int i = 0; i < 4; ++i) {
+        sum += a[i] * b[i];
+    }
+    return sum;
+}
+
+double normalize(std::array<double, 4>& v) {
+    double norm_sq = dot(v, v);
+    double norm = std::sqrt(norm_sq);
+    if (norm > 0.0) {
+        for (double& x : v) {
+            x /= norm;
+        }
+    }
+    return norm;
+}
+
+bool solve_linear_system(const double mat_in[4][4], const double rhs_in[4], double sol_out[4]) {
     double a[4][5];
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
-            a[i][j] = eq.ata[i][j];
+            a[i][j] = mat_in[i][j];
         }
-        a[i][4] = eq.atb[i];
+        a[i][4] = rhs_in[i];
     }
     for (int i = 0; i < 4; ++i) {
         int pivot = i;
@@ -269,31 +221,130 @@ std::array<double, 4> solve_normal_equations(NormalEquations eq) {
             }
         }
         if (max_val < 1e-12) {
-            return {0.0, 0.0, 0.0, 0.0};
+            return false;
         }
         if (pivot != i) {
             for (int c = i; c < 5; ++c) {
                 std::swap(a[i][c], a[pivot][c]);
             }
         }
-        double pivot_inv = 1.0 / a[i][i];
+        const double pivot_inv = 1.0 / a[i][i];
         for (int c = i; c < 5; ++c) {
             a[i][c] *= pivot_inv;
         }
         for (int r = 0; r < 4; ++r) {
-            if (r == i) continue;
-            double factor = a[r][i];
+            if (r == i) {
+                continue;
+            }
+            const double factor = a[r][i];
             for (int c = i; c < 5; ++c) {
                 a[r][c] -= factor * a[i][c];
             }
         }
     }
-    std::array<double, 4> beta{};
     for (int i = 0; i < 4; ++i) {
-        beta[i] = a[i][4];
+        sol_out[i] = a[i][4];
     }
-    return beta;
+    return true;
 }
+
+double rayleigh_quotient(const double mat[4][4], const std::array<double, 4>& v) {
+    auto Av = mat_vec(mat, v);
+    return dot(v, Av);
+}
+
+double largest_eigenvalue(const double mat[4][4]) {
+    std::array<double, 4> v{1.0, 0.3, -0.2, 0.1};
+    normalize(v);
+    double lambda = 0.0;
+    for (int iter = 0; iter < 30; ++iter) {
+        auto w = mat_vec(mat, v);
+        double norm = normalize(w);
+        if (norm < 1e-15) {
+            return 0.0;
+        }
+        const double next_lambda = rayleigh_quotient(mat, w);
+        if (std::abs(next_lambda - lambda) < 1e-10) {
+            lambda = next_lambda;
+            break;
+        }
+        lambda = next_lambda;
+        v = w;
+    }
+    return lambda;
+}
+
+double smallest_eigenvalue(const double mat[4][4]) {
+    std::array<double, 4> v{0.5, -0.4, 0.3, 0.2};
+    normalize(v);
+    double lambda = 0.0;
+    for (int iter = 0; iter < 30; ++iter) {
+        double rhs[4]{v[0], v[1], v[2], v[3]};
+        double y_arr[4]{};
+        if (!solve_linear_system(mat, rhs, y_arr)) {
+            return 0.0;
+        }
+        std::array<double, 4> y{y_arr[0], y_arr[1], y_arr[2], y_arr[3]};
+        double norm = normalize(y);
+        if (norm < 1e-15) {
+            return 0.0;
+        }
+        const double next_lambda = rayleigh_quotient(mat, y);
+        if (std::abs(next_lambda - lambda) < 1e-10) {
+            lambda = next_lambda;
+            break;
+        }
+        lambda = next_lambda;
+        v = y;
+    }
+    return lambda;
+}
+
+double compute_condition_number(const double mat_in[4][4]) {
+    double mat[4][4];
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            mat[i][j] = mat_in[i][j];
+        }
+    }
+    const double max_eval = largest_eigenvalue(mat);
+    if (max_eval <= 0.0) {
+        return std::numeric_limits<double>::infinity();
+    }
+    const double min_eval = smallest_eigenvalue(mat);
+    if (min_eval <= 0.0) {
+        return std::numeric_limits<double>::infinity();
+    }
+    return max_eval / min_eval;
+}
+
+RegressionSolution solve_normal_equations(NormalEquations eq, double ridge_lambda) {
+    eq.symmetrize();
+    for (int i = 0; i < 4; ++i) {
+        eq.ata[i][i] += ridge_lambda;
+    }
+
+    RegressionSolution result{};
+    result.condition_number = compute_condition_number(eq.ata);
+
+    double rhs[4];
+    for (int i = 0; i < 4; ++i) {
+        rhs[i] = eq.atb[i];
+    }
+
+    double beta_raw[4]{};
+    if (solve_linear_system(eq.ata, rhs, beta_raw)) {
+        for (int i = 0; i < 4; ++i) {
+            result.beta[i] = beta_raw[i];
+        }
+        result.success = true;
+    } else {
+        result.success = false;
+    }
+    return result;
+}
+
+} // namespace
 
 } // namespace
 
@@ -333,12 +384,12 @@ PsorResult price_psor(const PsorParams& params) {
     if (params.omega <= 0.0 || params.omega >= 2.0) {
         throw std::invalid_argument("PSOR omega must be in (0, 2)");
     }
-    SpaceGrid grid = build_space_grid(params);
+    SpaceGrid grid = make_space_grid(params);
     const int M = params.grid.num_space;
     std::vector<double> V(M);
     std::vector<double> intrinsic(M);
     for (int i = 0; i < M; ++i) {
-        intrinsic[i] = intrinsic_value(params.base.type, params.base.strike, grid.S[i]);
+        intrinsic[i] = intrinsic_value(params.base.type, params.base.strike, grid.spot[i]);
         V[i] = intrinsic[i];
     }
 
@@ -388,7 +439,7 @@ PsorResult price_psor(const PsorParams& params) {
         V = std::move(next);
     }
 
-    double price = interpolate_price(grid.S, V, params.base.spot);
+    double price = interpolate_price(grid.spot, V, params.base.spot);
     return PsorResult{price, total_iters, final_residual};
 }
 
@@ -396,6 +447,13 @@ LsmcResult price_lsmc(const LsmcParams& params) {
     if (params.num_paths == 0 || params.num_steps <= 0) {
         throw std::invalid_argument("LSMC requires positive paths and time steps");
     }
+    if (params.ridge_lambda < 0.0) {
+        throw std::invalid_argument("LSMC ridge lambda must be non-negative");
+    }
+    if (params.itm_moneyness_eps < 0.0) {
+        throw std::invalid_argument("LSMC moneyness band must be non-negative");
+    }
+
     const double dt = params.base.time / static_cast<double>(params.num_steps);
     const double mu = params.base.rate - params.base.dividend;
     const double disc = std::exp(-params.base.rate * dt);
@@ -406,97 +464,160 @@ LsmcResult price_lsmc(const LsmcParams& params) {
     const std::size_t base_paths = static_cast<std::size_t>(params.num_paths);
     const bool use_antithetic = params.antithetic;
     const std::size_t path_count = use_antithetic ? base_paths * 2 : base_paths;
+    if (path_count == 0) {
+        throw std::invalid_argument("LSMC requires at least one simulated path");
+    }
 
-    std::vector<std::vector<double>> spots(steps + 1, std::vector<double>(path_count));
-    spots[0].assign(path_count, params.base.spot);
+    const std::size_t shock_cols = use_antithetic ? base_paths : path_count;
+    std::vector<double> spot_curr(path_count, params.base.spot);
+    std::vector<double> spot_next(path_count, params.base.spot);
+    std::vector<float> shocks(steps * shock_cols, 0.0f);
 
     pcg64 rng(params.seed);
     std::normal_distribution<double> normal(0.0, 1.0);
 
-    for (std::size_t t = 1; t <= steps; ++t) {
-        auto& prev = spots[t - 1];
-        auto& curr = spots[t];
+    for (std::size_t step = 0; step < steps; ++step) {
+        float* row = shocks.data() + step * shock_cols;
         if (!use_antithetic) {
             for (std::size_t i = 0; i < path_count; ++i) {
                 double z = normal(rng);
-                curr[i] = prev[i] * std::exp(drift + vol_step * z);
+                row[i] = static_cast<float>(z);
+                spot_next[i] = spot_curr[i] * std::exp(drift + vol_step * z);
             }
         } else {
             for (std::size_t pair = 0; pair < base_paths; ++pair) {
-                std::size_t idx = 2 * pair;
                 double z = normal(rng);
-                curr[idx] = prev[idx] * std::exp(drift + vol_step * z);
-                curr[idx + 1] = prev[idx + 1] * std::exp(drift - vol_step * z);
+                row[pair] = static_cast<float>(z);
+                std::size_t idx = pair * 2;
+                const double mult_plus = std::exp(drift + vol_step * z);
+                const double mult_minus = std::exp(drift - vol_step * z);
+                spot_next[idx] = spot_curr[idx] * mult_plus;
+                spot_next[idx + 1] = spot_curr[idx + 1] * mult_minus;
             }
         }
+        spot_curr.swap(spot_next);
     }
+
+    std::vector<double> spot_tp1 = spot_curr;
+    std::vector<double> spot_t(path_count, params.base.spot);
 
     std::vector<double> cashflow(path_count);
-    std::vector<bool> exercised(path_count, false);
+    std::vector<char> exercised(path_count, 0);
 
     for (std::size_t i = 0; i < path_count; ++i) {
-        cashflow[i] = intrinsic_value(params.base.type, params.base.strike, spots[steps][i]);
+        cashflow[i] = intrinsic_value(params.base.type, params.base.strike, spot_tp1[i]);
     }
 
-    std::vector<double> S_itm;
-    std::vector<double> y_itm;
-    S_itm.reserve(path_count);
-    y_itm.reserve(path_count);
+    std::vector<std::size_t> itm_counts_rev;
+    std::vector<std::size_t> reg_counts_rev;
+    std::vector<double> cond_rev;
+    itm_counts_rev.reserve(steps > 1 ? steps - 1 : 0);
+    reg_counts_rev.reserve(itm_counts_rev.capacity());
+    cond_rev.reserve(itm_counts_rev.capacity());
 
-    for (int t = static_cast<int>(steps) - 1; t >= 1; --t) {
-        auto& spot_t = spots[static_cast<std::size_t>(t)];
+    for (int step = static_cast<int>(steps) - 1; step >= 1; --step) {
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
         for (std::size_t i = 0; i < path_count; ++i) {
             cashflow[i] *= disc;
         }
-        S_itm.clear();
-        y_itm.clear();
+
+        float* row = shocks.data() + static_cast<std::size_t>(step) * shock_cols;
+        if (!use_antithetic) {
+            for (std::size_t i = 0; i < path_count; ++i) {
+                double z = static_cast<double>(row[i]);
+                const double step_mult = std::exp(drift + vol_step * z);
+                spot_t[i] = spot_tp1[i] / step_mult;
+            }
+        } else {
+            for (std::size_t pair = 0; pair < base_paths; ++pair) {
+                double z = static_cast<double>(row[pair]);
+                const double mult_plus = std::exp(drift + vol_step * z);
+                const double mult_minus = std::exp(drift - vol_step * z);
+                std::size_t idx = pair * 2;
+                spot_t[idx] = spot_tp1[idx] / mult_plus;
+                spot_t[idx + 1] = spot_tp1[idx + 1] / mult_minus;
+            }
+        }
+
+        NormalEquations eq;
+        std::size_t regression_samples = 0;
+        std::size_t itm_count = 0;
+
         for (std::size_t i = 0; i < path_count; ++i) {
             if (exercised[i]) {
                 continue;
             }
-            double intrinsic = intrinsic_value(params.base.type, params.base.strike, spot_t[i]);
+            const double S = spot_t[i];
+            const double intrinsic = intrinsic_value(params.base.type, params.base.strike, S);
+            const double moneyness = S / params.base.strike - 1.0;
             if (intrinsic > 0.0) {
-                S_itm.push_back(spot_t[i] / params.base.strike - 1.0);
-                y_itm.push_back(cashflow[i]);
+                ++itm_count;
+            }
+            if (intrinsic > 0.0 || std::abs(moneyness) <= params.itm_moneyness_eps) {
+                eq.add(polynomial_features(moneyness), cashflow[i]);
+                ++regression_samples;
             }
         }
-        std::array<double,4> beta{0.0, 0.0, 0.0, 0.0};
-        if (S_itm.size() >= 5) {
-            NormalEquations eq;
-            for (std::size_t i = 0; i < S_itm.size(); ++i) {
-                eq.add(polynomial_features(S_itm[i]), y_itm[i]);
-            }
-            beta = solve_normal_equations(eq);
-        }
-        for (std::size_t i = 0; i < path_count; ++i) {
-            if (exercised[i]) {
-                continue;
-            }
-            double intrinsic = intrinsic_value(params.base.type, params.base.strike, spot_t[i]);
-            if (intrinsic <= 0.0) {
-                continue;
-            }
-            double x = spot_t[i] / params.base.strike - 1.0;
-            double cont = beta[0] + beta[1] * x + beta[2] * x * x + beta[3] * x * x * x;
-            if (cont <= intrinsic) {
-                cashflow[i] = intrinsic;
-                exercised[i] = true;
+
+        RegressionSolution solution{};
+        bool allow_exercise = itm_count >= params.min_itm && regression_samples >= 4;
+        if (allow_exercise) {
+            solution = solve_normal_equations(eq, params.ridge_lambda);
+            if (!solution.success || !std::isfinite(solution.condition_number) || solution.condition_number > 1.0e12) {
+                allow_exercise = false;
             }
         }
+
+        cond_rev.push_back(solution.success ? solution.condition_number : std::numeric_limits<double>::infinity());
+        itm_counts_rev.push_back(itm_count);
+        reg_counts_rev.push_back(regression_samples);
+
+        if (allow_exercise && solution.success) {
+            const auto& beta = solution.beta;
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+            for (std::size_t i = 0; i < path_count; ++i) {
+                if (exercised[i]) {
+                    continue;
+                }
+                const double S = spot_t[i];
+                const double intrinsic = intrinsic_value(params.base.type, params.base.strike, S);
+                if (intrinsic <= 0.0) {
+                    continue;
+                }
+                const double x = S / params.base.strike - 1.0;
+                const double cont = beta[0] + beta[1] * x + beta[2] * x * x + beta[3] * x * x * x;
+                if (cont <= intrinsic) {
+                    cashflow[i] = intrinsic;
+                    exercised[i] = 1;
+                }
+            }
+        }
+
+        spot_tp1.swap(spot_t);
     }
 
     double sum = 0.0;
     double sumsq = 0.0;
     for (std::size_t i = 0; i < path_count; ++i) {
-        double pv = disc * cashflow[i];
+        const double pv = disc * cashflow[i];
         sum += pv;
         sumsq += pv * pv;
     }
-    double mean = sum / static_cast<double>(path_count);
+    const double mean = sum / static_cast<double>(path_count);
     double variance = (sumsq / static_cast<double>(path_count)) - mean * mean;
     variance = std::max(0.0, variance);
-    double se = std::sqrt(variance / static_cast<double>(path_count));
-    return LsmcResult{mean, se};
+    const double se = std::sqrt(variance / static_cast<double>(path_count));
+
+    std::reverse(itm_counts_rev.begin(), itm_counts_rev.end());
+    std::reverse(reg_counts_rev.begin(), reg_counts_rev.end());
+    std::reverse(cond_rev.begin(), cond_rev.end());
+
+    LsmcDiagnostics diagnostics{std::move(itm_counts_rev), std::move(reg_counts_rev), std::move(cond_rev)};
+    return LsmcResult{mean, se, std::move(diagnostics)};
 }
 
 } // namespace quant::american
