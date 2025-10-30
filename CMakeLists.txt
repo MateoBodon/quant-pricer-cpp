@@ -54,6 +54,8 @@ option(QUANT_ENABLE_SANITIZERS "Enable Address/UB Sanitizers in supported compil
 option(QUANT_ENABLE_CLANG_TIDY "Enable clang-tidy static analysis (if available)" OFF)
 option(QUANT_ENABLE_PYBIND "Build Python bindings" OFF)
 
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 # OpenMP
 set(HAS_OPENMP OFF)
 if(QUANT_ENABLE_OPENMP)
@@ -178,6 +180,12 @@ add_test(NAME bench_pde_run COMMAND bench_pde --benchmark_min_time=0.01 --benchm
 set_tests_properties(bench_micro PROPERTIES LABELS "BENCH" RESOURCE_LOCK CPU)
 set_tests_properties(bench_mc_run PROPERTIES LABELS "BENCH" RESOURCE_LOCK CPU)
 set_tests_properties(bench_pde_run PROPERTIES LABELS "BENCH" RESOURCE_LOCK CPU)
+
+add_test(
+  NAME heston_calibration_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_heston_fast.py
+)
+set_tests_properties(heston_calibration_fast PROPERTIES LABELS "FAST")
 
 # Apply sanitizer flags to targets if requested
 if(SANITIZER_COMPILE_FLAGS OR SANITIZER_LINK_FLAGS)

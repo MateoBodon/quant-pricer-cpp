@@ -11,6 +11,16 @@
 
 ---
 
+## Results at a Glance
+
+Curated figures with reproduction commands live in [docs/Results.md](docs/Results.md).
+
+<a href="docs/Results.md#heston-smile-calibration-2024-06-14"><img src="artifacts/heston/fit_20240614.png" alt="Heston calibration" width="220"></a>
+<a href="docs/Results.md#qmc-vs-prng-rmse-scaling"><img src="artifacts/qmc_vs_prng.png" alt="QMC vs PRNG" width="220"></a>
+<a href="docs/Results.md#american-pricing-consistency"><img src="artifacts/american_consistency.png" alt="American consistency" width="220"></a>
+
+---
+
 ## Table of Contents
 
 - [Features](#features)
