@@ -14,13 +14,13 @@ from __future__ import annotations
 
 import argparse
 import glob
+import json
 import shlex
 import sys
 from pathlib import Path
 from typing import Iterable, List
 
 import pandas as pd
-
 from calibrate_heston import (
     CalibrationConfig,
     calibrate_surface,
@@ -76,6 +76,14 @@ def main() -> None:
     ap.add_argument("--fast", action="store_true", help="FAST mode for CI")
     ap.add_argument("--seed", type=int, default=11)
     ap.add_argument("--retries", type=int, default=4)
+    ap.add_argument("--max-evals", type=int, default=200)
+    ap.add_argument("--weight", choices=["iv", "vega", "bidask"], default="iv")
+    ap.add_argument("--feller-warn", action="store_true")
+    ap.add_argument(
+        "--param-transform",
+        choices=["none", "exp", "sigmoid"],
+        default="none",
+    )
     args = ap.parse_args()
 
     inputs = resolve_inputs(args.inputs, args.pattern, args.input_dir)
@@ -83,6 +91,7 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     rows = []
+    diagonals = []
     for idx, path in enumerate(inputs):
         print(f"[{idx+1}/{len(inputs)}] Calibrating {path}")
         df = pd.read_csv(path)
@@ -91,17 +100,37 @@ def main() -> None:
             metric=args.metric,
             seed=args.seed + idx,
             retries=args.retries,
+            max_evals=args.max_evals,
+            weight_mode=args.weight,
+            feller_warn=args.feller_warn,
+            param_transform=args.param_transform,
         )
-        metrics, surface = calibrate_surface(df, config)
+        metrics, surface, diagnostics = calibrate_surface(df, config)
+        metrics["weight_mode"] = config.weight_mode
+        metrics["param_transform"] = config.param_transform
+        metrics["diagnostics"] = diagnostics
         metrics["input"] = str(path)
         outputs = save_calibration_outputs(surface, metrics, output_dir, args.fast)
         params = metrics["params"]
+        if config.feller_warn and float(metrics["feller"]) < 0.0:
+            warn_msg = f"WARNING: Feller condition violated ({metrics['feller']:.4f}) for {surface['date'].iloc[0]}"
+            print(warn_msg)
+            diagnostics.setdefault("warnings", []).append(warn_msg)
+        diagnostics.setdefault("warnings", [])
+        diag_entries = {
+            "date": surface["date"].iloc[0].isoformat(),
+            **diagnostics,
+        }
+        diagonals.append(diag_entries)
+        row_diag = json.dumps(diagnostics)
         rows.append(
             {
                 "date": surface["date"].iloc[0].isoformat(),
                 "input_csv": str(path),
                 "fast_mode": bool(args.fast),
                 "metric": args.metric,
+                "weight_mode": config.weight_mode,
+                "param_transform": config.param_transform,
                 "kappa": params["kappa"],
                 "theta": params["theta"],
                 "sigma": params["sigma"],
@@ -109,6 +138,8 @@ def main() -> None:
                 "v0": params["v0"],
                 "rmse_price": metrics["rmse_price"],
                 "rmse_vol": metrics["rmse_vol"],
+                "rmspe_price_pct": metrics["rmspe_price_pct"],
+                "rmspe_vol_pct": metrics["rmspe_vol_pct"],
                 "feller": metrics["feller"],
                 "n_obs": metrics["n_obs"],
                 "cost": metrics["cost"],
@@ -116,6 +147,7 @@ def main() -> None:
                 "params_json": str(outputs["params_path"]),
                 "figure_png": str(outputs["figure_path"]),
                 "table_csv": str(outputs["table_path"]),
+                "diagnostics": row_diag,
             }
         )
 
@@ -132,6 +164,9 @@ def main() -> None:
         "metric": args.metric,
         "seed": args.seed,
         "retries": args.retries,
+        "max_evals": args.max_evals,
+        "weight_mode": args.weight,
+        "param_transform": args.param_transform,
         "inputs": [str(p) for p in inputs],
         "input_descriptors": describe_inputs(inputs),
         "artifacts_dir": str(output_dir),
@@ -139,6 +174,7 @@ def main() -> None:
         "num_dates": int(len(rows)),
         "dates": df["date"].tolist(),
         "entries": rows,
+        "diagnostics": diagonals,
     }
     update_run("heston_series", manifest_entry)
 

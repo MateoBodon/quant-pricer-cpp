@@ -12,21 +12,47 @@
 
 ---
 
+## Install & Quickstart
+
+```bash
+pip install pyquant-pricer
+```
+
+```python
+import pyquant_pricer as qp
+
+spot, strike, rate, div, vol, tenor = 100.0, 105.0, 0.02, 0.01, 0.25, 0.5
+call_price = qp.bs_call(spot, strike, rate, div, vol, tenor)
+delta = qp.bs_delta_call(spot, strike, rate, div, vol, tenor)
+gamma = qp.bs_gamma(spot, strike, rate, div, vol, tenor)
+barrier = qp.BarrierSpec(); barrier.type = qp.BarrierType.DownOut; barrier.B = 95.0
+barrier_price = qp.barrier_bs(qp.OptionType.Call, barrier, spot, strike, rate, div, vol, 1.0)
+params = qp.McParams(); params.spot = spot; params.strike = strike; params.rate = rate; params.vol = vol
+params.num_paths = 20000; params.time = tenor; params.seed = 7
+mc_price = qp.mc_european_call(params).estimate.value
+print(f"Call: {call_price:.4f}, Delta: {delta:.4f}, Barrier: {barrier_price:.4f}")
+print(f"Gamma: {gamma:.4f}, MC price: {mc_price:.4f}")
+```
+
+See [`python/examples/quickstart.py`](python/examples/quickstart.py) for a fuller walkthrough that optionally runs a FAST Heston calibration when sample data is available.
+
+---
+
 ## Results at a Glance
 
 Curated figures with reproduction commands live in [docs/Results.md](docs/Results.md).
 
 - <a href="docs/Results.md#qmc-vs-prng-rmse-scaling"><img src="artifacts/qmc_vs_prng.png" alt="QMC vs PRNG" width="220"></a><br>
-  **QMC vs PRNG RMSE Scaling** – log–log convergence shows Sobol QMC beating PRNG on both European and Asian payoffs.  
-  Reproduce: `python scripts/qmc_vs_prng.py --fast`  
+  **QMC vs PRNG RMSE Scaling** – log–log convergence shows Sobol QMC beating PRNG on both European and Asian payoffs.
+  Reproduce: `python scripts/qmc_vs_prng.py --fast`
   Data: [artifacts/qmc_vs_prng.csv](artifacts/qmc_vs_prng.csv)
 - <a href="docs/Results.md#american-pricing-consistency"><img src="artifacts/american_consistency.png" alt="American consistency" width="220"></a><br>
-  **American Consistency** – PSOR and CRR agree within the LSMC ±2σ band across spot/vol grids.  
-  Reproduce: `python scripts/american_consistency.py --fast`  
+  **American Consistency** – PSOR and CRR agree within the LSMC ±2σ band across spot/vol grids.
+  Reproduce: `python scripts/american_consistency.py --fast`
   Data: [artifacts/american_consistency.csv](artifacts/american_consistency.csv)
 - <a href="docs/Results.md#heston-smile-calibration-spy-2023-06-01"><img src="artifacts/heston/fit_20230601.png" alt="Heston calibration" width="220"></a><br>
-  **Heston Smile Fit (SPY 2023-06-01)** – real CBOE surface (40 quotes | 23 strikes × 2 maturities) with price RMSPE 5.7%.  
-  Reproduce: `python scripts/calibrate_heston.py --input data/normalized/spy_20230601.csv --metric price --max-evals 1200 --retries 6`  
+  **Heston Smile Fit (SPY 2023-06-01)** – real CBOE surface (40 quotes | 23 strikes × 2 maturities) with price RMSPE 5.7%.
+  Reproduce: `python scripts/calibrate_heston.py --input data/normalized/spy_20230601.csv --metric price --max-evals 1200 --retries 6`
   Data: [artifacts/heston/fit_20230601.csv](artifacts/heston/fit_20230601.csv) · Manifest: [artifacts/manifest.json](artifacts/manifest.json) (`runs.heston`, date `2023-06-01`)
 
 ---
@@ -551,7 +577,7 @@ namespace quant::bs {
     // Core pricing functions
     double call_price(double S, double K, double r, double q, double sigma, double T);
     double put_price(double S, double K, double r, double q, double sigma, double T);
-    
+
     // Greeks
     double delta_call(double S, double K, double r, double q, double sigma, double T);
     double delta_put(double S, double K, double r, double q, double sigma, double T);
@@ -561,7 +587,7 @@ namespace quant::bs {
     double theta_put(double S, double K, double r, double q, double sigma, double T);
     double rho_call(double S, double K, double r, double q, double sigma, double T);
     double rho_put(double S, double K, double r, double q, double sigma, double T);
-    
+
     // Utility functions
     double normal_pdf(double x);
     double normal_cdf(double x);
@@ -582,7 +608,7 @@ namespace quant::mc {
         enum class Bridge { None, BrownianBridge } bridge;
         int num_steps;
     };
-    
+
     struct McStatistic {
         double value;
         double std_error;
@@ -593,14 +619,14 @@ namespace quant::mc {
     struct McResult {
         McStatistic estimate;
     };
-    
+
     struct GreeksResult {
         McStatistic delta;
         McStatistic vega;
         McStatistic gamma_lrm;
         McStatistic gamma_mixed;
     };
-    
+
     McResult price_european_call(const McParams& p);
     GreeksResult greeks_european_call(const McParams& p);
 }
@@ -613,7 +639,7 @@ namespace quant::pde {
         int num_space, num_time;
         double s_max_mult;
     };
-    
+
     struct PdeParams {
         double spot, strike, rate, dividend, vol, time;
         OptionType type;
@@ -621,7 +647,7 @@ namespace quant::pde {
         bool log_space;
         enum class UpperBoundary { Dirichlet, Neumann } upper_boundary;
     };
-    
+
     double price_crank_nicolson(const PdeParams& p);
     std::vector<double> solve_tridiagonal(const std::vector<double>& a,
                                          const std::vector<double>& b,
@@ -835,7 +861,7 @@ quant::mc::McParams mc_params{S, K, r, q, sigma, T, 1000000, 42, true, true};
 auto mc_result = quant::mc::price_european_call(mc_params);
 
 // Method 3: PDE
-quant::pde::PdeParams pde_params{S, K, r, q, sigma, T, 
+quant::pde::PdeParams pde_params{S, K, r, q, sigma, T,
                                  quant::pde::OptionType::Call, {201, 200, 4.0}, true};
 double pde_price = quant::pde::price_crank_nicolson(pde_params);
 

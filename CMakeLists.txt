@@ -205,6 +205,18 @@ add_test(
 )
 set_tests_properties(heston_series_fast PROPERTIES LABELS "FAST")
 
+add_test(
+  NAME parity_checks_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_parity_fast.py
+)
+set_tests_properties(parity_checks_fast PROPERTIES LABELS "FAST")
+
+add_test(
+  NAME heston_safety_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_heston_safety_fast.py
+)
+set_tests_properties(heston_safety_fast PROPERTIES LABELS "FAST")
+
 # Apply sanitizer flags to targets if requested
 if(SANITIZER_COMPILE_FLAGS OR SANITIZER_LINK_FLAGS)
   foreach(tgt IN ITEMS quant_pricer quant_cli unit_tests micro_bench bench_mc bench_pde)

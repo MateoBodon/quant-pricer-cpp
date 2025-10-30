@@ -28,10 +28,12 @@ ls -1 artifacts
 - Keep headers self-contained under `include/quant/`
 - Add unit tests for new features
 - Run benchmarks for perf-sensitive changes
+- Use the provided formatting helpers before sending a PR:
+  - `pre-commit install` (run once) to enable git hooks
+  - `make format` to apply Black, isort, clang-format, and whitespace fixers
 
 ## Pull requests
 
 - Keep commits small with clear messages
 - Include rationale and validation (tests/benchmarks/artifacts)
 - Avoid unrelated refactors in the same PR
-

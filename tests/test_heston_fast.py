@@ -42,7 +42,13 @@ def main() -> None:
         threshold = 0.25
         print(f"rmse_vol={rmse_vol:.4f} (threshold {threshold})")
         if rmse_vol >= threshold:
-            raise AssertionError(f"FAST calibration rmse_vol {rmse_vol:.4f} exceeds {threshold}")
+            raise AssertionError(
+                f"FAST calibration rmse_vol {rmse_vol:.4f} exceeds {threshold}"
+            )
+        if data.get("weight_mode") != "iv":
+            raise AssertionError("Expected weight_mode 'iv' in calibration JSON")
+        if "diagnostics" not in data or "attempts" not in data["diagnostics"]:
+            raise AssertionError("Calibration JSON missing diagnostics attempts")
 
         csv_files = sorted(out_dir.glob("fit_*.csv"))
         if not csv_files:
@@ -55,7 +61,9 @@ def main() -> None:
         required_cols = {"strike", "ttm", "market_iv", "model_iv", "abs_error"}
         missing = required_cols - set(reader[0].keys())
         if missing:
-            raise AssertionError(f"Missing columns in Heston fit CSV: {sorted(missing)}")
+            raise AssertionError(
+                f"Missing columns in Heston fit CSV: {sorted(missing)}"
+            )
 
     manifest_path = repo_root / "artifacts" / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
@@ -78,6 +86,13 @@ def main() -> None:
         raise AssertionError("Manifest heston entry missing seed 17")
     if "rmspe_vol_pct" not in latest:
         raise AssertionError("Manifest heston entry missing rmspe_vol_pct")
+    if latest.get("weight_mode") != "iv":
+        raise AssertionError("Manifest missing weight_mode for Heston run")
+    if latest.get("param_transform") is None:
+        raise AssertionError("Manifest missing param_transform for Heston run")
+    diags = latest.get("diagnostics", {})
+    if "attempts" not in diags:
+        raise AssertionError("Manifest diagnostics missing attempts list")
     inputs = latest.get("inputs", [])
     if not inputs or not inputs[0].get("sha256"):
         raise AssertionError("Manifest heston entry missing input SHA256")
