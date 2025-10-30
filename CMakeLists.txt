@@ -33,6 +33,8 @@ endif()
 if(EXISTS ${BENCH_SOURCE_DIR}/CMakeLists.txt)
   message(STATUS "Using submodule: Google Benchmark")
   set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
   add_subdirectory(${BENCH_SOURCE_DIR} external/benchmark-build)
 else()
   include(FetchContent)
@@ -141,7 +143,8 @@ add_executable(unit_tests
   tests/test_multi.cpp
   tests/test_barrier_mc_regression.cpp
   tests/test_risk.cpp
-  tests/test_heston.cpp)
+  tests/test_heston.cpp
+  tests/test_rng_repro.cpp)
 target_sources(unit_tests PRIVATE tests/test_lookback.cpp)
 target_link_libraries(unit_tests PRIVATE quant_pricer GTest::gtest_main)
 include(GoogleTest)

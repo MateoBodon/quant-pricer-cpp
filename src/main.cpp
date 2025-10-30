@@ -4,11 +4,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <optional>
 #include "quant/version.hpp"
 #include "quant/black_scholes.hpp"
 #include "quant/barrier.hpp"
 #include "quant/bs_barrier.hpp"
 #include "quant/mc.hpp"
+#include "quant/math.hpp"
 #include "quant/mc_barrier.hpp"
 #include "quant/pde.hpp"
 #include "quant/pde_barrier.hpp"
@@ -59,6 +61,13 @@ quant::mc::McParams::Bridge parse_bridge_mode(const std::string& token) {
     throw std::runtime_error("Unknown bridge mode: " + token);
 }
 
+quant::rng::Mode parse_rng_mode(const std::string& token) {
+    std::string v = to_lower(token);
+    if (v == "counter" || v == "cb") return quant::rng::Mode::Counter;
+    if (v == "mt19937" || v == "mt" || v == "pcg") return quant::rng::Mode::Mt19937;
+    throw std::runtime_error("Unknown rng mode: " + token);
+}
+
 void apply_thread_override(int threads) {
 #ifdef QUANT_HAS_OPENMP
     if (threads > 0) {
@@ -69,7 +78,7 @@ void apply_thread_override(int threads) {
 #endif
 }
 
-void print_mc_result(const quant::mc::McResult& res, bool json) {
+void print_mc_result(const quant::mc::McResult& res, bool json, bool show_ci) {
     if (json) {
         std::cout << "{\"price\":" << res.estimate.value
                   << ",\"std_error\":" << res.estimate.std_error
@@ -77,8 +86,13 @@ void print_mc_result(const quant::mc::McResult& res, bool json) {
                   << ",\"ci_high\":" << res.estimate.ci_high
                   << "}\n";
     } else {
-        std::cout << res.estimate.value << " (se=" << res.estimate.std_error
-                  << ", 95% CI=[" << res.estimate.ci_low << ", " << res.estimate.ci_high << "])\n";
+        std::cout << res.estimate.value;
+        if (show_ci) {
+            std::cout << " +/- " << res.estimate.std_error
+                      << " (95% CI=[" << res.estimate.ci_low << ", " << res.estimate.ci_high << "])\n";
+        } else {
+            std::cout << " (se=" << res.estimate.std_error << ")\n";
+        }
     }
 }
 
@@ -176,7 +190,8 @@ int main(int argc, char** argv) {
         return 0;
     } else if (engine == "mc") {
         if (argc < 12) {
-            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc_mode> [bridge_mode] [num_steps] [--sampler=] [--bridge=] [--steps=] [--threads=] [--json]\n";
+            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc_mode> [bridge_mode] [num_steps]"
+                         " [--sampler=] [--bridge=] [--steps=] [--rng=counter|mt19937] [--threads=] [--greeks] [--ci] [--json]\n";
             return 1;
         }
         quant::mc::McParams p{};
@@ -212,12 +227,18 @@ int main(int argc, char** argv) {
         }
 
         bool json = false;
+        bool show_ci = false;
+        bool compute_greeks = false;
         int thread_override = -1;
 
         for (int idx = next; idx < argc; ++idx) {
             std::string flag = argv[idx];
             if (flag == "--json") {
                 json = true;
+            } else if (flag == "--ci") {
+                show_ci = true;
+            } else if (flag == "--greeks") {
+                compute_greeks = true;
             } else if (flag.rfind("--sampler=", 0) == 0) {
                 std::string value = flag.substr(10);
                 try {
@@ -236,6 +257,14 @@ int main(int argc, char** argv) {
                 }
             } else if (flag.rfind("--steps=", 0) == 0) {
                 p.num_steps = std::max(1, std::atoi(flag.substr(8).c_str()));
+            } else if (flag.rfind("--rng=", 0) == 0) {
+                std::string value = flag.substr(6);
+                try {
+                    p.rng = parse_rng_mode(value);
+                } catch (const std::exception& ex) {
+                    std::cerr << ex.what() << "\n";
+                    return 1;
+                }
             } else if (flag.rfind("--threads=", 0) == 0) {
                 thread_override = std::max(1, std::atoi(flag.substr(10).c_str()));
             } else {
@@ -246,6 +275,10 @@ int main(int argc, char** argv) {
 
         apply_thread_override(thread_override);
         auto res = quant::mc::price_european_call(p);
+        std::optional<quant::mc::GreeksResult> greeks;
+        if (compute_greeks) {
+            greeks = quant::mc::greeks_european_call(p);
+        }
         if (json) {
             int threads_used = 1;
 #ifdef QUANT_HAS_OPENMP
@@ -263,10 +296,50 @@ int main(int argc, char** argv) {
                       << ",\"sampler\":\"" << (p.qmc == quant::mc::McParams::Qmc::None ? "prng" : (p.qmc == quant::mc::McParams::Qmc::Sobol ? "sobol" : "sobol_scrambled")) << "\""
                       << ",\"bridge\":\"" << (p.bridge == quant::mc::McParams::Bridge::None ? "none" : "bb") << "\""
                       << ",\"steps\":" << p.num_steps
-                      << ",\"threads\":" << threads_used
-                      << "}\n";
+                      << ",\"rng\":\"" << (p.rng == quant::rng::Mode::Counter ? "counter" : "mt19937") << "\""
+                      << ",\"threads\":" << threads_used;
+            if (greeks) {
+                auto emit_stat = [&](const char* name, const quant::mc::McStatistic& stat) {
+                    std::cout << "\"" << name << "\":{"
+                              << "\"value\":" << stat.value
+                              << ",\"std_error\":" << stat.std_error
+                              << ",\"ci_low\":" << stat.ci_low
+                              << ",\"ci_high\":" << stat.ci_high
+                              << "}";
+                };
+                std::cout << ",\"greeks\":{";
+                emit_stat("delta", greeks->delta);
+                std::cout << ",";
+                emit_stat("vega", greeks->vega);
+                std::cout << ",";
+                emit_stat("gamma_lrm", greeks->gamma_lrm);
+                std::cout << ",";
+                emit_stat("gamma_pathwise", greeks->gamma_mixed);
+                std::cout << ",";
+                emit_stat("theta", greeks->theta);
+                std::cout << "}";
+            }
+            std::cout << "}\n";
         } else {
-            print_mc_result(res, false);
+            print_mc_result(res, false, show_ci);
+            if (greeks) {
+                auto print_stat = [&](const std::string& label, const quant::mc::McStatistic& stat) {
+                    std::cout << label << ": " << stat.value;
+                    if (show_ci) {
+                        std::cout << " +/- " << stat.std_error
+                                  << " (95% CI=[" << stat.ci_low << ", " << stat.ci_high << "])";
+                    } else {
+                        std::cout << " (se=" << stat.std_error << ")";
+                    }
+                    std::cout << "\n";
+                };
+                std::cout << "Greeks (LR/pathwise):\n";
+                print_stat("  Delta", greeks->delta);
+                print_stat("  Vega", greeks->vega);
+                print_stat("  Gamma (LR)", greeks->gamma_lrm);
+                print_stat("  Gamma (pathwise)", greeks->gamma_mixed);
+                print_stat("  Theta", greeks->theta);
+            }
         }
         return 0;
     } else if (engine == "barrier") {
@@ -359,23 +432,36 @@ int main(int argc, char** argv) {
                 p.num_paths = paths;
                 p.seed = seed;
                 p.antithetic = antithetic;
-                p.control_variate = true;
+                p.control_variate = false;
                 p.qmc = parse_qmc_sampler(qmc_mode);
                 p.bridge = parse_bridge_mode(bridge_mode);
                 p.num_steps = std::max(1, num_steps);
 
                 bool json = false;
+                bool show_ci = false;
                 int thread_override = -1;
                 for (int idx = 20; idx < argc; ++idx) {
                     std::string flag = argv[idx];
                     if (flag == "--json") {
                         json = true;
+                    } else if (flag == "--ci") {
+                        show_ci = true;
+                    } else if (flag == "--cv") {
+                        p.control_variate = true;
+                        std::cerr << "warning: barrier MC control variate is experimental and may introduce bias\n";
                     } else if (flag.rfind("--sampler=", 0) == 0) {
                         p.qmc = parse_qmc_sampler(flag.substr(10));
                     } else if (flag.rfind("--bridge=", 0) == 0) {
                         p.bridge = parse_bridge_mode(flag.substr(9));
                     } else if (flag.rfind("--steps=", 0) == 0) {
                         p.num_steps = std::max(1, std::atoi(flag.substr(8).c_str()));
+                    } else if (flag.rfind("--rng=", 0) == 0) {
+                        try {
+                            p.rng = parse_rng_mode(flag.substr(6));
+                        } catch (const std::exception& ex) {
+                            std::cerr << ex.what() << "\n";
+                            return 1;
+                        }
                     } else if (flag.rfind("--threads=", 0) == 0) {
                         thread_override = std::max(1, std::atoi(flag.substr(10).c_str()));
                     } else {
@@ -402,10 +488,11 @@ int main(int argc, char** argv) {
                               << ",\"sampler\":\"" << (p.qmc == quant::mc::McParams::Qmc::None ? "prng" : (p.qmc == quant::mc::McParams::Qmc::Sobol ? "sobol" : "sobol_scrambled")) << "\""
                               << ",\"bridge\":\"" << (p.bridge == quant::mc::McParams::Bridge::None ? "none" : "bb") << "\""
                               << ",\"steps\":" << p.num_steps
+                              << ",\"rng\":\"" << (p.rng == quant::rng::Mode::Counter ? "counter" : "mt19937") << "\""
                               << ",\"threads\":" << threads_used
                               << "}\n";
                 } else {
-                    print_mc_result(res, false);
+                    print_mc_result(res, false, show_ci);
                 }
             } catch (const std::exception& ex) {
                 std::cerr << ex.what() << "\n";
@@ -801,7 +888,7 @@ int main(int argc, char** argv) {
         return 0;
     } else if (engine == "heston") {
         if (argc < 15) {
-            std::cerr << "heston <kappa> <theta> <sigma_v> <rho> <v0> <S> <K> <r> <q> <T> <paths> <steps> <seed> [--mc|--analytic] [--json]\n";
+            std::cerr << "heston <kappa> <theta> <sigma_v> <rho> <v0> <S> <K> <r> <q> <T> <paths> <steps> <seed> [--mc] [--json]\n";
             return 1;
         }
         quant::heston::Params h{std::atof(argv[2]), std::atof(argv[3]), std::atof(argv[4]), std::atof(argv[5]), std::atof(argv[6])};
@@ -809,25 +896,77 @@ int main(int argc, char** argv) {
         std::uint64_t paths = static_cast<std::uint64_t>(std::atoll(argv[12]));
         int steps = std::max(1, std::atoi(argv[13]));
         std::uint64_t seed = static_cast<std::uint64_t>(std::atoll(argv[14]));
-        bool use_mc = true;
+        quant::heston::McParams mc_params{mkt, h, paths, seed, steps, true};
+        mc_params.scheme = quant::heston::McParams::Scheme::QE;
+        mc_params.rng = quant::rng::Mode::Counter;
+        bool show_ci = false;
+        bool use_mc = false;
         bool json = false;
         for (int idx = 15; idx < argc; ++idx) {
             std::string flag = argv[idx];
-            if (flag == "--analytic") use_mc = false;
-            else if (flag == "--mc") use_mc = true;
-            else if (flag == "--json") json = true;
-            else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
-        }
-        if (!use_mc) {
-            double price = quant::heston::call_analytic(mkt, h);
-            print_scalar(price, json);
-        } else {
-            auto res = quant::heston::call_qe_mc(quant::heston::McParams{mkt, h, paths, seed, steps, true});
-            if (json) {
-                std::cout << "{\"price\":" << res.price << ",\"std_error\":" << res.std_error << "}\n";
+            if (flag == "--mc") {
+                use_mc = true;
+            } else if (flag == "--json") {
+                json = true;
+            } else if (flag == "--ci") {
+                show_ci = true;
+            } else if (flag == "--no-anti") {
+                mc_params.antithetic = false;
+            } else if (flag == "--heston-qe") {
+                mc_params.scheme = quant::heston::McParams::Scheme::QE;
+            } else if (flag == "--heston-euler") {
+                mc_params.scheme = quant::heston::McParams::Scheme::Euler;
+            } else if (flag.rfind("--rng=", 0) == 0) {
+                std::string value = flag.substr(6);
+                try {
+                    mc_params.rng = parse_rng_mode(value);
+                } catch (const std::exception& ex) {
+                    std::cerr << ex.what() << "\n";
+                    return 1;
+                }
             } else {
-                std::cout << res.price << " (se=" << res.std_error << ")\n";
+                std::cerr << "Unknown flag " << flag << "\n";
+                return 1;
             }
+        }
+        const double analytic = quant::heston::call_analytic(mkt, h);
+        if (!use_mc) {
+            print_scalar(analytic, json);
+            return 0;
+        }
+        auto res = quant::heston::call_qe_mc(mc_params);
+        const double err = std::abs(res.price - analytic);
+        const double tolerance = std::max(1e-3, 5.0 * res.std_error);
+        if (err > tolerance) {
+            std::cerr << "warning: Heston MC deviates from analytic price by "
+                      << err << " (tolerance=" << tolerance << "); treat MC output as diagnostic only.\n";
+        }
+        const double half_width = quant::math::kZ95 * res.std_error;
+        const double ci_low = res.price - half_width;
+        const double ci_high = res.price + half_width;
+        if (json) {
+            std::cout << "{\"price\":" << res.price
+                      << ",\"std_error\":" << res.std_error
+                      << ",\"ci_low\":" << ci_low
+                      << ",\"ci_high\":" << ci_high
+                      << ",\"analytic\":" << analytic
+                      << ",\"abs_error\":" << err
+                      << ",\"rng\":\"" << (mc_params.rng == quant::rng::Mode::Counter ? "counter" : "mt19937") << "\""
+                      << ",\"scheme\":\"" << (mc_params.scheme == quant::heston::McParams::Scheme::QE ? "qe" : "euler") << "\""
+                      << "}\n";
+        } else {
+            std::cout << res.price;
+            if (show_ci) {
+                std::cout << " +/- " << res.std_error
+                          << " (95% CI=[" << ci_low << ", " << ci_high << "])";
+            } else {
+                std::cout << " (se=" << res.std_error << ")";
+            }
+            std::cout << " (analytic=" << analytic
+                      << ", |err|=" << err
+                      << ", rng=" << (mc_params.rng == quant::rng::Mode::Counter ? "counter" : "mt19937")
+                      << ", scheme=" << (mc_params.scheme == quant::heston::McParams::Scheme::QE ? "QE" : "Euler")
+                      << ")\n";
         }
         return 0;
     } else if (engine == "risk") {

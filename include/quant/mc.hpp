@@ -5,6 +5,8 @@
 #include <vector>
 #include <random>
 #include <optional>
+
+#include "quant/rng.hpp"
 #include "quant/term_structures.hpp"
 
 namespace quant::mc {
@@ -23,6 +25,7 @@ struct McParams {
     std::uint64_t seed;      // RNG seed
     bool antithetic{true};
     bool control_variate{true}; // control variate on discounted S_T vs E[S_T]
+    quant::rng::Mode rng{quant::rng::Mode::Counter};
     enum class Qmc { None, Sobol, SobolScrambled };
     enum class Bridge { None, BrownianBridge };
     Qmc qmc{Qmc::None};

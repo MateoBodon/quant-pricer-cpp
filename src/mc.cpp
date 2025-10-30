@@ -79,6 +79,7 @@ struct GreeksContext {
     double vol_sqrt_time;
     double inv_gamma_denom;
     double score_coeff;
+    quant::rng::Mode rng_mode;
 };
 
 double evolve_terminal(double spot,
@@ -188,11 +189,25 @@ quant::stats::Welford simulate_range(std::uint64_t begin,
                 }
             }
         } else {
-            for (int j = 0; j < ctx.steps; ++j) {
-                const double z = normal(rng);
-                inputs.normals[j] = z;
-                if (ctx.params.antithetic) {
-                    inputs.normals_antithetic[j] = -z;
+            if (ctx.params.rng == quant::rng::Mode::Counter) {
+                for (int j = 0; j < ctx.steps; ++j) {
+                    const double z = quant::rng::normal(seed_offset,
+                                                        idx,
+                                                        static_cast<std::uint32_t>(j),
+                                                        0U,
+                                                        0U);
+                    inputs.normals[j] = z;
+                    if (ctx.params.antithetic) {
+                        inputs.normals_antithetic[j] = -z;
+                    }
+                }
+            } else {
+                for (int j = 0; j < ctx.steps; ++j) {
+                    const double z = normal(rng);
+                    inputs.normals[j] = z;
+                    if (ctx.params.antithetic) {
+                        inputs.normals_antithetic[j] = -z;
+                    }
                 }
             }
         }
@@ -274,79 +289,89 @@ GreekAccumulators simulate_greeks_range(std::uint64_t begin,
         return ((z * z) - 1.0 - ctx.vol_sqrt_time * z) * ctx.inv_gamma_denom;
     };
 
+    const double sigma = ctx.vol;
+    const double sqrt_time = ctx.sqrt_time;
+    const double time = ctx.time;
+    const double inv_sigma = (sigma > 0.0) ? 1.0 / sigma : 0.0;
+
     for (std::uint64_t idx = begin; idx < end; ++idx) {
-        const double z = normal(rng);
+        const double z = (ctx.rng_mode == quant::rng::Mode::Counter)
+                             ? quant::rng::normal(seed_offset, idx, 0U, 0U, 1U)
+                             : normal(rng);
         const double ST1 = ctx.spot * std::exp(ctx.drift + ctx.vol_sqrt_time * z);
         const double payoff1 = std::max(0.0, ST1 - ctx.strike);
         const double priceT1 = ctx.discount * payoff1;
 
         double delta1 = 0.0;
-        double vega1 = 0.0;
         if (payoff1 > 0.0) {
             delta1 = ctx.discount * (ST1 / ctx.spot);
-            const double dST_dsigma = ST1 * (-ctx.vol * ctx.time + ctx.sqrt_time * z);
-            vega1 = ctx.discount * dST_dsigma;
         }
+        const double vega_weight = (sigma > 0.0)
+                                       ? ((z * z - 1.0) * inv_sigma - z * sqrt_time)
+                                       : 0.0;
+        const double vega1 = ctx.discount * payoff1 * vega_weight;
         const double gamma_lrm1 = ctx.discount * payoff1 * gamma_weight(z);
         const double gamma_mixed1 = delta1 * (ctx.score_coeff * z)
                                     - (payoff1 > 0.0 ? ctx.discount * (ST1 / (ctx.spot * ctx.spot)) : 0.0);
+        double theta_sample;
+        if (time > 0.0) {
+            const double h = std::max(1e-4, 1e-3 * time);
+            const double T_minus = (time > h) ? (time - h) : time;
+            auto price_at_T = [&](double T, double zval) {
+                if (T <= 0.0) return 0.0;
+                const double disc = std::exp(-ctx.rate * T);
+                const double driftT = (ctx.rate - ctx.dividend - 0.5 * sigma * sigma) * T;
+                const double ST = ctx.spot * std::exp(driftT + sigma * std::sqrt(T) * zval);
+                const double payoff = std::max(0.0, ST - ctx.strike);
+                return disc * payoff;
+            };
+            const double p_curr = priceT1;
+            const double p_minus = (T_minus < time) ? price_at_T(T_minus, z) : priceT1;
+            const double denom = (T_minus < time) ? (time - T_minus) : 1.0;
+            theta_sample = (p_minus - p_curr) / denom;
+        } else {
+            theta_sample = 0.0;
+        }
 
         double delta_sample = delta1;
         double vega_sample = vega1;
         double gamma_lrm_sample = gamma_lrm1;
         double gamma_mixed_sample = gamma_mixed1;
-        double theta_sample;
-
-        // Theta: backward difference in calendar time to match PDE convention
-        if (ctx.time > 0.0) {
-            const double h = std::max(1e-4, 1e-3 * ctx.time);
-            const double T_minus = (ctx.time > h) ? (ctx.time - h) : ctx.time;
-            auto price_at_T = [&](double T, double zval) {
-                if (T <= 0.0) return 0.0;
-                const double disc = std::exp(-ctx.rate * T);
-                const double driftT = (ctx.rate - ctx.dividend - 0.5 * ctx.vol * ctx.vol) * T;
-                const double ST = ctx.spot * std::exp(driftT + ctx.vol * std::sqrt(T) * zval);
-                const double payoff = std::max(0.0, ST - ctx.strike);
-                return disc * payoff;
-            };
-            const double p_curr = priceT1;
-            const double p_minus = (T_minus < ctx.time) ? price_at_T(T_minus, z) : priceT1;
-            const double denom = (T_minus < ctx.time) ? (ctx.time - T_minus) : 1.0;
-            theta_sample = (p_minus - p_curr) / denom;
-        } else {
-            theta_sample = 0.0;
-        }
 
         if (ctx.antithetic) {
             const double z2 = -z;
             const double ST2 = ctx.spot * std::exp(ctx.drift + ctx.vol_sqrt_time * z2);
             const double payoff2 = std::max(0.0, ST2 - ctx.strike);
             double delta2 = 0.0;
-            double vega2 = 0.0;
             if (payoff2 > 0.0) {
                 delta2 = ctx.discount * (ST2 / ctx.spot);
-                const double dST_dsigma2 = ST2 * (-ctx.vol * ctx.time + ctx.sqrt_time * z2);
-                vega2 = ctx.discount * dST_dsigma2;
             }
+            const double vega_weight2 = (sigma > 0.0)
+                                            ? ((z2 * z2 - 1.0) * inv_sigma - z2 * sqrt_time)
+                                            : 0.0;
+            const double vega2 = ctx.discount * payoff2 * vega_weight2;
             const double gamma_lrm2 = ctx.discount * payoff2 * gamma_weight(z2);
             const double gamma_mixed2 = delta2 * (ctx.score_coeff * z2)
                                         - (payoff2 > 0.0 ? ctx.discount * (ST2 / (ctx.spot * ctx.spot)) : 0.0);
-            double theta2 = 0.0;
-            if (ctx.time > 0.0) {
-                const double h = std::max(1e-4, 1e-3 * ctx.time);
-                const double T_minus = (ctx.time > h) ? (ctx.time - h) : ctx.time;
+            const double priceT2 = ctx.discount * payoff2;
+            double theta2;
+            if (time > 0.0) {
+                const double h = std::max(1e-4, 1e-3 * time);
+                const double T_minus = (time > h) ? (time - h) : time;
                 auto price_at_T = [&](double T, double zval) {
                     if (T <= 0.0) return 0.0;
                     const double disc = std::exp(-ctx.rate * T);
-                    const double driftT = (ctx.rate - ctx.dividend - 0.5 * ctx.vol * ctx.vol) * T;
-                    const double ST = ctx.spot * std::exp(driftT + ctx.vol * std::sqrt(T) * zval);
+                    const double driftT = (ctx.rate - ctx.dividend - 0.5 * sigma * sigma) * T;
+                    const double ST = ctx.spot * std::exp(driftT + sigma * std::sqrt(T) * zval);
                     const double payoff = std::max(0.0, ST - ctx.strike);
                     return disc * payoff;
                 };
-                const double p_curr2 = ctx.discount * payoff2;
-                const double p_minus2 = (T_minus < ctx.time) ? price_at_T(T_minus, z2) : p_curr2;
-                const double denom2 = (T_minus < ctx.time) ? (ctx.time - T_minus) : 1.0;
+                const double p_curr2 = priceT2;
+                const double p_minus2 = (T_minus < time) ? price_at_T(T_minus, z2) : p_curr2;
+                const double denom2 = (T_minus < time) ? (time - T_minus) : 1.0;
                 theta2 = (p_minus2 - p_curr2) / denom2;
+            } else {
+                theta2 = 0.0;
             }
 
             delta_sample = 0.5 * (delta1 + delta2);
@@ -447,6 +472,7 @@ McResult price_european_call(const McParams& p) {
     const std::uint64_t N = p.num_paths;
     const int max_threads = omp_get_max_threads();
     std::vector<quant::stats::Welford> partial(max_threads);
+    const std::uint64_t counter_seed = p.seed ? p.seed : 0x9E3779B97F4A7C15ULL;
 
     #pragma omp parallel
     {
@@ -454,7 +480,9 @@ McResult price_european_call(const McParams& p) {
         const int nthreads = omp_get_num_threads();
         const std::uint64_t begin = (tid * N) / nthreads;
         const std::uint64_t end = ((tid + 1) * N) / nthreads;
-        const std::uint64_t seed_offset = p.seed + 0x9E3779B97F4A7C15ULL * static_cast<std::uint64_t>(tid + 1);
+        const std::uint64_t seed_offset = (p.rng == quant::rng::Mode::Counter)
+                                              ? counter_seed
+                                              : p.seed + 0x9E3779B97F4A7C15ULL * static_cast<std::uint64_t>(tid + 1);
         partial[tid] = simulate_range(begin, end, seed_offset, ctx);
     }
 
@@ -462,7 +490,9 @@ McResult price_european_call(const McParams& p) {
         total.merge(part);
     }
 #else
-    const std::uint64_t seed_offset = p.seed ? p.seed : 0x9E3779B97F4A7C15ULL;
+    const std::uint64_t seed_offset = (p.rng == quant::rng::Mode::Counter)
+                                          ? (p.seed ? p.seed : 0x9E3779B97F4A7C15ULL)
+                                          : (p.seed ? p.seed : 0x9E3779B97F4A7C15ULL);
     total = simulate_range(0, p.num_paths, seed_offset, ctx);
 #endif
 
@@ -533,7 +563,8 @@ GreeksResult greeks_european_call(const McParams& p) {
         .sqrt_time = sqrt_time,
         .vol_sqrt_time = vol_sqrt_time,
         .inv_gamma_denom = inv_gamma_denom,
-        .score_coeff = score_coeff
+        .score_coeff = score_coeff,
+        .rng_mode = p.rng
     };
 
     GreekAccumulators totals;
@@ -542,6 +573,7 @@ GreeksResult greeks_european_call(const McParams& p) {
     const std::uint64_t N = p.num_paths;
     const int max_threads = omp_get_max_threads();
     std::vector<GreekAccumulators> partial(max_threads);
+    const std::uint64_t counter_seed = p.seed ? p.seed : 0x517cc1b727220a95ULL;
 
     #pragma omp parallel
     {
@@ -549,7 +581,9 @@ GreeksResult greeks_european_call(const McParams& p) {
         const int nthreads = omp_get_num_threads();
         const std::uint64_t begin = (tid * N) / nthreads;
         const std::uint64_t end = ((tid + 1) * N) / nthreads;
-        const std::uint64_t seed_offset = p.seed + 0x517cc1b727220a95ULL * static_cast<std::uint64_t>(tid + 1);
+        const std::uint64_t seed_offset = (p.rng == quant::rng::Mode::Counter)
+                                              ? counter_seed
+                                              : p.seed + 0x517cc1b727220a95ULL * static_cast<std::uint64_t>(tid + 1);
         partial[tid] = simulate_greeks_range(begin, end, seed_offset, ctx);
     }
 
@@ -557,7 +591,9 @@ GreeksResult greeks_european_call(const McParams& p) {
         totals.merge(part);
     }
 #else
-    const std::uint64_t seed_offset = p.seed ? p.seed : 0x517cc1b727220a95ULL;
+    const std::uint64_t seed_offset = (p.rng == quant::rng::Mode::Counter)
+                                          ? (p.seed ? p.seed : 0x517cc1b727220a95ULL)
+                                          : (p.seed ? p.seed : 0x517cc1b727220a95ULL);
     totals = simulate_greeks_range(0, p.num_paths, seed_offset, ctx);
 #endif
 

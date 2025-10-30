@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- feat(heston,mc): Andersen QE variance paths, deterministic counter RNG, CLI/pybind confidence intervals for MC Greeks
+
 ## v0.2.0
 
 - Advanced MC: Sobol (optional Owen/digital shift) + Brownian bridge; antithetic/control variates; mixed Γ estimator
@@ -10,4 +14,3 @@
 - CLI: modern flags (--sampler/--bridge/--steps/--threads/--json) with legacy positional retained
 - Docs: API hosted via GitHub Pages (Doxygen); README artifacts index and usage
 - Consumer example: examples/consumer-cmake with find_package support
-

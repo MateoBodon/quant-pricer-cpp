@@ -50,24 +50,24 @@ def main():
     # Plot
     try:
         import matplotlib.pyplot as plt
+        has_mpl = True
     except Exception:
-        subprocess.check_call(['python3','-m','pip','install','--quiet','matplotlib'])
-        import matplotlib.pyplot as plt
-    xs = [row['paths'] for row in rows]
-    lrm = [row['gamma_lrm_se'] for row in rows]
-    mix = [row['gamma_mixed_se'] for row in rows]
-    plt.figure(figsize=(6,4))
-    plt.loglog(xs, lrm, marker='o', label='Gamma LRM SE')
-    plt.loglog(xs, mix, marker='o', label='Gamma Mixed SE')
-    plt.xlabel('Paths')
-    plt.ylabel('Std Error')
-    plt.title('Gamma estimator variance vs paths')
-    plt.grid(True, which='both', linestyle='--', alpha=0.4)
-    plt.legend()
-    out_png = os.path.join(args.artifacts, 'greeks_variance.png')
-    plt.tight_layout(); plt.savefig(out_png, dpi=200); plt.close()
+        has_mpl = False
+    if has_mpl:
+        xs = [row['paths'] for row in rows]
+        lrm = [row['gamma_lrm_se'] for row in rows]
+        mix = [row['gamma_mixed_se'] for row in rows]
+        plt.figure(figsize=(6,4))
+        plt.loglog(xs, lrm, marker='o', label='Gamma LRM SE')
+        plt.loglog(xs, mix, marker='o', label='Gamma Mixed SE')
+        plt.xlabel('Paths')
+        plt.ylabel('Std Error')
+        plt.title('Gamma estimator variance vs paths')
+        plt.grid(True, which='both', linestyle='--', alpha=0.4)
+        plt.legend()
+        out_png = os.path.join(args.artifacts, 'greeks_variance.png')
+        plt.tight_layout(); plt.savefig(out_png, dpi=200); plt.close()
 
 if __name__ == '__main__':
     main()
-
 

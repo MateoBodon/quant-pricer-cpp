@@ -99,6 +99,9 @@ struct BarrierMcContext {
     double dt;
     double drift_dt;
     double sqrt_dt;
+    bool use_schedule;
+    std::vector<double> drift_step;
+    std::vector<double> sigma_step;
     double discount;
     double cv_expectation;
     bool knock_out;
@@ -125,7 +128,6 @@ struct PathWorkspace {
 double run_path(const BarrierMcContext& ctx,
                 const std::vector<double>& increments,
                 const std::vector<double>& uniforms) {
-    const double sigma = ctx.params.vol;
     double logS = std::log(ctx.params.spot);
     double S_prev = ctx.params.spot;
 
@@ -138,7 +140,9 @@ double run_path(const BarrierMcContext& ctx,
 
     for (int i = 0; i < steps; ++i) {
         const double incr = increments[i];
-        const double logS_next = logS + ctx.drift_dt + sigma * incr;
+        const double sigma_step = ctx.use_schedule ? ctx.sigma_step[static_cast<std::size_t>(i)] : ctx.params.vol;
+        const double drift_step = ctx.use_schedule ? ctx.drift_step[static_cast<std::size_t>(i)] : ctx.drift_dt;
+        const double logS_next = logS + drift_step + sigma_step * incr;
         const double S_next = std::exp(logS_next);
 
         bool cross = false;
@@ -146,7 +150,7 @@ double run_path(const BarrierMcContext& ctx,
             if (S_prev >= ctx.barrier.B || S_next >= ctx.barrier.B) {
                 cross = true;
             } else {
-                const double p_hit = crossing_probability(S_prev, S_next, ctx.barrier.B, sigma, dt, true);
+                const double p_hit = crossing_probability(S_prev, S_next, ctx.barrier.B, sigma_step, dt, true);
                 if (p_hit > 0.0) {
                     const double u = uniforms[i];
                     cross = (u < p_hit);
@@ -156,7 +160,7 @@ double run_path(const BarrierMcContext& ctx,
             if (S_prev <= ctx.barrier.B || S_next <= ctx.barrier.B) {
                 cross = true;
             } else {
-                const double p_hit = crossing_probability(S_prev, S_next, ctx.barrier.B, sigma, dt, false);
+                const double p_hit = crossing_probability(S_prev, S_next, ctx.barrier.B, sigma_step, dt, false);
                 if (p_hit > 0.0) {
                     const double u = uniforms[i];
                     cross = (u < p_hit);
@@ -269,12 +273,34 @@ quant::stats::Welford simulate_range(std::uint64_t begin,
                 }
             }
         } else {
-            for (int j = 0; j < ctx.steps; ++j) {
-                workspace.normals[j] = normal(rng);
-                workspace.uniforms[j] = uniform(rng);
-                if (ctx.params.antithetic) {
-                    workspace.normals_antithetic[j] = -workspace.normals[j];
-                    workspace.uniforms_antithetic[j] = 1.0 - workspace.uniforms[j];
+            if (ctx.params.rng == quant::rng::Mode::Counter) {
+                for (int j = 0; j < ctx.steps; ++j) {
+                    const std::uint32_t step_id = static_cast<std::uint32_t>(j);
+                    const double z = quant::rng::normal(seed_offset,
+                                                        idx,
+                                                        step_id,
+                                                        0U,
+                                                        0U);
+                    const double u = quant::rng::uniform(seed_offset,
+                                                         idx,
+                                                         step_id,
+                                                         1U,
+                                                         0U);
+                    workspace.normals[j] = z;
+                    workspace.uniforms[j] = u;
+                    if (ctx.params.antithetic) {
+                        workspace.normals_antithetic[j] = -z;
+                        workspace.uniforms_antithetic[j] = 1.0 - u;
+                    }
+                }
+            } else {
+                for (int j = 0; j < ctx.steps; ++j) {
+                    workspace.normals[j] = normal(rng);
+                    workspace.uniforms[j] = uniform(rng);
+                    if (ctx.params.antithetic) {
+                        workspace.normals_antithetic[j] = -workspace.normals[j];
+                        workspace.uniforms_antithetic[j] = 1.0 - workspace.uniforms[j];
+                    }
                 }
             }
         }
@@ -305,6 +331,14 @@ quant::stats::Welford simulate_range(std::uint64_t begin,
 }
 
 } // namespace
+
+bool control_variate_enabled(bool request, const BarrierSpec& spec) {
+    if (!request) return false;
+    if (spec.type == BarrierType::DownIn || spec.type == BarrierType::UpIn) {
+        return false;
+    }
+    return true;
+}
 
 McResult price_barrier_option(const McParams& base,
                               double strike,
@@ -347,7 +381,7 @@ McResult price_barrier_option(const McParams& base,
     }
 
     const double dt = base.time / static_cast<double>(steps);
-    const BarrierMcContext ctx{
+    BarrierMcContext ctx{
         base,
         strike,
         opt,
@@ -359,12 +393,41 @@ McResult price_barrier_option(const McParams& base,
         dt,
         (base.rate - base.dividend - 0.5 * base.vol * base.vol) * dt,
         std::sqrt(dt),
-        std::exp(-base.rate * base.time),
-        base.spot * std::exp(-base.dividend * base.time),
+        false,
+        {},
+        {},
+        0.0,
+        0.0,
         is_knock_out(barrier),
         is_up_barrier(barrier),
-        base.control_variate
+        control_variate_enabled(base.control_variate, barrier)
     };
+
+    bool has_schedule = base.rate_schedule.has_value() ||
+                        base.dividend_schedule.has_value() ||
+                        base.vol_schedule.has_value();
+    double integrated_rate = 0.0;
+    double integrated_div = 0.0;
+    if (has_schedule) {
+        ctx.use_schedule = true;
+        ctx.drift_step.resize(static_cast<std::size_t>(steps));
+        ctx.sigma_step.resize(static_cast<std::size_t>(steps));
+        for (int i = 0; i < steps; ++i) {
+            const double mid = (static_cast<double>(i) + 0.5) * dt;
+            const double r = base.rate_schedule ? base.rate_schedule->value(mid) : base.rate;
+            const double q = base.dividend_schedule ? base.dividend_schedule->value(mid) : base.dividend;
+            const double sig = base.vol_schedule ? base.vol_schedule->value(mid) : base.vol;
+            ctx.drift_step[static_cast<std::size_t>(i)] = (r - q - 0.5 * sig * sig) * dt;
+            ctx.sigma_step[static_cast<std::size_t>(i)] = sig;
+            integrated_rate += r * dt;
+            integrated_div += q * dt;
+        }
+    } else {
+        integrated_rate = base.rate * base.time;
+        integrated_div = base.dividend * base.time;
+    }
+    ctx.discount = std::exp(-integrated_rate);
+    ctx.cv_expectation = base.spot * std::exp(-integrated_div);
 
     std::unique_ptr<qmc::SobolSequence> sobol;
     if (use_qmc) {
@@ -379,6 +442,7 @@ McResult price_barrier_option(const McParams& base,
     const std::uint64_t N = base.num_paths;
     const int max_threads = omp_get_max_threads();
     std::vector<quant::stats::Welford> partial(max_threads);
+    const std::uint64_t counter_seed = base.seed ? base.seed : 0x517cc1b727220a95ULL;
 
     #pragma omp parallel
     {
@@ -386,7 +450,9 @@ McResult price_barrier_option(const McParams& base,
         const int nthreads = omp_get_num_threads();
         const std::uint64_t begin = (tid * N) / nthreads;
         const std::uint64_t end = ((tid + 1) * N) / nthreads;
-        const std::uint64_t seed_offset = base.seed + 0x517cc1b727220a95ULL * static_cast<std::uint64_t>(tid + 1);
+        const std::uint64_t seed_offset = (base.rng == quant::rng::Mode::Counter)
+                                              ? counter_seed
+                                              : base.seed + 0x517cc1b727220a95ULL * static_cast<std::uint64_t>(tid + 1);
         partial[tid] = simulate_range(begin, end, seed_offset, worker);
     }
 
@@ -394,7 +460,9 @@ McResult price_barrier_option(const McParams& base,
         total.merge(part);
     }
 #else
-    const std::uint64_t seed_offset = base.seed ? base.seed : 0x517cc1b727220a95ULL;
+    const std::uint64_t seed_offset = (base.rng == quant::rng::Mode::Counter)
+                                          ? (base.seed ? base.seed : 0x517cc1b727220a95ULL)
+                                          : (base.seed ? base.seed : 0x517cc1b727220a95ULL);
     total = simulate_range(0, base.num_paths, seed_offset, worker);
 #endif
 
