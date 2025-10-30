@@ -35,12 +35,12 @@
 
 ### 🚀 **Core Pricing Engines**
 - **Black–Scholes Analytics**: Complete European option pricing with all major Greeks (Delta, Gamma, Vega, Theta, Rho)
-- **Monte Carlo Engine**: High-performance GBM simulation with PCG64 RNG and OpenMP parallelization
+- **Monte Carlo Engine**: High-performance GBM simulation with deterministic counter-based RNG (thread-invariant), optional PCG/MT streams, and OpenMP parallelization
 - **PDE Solver**: Crank–Nicolson with Rannacher start-up, optional tanh-stretched grids around the strike, and direct Δ/Γ/Θ extraction
 - **Barrier Options**: Continuous single-barrier (up/down, in/out) pricing via Reiner–Rubinstein closed-form, Brownian-bridge Monte Carlo, and absorbing-boundary PDE
 - **American Options**: PSOR (finite-difference LCP) and Longstaff–Schwartz Monte Carlo with polynomial basis; see `artifacts/american_convergence.png` for agreement and grid/path convergence.
 - **Exotics**: Arithmetic Asian MC with geometric CV, lookback MC (fixed/floating), digitals (analytic and MC hooks)
-- **Heston**: Analytic European call via characteristic-function Gauss–Laguerre (Monte Carlo path engine currently marked experimental)
+- **Heston**: Analytic European call via characteristic-function Gauss–Laguerre **plus Andersen QE Monte Carlo** with deterministic counter-based RNG for variance paths
 - **Risk**: VaR/CVaR via MC and historical backtesting with Kupiec test
  - **Multi‑Asset & Jumps**: Basket MC with Cholesky correlation; Merton jump‑diffusion MC for European options
 
@@ -49,6 +49,7 @@
 - **Quasi-Monte Carlo**: **Sobol** (optional Owen/digital shift) **+ Brownian bridge** path construction; antithetic and control variates. *Legacy:* an earlier version used a Van der Corput scalar sequence with inverse-normal transform for single-step paths.
 - **MC Greeks**: Pathwise estimators (Delta, Vega) and Likelihood Ratio Method (Gamma)
 - **Streaming Architecture**: Cache-friendly memory access patterns for optimal performance
+- **Piecewise-Constant Schedules**: Optional rate/dividend/vol term structures for vanilla and barrier engines via CSV or `PiecewiseConstant`
 
 ### 🎯 **Production-Ready Quality**
 - **Cross-Validation**: Three independent pricing methods for result verification
@@ -61,7 +62,7 @@
 - **CMake Build System**: Cross-platform support with optional dependencies
 - **CI/CD Pipeline**: Multi-compiler, multi-OS testing with sanitizers and static analysis
 - **Documentation**: Doxygen-generated API docs with mathematical formulations
-- **Python Bindings**: Optional `pyquant_pricer` module (pybind11), wheels via cibuildwheel
+- **Python Bindings**: Optional `pyquant_pricer` module (pybind11) with enums (`OptionType`, `BarrierType`, `McSampler`, `McBridge`) and `PiecewiseConstant` schedules; wheels via cibuildwheel
 
 ---
 
@@ -142,14 +143,15 @@ auto result = quant::mc::price_european_call(params);
 ```
 
 **Advanced Features:**
-- **PCG64 RNG**: High-quality pseudorandom number generation
+- **Deterministic Counter RNG**: Hash-based counter generator keyed by `(seed, path, step, dim)` makes serial vs parallel runs bitwise-identical
+- **PCG64 / MT Streams**: Optional stateful generators via `McParams::rng = quant::rng::Mode::Mt19937`
 - **Antithetic Variates**: Automatic variance reduction through negative correlation
 - **Control Variates**: Uses discounted terminal stock price as control
 - **Quasi-Monte Carlo**: Sobol (Joe–Kuo) sequences with optional Owen-style scramble
 - **Brownian Bridge**: Low effective dimension mapping for multi-step paths
 - **OpenMP Parallelization**: Multi-threaded path generation
 - **Streaming Statistics**: Welford accumulators produce numerically stable means, SEs, and 95% confidence intervals
-- **Mixed Γ Estimator**: Combines pathwise and LR for markedly lower gamma variance than pure LRM
+- **Mixed Γ & LR Θ**: Combines pathwise and LR for markedly lower gamma variance and likelihood-ratio-based Θ with common random numbers
 
 ### PDE Solver
 
@@ -241,22 +243,27 @@ The library also provides a robust Θ estimator via a backward calendar‑time f
 
 ### Variance Reduction Techniques
 
+**Counter-Based RNG (deterministic by construction):**
+```cpp
+params.rng = quant::rng::Mode::Counter; // default
+// Hash(seed, path, step, dim) → uniform → inverse normal
+// Guarantees identical streams regardless of OpenMP scheduling
+```
+
 **Antithetic Variates:**
 ```cpp
-// For each path S_T, also simulate -S_T using -W_T
-// Reduces variance through negative correlation
+params.antithetic = true; // Simulate W_t and -W_t in lockstep
 ```
 
 **Control Variates:**
 ```cpp
-// Use discounted terminal stock price as control
-// E[e^(-rT) * S_T] = S_0 * e^(-qT) (known analytically)
+params.control_variate = true; // Use discounted S_T as zero-variance control
 ```
 
-**Quasi-Monte Carlo:**
+**Sobol + Brownian Bridge:**
 ```cpp
-// Van der Corput sequence: u_n = 0.b_1b_2b_3... (binary)
-// Better space-filling properties than pseudorandom
+params.qmc = quant::mc::McParams::Qmc::Sobol;
+params.bridge = quant::mc::McParams::Bridge::BrownianBridge;
 ```
 
 ---
@@ -265,9 +272,13 @@ The library also provides a robust Θ estimator via a backward calendar‑time f
 
 ### Seed-Based Reproducibility
 ```cpp
-// Deterministic results with fixed seed
-params.seed = 42;  // Reproducible across runs
+// Deterministic across threads thanks to counter-based RNG
+params.seed = 42;
+params.rng  = quant::rng::Mode::Counter;
 ```
+
+- `tests/test_rng_repro.cpp` asserts that serial vs OpenMP-parallel executions (1, 4, 8 threads) produce bitwise-identical estimates and standard errors.
+- CLI exposes `--rng=counter|mt19937` to toggle the generator while keeping reproducibility guarantees explicit.
 
 ### Cross-Platform Consistency
 - **IEEE 754 Compliance**: Consistent floating-point behavior
@@ -341,17 +352,19 @@ cmake --build build -j
 
 **Modern flags (recommended)**
 ```bash
-# Monte Carlo (Sobol + Brownian bridge), 64 steps, 8 threads, JSON output
+# Monte Carlo (Sobol + Brownian bridge), 64 steps, counter RNG, JSON output
 ./build/quant_cli mc \
   --S=100 --K=100 --r=0.03 --q=0.01 --sigma=0.20 --T=1 \
   --paths=1000000 --seed=42 \
   --sampler=sobol --bridge=bb --steps=64 --threads=8 \
-  --json
+  --rng=counter --ci --json
 ```
 
-- New: time‑dependent schedules for MC: `--rate_csv=path`, `--div_csv=path`, `--vol_csv=path` (CSV with `time,value`, strictly increasing times). When provided, they override scalar `r,q,σ`.
-- New: same schedule flags are supported in `pde` mode for piecewise‑constant coefficients.
-- New: Barrier MC accepts `--no_cv` to disable the terminal‑stock control variate.
+- `--rng=counter|mt19937` toggles between deterministic counter-based streams (default) and stateful MT19937.
+- `--ci` prints mean ± stderr and 95% CI for human-readable output (JSON always includes the fields).
+- `--greeks` (MC only) adds Delta/Vega/Gamma/Theta estimates to the response; combine with `--ci` for CLI output.
+- Time-dependent schedules for MC: `--rate_csv=path`, `--div_csv=path`, `--vol_csv=path` (CSV with `time,value`, strictly increasing times). When provided, they override scalar `r,q,σ`.
+- The same schedule flags are supported in `pde` mode for piecewise-constant coefficients. Barrier MC disables the terminal-stock control variate by default; supply schedules plus `--cv` if you need the classic control.
 
 **Legacy positional (backward compatible)**
 `./build/quant_cli mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc:0|1>`
@@ -370,11 +383,15 @@ cmake --build build -j
 ### Monte Carlo Pricing
 ```bash
 # Standard Monte Carlo (1M paths, antithetic + control variate)
-./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 none none 1 --json
-# Output: {"price": 10.4506, "std_error": 1.0e-4, ...}
+./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 none none 1 --rng=counter --ci --json
+# Output: {"price": 10.4506, "std_error": 1.0e-4, "ci_low": ..., "threads": ..., "rng": "counter"}
 
 # Sobol QMC with Brownian bridge (64 time steps, explicit flags)
-./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 none none 1   --sampler=sobol_scrambled --bridge=bb --steps=64 --threads=4
+./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 1000000 42 1 none none 1 \
+  --sampler=sobol_scrambled --bridge=bb --steps=64 --threads=4 --rng=counter --json
+
+# Greeks with LR/pathwise estimators (+CI)
+./build/quant_cli mc 100 100 0.03 0.00 0.2 1.0 200000 42 1 none none 1 --greeks --ci --rng=counter --json
 ```
 
 `--sampler` accepts `prng`, `sobol`, or `sobol_scrambled`; `--bridge` accepts `none` or `bb`. `--steps` controls the number of time slices (defaults to 1 for terminal sampling) and `--threads` overrides OpenMP thread counts when available. Append `--json` on any engine to receive structured output.
@@ -384,12 +401,14 @@ cmake --build build -j
 # Reiner–Rubinstein analytic price (down-and-out call)
 ./build/quant_cli barrier bs call down out 100 95 90 0 0.02 0.00 0.2 1.0
 
-# Sobol MC with Brownian bridge correction (32 steps + JSON)
-# Note: Sobol supports up to 64 dimensions; barrier MC uses 2 dims/step → use ≤ 32 steps
-./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 none bb 32   --sampler=sobol --bridge=bb --steps=32 --json
+# PRNG baseline (control variate OFF by default to avoid bias)
+./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 none none 128 --json
 
-# Disable control variate for barrier MC (optional)
-./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 sobol bb 32 --no_cv --json
+# Re-enable terminal-stock control variate explicitly (experimental)
+./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 none none 128 --cv --json
+
+# Sobol + Brownian bridge (remember 64-dim limit → ≤32 monitoring steps)
+./build/quant_cli barrier mc call down out 100 95 90 0 0.02 0.00 0.2 1.0 250000 424242 1 sobol bb 32 --sampler=sobol --bridge=bb --steps=32 --json
 
 # Crank–Nicolson PDE with absorbing boundary at S=B
 ./build/quant_cli barrier pde call down out 100 95 90 0 0.02 0.00 0.2 1.0 201 200 4.0
@@ -422,19 +441,14 @@ See “Barrier MC crossing correction” in docs/Design.md for the within‑step
 ### Heston
 ```bash
 # Analytic Heston via CF + Gauss–Laguerre
-./build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04  100 100 0.01 0.00 1.0  0 1 0 --analytic --json
+./build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04  100 100 0.01 0.00 1.0  120000 64 2025 --json
 
-# Experimental QE MC (bias not yet corrected – prefer analytic result)
-./build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04  100 100 0.01 0.00 1.0  100000 64 2025 --mc --json
+# Andersen QE Monte Carlo (counter RNG, 96 steps)
+./build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04  100 100 0.01 0.00 1.0  80000 96 2025 --mc --heston-qe --rng=counter --ci --json
+
+# Euler fallback for comparison (stateful MT19937 RNG)
+./build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04  100 100 0.01 0.00 1.0  80000 96 2025 --mc --heston-euler --rng=mt19937 --json
 ```
-
-> **Note:** The current Heston Monte Carlo path engine is a placeholder. Until the Andersen QE scheme (with proper martingale correction and control variate) is reintroduced, rely on the analytic pricing routine above.
-
-### Next Steps
-
-- Port a complete Andersen QE implementation (or reuse a vetted library) to restore an unbiased Heston Monte Carlo pricer.
-- Add analytic-vs-MC regression tests and expose the analytic control variate in the CLI/Python bindings.
-- Keep publishing deterministic demo artifacts via `scripts/demo.sh` and the `demo-artifacts` CI job for recruiters.
 
 ### Risk
 ```bash
@@ -582,6 +596,8 @@ namespace quant::pde {
 
 ## Validation & Results
 
+*See also: [docs/ValidationHighlights.md](docs/ValidationHighlights.md) for the most recent artifact snapshot produced by `scripts/demo.sh`.*
+
 ### Cross-Method Validation
 
 The library implements rigorous cross-validation between all three pricing methods:
@@ -604,32 +620,19 @@ The mixed gamma estimator trims the standard error by ~4× versus the pure LRM e
 
 ### Convergence Analysis
 
-**Monte Carlo Convergence:**
-```bash
-python3 scripts/qmc_vs_prng.py
-# QMC vs PRNG absolute error:
-# ('paths', 'prng_err', 'qmc_err')
-# (20000, 0.0012, 0.0008)
-# (40000, 0.0009, 0.0006)
-# (80000, 0.0007, 0.0004)
-# (160000, 0.0005, 0.0003)
-# (320000, 0.0004, 0.0002)
-```
+**Monte Carlo Convergence:** `artifacts/qmc_vs_prng.csv` shows Sobol + Brownian bridge cutting RMSE to 0.02398 (vs 0.03435) at 40 000 paths and to 0.00848 (vs 0.01215) at 320 000 paths—roughly a 1.4× gain at equal runtime.
 
-**PDE Convergence:**
-```bash
-python3 scripts/pde_convergence.py
-# M,N,error (PDE log-space Neumann)
-# 101 100 0.0008
-# 201 200 0.0002
-# 401 400 0.00005
-```
+**Heston QE vs Euler:** `artifacts/heston_qe_convergence.csv` captures Andersen's QE scheme against the legacy Euler discretisation across 16–128 steps (80k paths). QE tracks the analytic price within ~1.3 e-4 at 64 steps while Euler lags by >2×, and the PNG shows logarithmic convergence with the counter-based RNG keeping dispersion stable across threads.
 
-The demo harness also writes `artifacts/qmc_vs_prng.png`, showing that Sobol sequences with Brownian bridge (64 time steps) achieve roughly 2–3× lower RMSE than a pseudorandom Euler discretisation at equal path counts.
+**PDE Convergence:** `artifacts/pde_convergence.csv` confirms ≈second-order behaviour (slope −2.0). Price errors shrink from 4.98×10⁻³ on a 101×100 grid to 8.0×10⁻⁵ on an 801×400 grid while Δ/Γ stay within 10⁻⁵ of Black–Scholes.
+
+The demo harness also writes plots—`artifacts/qmc_vs_prng.png` compares RMSE reductions, `artifacts/heston_qe_convergence.png` visualises QE vs Euler convergence, and `artifacts/greeks_ci.png` overlays MC Greeks with 95 % confidence bands.
 
 Barrier validation is captured via `artifacts/barrier_validation.csv` and `artifacts/barrier_validation.png`, comparing Monte Carlo and PDE prices against Reiner–Rubinstein closed-form benchmarks for representative up/down knock-out cases.
 
 `artifacts/pde_convergence.csv` and `artifacts/pde_convergence.png` record log–log error curves versus grid size, demonstrating the expected ≈ second-order slope once the two Rannacher start-up steps have smoothed the payoff kink.
+
+`artifacts/greeks_ci.csv` tabulates Delta/Vega/Gamma/Theta alongside their standard errors and 95 % confidence limits (likelihood-ratio Theta, mixed Gamma). These match Black–Scholes within the CI width and feed directly into downstream dashboards.
 
 ### Edge Case Validation
 
@@ -655,9 +658,9 @@ Barrier validation is captured via `artifacts/barrier_validation.csv` and `artif
 
 ### Reproducible Demo Artifacts
 
-Run `./scripts/demo.sh` to produce a Release build, execute representative Black–Scholes, Monte Carlo, and PDE validations, and emit CSVs plus `artifacts/manifest.json` recording the git SHA, compiler metadata, and RNG settings. The script also generates `artifacts/qmc_vs_prng.csv` and `artifacts/qmc_vs_prng.png`, comparing RMSE for PRNG vs Sobol+Brownian-bridge paths over 64 time steps. CI publishes the resulting `artifacts/` directory on every successful run via the `demo-artifacts` workflow job.
+Run `./scripts/demo.sh` to produce a Release build, execute representative Black–Scholes, Monte Carlo, Heston, and PDE validations, and emit CSVs plus `artifacts/manifest.json` capturing git SHA, compiler metadata, RNG mode, OpenMP thread count, and summary statistics (including MC Greeks and Heston runs). If `matplotlib` is unavailable the script still writes every CSV and logs a warning while skipping PNG/PDF generation—so the workflow is fully offline-safe.
 
-- Want resume-ready figures? Run `./scripts/demo.sh`, then open `artifacts/onepager.pdf` for a one-page summary that cross-references the PNGs in the same directory.
+- Want resume-ready figures? Run `./scripts/demo.sh`, then open `artifacts/onepager.pdf` for a one-page summary that cross-references the PNGs in the same directory (`twopager.pdf` adds Greeks and multi-asset views when plots are available).
 - Need to regenerate individual plots interactively? Each helper under `scripts/` (e.g., `qmc_vs_prng.py`, `pde_convergence.py`, `risk_backtest.py`) reads the CSVs emitted by the demo and can be re-run with `PYTHONPATH=build/python` to use the in-tree bindings.
 
 ### Artifact index
@@ -667,7 +670,8 @@ File | What it shows
 `pde_convergence.png` | CN + **Rannacher** ~2nd‑order slope on log–log error; Δ/Γ truncation behavior.
 `barrier_validation.png` | MC (≤3σ) and PDE (≤1e‑4) vs **Reiner–Rubinstein** closed forms.
 `american_convergence.png` | **PSOR** vs **LSMC** agreement and convergence on a standard grid.
-`greeks_variance.png` | Γ estimator std error vs paths: mixed Γ ≪ LRM.
+`heston_qe_convergence.png` | Andersen QE vs Euler relative error vs time steps (counter RNG).
+`greeks_ci.png` | Delta/Vega/Gamma/Theta with 95 % confidence intervals (LR Θ, mixed Γ).
 `basket_correlation.png` | 2‑asset basket call price vs correlation ρ.
 `merton_lambda.png` | Merton jump‑diffusion price vs jump intensity λ.
 `onepager.pdf` | One‑page summary with the four plots and validation tables.
@@ -772,6 +776,7 @@ doxygen Doxyfile
 - Monte Carlo convergence proofs
 - PDE discretization schemes
 - Greek derivation formulas
+- Validation digest: [docs/ValidationHighlights.md](docs/ValidationHighlights.md) summarises the latest artifact bundle
 
 ### Code Examples
 
@@ -818,14 +823,19 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 ## Limitations
 
 ### Current Constraints
-- **Multi‑Asset**: Basket MC supported; spreads and multi‑step path Greeks forthcoming
-- **Constant Parameters**: No time-dependent volatility or rates
-- **No Dividends**: Continuous dividend yield only (no discrete dividends)
+- **Term structures**: MC/PDE support piecewise-constant schedules (via CSV or programmatic
+  `PiecewiseConstant`), but there is no curve-building or spline interpolation yet.
+- **Multi-asset Greeks**: Basket and jump Monte Carlo engines expose prices only; pathwise/adjoint
+  Greeks are on the roadmap.
+- **Heston Monte Carlo**: The Andersen QE path engine is still experimental—treat the analytic
+  solver as the reference implementation.
+- **Dividends**: Only continuous dividend yields are modelled; discrete cash dividends are not.
 
 ### Known Limitations
-- **PDE Greeks**: Implemented for CN grids (Δ, Γ via three‑point central differences around \(S_0\); optional Θ via one‑step backward differencing). Accuracy depends on grid resolution and payoff smoothness; prefer MC Greeks near discontinuities (digitals/barriers) or when variance‑reduction is available.
-- **Memory Usage**: Large Monte Carlo simulations may require significant RAM
-- **Convergence**: QMC benefits diminish with very high dimensions
+- **PDE Greeks**: Implemented for CN grids (Δ, Γ via three-point central around \(S_0\); optional Θ via one-step backward differencing). Accuracy depends on grid resolution and payoff smoothness; prefer MC Greeks near discontinuities (digitals/barriers) or when variance-reduction is available.
+- **Memory Usage**: Large Monte Carlo simulations may require significant RAM.
+- **Barrier MC**: The terminal-stock control variate is disabled by default to avoid bias; re-enable with `--cv` only if you can post-process the correction.
+- **QMC Dimensionality**: Sobol sequences top out at 64 dimensions (Brownian bridge + hit uniforms → ≤32 monitoring steps for barriers).
 
 ### Performance Considerations
 - **Monte Carlo**: Linear scaling with number of paths
@@ -836,22 +846,20 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 
 ## Roadmap
 
-### Near Term (v0.2)
-- [ ] **Barrier Options**: Higher-order schemes in PDE / bridge variance analysis
-- [ ] **Multi-Asset**: Basket and spread options
-- [ ] **Time-Dependent Parameters**: Volatility surfaces and yield curves
+### Near Term
+- [ ] **Heston QE MC**: Bias correction, analytic control variate, and regression tests against the closed form.
+- [ ] **Barrier MC**: Re-introduce unbiased control variates and document QMC/Brownian-bridge tuning.
+- [ ] **Schedule ergonomics**: Curve loaders (flat/linear/exponential) and richer CLI validation.
 
-### Medium Term (v0.3)
-- [ ] **Exotic Options**: Asian, lookback, and digital options
-- [ ] **Stochastic Volatility**: Heston and SABR models
-- [ ] **Jump Processes**: Extend Merton (done) with Kou and Bates; Greeks
-- [ ] **GPU Acceleration**: CUDA/OpenCL Monte Carlo
+### Medium Term
+- [ ] **Multi-asset Greeks** (basket/jump diffusion) and variance-reduction hooks.
+- [ ] **Discrete dividends** for analytics, MC, and PDE.
+- [ ] **Calibration utilities** (Heston / local vol notebooks + report generation).
 
-### Long Term (v1.0)
-- [ ] **Risk Management**: Portfolio Greeks and scenario analysis
-- [ ] **Calibration**: Market data fitting and parameter estimation
-- [ ] **Real-Time Pricing**: Low-latency market data integration
-- [ ] **Python Bindings**: Pybind11 interface for research workflows
+### Long Term
+- [ ] **GPU / multi-core acceleration** for high-path Monte Carlo workloads.
+- [ ] **Scenario & sensitivities**: portfolio risk toolkit beyond single-asset greeks.
+- [ ] **Real-time integration**: streaming market data adapters and low-latency CLI mode.
 
 ---
 

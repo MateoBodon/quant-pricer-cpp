@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#include "quant/rng.hpp"
+
 namespace quant::heston {
 
 struct Params {
@@ -33,11 +35,13 @@ struct McParams {
     std::uint64_t seed;
     int num_steps; // QE time steps
     bool antithetic{true};
+    quant::rng::Mode rng{quant::rng::Mode::Counter};
+    enum class Scheme { Euler, QE };
+    Scheme scheme{Scheme::QE};
 };
 
 // Andersen QE Monte Carlo pricing of European call
 McResult call_qe_mc(const McParams& p);
 
 }
-
 

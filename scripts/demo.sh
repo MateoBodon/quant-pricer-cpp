@@ -62,11 +62,12 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.image as mpimg
     from matplotlib.backends.backend_pdf import PdfPages
+    HAS_MPL = True
 except ImportError:  # pragma: no cover - dependency bootstrap
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet", "matplotlib"])
-    import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
-    from matplotlib.backends.backend_pdf import PdfPages
+    HAS_MPL = False
+    plt = None
+    mpimg = None
+    PdfPages = None
 
 root = pathlib.Path(os.environ["ROOT"])
 cli = pathlib.Path(os.environ["CLI"])
@@ -88,7 +89,7 @@ def run_cli_json(args):
 MC_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(se=([0-9eE+\-.]+), 95% CI=\[([0-9eE+\-.]+), ([0-9eE+\-.]+)\]\)$")
 PDE_OUTPUT_RE = re.compile(r"^([0-9eE+\-.]+) \(delta=([0-9eE+\-.]+), gamma=([0-9eE+\-.]+)(?:, theta=([0-9eE+\-.]+))?\)$")
 
-def mc_price_and_error(params):
+def mc_price_and_error(params, *, extra_args=None, return_json=False):
     args = [
         "mc",
         params["spot"],
@@ -108,6 +109,8 @@ def mc_price_and_error(params):
     num_steps = params.get("num_steps", 1)
     if num_steps is not None:
         args.append(int(num_steps))
+    if extra_args:
+        args.extend(extra_args)
 
     # Prefer JSON output for determinism metadata and robust parsing
     res = run_cli_json(args)
@@ -115,6 +118,8 @@ def mc_price_and_error(params):
     std_error = float(res.get("std_error", 0.0))
     ci_low = float(res.get("ci_low", price))
     ci_high = float(res.get("ci_high", price))
+    if return_json:
+        return price, std_error, ci_low, ci_high, res
     return price, std_error, ci_low, ci_high
 
 SQRT_2PI = math.sqrt(2.0 * math.pi)
@@ -214,7 +219,11 @@ mc_params = {
     "bridge_mode": "none",
     "num_steps": 1,
 }
-mc_price, mc_std_error, mc_ci_low, mc_ci_high = mc_price_and_error(mc_params)
+mc_price, mc_std_error, mc_ci_low, mc_ci_high, mc_json = mc_price_and_error(
+    mc_params,
+    extra_args=["--rng=counter"],
+    return_json=True,
+)
 mc_reference = float(run_cli([
     "bs",
     mc_params["spot"],
@@ -320,20 +329,170 @@ with open(artifact_dir / "qmc_vs_prng.csv", "w", newline="") as fh:
             "rmse_ratio": f"{row['rmse_ratio']:.3f}",
         })
 
-plt.figure(figsize=(6.0, 4.0))
-plt.loglog(paths_grid, prng_rmse_values, marker="o", label="PRNG (Euler)")
-plt.loglog(paths_grid, qmc_rmse_values, marker="o", label="Sobol + Brownian bridge")
-plt.xlabel("Paths")
-plt.ylabel("RMSE")
-plt.title("ATM call RMSE vs paths (num_steps=64)")
-plt.grid(True, which="both", linestyle="--", alpha=0.4)
-plt.legend()
-plt.tight_layout()
-plt.savefig(artifact_dir / "qmc_vs_prng.png", dpi=200)
-plt.close()
+if HAS_MPL:
+    plt.figure(figsize=(6.0, 4.0))
+    plt.loglog(paths_grid, prng_rmse_values, marker="o", label="PRNG (Euler)")
+    plt.loglog(paths_grid, qmc_rmse_values, marker="o", label="Sobol + Brownian bridge")
+    plt.xlabel("Paths")
+    plt.ylabel("RMSE")
+    plt.title("ATM call RMSE vs paths (num_steps=64)")
+    plt.grid(True, which="both", linestyle="--", alpha=0.4)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(artifact_dir / "qmc_vs_prng.png", dpi=200)
+    plt.close()
+else:
+    print("warn: matplotlib unavailable; skipping qmc_vs_prng plot")
 
 rmse_ratio_values = [row["rmse_ratio"] for row in rmse_rows]
 
+# Heston QE vs Euler convergence (deterministic counter RNG)
+heston_params = {
+    "kappa": 1.5,
+    "theta": 0.04,
+    "sigma": 0.5,
+    "rho": -0.5,
+    "v0": 0.04,
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.01,
+    "dividend": 0.0,
+    "tenor": 1.0,
+    "paths": 80000,
+    "seed": 2025,
+}
+heston_reference = float(run_cli([
+    "heston",
+    heston_params["kappa"], heston_params["theta"], heston_params["sigma"],
+    heston_params["rho"], heston_params["v0"],
+    heston_params["spot"], heston_params["strike"],
+    heston_params["rate"], heston_params["dividend"], heston_params["tenor"],
+    heston_params["paths"], 64, heston_params["seed"],
+]))
+
+step_grid = [16, 32, 64, 128]
+heston_rows = []
+for scheme_flag, label in (("--heston-qe", "qe"), ("--heston-euler", "euler")):
+    for steps in step_grid:
+        res = run_cli_json([
+            "heston",
+            heston_params["kappa"], heston_params["theta"], heston_params["sigma"],
+            heston_params["rho"], heston_params["v0"],
+            heston_params["spot"], heston_params["strike"],
+            heston_params["rate"], heston_params["dividend"], heston_params["tenor"],
+            heston_params["paths"], steps, heston_params["seed"],
+            "--mc", "--json", scheme_flag, "--rng=counter"
+        ])
+        price = float(res["price"])
+        std_error = float(res.get("std_error", 0.0))
+        ci_low = float(res.get("ci_low", price))
+        ci_high = float(res.get("ci_high", price))
+        heston_rows.append({
+            "scheme": label,
+            "steps": steps,
+            "paths": heston_params["paths"],
+            "price": price,
+            "std_error": std_error,
+            "ci_low": ci_low,
+            "ci_high": ci_high,
+            "abs_error": abs(price - heston_reference),
+        })
+
+with open(artifact_dir / "heston_qe_convergence.csv", "w", newline="") as fh:
+    writer = csv.DictWriter(fh, fieldnames=[
+        "scheme", "steps", "paths", "price", "std_error", "ci_low", "ci_high", "analytic", "abs_error"
+    ])
+    writer.writeheader()
+    for row in heston_rows:
+        writer.writerow({
+            "scheme": row["scheme"],
+            "steps": row["steps"],
+            "paths": row["paths"],
+            "price": f"{row['price']:.6f}",
+            "std_error": f"{row['std_error']:.6f}",
+            "ci_low": f"{row['ci_low']:.6f}",
+            "ci_high": f"{row['ci_high']:.6f}",
+            "analytic": f"{heston_reference:.6f}",
+            "abs_error": f"{row['abs_error']:.6f}",
+        })
+
+if HAS_MPL:
+    for scheme in {row["scheme"] for row in heston_rows}:
+        data = [row for row in heston_rows if row["scheme"] == scheme]
+        plt.plot([row["steps"] for row in data], [row["abs_error"] for row in data], marker="o", label=scheme.upper())
+    plt.xlabel("Time steps")
+    plt.ylabel("|MC price - analytic|")
+    plt.title("Heston MC convergence (paths={} rng=counter)".format(heston_params["paths"]))
+    plt.xscale("log", base=2)
+    plt.yscale("log")
+    plt.grid(True, which="both", linestyle="--", alpha=0.4)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(artifact_dir / "heston_qe_convergence.png", dpi=200)
+    plt.close()
+else:
+    print("warn: matplotlib unavailable; skipping heston convergence plot")
+
+# Greeks CI via CLI (LR/pathwise estimators)
+greeks_params = {
+    "spot": atm_params["spot"],
+    "strike": atm_params["strike"],
+    "rate": atm_params["rate"],
+    "dividend": atm_params["dividend"],
+    "vol": atm_params["vol"],
+    "tenor": atm_params["tenor"],
+    "paths": 200000,
+    "seed": mc_seed,
+    "antithetic": True,
+    "num_steps": 1,
+}
+
+greeks_json = run_cli_json([
+    "mc",
+    greeks_params["spot"], greeks_params["strike"], greeks_params["rate"], greeks_params["dividend"],
+    greeks_params["vol"], greeks_params["tenor"], greeks_params["paths"], greeks_params["seed"],
+    1 if greeks_params["antithetic"] else 0, "none", "none", greeks_params["num_steps"],
+    "--greeks", "--ci", "--rng=counter"
+])
+
+greek_rows = []
+greeks_data = greeks_json.get("greeks", {})
+for name, stats in greeks_data.items():
+    greek_rows.append({
+        "greek": name,
+        "estimate": float(stats.get("value", 0.0)),
+        "std_error": float(stats.get("std_error", 0.0)),
+        "ci_low": float(stats.get("ci_low", stats.get("value", 0.0))),
+        "ci_high": float(stats.get("ci_high", stats.get("value", 0.0))),
+    })
+
+with open(artifact_dir / "greeks_ci.csv", "w", newline="") as fh:
+    writer = csv.DictWriter(fh, fieldnames=["greek", "estimate", "std_error", "ci_low", "ci_high"])
+    writer.writeheader()
+    for row in greek_rows:
+        writer.writerow({
+            "greek": row["greek"],
+            "estimate": f"{row['estimate']:.6f}",
+            "std_error": f"{row['std_error']:.6f}",
+            "ci_low": f"{row['ci_low']:.6f}",
+            "ci_high": f"{row['ci_high']:.6f}",
+        })
+
+if HAS_MPL and greek_rows:
+    labels = [row["greek"] for row in greek_rows]
+    estimates = [row["estimate"] for row in greek_rows]
+    errors = [row["std_error"] for row in greek_rows]
+    plt.figure(figsize=(6.0, 4.0))
+    plt.bar(labels, estimates, yerr=[1.96 * e for e in errors], capsize=6, color="tab:blue")
+    plt.ylabel("Estimate")
+    plt.title("MC Greeks with 95% CI (paths={})".format(greeks_params["paths"]))
+    plt.grid(True, axis="y", linestyle="--", alpha=0.4)
+    plt.tight_layout()
+    plt.savefig(artifact_dir / "greeks_ci.png", dpi=200)
+    plt.close()
+else:
+    if not HAS_MPL:
+        print("warn: matplotlib unavailable; skipping greeks CI plot")
 # PDE validation
 pde_params = {
     "spot": 100.0,
@@ -550,16 +709,19 @@ def log_slope(xs, ys):
 
 slope = log_slope([row["M"] for row in pde_conv_rows], price_errors)
 
-plt.figure(figsize=(6.0, 4.0))
-plt.loglog([row["M"] for row in pde_conv_rows], price_errors, marker="o", label=f"Price error (slope~{slope:.2f})")
-plt.xlabel("Spatial nodes (M)")
-plt.ylabel("|Price - BS|")
-plt.title("Crank–Nicolson with Rannacher start")
-plt.grid(True, which="both", linestyle="--", alpha=0.4)
-plt.legend()
-plt.tight_layout()
-plt.savefig(artifact_dir / "pde_convergence.png", dpi=200)
-plt.close()
+if HAS_MPL:
+    plt.figure(figsize=(6.0, 4.0))
+    plt.loglog([row["M"] for row in pde_conv_rows], price_errors, marker="o", label=f"Price error (slope~{slope:.2f})")
+    plt.xlabel("Spatial nodes (M)")
+    plt.ylabel("|Price - BS|")
+    plt.title("Crank–Nicolson with Rannacher start")
+    plt.grid(True, which="both", linestyle="--", alpha=0.4)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(artifact_dir / "pde_convergence.png", dpi=200)
+    plt.close()
+else:
+    print("warn: matplotlib unavailable; skipping pde_convergence plot")
 
 american_params = {
     "spot": 100.0,
@@ -664,18 +826,21 @@ with open(artifact_dir / "american_validation.csv", "w", newline="") as fh:
         "extra": f"std_error={lsmc_std_error:.6f}",
     })
 
-plt.figure(figsize=(6.0, 4.0))
-plt.loglog([row["steps"] for row in binomial_rows], [row["abs_err"] for row in binomial_rows], marker="o", label="Binomial |error|")
-plt.loglog([row["M"] for row in psor_rows], [row["abs_err"] for row in psor_rows], marker="s", label="PSOR |error|")
-plt.axhline(lsmc_std_error, color="tab:green", linestyle="--", label="LSMC SE")
-plt.xlabel("Resolution (steps or spatial nodes)")
-plt.ylabel("|Price - PSOR_ref|")
-plt.title("American put convergence")
-plt.grid(True, which="both", linestyle="--", alpha=0.4)
-plt.legend()
-plt.tight_layout()
-plt.savefig(artifact_dir / "american_convergence.png", dpi=200)
-plt.close()
+if HAS_MPL:
+    plt.figure(figsize=(6.0, 4.0))
+    plt.loglog([row["steps"] for row in binomial_rows], [row["abs_err"] for row in binomial_rows], marker="o", label="Binomial |error|")
+    plt.loglog([row["M"] for row in psor_rows], [row["abs_err"] for row in psor_rows], marker="s", label="PSOR |error|")
+    plt.axhline(lsmc_std_error, color="tab:green", linestyle="--", label="LSMC SE")
+    plt.xlabel("Resolution (steps or spatial nodes)")
+    plt.ylabel("|Price - PSOR_ref|")
+    plt.title("American put convergence")
+    plt.grid(True, which="both", linestyle="--", alpha=0.4)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(artifact_dir / "american_convergence.png", dpi=200)
+    plt.close()
+else:
+    print("warn: matplotlib unavailable; skipping american_convergence plot")
 
 barrier_cases = [
     {
@@ -725,7 +890,7 @@ for case in barrier_cases:
         "barrier", "mc", case["opt"], case["dir"], case["style"],
         case["spot"], case["strike"], case["barrier"], case["rebate"],
         case["rate"], case["dividend"], case["vol"], case["tenor"],
-        mc_paths, mc_seed, 1, "sobol", "bb", 32,
+        mc_paths, mc_seed, 1, "none", "none", 128,
     ]
     mc_out = run_cli(mc_cli)
     mc_match = MC_OUTPUT_RE.match(mc_out)
@@ -763,6 +928,11 @@ for case in barrier_cases:
         "bs": bs_barrier,
         "mc": mc_barrier,
         "mc_se": mc_barrier_se,
+        "mc_sampler": "prng",
+        "mc_bridge": "none",
+        "mc_steps": 128,
+        "mc_paths": mc_paths,
+        "mc_cv": False,
         "pde": pde_barrier,
         "mc_abs_err": mc_abs_err,
         "pde_abs_err": pde_abs_err,
@@ -777,6 +947,7 @@ with open(artifact_dir / "barrier_validation.csv", "w", newline="") as fh:
     writer = csv.DictWriter(fh, fieldnames=[
         "name", "option", "direction", "style", "spot", "strike", "barrier", "rebate",
         "rate", "dividend", "vol", "tenor", "bs", "mc", "mc_se", "mc_ci_low", "mc_ci_high",
+        "mc_sampler", "mc_bridge", "mc_steps", "mc_paths", "mc_cv",
         "pde", "mc_abs_err", "pde_abs_err"
     ])
     writer.writeheader()
@@ -799,6 +970,11 @@ with open(artifact_dir / "barrier_validation.csv", "w", newline="") as fh:
             "mc_se": f"{row['mc_se']:.6f}",
             "mc_ci_low": f"{row['mc_ci_low']:.6f}",
             "mc_ci_high": f"{row['mc_ci_high']:.6f}",
+            "mc_sampler": row["mc_sampler"],
+            "mc_bridge": row["mc_bridge"],
+            "mc_steps": row["mc_steps"],
+            "mc_paths": row["mc_paths"],
+            "mc_cv": int(row["mc_cv"]),
             "pde": f"{row['pde']:.6f}",
             "mc_abs_err": f"{row['mc_abs_err']:.6f}",
             "pde_abs_err": f"{row['pde_abs_err']:.6f}",
@@ -806,34 +982,44 @@ with open(artifact_dir / "barrier_validation.csv", "w", newline="") as fh:
 
 plt.figure(figsize=(6.0, 4.0))
 indices = range(len(barrier_labels))
-plt.bar([i - 0.15 for i in indices], barrier_mc_abs_errors, width=0.3, label="|MC - RR|")
-plt.bar([i + 0.15 for i in indices], barrier_pde_abs_errors, width=0.3, label="|PDE - RR|")
-plt.xticks(list(indices), barrier_labels, rotation=15)
-plt.ylabel("Absolute error")
-plt.title("Barrier pricing validation")
-plt.yscale("log")
-plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
-plt.legend()
-plt.tight_layout()
-plt.savefig(artifact_dir / "barrier_validation.png", dpi=200)
-plt.close()
+if HAS_MPL:
+    plt.bar([i - 0.15 for i in indices], barrier_mc_abs_errors, width=0.3, label="|MC - RR|")
+    plt.bar([i + 0.15 for i in indices], barrier_pde_abs_errors, width=0.3, label="|PDE - RR|")
+    plt.xticks(list(indices), barrier_labels, rotation=15)
+    plt.ylabel("Absolute error")
+    plt.title("Barrier pricing validation")
+    plt.yscale("log")
+    plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(artifact_dir / "barrier_validation.png", dpi=200)
+    plt.close()
+else:
+    print("warn: matplotlib unavailable; skipping barrier validation plot")
 
-pdf_path = artifact_dir / "onepager.pdf"
-with PdfPages(pdf_path) as pdf:
-    fig, axes = plt.subplots(2, 2, figsize=(11.0, 8.5))
+plots = []
+if HAS_MPL:
     plots = [
         (artifact_dir / "qmc_vs_prng.png", "MC RMSE (PRNG vs Sobol)"),
         (artifact_dir / "pde_convergence.png", "PDE convergence"),
         (artifact_dir / "american_convergence.png", "American convergence"),
         (artifact_dir / "barrier_validation.png", "Barrier validation"),
     ]
-    for ax, (img_path, title) in zip(axes.flatten(), plots):
-        img = mpimg.imread(img_path)
-        ax.imshow(img)
-        ax.set_title(title)
-        ax.axis("off")
-    pdf.savefig(fig)
-    plt.close(fig)
+    pdf_path = artifact_dir / "onepager.pdf"
+    with PdfPages(pdf_path) as pdf:
+        fig, axes = plt.subplots(2, 2, figsize=(11.0, 8.5))
+        for ax, (img_path, title) in zip(axes.flatten(), plots):
+            if not img_path.exists():
+                ax.text(0.5, 0.5, f"missing {img_path.name}", ha="center", va="center")
+            else:
+                img = mpimg.imread(img_path)
+                ax.imshow(img)
+            ax.set_title(title)
+            ax.axis("off")
+        pdf.savefig(fig)
+        plt.close(fig)
+else:
+    print("warn: matplotlib unavailable; skipping PDF dashboards")
 
 # Generate extra figures (Greeks variance, multi-asset)
 try:
@@ -848,41 +1034,43 @@ try:
 except Exception as e:
     print('warn: multiasset figures failed:', e)
 
-# Two-pager PDF with extra figures (if present)
-twopager = artifact_dir / 'twopager.pdf'
-with PdfPages(twopager) as pdf2:
-    # Page 1: reuse onepager content
-    fig, axes = plt.subplots(2, 2, figsize=(11.0, 8.5))
-    for ax, (img_path, title) in zip(axes.flatten(), plots):
-        img = mpimg.imread(img_path)
-        ax.imshow(img)
-        ax.set_title(title)
-        ax.axis('off')
-    pdf2.savefig(fig)
-    plt.close(fig)
-    # Page 2: new figures if available
-    extra_imgs = []
-    for name, title in [
-        ('greeks_variance.png', 'Gamma estimator variance'),
-        ('basket_correlation.png', 'Basket price vs correlation'),
-        ('merton_lambda.png', 'Merton price vs lambda'),
-    ]:
-        path = artifact_dir / name
-        if path.exists():
-            extra_imgs.append((path, title))
-    if extra_imgs:
-        rows = 1
-        cols = len(extra_imgs)
-        fig, axes = plt.subplots(rows, cols, figsize=(11.0, 4.5))
-        if cols == 1:
-            axes = [axes]
-        for ax, (img_path, title) in zip(axes, extra_imgs):
-            img = mpimg.imread(img_path)
-            ax.imshow(img)
+if HAS_MPL and plots:
+    twopager = artifact_dir / 'twopager.pdf'
+    with PdfPages(twopager) as pdf2:
+        fig, axes = plt.subplots(2, 2, figsize=(11.0, 8.5))
+        for ax, (img_path, title) in zip(axes.flatten(), plots):
+            if not img_path.exists():
+                ax.text(0.5, 0.5, f"missing {img_path.name}", ha="center", va="center")
+            else:
+                img = mpimg.imread(img_path)
+                ax.imshow(img)
             ax.set_title(title)
             ax.axis('off')
         pdf2.savefig(fig)
         plt.close(fig)
+
+        extra_imgs = []
+        for name, title in [
+            ('greeks_variance.png', 'Gamma estimator variance'),
+            ('basket_correlation.png', 'Basket price vs correlation'),
+            ('merton_lambda.png', 'Merton price vs lambda'),
+        ]:
+            path = artifact_dir / name
+            if path.exists():
+                extra_imgs.append((path, title))
+        if extra_imgs:
+            rows = 1
+            cols = len(extra_imgs)
+            fig, axes = plt.subplots(rows, cols, figsize=(11.0, 4.5))
+            if cols == 1:
+                axes = [axes]
+            for ax, (img_path, title) in zip(axes, extra_imgs):
+                img = mpimg.imread(img_path)
+                ax.imshow(img)
+                ax.set_title(title)
+                ax.axis('off')
+            pdf2.savefig(fig)
+            plt.close(fig)
 
 # Manifest JSON
 try:
@@ -907,12 +1095,8 @@ manifest = {
         "std_error": round(mc_std_error, 6),
         "ci_low": round(mc_ci_low, 6),
         "ci_high": round(mc_ci_high, 6),
-        # capture threads used via JSON query
-        "threads": run_cli_json([
-            "mc",
-            mc_params["spot"], mc_params["strike"], mc_params["rate"], mc_params["dividend"], mc_params["vol"], mc_params["tenor"],
-            mc_params["paths"], mc_params["seed"], 1, mc_params["qmc_mode"], mc_params["bridge_mode"], mc_params["num_steps"],
-        ]).get("threads", 1),
+        "rng": mc_json.get("rng", "counter"),
+        "threads": mc_json.get("threads", 1),
     },
     "qmc_vs_prng": {
         "paths": paths_grid,
@@ -923,6 +1107,22 @@ manifest = {
         "prng_ci_high": [round(row["prng_ci_high"], 6) for row in rmse_rows],
         "qmc_ci_low": [round(row["qmc_ci_low"], 6) for row in rmse_rows],
         "qmc_ci_high": [round(row["qmc_ci_high"], 6) for row in rmse_rows],
+    },
+    "heston": {
+        "analytic": round(heston_reference, 6),
+        "rows": [
+            {
+                "scheme": row["scheme"],
+                "steps": row["steps"],
+                "paths": row["paths"],
+                "price": round(row["price"], 6),
+                "std_error": round(row["std_error"], 6),
+                "ci_low": round(row["ci_low"], 6),
+                "ci_high": round(row["ci_high"], 6),
+                "abs_error": round(row["abs_error"], 6),
+            }
+            for row in heston_rows
+        ],
     },
     "pde": {
         "engine": "pde",
@@ -969,6 +1169,21 @@ manifest = {
         "pde_abs_error": [round(v, 6) for v in barrier_pde_abs_errors],
         "mc_ci_low": [round(row["mc_ci_low"], 6) for row in barrier_rows],
         "mc_ci_high": [round(row["mc_ci_high"], 6) for row in barrier_rows],
+    },
+    "greeks": {
+        "paths": greeks_params["paths"],
+        "seed": greeks_params["seed"],
+        "rng": greeks_json.get("rng", "counter"),
+        "threads": greeks_json.get("threads", 1),
+        "stats": {
+            row["greek"]: {
+                "estimate": round(row["estimate"], 6),
+                "std_error": round(row["std_error"], 6),
+                "ci_low": round(row["ci_low"], 6),
+                "ci_high": round(row["ci_high"], 6),
+            }
+            for row in greek_rows
+        },
     },
     "executables": {
         "quant_cli": cli_rel,

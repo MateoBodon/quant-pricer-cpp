@@ -39,6 +39,25 @@ PYBIND11_MODULE(pyquant_pricer, m) {
     m.def("mc_greeks_call", &quant::mc::greeks_european_call, "MC Greeks (European call)",
           py::arg("params"));
 
+    py::class_<quant::PiecewiseConstant>(m, "PiecewiseConstant")
+        .def(py::init<>())
+        .def_readwrite("times", &quant::PiecewiseConstant::times)
+        .def_readwrite("values", &quant::PiecewiseConstant::values)
+        .def("value", &quant::PiecewiseConstant::value);
+
+    py::enum_<quant::mc::McParams::Qmc>(m, "McSampler")
+        .value("None", quant::mc::McParams::Qmc::None)
+        .value("Sobol", quant::mc::McParams::Qmc::Sobol)
+        .value("SobolScrambled", quant::mc::McParams::Qmc::SobolScrambled);
+
+    py::enum_<quant::mc::McParams::Bridge>(m, "McBridge")
+        .value("None", quant::mc::McParams::Bridge::None)
+        .value("BrownianBridge", quant::mc::McParams::Bridge::BrownianBridge);
+
+    py::enum_<quant::rng::Mode>(m, "McRng")
+        .value("Mt19937", quant::rng::Mode::Mt19937)
+        .value("Counter", quant::rng::Mode::Counter);
+
     py::class_<quant::mc::McParams>(m, "McParams")
         .def(py::init<>())
         .def_readwrite("spot", &quant::mc::McParams::spot)
@@ -51,7 +70,13 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readwrite("seed", &quant::mc::McParams::seed)
         .def_readwrite("antithetic", &quant::mc::McParams::antithetic)
         .def_readwrite("control_variate", &quant::mc::McParams::control_variate)
-        .def_readwrite("num_steps", &quant::mc::McParams::num_steps);
+        .def_readwrite("rng", &quant::mc::McParams::rng)
+        .def_readwrite("qmc", &quant::mc::McParams::qmc)
+        .def_readwrite("bridge", &quant::mc::McParams::bridge)
+        .def_readwrite("num_steps", &quant::mc::McParams::num_steps)
+        .def_readwrite("rate_schedule", &quant::mc::McParams::rate_schedule)
+        .def_readwrite("dividend_schedule", &quant::mc::McParams::dividend_schedule)
+        .def_readwrite("vol_schedule", &quant::mc::McParams::vol_schedule);
 
     py::class_<quant::mc::McStatistic>(m, "McStatistic")
         .def_readonly("value", &quant::mc::McStatistic::value)
@@ -66,7 +91,8 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readonly("delta", &quant::mc::GreeksResult::delta)
         .def_readonly("vega", &quant::mc::GreeksResult::vega)
         .def_readonly("gamma_lrm", &quant::mc::GreeksResult::gamma_lrm)
-        .def_readonly("gamma_mixed", &quant::mc::GreeksResult::gamma_mixed);
+        .def_readonly("gamma_mixed", &quant::mc::GreeksResult::gamma_mixed)
+        .def_readonly("theta", &quant::mc::GreeksResult::theta);
 
     // PDE pricing (Δ/Γ/Θ)
     py::class_<quant::pde::GridSpec>(m, "GridSpec")
@@ -103,6 +129,12 @@ PYBIND11_MODULE(pyquant_pricer, m) {
     py::enum_<quant::OptionType>(m, "OptionType")
         .value("Call", quant::OptionType::Call)
         .value("Put", quant::OptionType::Put);
+
+    py::enum_<quant::BarrierType>(m, "BarrierType")
+        .value("UpOut", quant::BarrierType::UpOut)
+        .value("DownOut", quant::BarrierType::DownOut)
+        .value("UpIn", quant::BarrierType::UpIn)
+        .value("DownIn", quant::BarrierType::DownIn);
 
     py::class_<quant::american::Params>(m, "AmParams")
         .def(py::init<>())
@@ -150,6 +182,7 @@ PYBIND11_MODULE(pyquant_pricer, m) {
     // Barriers
     py::class_<quant::BarrierSpec>(m, "BarrierSpec")
         .def(py::init<>())
+        .def_readwrite("type", &quant::BarrierSpec::type)
         .def_readwrite("B", &quant::BarrierSpec::B)
         .def_readwrite("rebate", &quant::BarrierSpec::rebate);
 
@@ -179,6 +212,10 @@ PYBIND11_MODULE(pyquant_pricer, m) {
 
     m.def("heston_call_analytic", &quant::heston::call_analytic, py::arg("mkt"), py::arg("params"));
 
+    py::enum_<quant::heston::McParams::Scheme>(m, "HestonScheme")
+        .value("Euler", quant::heston::McParams::Scheme::Euler)
+        .value("QE", quant::heston::McParams::Scheme::QE);
+
     py::class_<quant::heston::McParams>(m, "HestonMcParams")
         .def(py::init<>())
         .def_readwrite("mkt", &quant::heston::McParams::mkt)
@@ -186,7 +223,9 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readwrite("num_paths", &quant::heston::McParams::num_paths)
         .def_readwrite("seed", &quant::heston::McParams::seed)
         .def_readwrite("num_steps", &quant::heston::McParams::num_steps)
-        .def_readwrite("antithetic", &quant::heston::McParams::antithetic);
+        .def_readwrite("antithetic", &quant::heston::McParams::antithetic)
+        .def_readwrite("rng", &quant::heston::McParams::rng)
+        .def_readwrite("scheme", &quant::heston::McParams::scheme);
 
     py::class_<quant::heston::McResult>(m, "HestonMcResult")
         .def_readonly("price", &quant::heston::McResult::price)
@@ -254,4 +293,3 @@ PYBIND11_MODULE(pyquant_pricer, m) {
 
     m.def("merton_call_mc", &quant::multi::merton_call_mc, py::arg("params"));
 }
-

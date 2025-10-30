@@ -6,13 +6,11 @@
 
 namespace quant::mc {
 
+/// Price a barrier option via Monte Carlo. The control variate is disabled for
+/// knock-in structures even if requested, to avoid bias from parity mismatches.
 McResult price_barrier_option(const McParams& base,
                               double strike,
                               OptionType opt,
                               const BarrierSpec& barrier);
 
-/// Note: barrier MC respects McParams.control_variate to enable/disable
-/// the terminal stock control variate in the path payoff.
-
 }
-

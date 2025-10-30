@@ -8,6 +8,7 @@
 #include <cmath>
 #include <limits>
 #include <random>
+#include <vector>
 
 namespace quant::asian {
 
@@ -41,19 +42,21 @@ asian::McStatistic price_mc(const McParams& p) {
 
     pcg64 rng(p.seed ? p.seed : 0xC0FFEEULL);
     std::normal_distribution<double> normal(0.0, 1.0);
+    std::vector<double> normals(static_cast<std::size_t>(p.num_steps));
 
-    for (std::uint64_t i = 0; i < p.num_paths; ++i) {
+    auto run_path = [&](const std::vector<double>& draws) {
         double S = p.spot;
-        double sum = 0.0;
-        double log_sum = 0.0;
+        double arith_acc = 0.0;
+        double log_acc = 0.0;
         for (int t = 0; t < p.num_steps; ++t) {
-            const double z = normal(rng);
+            const double z = draws[static_cast<std::size_t>(t)];
             S = S * std::exp(drift_dt + vol_sdt * z);
-            sum += S;
-            log_sum += std::log(S);
+            arith_acc += S;
+            log_acc += std::log(S);
         }
-        const double arith = sum / static_cast<double>(p.num_steps);
-        const double geom = std::exp(log_sum / static_cast<double>(p.num_steps));
+        const double inv_steps = 1.0 / static_cast<double>(p.num_steps);
+        const double arith = arith_acc * inv_steps;
+        const double geom = std::exp(log_acc * inv_steps);
 
         double payoff = 0.0;
         if (fixed_strike) {
@@ -67,6 +70,23 @@ asian::McStatistic price_mc(const McParams& p) {
             const double geo_disc = df_r * geo_payoff;
             sample += (geo_cf - geo_disc);
         }
+        return sample;
+    };
+
+    std::vector<double> antithetic_draws(static_cast<std::size_t>(p.num_steps));
+
+    for (std::uint64_t i = 0; i < p.num_paths; ++i) {
+        for (int t = 0; t < p.num_steps; ++t) {
+            normals[static_cast<std::size_t>(t)] = normal(rng);
+        }
+        double sample = run_path(normals);
+        if (p.antithetic) {
+            for (int t = 0; t < p.num_steps; ++t) {
+                antithetic_draws[static_cast<std::size_t>(t)] = -normals[static_cast<std::size_t>(t)];
+            }
+            const double antithetic_sample = run_path(antithetic_draws);
+            sample = 0.5 * (sample + antithetic_sample);
+        }
         acc.add(sample);
     }
 
@@ -78,5 +98,3 @@ asian::McStatistic price_mc(const McParams& p) {
 }
 
 } // namespace quant::asian
-
-
