@@ -1,6 +1,7 @@
 #include "quant/pde_barrier.hpp"
 
 #include "quant/black_scholes.hpp"
+#include "quant/grid_utils.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -66,16 +67,19 @@ GridResult solve_knockout_grid(const BarrierPdeParams& params, ::quant::OptionTy
         }
     }
 
-    const double x_min = std::log(S_lower);
-    const double x_max = std::log(S_upper);
-    const double dx = (x_max - x_min) / (M - 1);
-
-    std::vector<double> X(M);
-    std::vector<double> S(M);
-    for (int i = 0; i < M; ++i) {
-        X[i] = x_min + i * dx;
-        S[i] = std::exp(X[i]);
-    }
+    quant::grid_utils::StretchedGridParams grid_params{
+        .nodes = M,
+        .lower = S_lower,
+        .upper = S_upper,
+        .anchor = params.strike,
+        .stretch = 0.0,
+        .log_space = true
+    };
+    auto grid = quant::grid_utils::build_space_grid(grid_params);
+    const double x_min = grid.coordinate.front();
+    const double dx = (grid.coordinate.size() > 1)
+        ? (grid.coordinate[1] - grid.coordinate[0])
+        : 0.0;
 
     std::vector<double> V(M);
     for (int i = 0; i < M; ++i) {
@@ -85,8 +89,8 @@ GridResult solve_knockout_grid(const BarrierPdeParams& params, ::quant::OptionTy
             V[i] = params.barrier.rebate;
         } else {
             const double payoff = (opt == ::quant::OptionType::Call)
-                                      ? std::max(0.0, S[i] - params.strike)
-                                      : std::max(0.0, params.strike - S[i]);
+                                      ? std::max(0.0, grid.spot[i] - params.strike)
+                                      : std::max(0.0, params.strike - grid.spot[i]);
             V[i] = payoff;
         }
     }
@@ -140,7 +144,7 @@ GridResult solve_knockout_grid(const BarrierPdeParams& params, ::quant::OptionTy
 
         V = solve_tridiagonal(a, b, c, d);
     }
-    GridResult out{S, V, x_min, dx};
+    GridResult out{grid.spot, V, x_min, dx};
     return out;
 }
 

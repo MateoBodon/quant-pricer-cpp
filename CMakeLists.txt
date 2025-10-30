@@ -93,6 +93,7 @@ add_library(quant_pricer
   src/black_scholes.cpp
   src/mc.cpp
   src/pde.cpp
+  src/grid_utils.cpp
   src/bs_barrier_rr.cpp
   src/mc_barrier.cpp
   src/pde_barrier.cpp
@@ -137,6 +138,7 @@ add_executable(unit_tests
   tests/test_pde.cpp
   tests/test_barrier.cpp
   tests/test_american.cpp
+  tests/test_grid_utils.cpp
   tests/test_digital.cpp
   tests/test_asian.cpp
   tests/test_term_structures.cpp
@@ -148,7 +150,17 @@ add_executable(unit_tests
 target_sources(unit_tests PRIVATE tests/test_lookback.cpp)
 target_link_libraries(unit_tests PRIVATE quant_pricer GTest::gtest_main)
 include(GoogleTest)
-gtest_discover_tests(unit_tests)
+gtest_add_tests(TARGET unit_tests TEST_LIST unit_test_list)
+
+foreach(test_name ${unit_test_list})
+  if(test_name MATCHES "^.*Slow\\.")
+    set_tests_properties(${test_name} PROPERTIES LABELS "SLOW")
+  elseif(test_name MATCHES "^.*Fast\\.")
+    set_tests_properties(${test_name} PROPERTIES LABELS "FAST")
+  else()
+    set_tests_properties(${test_name} PROPERTIES LABELS "FAST")
+  endif()
+endforeach()
 
 # Benchmarks
 add_executable(micro_bench benchmarks/bench_sanity.cpp)
@@ -159,6 +171,13 @@ target_link_libraries(bench_mc PRIVATE quant_pricer benchmark::benchmark)
 
 add_executable(bench_pde benchmarks/bench_pde.cpp)
 target_link_libraries(bench_pde PRIVATE quant_pricer benchmark::benchmark)
+
+add_test(NAME bench_micro COMMAND micro_bench --benchmark_min_time=0.01 --benchmark_repetitions=1 --benchmark_format=json)
+add_test(NAME bench_mc_run COMMAND bench_mc --benchmark_min_time=0.01 --benchmark_repetitions=1 --benchmark_format=json)
+add_test(NAME bench_pde_run COMMAND bench_pde --benchmark_min_time=0.01 --benchmark_repetitions=1 --benchmark_format=json)
+set_tests_properties(bench_micro PROPERTIES LABELS "BENCH" RESOURCE_LOCK CPU)
+set_tests_properties(bench_mc_run PROPERTIES LABELS "BENCH" RESOURCE_LOCK CPU)
+set_tests_properties(bench_pde_run PROPERTIES LABELS "BENCH" RESOURCE_LOCK CPU)
 
 # Apply sanitizer flags to targets if requested
 if(SANITIZER_COMPILE_FLAGS OR SANITIZER_LINK_FLAGS)
