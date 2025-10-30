@@ -52,7 +52,7 @@ def main() -> None:
             reader = list(csv.DictReader(fh))
         if len(reader) <= 5:
             raise AssertionError("Expected >5 rows in Heston fit CSV")
-        required_cols = {"strike", "ttm", "market_iv", "model_iv", "abs_vol_error"}
+        required_cols = {"strike", "ttm", "market_iv", "model_iv", "abs_error"}
         missing = required_cols - set(reader[0].keys())
         if missing:
             raise AssertionError(f"Missing columns in Heston fit CSV: {sorted(missing)}")
@@ -76,6 +76,8 @@ def main() -> None:
     latest = runs[-1]
     if latest.get("seed") != 17:
         raise AssertionError("Manifest heston entry missing seed 17")
+    if "rmspe_vol_pct" not in latest:
+        raise AssertionError("Manifest heston entry missing rmspe_vol_pct")
     inputs = latest.get("inputs", [])
     if not inputs or not inputs[0].get("sha256"):
         raise AssertionError("Manifest heston entry missing input SHA256")
