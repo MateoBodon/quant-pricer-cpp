@@ -1,17 +1,17 @@
-# Validation Highlights (current `scripts/demo.sh` bundle)
+# Validation Highlights (current `scripts/reproduce_all.sh` bundle)
 
-This document distills the highest-leverage outputs emitted by `scripts/demo.sh`.
+This document distills the highest-leverage outputs emitted by `scripts/reproduce_all.sh`.
 Regenerate it after significant algorithmic changes:
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
-./scripts/demo.sh
+./scripts/reproduce_all.sh
 ```
 
-All raw CSVs/PNGs/PDFs live in `artifacts/`, while `artifacts/manifest.json`
-now records the git SHA, compiler, build flags, platform details, every CLI
-command executed by the demo script, and the seeds/resolutions used for each
+All raw CSVs/PNGs/PDFs live in `docs/artifacts/`, while `docs/artifacts/manifest.json`
+records the git SHA, compiler, build flags, platform details, every CLI
+command executed by the reproduction script, and the seeds/resolutions used for each
 pricing sweep.
 
 ## Highlights at a glance
@@ -25,7 +25,7 @@ pricing sweep.
 - **Greeks with Confidence Bands:** `artifacts/greeks_ci.csv` records Delta,
   Vega, Gamma (LR + mixed), and Theta (LR) with standard errors and 95 % CIs.
   The companion PNG visualises the bands and spotlights estimator stability.
-- **Offline-safe artifacts:** The demo script never `pip install`s matplotlib.
+- **Offline-safe artifacts:** The reproduction script never `pip install`s matplotlib.
   If plotting libraries are absent it still writes every CSV, logging which PNG/
   PDF outputs were skipped.
 
@@ -77,7 +77,7 @@ comparison with Black–Scholes analytics.
 
 ## Artifact index
 
-- `artifacts/manifest.json` – reproducibility metadata (compiler, flags,
+- `docs/artifacts/manifest.json` – reproducibility metadata (compiler, flags,
   platform, executed commands, MC/Heston/Greeks/American seeds & summaries).
 - `qmc_vs_prng.csv` / `.png` – MC RMSE comparison.
 - `heston_qe_convergence.csv` / `.png` – Andersen QE vs Euler convergence.
@@ -86,5 +86,5 @@ comparison with Black–Scholes analytics.
 - `american_convergence.csv` / `.png` – PSOR/binomial/LSMC agreement.
 - `barrier_validation.csv` / `.png` – MC + PDE vs Reiner–Rubinstein.
 
-> Regenerate with `./scripts/demo.sh` whenever pricing engines or RNGs change
+> Regenerate with `./scripts/reproduce_all.sh` whenever pricing engines or RNGs change
 > so recruiters and reviewers always see current evidence.

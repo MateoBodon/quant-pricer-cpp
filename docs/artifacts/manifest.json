@@ -1,0 +1,620 @@
+{
+  "build": {
+    "available": true,
+    "compiler_id": "unknown",
+    "compiler_path": "/usr/bin/c++",
+    "compiler_version": "unknown",
+    "cxx_flags": "",
+    "cxx_flags_release": "-O3 -DNDEBUG",
+    "generator": "Unix Makefiles"
+  },
+  "generated_at": "2025-11-10T20:26:45.519886+00:00",
+  "git": {
+    "branch": "resume-polish-nightly",
+    "dirty": true,
+    "sha": "a9ca584f5977d9b67857ffcaed083696391bf8f0"
+  },
+  "omp_threads": 11,
+  "runs": {
+    "greeks_reliability": {
+      "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/greeks_reliability.py --fast --seed 1337",
+      "fast": true,
+      "output_csv": "artifacts/greeks_reliability.csv",
+      "output_png": "artifacts/greeks_reliability.png",
+      "paths": [
+        1000,
+        2000,
+        5000,
+        10000,
+        20000
+      ],
+      "rows": 25,
+      "seed": 1337,
+      "spec": {
+        "bump": 0.01,
+        "dividend": 0.0,
+        "rate": 0.015,
+        "spot": 100.0,
+        "strike": 100.0,
+        "time": 0.5,
+        "vol": 0.2
+      }
+    },
+    "heston": [
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/calibrate_heston.py --input /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp2xc1bdtg",
+        "cost": 0.10009447672986851,
+        "csv_rows": 12,
+        "date": "2024-06-14",
+        "diagnostics": {
+          "attempts": [
+            {
+              "feller": -0.005343760505443038,
+              "nit": 39,
+              "rmse_price": 159.96845408718906,
+              "rmse_vol": 0.11992444527012011,
+              "success": true
+            },
+            {
+              "feller": -0.05673983605830059,
+              "nit": 43,
+              "rmse_price": 338.64494000410747,
+              "rmse_vol": 0.187351323194217,
+              "success": true
+            }
+          ],
+          "feller_violation": true,
+          "param_transform": "exp",
+          "residual_norm": 0.44742480201676016,
+          "retry_failures": 0,
+          "warnings": [],
+          "weight_mode": "vega"
+        },
+        "fast": true,
+        "feller": -0.005343760505443038,
+        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp2xc1bdtg/fit_20240614.png",
+        "input": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv",
+        "inputs": [
+          {
+            "path": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv",
+            "sha256": "30ff14ae7a297f00258bf70625d799ddac2ed90cf8e80bda1516ed75b6095af5",
+            "size_bytes": 1133
+          }
+        ],
+        "max_evals": 200,
+        "metric": "price",
+        "n_maturities": 2,
+        "n_obs": 12,
+        "n_strikes": 6,
+        "nit": 39,
+        "param_transform": "exp",
+        "params": {
+          "kappa": 2.035104134786584,
+          "rho": -0.9309382067772419,
+          "sigma": 0.08590031804498527,
+          "theta": 0.0005,
+          "v0": 0.0005
+        },
+        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp2xc1bdtg/params_20240614.json",
+        "retries": 2,
+        "rmse_price": 159.96845408718906,
+        "rmse_vol": 0.11992444527012011,
+        "rmspe_price": 0.7346817233576017,
+        "rmspe_price_pct": 73.46817233576017,
+        "rmspe_vol": 0.5456505978852593,
+        "rmspe_vol_pct": 54.56505978852593,
+        "seed": 19,
+        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp2xc1bdtg/fit_20240614.csv",
+        "warnings": [
+          "WARNING: Feller condition violated (-0.0053) for 2024-06-14"
+        ],
+        "weight_mode": "vega"
+      }
+    ],
+    "heston_params_series": {
+      "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/heston_series_plot.py --inputs /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/normalized/spy_20230601.csv /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv --metric price --fast --seed 23 --retries 2",
+      "dates": [
+        "2023-06-01",
+        "2024-06-14"
+      ],
+      "fast": true,
+      "input_descriptors": [
+        {
+          "path": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/normalized/spy_20230601.csv",
+          "sha256": "2d0cef0a1adf659a5bf35648d943fc814e610cc2b27cbdcc3299b46acb435677",
+          "size_bytes": 3750
+        },
+        {
+          "path": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv",
+          "sha256": "30ff14ae7a297f00258bf70625d799ddac2ed90cf8e80bda1516ed75b6095af5",
+          "size_bytes": 1133
+        }
+      ],
+      "inputs": [
+        "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/normalized/spy_20230601.csv",
+        "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv"
+      ],
+      "max_evals": 200,
+      "metric": "price",
+      "num_dates": 2,
+      "output_csv": "artifacts/heston/params_series.csv",
+      "output_png": "artifacts/heston/params_series.png",
+      "param_transform": "none",
+      "retries": 2,
+      "rows": [
+        {
+          "date": "2023-06-01",
+          "diagnostics": {
+            "attempts": [
+              {
+                "feller": -0.07518417034671439,
+                "nit": 35,
+                "rmse_price": 1.1343051342403954,
+                "rmse_vol": 0.12470152429946556,
+                "success": true
+              },
+              {
+                "feller": 0.1791473412475974,
+                "nit": 34,
+                "rmse_price": 3.3314514240925255,
+                "rmse_vol": 0.2508072303065874,
+                "success": true
+              }
+            ],
+            "feller_violation": true,
+            "param_transform": "none",
+            "residual_norm": 31.846341748038945,
+            "retry_failures": 0,
+            "warnings": [],
+            "weight_mode": "iv"
+          },
+          "fast_mode": true,
+          "figure_png": "artifacts/heston/series_runs/fit_20230601.png",
+          "input_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/normalized/spy_20230601.csv",
+          "kappa": 1.6484025390983532,
+          "metric": "price",
+          "n_maturities": 2,
+          "n_obs": 12,
+          "n_strikes": 12,
+          "param_transform": "none",
+          "params_json": "artifacts/heston/series_runs/params_20230601.json",
+          "rho": -0.7035309937703432,
+          "rmse_price": 1.1343051342403954,
+          "rmse_vol": 0.12470152429946556,
+          "rmspe_vol_pct": 71.53087378814116,
+          "sigma_v": 0.38217521830033574,
+          "table_csv": "artifacts/heston/series_runs/fit_20230601.csv",
+          "theta": 0.02149770018401014,
+          "v0": 0.0005000099236458892,
+          "weight_mode": "iv"
+        },
+        {
+          "date": "2024-06-14",
+          "diagnostics": {
+            "attempts": [
+              {
+                "feller": -1.0779877352127496,
+                "nit": 6,
+                "rmse_price": 302.90194069460176,
+                "rmse_vol": 0.24757414515945902,
+                "success": true
+              },
+              {
+                "feller": -0.083673026525652,
+                "nit": 2,
+                "rmse_price": 4708.51132008983,
+                "rmse_vol": 1.0935315341463807,
+                "success": true
+              }
+            ],
+            "feller_violation": true,
+            "param_transform": "none",
+            "residual_norm": 34641.016151377546,
+            "retry_failures": 0,
+            "warnings": [],
+            "weight_mode": "iv"
+          },
+          "fast_mode": true,
+          "figure_png": "artifacts/heston/series_runs/fit_20240614.png",
+          "input_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv",
+          "kappa": -0.8367302742973648,
+          "metric": "price",
+          "n_maturities": 2,
+          "n_obs": 12,
+          "n_strikes": 6,
+          "param_transform": "none",
+          "params_json": "artifacts/heston/series_runs/params_20240614.json",
+          "rho": -0.7156277815850614,
+          "rmse_price": 302.90194069460176,
+          "rmse_vol": 0.24757414515945902,
+          "rmspe_vol_pct": 108.10290968720003,
+          "sigma_v": -0.81550639964861,
+          "table_csv": "artifacts/heston/series_runs/fit_20240614.csv",
+          "theta": 0.2467563682285014,
+          "v0": -0.07017285399063108,
+          "weight_mode": "iv"
+        }
+      ],
+      "seed": 23,
+      "weight_mode": "iv"
+    },
+    "heston_qe_vs_analytic": {
+      "analytic": 0.520525,
+      "commands": [
+        "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04 100.0 100.0 0.01 0.0 1.0 40000 16 2025 --mc --json --heston-qe --rng=counter",
+        "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04 100.0 100.0 0.01 0.0 1.0 40000 32 2025 --mc --json --heston-qe --rng=counter",
+        "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04 100.0 100.0 0.01 0.0 1.0 40000 64 2025 --mc --json --heston-qe --rng=counter",
+        "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04 100.0 100.0 0.01 0.0 1.0 40000 16 2025 --mc --json --heston-euler --rng=counter",
+        "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04 100.0 100.0 0.01 0.0 1.0 40000 32 2025 --mc --json --heston-euler --rng=counter",
+        "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/quant_cli heston 1.5 0.04 0.5 -0.5 0.04 100.0 100.0 0.01 0.0 1.0 40000 64 2025 --mc --json --heston-euler --rng=counter"
+      ],
+      "csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/heston_qe_vs_analytic.csv",
+      "figure": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/heston_qe_vs_analytic.png",
+      "paths": 40000,
+      "results": [
+        {
+          "abs_error": 8.402735000000002,
+          "ci_high": 8.98076,
+          "ci_low": 8.86575,
+          "paths": 40000,
+          "price": 8.92326,
+          "scheme": "qe",
+          "std_error": 0.0293388,
+          "steps": 16
+        },
+        {
+          "abs_error": 8.351325000000001,
+          "ci_high": 8.93031,
+          "ci_low": 8.8134,
+          "paths": 40000,
+          "price": 8.87185,
+          "scheme": "qe",
+          "std_error": 0.0298264,
+          "steps": 32
+        },
+        {
+          "abs_error": 8.318705000000001,
+          "ci_high": 8.8981,
+          "ci_low": 8.78037,
+          "paths": 40000,
+          "price": 8.83923,
+          "scheme": "qe",
+          "std_error": 0.0300361,
+          "steps": 64
+        },
+        {
+          "abs_error": 7.492605,
+          "ci_high": 8.07546,
+          "ci_low": 7.95081,
+          "paths": 40000,
+          "price": 8.01313,
+          "scheme": "euler",
+          "std_error": 0.0318015,
+          "steps": 16
+        },
+        {
+          "abs_error": 7.375475,
+          "ci_high": 7.95636,
+          "ci_low": 7.83565,
+          "paths": 40000,
+          "price": 7.896,
+          "scheme": "euler",
+          "std_error": 0.030795,
+          "steps": 32
+        },
+        {
+          "abs_error": 7.281035,
+          "ci_high": 7.86114,
+          "ci_low": 7.74197,
+          "paths": 40000,
+          "price": 7.80156,
+          "scheme": "euler",
+          "std_error": 0.0303993,
+          "steps": 64
+        }
+      ],
+      "seed": 2025,
+      "step_grid": [
+        16,
+        32,
+        64
+      ]
+    },
+    "mc_greeks_ci": {
+      "antithetic": true,
+      "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/quant_cli mc 100.0 100.0 0.02 0.0 0.2 1.0 100000 2025 1 none none 1 --greeks --ci --rng=counter --json",
+      "csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/mc_greeks_ci.csv",
+      "figure": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/mc_greeks_ci.png",
+      "paths": 100000,
+      "price": 8.95405,
+      "records": [
+        {
+          "ci_high": 0.579246,
+          "ci_low": 0.578326,
+          "estimate": 0.578786,
+          "greek": "Delta",
+          "std_error": 0.000234699
+        },
+        {
+          "ci_high": 39.5287,
+          "ci_low": 37.2521,
+          "estimate": 38.3904,
+          "greek": "Vega",
+          "std_error": 0.580767
+        },
+        {
+          "ci_high": 0.0197644,
+          "ci_low": 0.0186261,
+          "estimate": 0.0191952,
+          "greek": "Gamma (LRM)",
+          "std_error": 0.000290384
+        },
+        {
+          "ci_high": 0.0195511,
+          "ci_low": 0.0192737,
+          "estimate": 0.0194124,
+          "greek": "Gamma (pathwise)",
+          "std_error": 7.07596e-05
+        },
+        {
+          "ci_high": -4.83595,
+          "ci_low": -4.89144,
+          "estimate": -4.86369,
+          "greek": "Theta",
+          "std_error": 0.0141542
+        }
+      ],
+      "rng": "counter",
+      "seed": 2025,
+      "std_error": 0.0152195,
+      "steps": 1
+    },
+    "parity_checks": [
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      }
+    ],
+    "pde_convergence": {
+      "analytic": 8.916037278572539,
+      "command": "/usr/local/bin/python3 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/pde_convergence.py --fast --skip-build --output /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/pde_convergence.png --csv /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/pde_convergence.csv",
+      "csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/pde_convergence.csv",
+      "dividend": 0.0,
+      "fast": true,
+      "figure": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/pde_convergence.png",
+      "intercept": 5.2992669376888495,
+      "nodes": [
+        101,
+        201,
+        401
+      ],
+      "rate": 0.02,
+      "records": [
+        {
+          "abs_error": 0.01855727857253875,
+          "nodes": 101,
+          "price": 8.89748,
+          "timesteps": 100
+        },
+        {
+          "abs_error": 0.004627278572538529,
+          "nodes": 201,
+          "price": 8.91141,
+          "timesteps": 200
+        },
+        {
+          "abs_error": 0.001157278572538445,
+          "nodes": 401,
+          "price": 8.91488,
+          "timesteps": 400
+        }
+      ],
+      "slope": -2.012404848802818,
+      "spot": 100.0,
+      "strike": 100.0,
+      "tenor": 1.0,
+      "vol": 0.2
+    },
+    "qmc_vs_prng": {
+      "asian_steps": 12,
+      "command": "/usr/local/bin/python3 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/qmc_vs_prng.py --fast --output /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/qmc_vs_prng.png --csv /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/qmc_vs_prng.csv",
+      "csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/qmc_vs_prng.csv",
+      "csv_rows": 8,
+      "fast": true,
+      "figure": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/qmc_vs_prng.png",
+      "generated_at": "2025-11-10T20:26:39.287354+00:00",
+      "inputs": [],
+      "paths": [
+        256,
+        512,
+        1024,
+        2048
+      ],
+      "reps": 6,
+      "seed": 4242,
+      "slopes": {
+        "asian": {
+          "prng": -0.2899400495329492,
+          "qmc": -0.6213101436821864
+        },
+        "call": {
+          "prng": -0.16084506232634005,
+          "qmc": -0.8582104415501778
+        }
+      }
+    }
+  },
+  "system": {
+    "cpu_brand": "Apple M3 Pro",
+    "cpu_count": 11,
+    "machine": "arm64",
+    "platform": "Darwin",
+    "processor": "arm",
+    "python": "3.12.2",
+    "release": "25.0.0"
+  }
+}

@@ -15,11 +15,11 @@ cmake --build build --parallel
 ctest --test-dir build --output-on-failure
 ```
 
-## Demo artifacts
+## Validation artifacts
 
 ```bash
-./scripts/demo.sh
-ls -1 artifacts
+./scripts/reproduce_all.sh
+ls -1 docs/artifacts
 ```
 
 ## Coding style
