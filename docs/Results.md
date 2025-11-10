@@ -42,6 +42,17 @@ Current QE runs still exhibit a large bias versus the analytic reference (CLI em
 - Data: [artifacts/heston_qe_vs_analytic.csv](artifacts/heston_qe_vs_analytic.csv)
 - Manifest entry: `runs.heston_qe_vs_analytic`
 
+## WRDS OptionMetrics Snapshot (Opt-in)
+
+The WRDS pipeline ingests a single SPX trading day (OptionMetrics), bins mid IVs by tenor/moneyness, performs a coarse Heston calibration, and emits only aggregated diagnostics. MARKET tests (`ctest -L MARKET`) are gated by `WRDS_ENABLED=1` plus credentials; without them we fall back to the bundled sample file so the CSVs stay reproducible.
+
+- Surface buckets: [artifacts/wrds/spx_surface_sample.csv](artifacts/wrds/spx_surface_sample.csv)
+- Calibration summary: [artifacts/wrds/heston_calibration_summary.csv](artifacts/wrds/heston_calibration_summary.csv)
+- OOS diagnostics: [artifacts/wrds/oos_pricing.csv](artifacts/wrds/oos_pricing.csv) / [artifacts/wrds/oos_pricing_summary.csv](artifacts/wrds/oos_pricing_summary.csv)
+- Delta hedge trace: [artifacts/wrds/delta_hedge_pnl.csv](artifacts/wrds/delta_hedge_pnl.csv)
+
+Regenerate offline with `RUN_WRDS_PIPELINE=1 ./scripts/reproduce_all.sh` (forces the sample fallback) or call `python wrds_pipeline/pipeline.py --use-sample` directly. Remove `--use-sample` and export the WRDS env vars to hit the live database.
+
 ## Manifest & determinism
 
 [`artifacts/manifest.json`](artifacts/manifest.json) records the git SHA, compiler/flag metadata, CPU info, RNG modes, and the exact CLI invocations behind every plot above. CI appends to the same manifest so reviewers can diff the bundle before shipping changes.

@@ -8,11 +8,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-11-10T20:41:11.316989+00:00",
+  "generated_at": "2025-11-10T20:57:54.734941+00:00",
   "git": {
     "branch": "resume-polish-nightly",
     "dirty": true,
-    "sha": "2de7ad5796d233d1a96edcb957866318647c1e2f"
+    "sha": "b1af3106d88a5becd57fa2eae7a584a5d3d02201"
   },
   "omp_threads": 11,
   "runs": {
@@ -673,7 +673,22 @@
           "qmc": -1.3633402856716317
         }
       }
-    }
+    },
+    "wrds_pipeline": [
+      {
+        "atm_iv": 0.155,
+        "calibration": "docs/artifacts/wrds/heston_calibration_summary.csv",
+        "delta_hedge": "docs/artifacts/wrds/delta_hedge_pnl.csv",
+        "oos_pricing": "docs/artifacts/wrds/oos_pricing.csv",
+        "oos_summary": "docs/artifacts/wrds/oos_pricing_summary.csv",
+        "rmse_iv": 0.011592023119369627,
+        "rows": 9,
+        "source": "sample",
+        "surface": "docs/artifacts/wrds/spx_surface_sample.csv",
+        "timestamp": "2025-11-10T20:53:38.283798+00:00",
+        "use_sample": true
+      }
+    ]
   },
   "system": {
     "cpu_brand": "Apple M3 Pro",

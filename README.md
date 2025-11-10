@@ -890,6 +890,17 @@ pde_params.grid = {401, 400, 6.0};  // Higher resolution
 pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 ```
 
+### WRDS (OptionMetrics) Pipeline
+
+Opt-in MARKET tests under `wrds_pipeline/` pull (or fall back to synthetic samples), aggregate the SPX surface, run a lightweight Heston calibration, and emit anonymised CSVs under `docs/artifacts/wrds/`. Set `WRDS_ENABLED=1` together with `WRDS_USERNAME` / `WRDS_PASSWORD` to enable `ctest -L MARKET`; otherwise the tests are skipped. Key artifacts (all aggregated / anonymised):
+
+- [`docs/artifacts/wrds/spx_surface_sample.csv`](docs/artifacts/wrds/spx_surface_sample.csv) – grouped mid IV by moneyness/tenor
+- [`docs/artifacts/wrds/heston_calibration_summary.csv`](docs/artifacts/wrds/heston_calibration_summary.csv) – heuristic parameters + RMSE
+- [`docs/artifacts/wrds/oos_pricing.csv`](docs/artifacts/wrds/oos_pricing.csv) + summary – out-of-sample diagnostics
+- [`docs/artifacts/wrds/delta_hedge_pnl.csv`](docs/artifacts/wrds/delta_hedge_pnl.csv) – synthetic hedge P&L trace
+
+Regenerate the public demo bundle with `RUN_WRDS_PIPELINE=1 ./scripts/reproduce_all.sh` (forces the sample fallback) or run `python wrds_pipeline/pipeline.py` without `--use-sample` when the WRDS credentials are present to hit the live database.
+
 ---
 
 ## Limitations
