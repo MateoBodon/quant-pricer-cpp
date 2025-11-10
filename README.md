@@ -4,6 +4,7 @@
 
 [![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag)](https://github.com/MateoBodon/quant-pricer-cpp/releases)
+[![codecov](https://codecov.io/gh/MateoBodon/quant-pricer-cpp/branch/main/graph/badge.svg)](https://codecov.io/gh/MateoBodon/quant-pricer-cpp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Docs](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/docs-pages.yml/badge.svg?branch=main)](https://mateobodon.github.io/quant-pricer-cpp/)
 [![Reproducibility](https://img.shields.io/badge/reproducibility-manifest-blue)](docs/artifacts/manifest.json)
@@ -779,6 +780,8 @@ File | What it shows
 ---
 
 ## Testing & CI
+
+The CI matrix covers linting, multi-platform Release builds, sanitizers, and a dedicated coverage job (Debug + gcovr + Codecov). FAST tests gate CI; SLOW tests run locally before publishing artifacts, and `./scripts/reproduce_all.sh` drops the verbose logs plus JUnit under `docs/artifacts/logs/slow_<timestamp>.{log,xml}` so regressions can be diffed later.
 
 ### Comprehensive Test Suite
 

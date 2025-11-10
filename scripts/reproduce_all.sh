@@ -5,8 +5,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-${ROOT}/build}"
 BUILD_TYPE="${BUILD_TYPE:-Release}"
 ARTIFACT_DIR="${ARTIFACT_DIR:-${ROOT}/docs/artifacts}"
+LOG_DIR="${LOG_DIR:-${ARTIFACT_DIR}/logs}"
+TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 
-mkdir -p "${ARTIFACT_DIR}"
+mkdir -p "${ARTIFACT_DIR}" "${LOG_DIR}"
 
 echo "[reproduce] configuring ${BUILD_TYPE} build in ${BUILD_DIR}"
 cmake -S "${ROOT}" -B "${BUILD_DIR}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
@@ -16,8 +18,10 @@ echo "[reproduce] running FAST tests (label=FAST)"
 CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir "${BUILD_DIR}" -L FAST --output-on-failure -VV
 
 if [[ "${SKIP_SLOW:-0}" != "1" ]]; then
-  echo "[reproduce] running SLOW tests (label=SLOW)"
-  CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir "${BUILD_DIR}" -L SLOW --output-on-failure -VV
+  slow_log="${LOG_DIR}/slow_${TIMESTAMP}.log"
+  slow_junit="${LOG_DIR}/slow_${TIMESTAMP}.xml"
+  echo "[reproduce] running SLOW tests (label=SLOW) -> ${slow_log}"
+  CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir "${BUILD_DIR}" -L SLOW --output-on-failure -VV --output-junit "${slow_junit}" | tee "${slow_log}"
 else
   echo "[reproduce] skipping SLOW tests (SKIP_SLOW=1)"
 fi

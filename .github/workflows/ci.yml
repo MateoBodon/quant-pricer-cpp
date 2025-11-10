@@ -44,6 +44,57 @@ jobs:
       - name: Test (FAST tier)
         run: ctest --test-dir build --output-on-failure -C Release -L FAST
 
+  coverage:
+    needs: lint
+    name: Coverage (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install gcovr
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install gcovr
+      - name: Configure (coverage flags)
+        env:
+          CC: gcc
+          CXX: g++
+        run: >
+          cmake -S . -B build-cov -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_CXX_FLAGS="--coverage"
+          -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+          -DCMAKE_SHARED_LINKER_FLAGS="--coverage"
+      - name: Build
+        run: cmake --build build-cov --parallel
+      - name: Test (FAST tier)
+        run: ctest --test-dir build-cov --output-on-failure -L FAST
+      - name: Generate coverage report
+        run: |
+          gcovr -r . \
+            --xml -o build-cov/coverage.xml \
+            --html --html-details -o build-cov/coverage.html \
+            --txt -o build-cov/coverage.txt \
+            --filter='src/' --filter='include/' \
+            --exclude='external/' --exclude='tests/'
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            build-cov/coverage.xml
+            build-cov/coverage.html
+            build-cov/coverage.txt
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: build-cov/coverage.xml
+          flags: unittests
+          fail_ci_if_error: true
+
   sanitizers:
     needs: lint
     name: Sanitizers (Ubuntu, Clang)
