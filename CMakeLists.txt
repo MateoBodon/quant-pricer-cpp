@@ -223,6 +223,12 @@ add_test(
 )
 set_tests_properties(heston_safety_fast PROPERTIES LABELS "FAST")
 
+add_test(
+  NAME market_wrds_pipeline
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/wrds_pipeline/tests/test_wrds_pipeline.py
+)
+set_tests_properties(market_wrds_pipeline PROPERTIES LABELS "MARKET" SKIP_RETURN_CODE 77)
+
 # Apply sanitizer flags to targets if requested
 if(SANITIZER_COMPILE_FLAGS OR SANITIZER_LINK_FLAGS)
   foreach(tgt IN ITEMS quant_pricer quant_cli unit_tests micro_bench bench_mc bench_pde)

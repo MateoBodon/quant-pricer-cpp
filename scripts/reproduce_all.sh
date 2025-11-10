@@ -61,4 +61,15 @@ run_py "${ROOT}/scripts/pde_convergence.py" "${FAST_FLAGS[@]}" --skip-build --ou
 run_py "${ROOT}/scripts/mc_greeks_ci.py" "${FAST_FLAGS[@]}" --quant-cli "${QUANT_CLI}" --output "${ARTIFACT_DIR}/mc_greeks_ci.png" --csv "${ARTIFACT_DIR}/mc_greeks_ci.csv"
 run_py "${ROOT}/scripts/heston_qe_vs_analytic.py" "${FAST_FLAGS[@]}" --quant-cli "${QUANT_CLI}" --output "${ARTIFACT_DIR}/heston_qe_vs_analytic.png" --csv "${ARTIFACT_DIR}/heston_qe_vs_analytic.csv"
 
+if [[ "${RUN_WRDS_PIPELINE:-0}" == "1" ]]; then
+  extra_flags=()
+  if [[ "${WRDS_ENABLED:-0}" != "1" ]]; then
+    extra_flags+=(--use-sample)
+  fi
+  echo "[reproduce] running WRDS pipeline ${extra_flags[*]}"
+  python3 "${ROOT}/wrds_pipeline/pipeline.py" "${extra_flags[@]}"
+else
+  echo "[reproduce] skipping WRDS pipeline (set RUN_WRDS_PIPELINE=1 to enable with sample or credentials)."
+fi
+
 echo "[reproduce] artifacts available under ${ARTIFACT_DIR}"

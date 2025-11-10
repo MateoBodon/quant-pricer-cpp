@@ -21,3 +21,8 @@
 - Added a `bench` CMake target (`cmake --build build --target bench` / `make bench`), created `scripts/generate_bench_artifacts.py`, and captured the first JSON/CSV/PNG bundle under `docs/artifacts/bench/`.
 - Commands run: `cmake --build build --target bench`, `build/bench_mc --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_mc.json --benchmark_out_format=json`, `build/bench_pde --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_pde.json --benchmark_out_format=json`, `python3 scripts/generate_bench_artifacts.py`.
 - Artifacts: `docs/artifacts/bench/bench_mc.json`, `bench_pde.json`, the derived CSV/PNG quartet, and the corresponding manifest entry.
+
+## 2025-11-10 (WRDS pipeline)
+- Finished the opt-in WRDS pipeline (ingest + calibration + OOS/hedge diagnostics), added the MARKET ctest wrapper with skip gating, and wired `scripts/reproduce_all.sh` to optionally rebuild the sample bundle.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel && CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST --output-on-failure -VV`, `python3 wrds_pipeline/pipeline.py --use-sample`.
+- Artifacts: `docs/artifacts/wrds/{spx_surface_sample.csv,heston_calibration_summary.csv,oos_pricing.csv,oos_pricing_summary.csv,delta_hedge_pnl.csv}`, updated `docs/artifacts/manifest.json`.
