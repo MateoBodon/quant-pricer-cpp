@@ -66,6 +66,9 @@ if [[ "${RUN_WRDS_PIPELINE:-0}" == "1" ]]; then
   if [[ "${WRDS_ENABLED:-0}" != "1" ]]; then
     extra_flags+=(--use-sample)
   fi
+  wrds_symbol="${WRDS_SYMBOL:-SPX}"
+  wrds_trade_date="${WRDS_TRADE_DATE:-2023-06-14}"
+  extra_flags+=(--symbol "${wrds_symbol}" --trade-date "${wrds_trade_date}")
   echo "[reproduce] running WRDS pipeline ${extra_flags[*]}"
   python3 "${ROOT}/wrds_pipeline/pipeline.py" "${extra_flags[@]}"
 else
