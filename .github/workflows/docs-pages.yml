@@ -23,7 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install doxygen
+        with:
+          submodules: true
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Install Doxygen toolchain
         run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
       - name: Generate docs
         run: doxygen Doxyfile
