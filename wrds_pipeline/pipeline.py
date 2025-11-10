@@ -32,11 +32,11 @@ def _wrds_env_ready() -> bool:
     )
 
 
-def run(use_sample: bool = False) -> None:
+def run(symbol: str = "SPX", trade_date: str = "2023-06-14", use_sample: bool = False) -> None:
     out_dir = ARTIFACTS_ROOT / "wrds"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    surface_raw, source = ingest_sppx_surface.load_surface(force_sample=use_sample)
+    surface_raw, source = ingest_sppx_surface.load_surface(symbol=symbol, trade_date=trade_date, force_sample=use_sample)
     aggregated = ingest_sppx_surface.aggregate_surface(surface_raw)
     surface_path = out_dir / "spx_surface_sample.csv"
     ingest_sppx_surface.write_surface(surface_path, aggregated)
@@ -66,6 +66,8 @@ def run(use_sample: bool = False) -> None:
             "rmse_iv": summary["rmse_iv"],
             "rows": len(aggregated),
             "use_sample": use_sample,
+            "symbol": symbol,
+            "trade_date": trade_date,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         },
         append=True,
@@ -75,11 +77,13 @@ def run(use_sample: bool = False) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--use-sample", action="store_true", help="Force sample data")
+    ap.add_argument("--symbol", default="SPX", help="Option symbol to ingest (default: SPX)")
+    ap.add_argument("--trade-date", default="2023-06-14", help="Trade date (YYYY-MM-DD)")
     args = ap.parse_args()
     use_sample = args.use_sample or not _wrds_env_ready()
     if use_sample:
         os.environ.pop("WRDS_ENABLED", None)
-    run(use_sample=use_sample)
+    run(symbol=args.symbol.upper(), trade_date=args.trade_date, use_sample=use_sample)
 
 
 if __name__ == "__main__":  # pragma: no cover

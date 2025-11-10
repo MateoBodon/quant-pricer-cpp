@@ -899,7 +899,7 @@ Opt-in MARKET tests under `wrds_pipeline/` pull (or fall back to synthetic sampl
 - [`docs/artifacts/wrds/oos_pricing.csv`](docs/artifacts/wrds/oos_pricing.csv) + summary – out-of-sample diagnostics
 - [`docs/artifacts/wrds/delta_hedge_pnl.csv`](docs/artifacts/wrds/delta_hedge_pnl.csv) – synthetic hedge P&L trace
 
-Regenerate the public demo bundle with `RUN_WRDS_PIPELINE=1 ./scripts/reproduce_all.sh` (forces the sample fallback) or run `python wrds_pipeline/pipeline.py` without `--use-sample` when the WRDS credentials are present to hit the live database.
+Regenerate the public demo bundle with `RUN_WRDS_PIPELINE=1 ./scripts/reproduce_all.sh` (forces the sample fallback) or run `python wrds_pipeline/pipeline.py --symbol SPX --trade-date 2023-06-14` after exporting `WRDS_ENABLED=1`, `WRDS_USERNAME`, and `WRDS_PASSWORD`. The CLI automatically maps the trade date to the correct OptionMetrics annual table (e.g., `optionm.opprcd2023`).
 
 ---
 

@@ -23,6 +23,6 @@
 - Artifacts: `docs/artifacts/bench/bench_mc.json`, `bench_pde.json`, the derived CSV/PNG quartet, and the corresponding manifest entry.
 
 ## 2025-11-10 (WRDS pipeline)
-- Finished the opt-in WRDS pipeline (ingest + calibration + OOS/hedge diagnostics), added the MARKET ctest wrapper with skip gating, and wired `scripts/reproduce_all.sh` to optionally rebuild the sample bundle.
-- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel && CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST --output-on-failure -VV`, `python3 wrds_pipeline/pipeline.py --use-sample`.
+- Finished the opt-in WRDS pipeline (ingest + calibration + OOS/hedge diagnostics), added the MARKET ctest wrapper with skip gating, and wired `scripts/reproduce_all.sh` to optionally rebuild the sample bundle. Later updated ingestion to resolve `secid` via `optionm.secnmd`, target the year-partitioned `optionm.opprcdYYYY` tables, and filter to practical moneyness/tenor buckets so the live OptionMetrics pull hits real SPX data.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel && CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST --output-on-failure -VV`, `python3 wrds_pipeline/pipeline.py --use-sample`, `WRDS_ENABLED=1 WRDS_USERNAME=... WRDS_PASSWORD=... python3 wrds_pipeline/pipeline.py --symbol SPX --trade-date 2023-06-14`.
 - Artifacts: `docs/artifacts/wrds/{spx_surface_sample.csv,heston_calibration_summary.csv,oos_pricing.csv,oos_pricing_summary.csv,delta_hedge_pnl.csv}`, updated `docs/artifacts/manifest.json`.

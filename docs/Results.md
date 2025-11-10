@@ -44,14 +44,14 @@ Current QE runs still exhibit a large bias versus the analytic reference (CLI em
 
 ## WRDS OptionMetrics Snapshot (Opt-in)
 
-The WRDS pipeline ingests a single SPX trading day (OptionMetrics), bins mid IVs by tenor/moneyness, performs a coarse Heston calibration, and emits only aggregated diagnostics. MARKET tests (`ctest -L MARKET`) are gated by `WRDS_ENABLED=1` plus credentials; without them we fall back to the bundled sample file so the CSVs stay reproducible.
+The WRDS pipeline ingests a single SPX trading day (OptionMetrics IvyDB), bins mid IVs by tenor/moneyness, performs a coarse Heston calibration, and emits only aggregated diagnostics. MARKET tests (`ctest -L MARKET`) are gated by `WRDS_ENABLED=1` plus credentials; without them we fall back to the bundled sample file so the CSVs stay reproducible. When credentials are present we map the requested trade date to the year-partitioned OptionMetrics tables (e.g., `optionm.opprcd2023`) via the ticker’s `secid`.
 
 - Surface buckets: [artifacts/wrds/spx_surface_sample.csv](artifacts/wrds/spx_surface_sample.csv)
 - Calibration summary: [artifacts/wrds/heston_calibration_summary.csv](artifacts/wrds/heston_calibration_summary.csv)
 - OOS diagnostics: [artifacts/wrds/oos_pricing.csv](artifacts/wrds/oos_pricing.csv) / [artifacts/wrds/oos_pricing_summary.csv](artifacts/wrds/oos_pricing_summary.csv)
 - Delta hedge trace: [artifacts/wrds/delta_hedge_pnl.csv](artifacts/wrds/delta_hedge_pnl.csv)
 
-Regenerate offline with `RUN_WRDS_PIPELINE=1 ./scripts/reproduce_all.sh` (forces the sample fallback) or call `python wrds_pipeline/pipeline.py --use-sample` directly. Remove `--use-sample` and export the WRDS env vars to hit the live database.
+Regenerate offline with `RUN_WRDS_PIPELINE=1 ./scripts/reproduce_all.sh` (forces the sample fallback) or call `python wrds_pipeline/pipeline.py --symbol SPX --trade-date 2023-06-14` after exporting the WRDS env vars to hit the live database. Use `--use-sample` to stay offline.
 
 ## Manifest & determinism
 
