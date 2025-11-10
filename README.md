@@ -5,7 +5,7 @@
 [![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag)](https://github.com/MateoBodon/quant-pricer-cpp/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-Doxygen-blue)](https://mateobodon.github.io/quant-pricer-cpp/)
+[![Docs](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/docs-pages.yml/badge.svg?branch=main)](https://mateobodon.github.io/quant-pricer-cpp/)
 [![Reproducibility](https://img.shields.io/badge/reproducibility-manifest-blue)](artifacts/manifest.json)
 
 **TL;DR:** A fast, tested C++ pricer that cross-checks three independent methods (analytic / MC / PDE), exposes Greeks via pathwise & likelihood-ratio estimators, and ships with benchmarks and convergence reports so results are both correct and reproducible.
