@@ -16,3 +16,8 @@
 - Added a CI coverage job (Debug + `gcovr` + Codecov badge) and taught `scripts/reproduce_all.sh` to capture SLOW `ctest` logs/JUnit under `docs/artifacts/logs/`.
 - Commands run: repeated `cmake ... && ctest -L FAST` cycles plus `REPRO_FAST=1 ./scripts/reproduce_all.sh` to generate the first archived SLOW log bundle.
 - Artifacts: `docs/artifacts/logs/slow_20251110T203245Z.{log,xml}` and updated `docs/artifacts/manifest.json`.
+
+## 2025-11-10 (benchmarks)
+- Added a `bench` CMake target (`cmake --build build --target bench` / `make bench`), created `scripts/generate_bench_artifacts.py`, and captured the first JSON/CSV/PNG bundle under `docs/artifacts/bench/`.
+- Commands run: `cmake --build build --target bench`, `build/bench_mc --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_mc.json --benchmark_out_format=json`, `build/bench_pde --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_pde.json --benchmark_out_format=json`, `python3 scripts/generate_bench_artifacts.py`.
+- Artifacts: `docs/artifacts/bench/bench_mc.json`, `bench_pde.json`, the derived CSV/PNG quartet, and the corresponding manifest entry.
