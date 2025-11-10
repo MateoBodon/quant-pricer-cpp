@@ -38,7 +38,7 @@ def main() -> None:
         ]
         subprocess.check_call(cmd, cwd=repo_root)
 
-    manifest_path = repo_root / "artifacts" / "manifest.json"
+    manifest_path = repo_root / "docs" / "artifacts" / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
     runs = manifest.get("runs", {}).get("heston")
     if not runs:

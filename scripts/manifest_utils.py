@@ -9,7 +9,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
-MANIFEST_PATH = Path("artifacts/manifest.json")
+ARTIFACTS_ROOT = Path("docs") / "artifacts"
+MANIFEST_PATH = ARTIFACTS_ROOT / "manifest.json"
 
 
 def _git_info() -> Dict[str, Any]:
@@ -175,6 +176,7 @@ def update_run(
 
 
 __all__ = [
+    "ARTIFACTS_ROOT",
     "load_manifest",
     "save_manifest",
     "update_run",

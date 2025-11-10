@@ -40,7 +40,7 @@ def main() -> None:
         if missing:
             raise AssertionError(f"Missing columns in QMC vs PRNG CSV: {sorted(missing)}")
 
-    manifest_path = repo_root / "artifacts" / "manifest.json"
+    manifest_path = repo_root / "docs" / "artifacts" / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
     qmc_entry = manifest["runs"].get("qmc_vs_prng")
     if not qmc_entry:

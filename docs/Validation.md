@@ -7,13 +7,13 @@
 - **Barrier In/Out Parity**: Analytic `in + out = vanilla` identity is exercised for down-and-out calls at 1e-8 tolerance.
 - **American Consistency**: Binomial, PSOR, and LSMC agree within PSOR tolerance / LSMC SE for American puts with dividends.
 
-## Demo Artifacts (see `./scripts/demo.sh`)
+## Validation Artifacts (see `./scripts/reproduce_all.sh`)
 - `qmc_vs_prng.png`: RMSE decay (paths vs error) comparing PRNG and Sobol+Brownian bridge; shows Sobol achieving ~2× lower RMSE at equal paths.
 - `pde_convergence.png`: Price error vs grid nodes validating ≈2nd order slope and Rannacher smoothing.
 - `american_convergence.png`: PSOR versus binomial convergence plus LSMC scatter overlay (3σ band) for early-exercise options.
 - `barrier_validation.png`: Log-scale absolute error comparison for barrier MC/PDE vs Reiner–Rubinstein benchmarks.
 
-`artifacts/manifest.json` accompanies every run. It captures the compiler, build flags,
+`docs/artifacts/manifest.json` accompanies every run. It captures the compiler, build flags,
 platform details, all CLI invocations issued by the script, and the seeds/paths used
 for each scenario (including the new LSMC diagnostics: ITM counts, regression sample
 sizes, and basis condition numbers per exercise date).
@@ -27,4 +27,4 @@ sizes, and basis condition numbers per exercise date).
 - **PDE Timing**: `bench_pde` measures wall-time as grids refine (101×100 → 321×320) and records PSOR iteration counts across ω settings.
 
 ## CLI Regression
-- CLI regression options `--sampler`, `--bridge`, `--steps`, `--threads`, and `--json` are covered in integration tests via the demo script to ensure consistent formatting and deterministic results.
+- CLI regression options `--sampler`, `--bridge`, `--steps`, `--threads`, and `--json` are covered in integration tests via the reproduction script to ensure consistent formatting and deterministic results.

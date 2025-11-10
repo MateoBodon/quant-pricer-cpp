@@ -32,4 +32,4 @@
 - `src/` contains engine implementations alongside shared utilities (grid builders, regression helpers).
 - `tests/` holds GTest suites covering analytics parity, variance reduction, boundary conditions, and American cross-checks.
 - `benchmarks/` hosts Google Benchmark entry points for MC throughput, MC RMSE comparisons, PDE wall-time, and PSOR iteration studies.
-- `scripts/demo.sh` orchestrates reproducible builds/runs, capturing CSVs, PNGs, and a synthesized one-pager PDF.
+- `scripts/reproduce_all.sh` orchestrates reproducible builds/runs, capturing CSVs/PNGs plus `docs/artifacts/manifest.json`.
