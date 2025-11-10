@@ -1,5 +1,12 @@
 # WORKLOG
 
+## 2025-11-10 (docs pages + README badge)
+- Enabled Pages best-practice workflow (configure-pages + Doxygen) and wired Doxygen to a Markdown main page with sidebar navigation.
+- Added `docs/api/index.md`, tree view, and enabled alphabetical index so the published API docs have a real landing page.
+- Pointed the README “API Docs” CTA and Docs badge at the deployed `https://mateobodon.github.io/quant-pricer-cpp/index.html` URL.
+- Commands run: n/a (config only).
+- Artifacts: n/a (CI/Pages deployment).
+
 ## 2025-11-10
 - Hardened the Doxygen GitHub Pages workflow (main + tags) and removed the legacy duplicate job.
 - Swapped the README docs badge to track the docs deployment workflow status.
