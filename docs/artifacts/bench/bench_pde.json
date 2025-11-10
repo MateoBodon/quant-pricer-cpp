@@ -1,0 +1,161 @@
+{
+  "context": {
+    "date": "2025-11-10T15:39:57-05:00",
+    "host_name": "Mateos-MBP-5.stdusr.yale.internal",
+    "executable": "build/bench_pde",
+    "num_cpus": 11,
+    "mhz_per_cpu": 24,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 65536,
+        "num_sharing": 0
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 131072,
+        "num_sharing": 0
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 4194304,
+        "num_sharing": 1
+      }
+    ],
+    "load_avg": [7.41602,14.5479,13.2778],
+    "library_version": "v1.9.4-45-g01deef52",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [
+    {
+      "name": "BM_PDE_WallTime/101/100",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "BM_PDE_WallTime/101/100",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 634,
+      "real_time": 1.0606775710128588e+05,
+      "cpu_time": 1.0518454258675105e+05,
+      "time_unit": "ns",
+      "price": 8.8228576570552182e+00
+    },
+    {
+      "name": "BM_PDE_WallTime/201/200",
+      "family_index": 0,
+      "per_family_instance_index": 1,
+      "run_name": "BM_PDE_WallTime/201/200",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 176,
+      "real_time": 3.8818607952800283e+05,
+      "cpu_time": 3.8577840909090714e+05,
+      "time_unit": "ns",
+      "price": 8.8262048685188557e+00
+    },
+    {
+      "name": "BM_PDE_WallTime/321/320",
+      "family_index": 0,
+      "per_family_instance_index": 2,
+      "run_name": "BM_PDE_WallTime/321/320",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 73,
+      "real_time": 9.7666095905580034e+05,
+      "cpu_time": 9.6858904109589139e+05,
+      "time_unit": "ns",
+      "price": 8.8268851114948284e+00
+    },
+    {
+      "name": "BM_PSOR_Iterations/110",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "BM_PSOR_Iterations/110",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 2,
+      "real_time": 3.7403562499093823e+07,
+      "cpu_time": 3.4438999999999888e+07,
+      "time_unit": "ns",
+      "iterations": 2.2260000000000000e+04,
+      "residual": 9.4959435870123343e-09
+    },
+    {
+      "name": "BM_PSOR_Iterations/130",
+      "family_index": 1,
+      "per_family_instance_index": 1,
+      "run_name": "BM_PSOR_Iterations/130",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 3,
+      "real_time": 2.1316958329407498e+07,
+      "cpu_time": 2.1124666666666683e+07,
+      "time_unit": "ns",
+      "iterations": 1.4758000000000000e+04,
+      "residual": 8.8479108484307289e-09
+    },
+    {
+      "name": "BM_PSOR_Iterations/150",
+      "family_index": 1,
+      "per_family_instance_index": 2,
+      "run_name": "BM_PSOR_Iterations/150",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 6,
+      "real_time": 1.2295791665868213e+07,
+      "cpu_time": 1.2204833333333330e+07,
+      "time_unit": "ns",
+      "iterations": 8.5160000000000000e+03,
+      "residual": 8.9391090085655378e-09
+    },
+    {
+      "name": "BM_PSOR_Iterations/170",
+      "family_index": 1,
+      "per_family_instance_index": 3,
+      "run_name": "BM_PSOR_Iterations/170",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 5,
+      "real_time": 1.3625108200358227e+07,
+      "cpu_time": 1.3527999999999985e+07,
+      "time_unit": "ns",
+      "iterations": 9.4800000000000000e+03,
+      "residual": 9.0595122514969262e-09
+    },
+    {
+      "name": "BM_PSOR_Iterations/190",
+      "family_index": 1,
+      "per_family_instance_index": 4,
+      "run_name": "BM_PSOR_Iterations/190",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 2,
+      "real_time": 4.2896416503936052e+07,
+      "cpu_time": 4.2543000000000000e+07,
+      "time_unit": "ns",
+      "iterations": 2.9750000000000000e+04,
+      "residual": 9.9912789153222548e-09
+    }
+  ]
+}

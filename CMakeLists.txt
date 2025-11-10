@@ -181,6 +181,12 @@ set_tests_properties(bench_micro PROPERTIES LABELS "BENCH" RESOURCE_LOCK CPU)
 set_tests_properties(bench_mc_run PROPERTIES LABELS "BENCH" RESOURCE_LOCK CPU)
 set_tests_properties(bench_pde_run PROPERTIES LABELS "BENCH" RESOURCE_LOCK CPU)
 
+add_custom_target(bench
+  COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -L BENCH
+  DEPENDS micro_bench bench_mc bench_pde
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  COMMENT "Run benchmark suite (label=BENCH)")
+
 add_test(
   NAME heston_calibration_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_heston_fast.py
