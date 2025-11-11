@@ -224,6 +224,13 @@ add_test(
 set_tests_properties(heston_safety_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME cli_smoke_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_cli_fast.py
+          --quant-cli $<TARGET_FILE:quant_cli>
+)
+set_tests_properties(cli_smoke_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME market_wrds_pipeline
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/wrds_pipeline/tests/test_wrds_pipeline.py
 )
