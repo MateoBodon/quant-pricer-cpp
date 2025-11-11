@@ -111,7 +111,7 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
 - **CMake Build System**: Cross-platform support with optional dependencies
 - **CI/CD Pipeline**: Multi-compiler, multi-OS testing with sanitizers and static analysis
 - **Documentation**: Doxygen-generated API docs with mathematical formulations
-- **Python Bindings**: Optional `pyquant_pricer` module (pybind11) with enums (`OptionType`, `BarrierType`, `McSampler`, `McBridge`) and `PiecewiseConstant` schedules; wheels via cibuildwheel
+- **Python Bindings**: Optional `pyquant_pricer` module (pybind11) with BS/MC/PDE/Heston coverage (characteristic fn + implied vol helpers), enums (`OptionType`, `BarrierType`, `McSampler`, `McBridge`), and `PiecewiseConstant` schedules; wheels via cibuildwheel
 
 ---
 
@@ -520,7 +520,11 @@ python3 scripts/report.py \
   --artifacts_dir artifacts
 ```
 
-### Python bindings (dev workflow)
+### Python bindings (pip install)
+```bash
+pip install pyquant-pricer
+python -m python.examples.quickstart
+```
 
 ### Python Quickstart
 ```python
@@ -532,12 +536,33 @@ spot = 100.0
 print(f"Call price: {qp.bs_call(spot, 105.0, 0.02, 0.01, 0.25, 0.5):.4f}")
 barrier = qp.BarrierSpec(); barrier.type = qp.BarrierType.DownOut; barrier.B = 95.0
 print(f"Down-and-out call: {qp.barrier_bs(qp.OptionType.Call, barrier, spot, 100.0, 0.03, 0.0, 0.2, 1.0):.4f}")
+
+market = qp.HestonMarket()
+market.spot = spot
+market.strike = 100.0
+market.rate = 0.01
+market.dividend = 0.0
+market.time = 1.0
+
+params = qp.HestonParams()
+params.kappa = 1.5
+params.theta = 0.04
+params.sigma = 0.5
+params.rho = -0.5
+params.v0 = 0.04
+
+iv = qp.heston_implied_vol(market, params)
+phi = qp.heston_characteristic_fn(1.0, market, params)
+print(f"Heston IV {iv:.4%} | phi(1) = {phi.real:.4f} + {phi.imag:.4f}i")
+
 repo_root = Path(__file__).resolve().parents[2]
 surface = next((repo_root / "data" / "samples").glob("spx_*.csv"), None)
 if surface:
     subprocess.run([sys.executable, repo_root / "scripts" / "calibrate_heston.py",
                     "--input", surface, "--fast", "--metric", "price"], check=True)
 ```
+
+### Python bindings (dev workflow)
 
 ```bash
 # Use the in-tree module during development

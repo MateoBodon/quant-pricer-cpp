@@ -12,7 +12,7 @@ jobs:
       TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: pypa/cibuildwheel@v2.17.0
@@ -20,7 +20,10 @@ jobs:
           CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
           CIBW_SKIP: pp* *-musllinux*
           CIBW_ARCHS_MACOS: universal2
-          CIBW_ENVIRONMENT: QUANT_ENABLE_PYBIND=ON
+          CIBW_ENVIRONMENT: QUANT_ENABLE_PYBIND=ON QUANT_ENABLE_OPENMP=OFF
+          CIBW_ENVIRONMENT_MACOS: QUANT_ENABLE_PYBIND=ON QUANT_ENABLE_OPENMP=OFF
+          CIBW_ENVIRONMENT_WINDOWS: QUANT_ENABLE_PYBIND=ON QUANT_ENABLE_OPENMP=OFF
+          CIBW_TEST_COMMAND: python "{project}/python/scripts/cibw_smoke.py"
         with:
           package-dir: .
           output-dir: wheelhouse

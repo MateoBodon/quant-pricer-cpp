@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstdint>
+#include <complex>
 
 #include "quant/rng.hpp"
 
@@ -26,6 +27,14 @@ struct MarketParams {
 // Analytic European call via Heston characteristic function and Gauss-Laguerre
 double call_analytic(const MarketParams& mkt, const Params& h);
 
+/// Risk-neutral characteristic function φ(u) = E[e^{iu ln S_T}]
+std::complex<double> characteristic_function(double u,
+                                             const MarketParams& mkt,
+                                             const Params& h);
+
+/// Black–Scholes implied volatility implied by the Heston analytic call price
+double implied_vol_call(const MarketParams& mkt, const Params& h);
+
 struct McResult { double price; double std_error; };
 
 struct McParams {
@@ -44,4 +53,3 @@ struct McParams {
 McResult call_qe_mc(const McParams& p);
 
 }
-

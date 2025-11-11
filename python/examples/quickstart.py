@@ -41,6 +41,26 @@ def price_barrier() -> None:
     print(f"Down-and-out call (analytic RR): {price:.4f}")
 
 
+def heston_helpers() -> None:
+    params = qp.HestonParams()
+    params.kappa = 1.5
+    params.theta = 0.04
+    params.sigma = 0.5
+    params.rho = -0.5
+    params.v0 = 0.04
+
+    market = qp.HestonMarket()
+    market.spot = 100.0
+    market.strike = 100.0
+    market.rate = 0.01
+    market.dividend = 0.0
+    market.time = 1.0
+
+    iv = qp.heston_implied_vol(market, params)
+    phi = qp.heston_characteristic_fn(1.0, market, params)
+    print(f"Heston analytic call IV: {iv:.4%} | phi(1) = {phi.real:.4f} + {phi.imag:.4f}i")
+
+
 def maybe_run_heston(repo_root: Path) -> None:
     samples_dir = repo_root / "data" / "samples"
     normalized_dir = repo_root / "data" / "normalized"
@@ -70,6 +90,7 @@ def main() -> None:
     repo_root = Path(__file__).resolve().parents[2]
     price_vanilla()
     price_barrier()
+    heston_helpers()
     maybe_run_heston(repo_root)
 
 

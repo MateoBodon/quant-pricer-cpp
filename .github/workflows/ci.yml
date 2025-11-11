@@ -149,3 +149,24 @@ jobs:
         with:
           name: doxygen-html
           path: docs/html
+
+  consumer-example:
+    needs: build-test
+    name: Consumer CMake Example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Configure + install quant-pricer
+        run: |
+          cmake -S . -B build-install -DCMAKE_BUILD_TYPE=Release -DQUANT_ENABLE_OPENMP=OFF -DQUANT_ENABLE_PYBIND=OFF -DCMAKE_INSTALL_PREFIX=$PWD/install
+          cmake --build build-install --parallel
+          cmake --install build-install --prefix $PWD/install
+      - name: Configure consumer example
+        run: |
+          cmake -S examples/consumer-cmake -B examples/consumer-cmake/build -Dquant-pricer_DIR=$PWD/install/lib/cmake/quant-pricer
+      - name: Build consumer example
+        run: cmake --build examples/consumer-cmake/build --parallel
+      - name: Run probe
+        run: ./examples/consumer-cmake/build/probe
