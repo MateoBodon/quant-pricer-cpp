@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from datetime import datetime, timedelta, timezone
@@ -136,8 +137,76 @@ def _plot_hedge_distribution(pnl_detail: pd.DataFrame, out_path: Path) -> None:
     plt.close(fig)
 
 
-def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: bool, fast: bool) -> Dict[str, Path]:
-    out_dir = ARTIFACTS_ROOT / "wrds"
+def _plot_multi_date_summary(pricing: pd.DataFrame, oos: pd.DataFrame, pnl: pd.DataFrame, out_path: Path) -> None:
+    if pricing.empty:
+        return
+    color_map = {"stress": "#d62728", "calm": "#1f77b4", "unknown": "#7f7f7f"}
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+    pricing_sorted = pricing.sort_values("trade_date")
+    labels = pricing_sorted["label"].fillna(pricing_sorted["trade_date"])
+    colors = pricing_sorted["regime"].map(color_map).fillna(color_map["unknown"])
+    axes[0].bar(labels, pricing_sorted["iv_rmse_vp_weighted"] * 100.0, color=colors)
+    axes[0].set_title("Vega-wtd IV RMSE (vol pts)")
+    axes[0].set_ylabel("vol pts")
+    for tick in axes[0].get_xticklabels():
+        tick.set_rotation(30)
+        tick.set_ha("right")
+    axes[0].grid(True, axis="y", ls=":", alpha=0.4)
+
+    if oos.empty:
+        axes[1].text(0.5, 0.5, "No OOS data", ha="center", va="center")
+    else:
+        pivot = (
+            oos.pivot_table(index="tenor_bucket", columns="trade_date", values="mae_iv_bps", observed=True)
+            .sort_index()
+        )
+        im = axes[1].imshow(pivot, aspect="auto", cmap="viridis")
+        axes[1].set_title("OOS IV MAE (bps)")
+        axes[1].set_xlabel("Trade date")
+        axes[1].set_ylabel("Tenor")
+        axes[1].set_xticks(range(len(pivot.columns)))
+        axes[1].set_xticklabels(pivot.columns, rotation=45, ha="right")
+        axes[1].set_yticks(range(len(pivot.index)))
+        axes[1].set_yticklabels(pivot.index)
+        fig.colorbar(im, ax=axes[1], fraction=0.046, pad=0.04, label="bps")
+
+    if pnl.empty:
+        axes[2].text(0.5, 0.5, "No hedge data", ha="center", va="center")
+    else:
+        pnl_avg = (
+            pnl.groupby(["trade_date", "regime", "label"], observed=True, as_index=False)["mean_ticks"]
+            .mean()
+            .sort_values("trade_date")
+        )
+        pnl_colors = pnl_avg["regime"].map(color_map).fillna(color_map["unknown"])
+        axes[2].bar(pnl_avg["label"].fillna(pnl_avg["trade_date"]), pnl_avg["mean_ticks"], color=pnl_colors)
+        axes[2].set_title("Δ-hedged mean ticks")
+        axes[2].set_ylabel("ticks")
+        for tick in axes[2].get_xticklabels():
+            tick.set_rotation(30)
+            tick.set_ha("right")
+        axes[2].axhline(0.0, color="#444444", linewidth=1)
+        axes[2].grid(True, axis="y", ls=":", alpha=0.4)
+
+    fig.tight_layout()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=220)
+    plt.close(fig)
+
+
+def run(
+    symbol: str,
+    trade_date: str,
+    next_trade_date: str | None,
+    use_sample: bool,
+    fast: bool,
+    *,
+    output_dir: Path | None = None,
+    label: str | None = None,
+    regime: str | None = None,
+) -> Dict[str, object]:
+    out_dir = output_dir or (ARTIFACTS_ROOT / "wrds")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     raw_today, source_today = ingest_sppx_surface.load_surface(symbol, trade_date, force_sample=use_sample)
@@ -172,6 +241,8 @@ def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: b
     summary_payload = {
         "trade_date": trade_date,
         "next_trade_date": next_trade_date,
+        "label": label,
+        "regime": regime,
         "params": calib["params"],
         **fit_metrics,
         "bootstrap_ci": {k: list(v) for k, v in ci.items()},
@@ -250,6 +321,8 @@ def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: b
             "symbol": symbol,
             "trade_date": trade_date,
             "next_trade_date": next_trade_date,
+            "label": label,
+            "regime": regime,
             "source_today": source_today,
             "source_next": source_next,
             "surface_today": str(today_csv),
@@ -274,10 +347,142 @@ def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: b
     )
 
     return {
-        "surface_today": today_csv,
-        "surface_next": next_csv,
-        "fit_json": fit_json,
-        "summary_fig": summary_fig,
+        "trade_date": trade_date,
+        "next_trade_date": next_trade_date,
+        "label": label,
+        "regime": regime,
+        "summary": summary_payload,
+        "oos_summary": oos_summary.copy(),
+        "pnl_summary": pnl_summary.copy(),
+        "artifacts": {
+            "surface_today": today_csv,
+            "surface_next": next_csv,
+            "fit_json": fit_json,
+            "summary_fig": summary_fig,
+        },
+    }
+
+
+def run_dateset(symbol: str, dateset_path: Path, use_sample: bool, fast: bool) -> Dict[str, Path]:
+    payload = json.loads(dateset_path.read_text())
+    entries = payload.get("dates", [])
+    if not entries:
+        raise RuntimeError(f"{dateset_path} does not contain any dates")
+    per_date_root = ARTIFACTS_ROOT / "wrds" / "per_date"
+    per_date_root.mkdir(parents=True, exist_ok=True)
+    agg_dir = ARTIFACTS_ROOT / "wrds"
+    agg_dir.mkdir(parents=True, exist_ok=True)
+
+    pricing_rows = []
+    oos_rows = []
+    pnl_rows = []
+
+    for entry in entries:
+        trade_date = entry["trade_date"]
+        next_trade_date = entry.get("next_trade_date") or _next_business_day(entry["trade_date"])
+        label = entry.get("label")
+        regime = entry.get("regime")
+        comment = entry.get("comment")
+        per_date_dir = per_date_root / trade_date
+        try:
+            result = run(
+                symbol,
+                trade_date,
+                next_trade_date,
+                use_sample,
+                fast,
+                output_dir=per_date_dir,
+                label=label,
+                regime=regime,
+            )
+        except Exception as exc:  # pragma: no cover
+            print(f"[wrds_pipeline] {trade_date} failed: {exc}")
+            pricing_rows.append({
+                "trade_date": trade_date,
+                "next_trade_date": next_trade_date,
+                "label": label,
+                "regime": regime,
+                "comment": comment,
+                "status": "error",
+                "iv_rmse_vp_weighted": np.nan,
+                "iv_mae_vp_weighted": np.nan,
+                "iv_p90_vp_weighted": np.nan,
+                "price_rmse_ticks": np.nan,
+                "iv_mae_bps_oos": np.nan,
+                "error": str(exc),
+            })
+            continue
+        summary = result["summary"]
+        pricing_rows.append({
+            "trade_date": summary["trade_date"],
+            "next_trade_date": summary["next_trade_date"],
+            "label": summary.get("label"),
+            "regime": summary.get("regime"),
+            "comment": comment,
+            "status": "ok",
+            "source_today": summary.get("source_today"),
+            "source_next": summary.get("source_next"),
+            "iv_rmse_vp_weighted": summary["iv_rmse_vp_weighted"],
+            "iv_mae_vp_weighted": summary["iv_mae_vp_weighted"],
+            "iv_p90_vp_weighted": summary["iv_p90_vp_weighted"],
+            "price_rmse_ticks": summary["price_rmse_ticks"],
+            "iv_mae_bps_oos": summary.get("iv_mae_bps_oos"),
+        })
+
+        oos_df = result["oos_summary"].copy()
+        if not oos_df.empty:
+            oos_df["trade_date"] = summary["trade_date"]
+            oos_df["label"] = summary.get("label")
+            oos_df["regime"] = summary.get("regime")
+            oos_rows.append(oos_df)
+
+        pnl_df = result["pnl_summary"].copy()
+        if not pnl_df.empty:
+            pnl_df["trade_date"] = summary["trade_date"]
+            pnl_df["label"] = summary.get("label")
+            pnl_df["regime"] = summary.get("regime")
+            pnl_rows.append(pnl_df)
+
+    pricing_df = pd.DataFrame(pricing_rows)
+    pricing_csv = agg_dir / "wrds_agg_pricing.csv"
+    pricing_df.to_csv(pricing_csv, index=False)
+
+    if oos_rows:
+        oos_df = pd.concat(oos_rows, ignore_index=True)
+    else:
+        oos_df = pd.DataFrame(columns=["trade_date", "label", "regime", "tenor_bucket", "mae_iv_bps", "mae_price_ticks", "quotes"])
+    oos_csv = agg_dir / "wrds_agg_oos.csv"
+    oos_df.to_csv(oos_csv, index=False)
+
+    if pnl_rows:
+        pnl_df = pd.concat(pnl_rows, ignore_index=True)
+    else:
+        pnl_df = pd.DataFrame(columns=["trade_date", "label", "regime", "tenor_bucket", "mean_pnl", "std_pnl", "mean_ticks", "count"])
+    pnl_csv = agg_dir / "wrds_agg_pnl.csv"
+    pnl_df.to_csv(pnl_csv, index=False)
+
+    multi_fig = agg_dir / "wrds_multi_date_summary.png"
+    _plot_multi_date_summary(pricing_df, oos_df, pnl_df, multi_fig)
+
+    update_run(
+        "wrds_dateset",
+        {
+            "symbol": symbol,
+            "dateset": str(dateset_path),
+            "pricing_csv": str(pricing_csv),
+            "oos_csv": str(oos_csv),
+            "pnl_csv": str(pnl_csv),
+            "summary_fig": str(multi_fig),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        },
+        append=True,
+    )
+
+    return {
+        "pricing_csv": pricing_csv,
+        "oos_csv": oos_csv,
+        "pnl_csv": pnl_csv,
+        "summary_fig": multi_fig,
     }
 
 
@@ -288,10 +493,17 @@ def main() -> None:
     ap.add_argument("--next-trade-date", default=None)
     ap.add_argument("--use-sample", action="store_true")
     ap.add_argument("--fast", action="store_true")
+    ap.add_argument("--dateset", default=None, help="Path to a YAML/JSON file listing trade dates to batch-process")
     args = ap.parse_args()
     next_trade = args.next_trade_date or _next_business_day(args.trade_date)
     use_sample = args.use_sample or not ingest_sppx_surface.has_wrds_credentials()
-    run(args.symbol.upper(), args.trade_date, next_trade, use_sample, args.fast)
+    if args.dateset:
+        dateset_path = Path(args.dateset)
+        if not dateset_path.is_absolute():
+            dateset_path = REPO_ROOT / dateset_path
+        run_dateset(args.symbol.upper(), dateset_path, use_sample, args.fast)
+    else:
+        run(args.symbol.upper(), args.trade_date, next_trade, use_sample, args.fast)
 
 
 if __name__ == "__main__":  # pragma: no cover

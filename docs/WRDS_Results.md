@@ -34,6 +34,17 @@ This appendix tracks the deterministic WRDS OptionMetrics bundle that lives unde
 ![Next-day OOS errors](artifacts/wrds/wrds_heston_oos.png)
 ![Δ-hedged PnL hist](artifacts/wrds/wrds_heston_hedge.png)
 
+## Multi-date Dashboard (≥5 trade dates)
+
+The batch runner iterates every entry in [`wrds_pipeline/dateset.yaml`](../wrds_pipeline/dateset.yaml)—mixing calm and stress labels—and writes one row per trade date under:
+
+- [`docs/artifacts/wrds/wrds_agg_pricing.csv`](artifacts/wrds/wrds_agg_pricing.csv): vega-weighted fit metrics, labels, and provenance.
+- [`docs/artifacts/wrds/wrds_agg_oos.csv`](artifacts/wrds/wrds_agg_oos.csv): tenor-by-date OOS IV/price MAE with quote counts.
+- [`docs/artifacts/wrds/wrds_agg_pnl.csv`](artifacts/wrds/wrds_agg_pnl.csv): Δ-hedged P&L stats per tenor bucket.
+- [`docs/artifacts/wrds/wrds_multi_date_summary.png`](artifacts/wrds/wrds_multi_date_summary.png): overview figure (vega-wtd IV RMSE bars, OOS MAE heatmap, hedge mean ticks).
+
+Run `python -m wrds_pipeline.pipeline --dateset wrds_pipeline/dateset.yaml --use-sample` for the deterministic bundle, or drop `--use-sample` (with `WRDS_ENABLED=1`) to pull live IvyDB data.
+
 ## Reproducing this bundle
 
 1. `./scripts/reproduce_all.sh` – builds Release, runs FAST+SLOW tests, and refreshes every artifact (WRDS sample bundle runs without credentials).

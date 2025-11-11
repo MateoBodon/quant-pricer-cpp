@@ -15,6 +15,12 @@
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
 - Artifacts: n/a (code/docs only).
 
+## 2025-11-11 (WRDS multi-date aggregation)
+- Added `wrds_pipeline/dateset.yaml`, expanded the sample OptionMetrics bundle to cover ≥5 trade dates, and taught the pipeline to loop the dateset (per-date outputs under `docs/artifacts/wrds/per_date/` + aggregated CSV/PNG under `docs/artifacts/wrds/`).
+- Updated `scripts/reproduce_all.sh` to run the batch mode after the single-date snapshot so CI regenerates `wrds_agg_{pricing,oos,pnl}.csv` and `wrds_multi_date_summary.png`.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`, `python3 -m wrds_pipeline.pipeline --use-sample`, `python3 -m wrds_pipeline.pipeline --dateset wrds_pipeline/dateset.yaml --use-sample` (multiple iterations to refresh artifacts and manifest).
+- Artifacts: refreshed `docs/artifacts/wrds/heston_fit.{json,png}` plus new `wrds_agg_{pricing,oos,pnl}.csv` and `wrds_multi_date_summary.png`.
+
 ## 2025-11-11 (docs pages base-url fix)
 - Hardened the `docs-pages` workflow with a post-Doxygen base-href injector and `.nojekyll` so GitHub Pages serves assets under `/quant-pricer-cpp/`, then swapped the README API Docs link/badge to the live site.
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
