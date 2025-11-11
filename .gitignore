@@ -36,3 +36,4 @@ CTestTestfile.cmake
 # OS
 .DS_Store
 docs/artifacts/wrds/per_date/
+docs/validation_pack.zip
