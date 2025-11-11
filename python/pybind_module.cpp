@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/complex.h>
 #include <pybind11/stl.h>
 // Optional: add numpy later for zero-copy arrays
 //#include <pybind11/numpy.h>
@@ -211,6 +212,12 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readwrite("time", &quant::heston::MarketParams::time);
 
     m.def("heston_call_analytic", &quant::heston::call_analytic, py::arg("mkt"), py::arg("params"));
+    m.def("heston_characteristic_fn", &quant::heston::characteristic_function,
+          py::arg("u"), py::arg("mkt"), py::arg("params"),
+          "Risk-neutral characteristic function φ(u)");
+    m.def("heston_implied_vol", &quant::heston::implied_vol_call,
+          py::arg("mkt"), py::arg("params"),
+          "Black–Scholes implied vol implied by Heston analytic price");
 
     py::enum_<quant::heston::McParams::Scheme>(m, "HestonScheme")
         .value("Euler", quant::heston::McParams::Scheme::Euler)

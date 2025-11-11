@@ -32,6 +32,12 @@
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
 - Artifacts: n/a (workflow/docs only).
 
+## 2025-11-11 (packaging + consumer example)
+- Exposed the Heston characteristic function and implied-vol helpers in the core library and pybind module, refreshed the Python quickstart/smoke tests, and bumped the project/wheel version to v0.3.0.
+- Extended `wheels.yml` to cover Linux/macOS/Windows via cibuildwheel (with an import smoke test) and added a CI job that installs the library then builds/runs `examples/consumer-cmake`.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`, `PYTHONPATH=scripts python3 - <<'PY' ...` (manifest metadata refresh).
+- Artifacts: n/a (code/workflows only).
+
 ## 2025-11-11 (artifacts refresh: equal-time QMC + PDE slope)
 - Replaced the legacy `qmc_vs_prng` helper with `scripts/qmc_vs_prng_equal_time.py`, introduced `scripts/pde_order_slope.py`, and refreshed the `ctest` harness to keep the FAST label aligned with the new artifact set.
 - Regenerated every artifact/manifest via `./scripts/reproduce_all.sh` (Release rebuild, `ctest -L FAST`, full SLOW tier, WRDS sample bundle, and log/JUnit capture) so the committed CSV/PNGs reflect the equal-time QMC + PDE slope outputs.

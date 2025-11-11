@@ -4,6 +4,13 @@
 
 - feat(heston,mc): Andersen QE variance paths, deterministic counter RNG, CLI/pybind confidence intervals for MC Greeks
 
+## v0.3.0
+
+- feat(python): pybind bindings now expose Heston characteristic function/implied vol plus PDE + MC stats; `python/examples/quickstart.py` demonstrates the helpers.
+- feat(heston): Added public `characteristic_function` and `implied_vol_call` APIs with unit tests (phi(0)=1, BS parity).
+- ci(packaging): cibuildwheel workflow now builds Linux/macOS/Windows wheels and runs a smoke test; consumer CMake example builds in CI to guard install export.
+- build: bumped project + Python package version to 0.3.0, documented `pip install pyquant-pricer`, and added `python/scripts/cibw_smoke.py`.
+
 ## v0.2.0
 
 - Advanced MC: Sobol (optional Owen/digital shift) + Brownian bridge; antithetic/control variates; mixed Γ estimator

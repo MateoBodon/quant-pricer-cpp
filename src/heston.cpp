@@ -1,4 +1,5 @@
 #include "quant/heston.hpp"
+#include "quant/black_scholes.hpp"
 #include "quant/math.hpp"
 #include "quant/stats.hpp"
 
@@ -105,6 +106,17 @@ double call_analytic(const MarketParams& mkt, const Params& h) {
     const double df_r = std::exp(-mkt.rate * mkt.time);
     const double df_q = std::exp(-mkt.dividend * mkt.time);
     return mkt.spot * df_q * P1 - mkt.strike * df_r * P2;
+}
+
+std::complex<double> characteristic_function(double u,
+                                             const MarketParams& mkt,
+                                             const Params& h) {
+    return heston_phi(u, mkt.spot, mkt.rate, mkt.dividend, mkt.time, h);
+}
+
+double implied_vol_call(const MarketParams& mkt, const Params& h) {
+    const double price = call_analytic(mkt, h);
+    return quant::bs::implied_vol_call(mkt.spot, mkt.strike, mkt.rate, mkt.dividend, mkt.time, price);
 }
 
 McResult call_qe_mc(const McParams& p) {
