@@ -19,8 +19,8 @@ def evaluate(oos_surface: pd.DataFrame, params: Dict[str, float]) -> Tuple[pd.Da
     summary = (
         modeled.groupby("tenor_bucket", as_index=False, observed=True)
         .agg(
-            mae_iv_bps=("abs_iv_bps", "mean"),
-            mae_price_ticks=("abs_price_ticks", "mean"),
+            iv_mae_bps=("abs_iv_bps", "mean"),
+            price_mae_ticks=("abs_price_ticks", "mean"),
             quotes=("quotes", "sum"),
         )
         .sort_values("tenor_bucket")

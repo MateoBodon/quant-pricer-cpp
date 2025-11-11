@@ -20,7 +20,7 @@ def simulate(today: pd.DataFrame, tomorrow: pd.DataFrame) -> Tuple[pd.DataFrame,
     )
     if merged.empty:
         detail_cols = ["tenor_bucket", "moneyness", "pnl", "pnl_per_tick", "quotes"]
-        summary_cols = ["tenor_bucket", "mean_pnl", "std_pnl", "mean_ticks", "count"]
+        summary_cols = ["tenor_bucket", "mean_pnl", "mean_ticks", "pnl_sigma", "count"]
         return pd.DataFrame(columns=detail_cols), pd.DataFrame(columns=summary_cols)
 
     spot_t = float(today["spot"].mean())
@@ -46,18 +46,18 @@ def simulate(today: pd.DataFrame, tomorrow: pd.DataFrame) -> Tuple[pd.DataFrame,
 
     exploded = detail.loc[detail.index.repeat(detail["quotes"].clip(lower=1).astype(int))].reset_index(drop=True)
     if exploded.empty:
-        summary = pd.DataFrame(columns=["tenor_bucket", "mean_pnl", "std_pnl", "mean_ticks", "count"])
+        summary = pd.DataFrame(columns=["tenor_bucket", "mean_pnl", "mean_ticks", "pnl_sigma", "count"])
     else:
         summary = (
             exploded.groupby("tenor_bucket", as_index=False, observed=True)
             .agg(
                 mean_pnl=("pnl", "mean"),
-                std_pnl=("pnl", "std"),
                 mean_ticks=("pnl_per_tick", "mean"),
+                pnl_sigma=("pnl_per_tick", "std"),
                 count=("pnl", "size"),
             )
         )
-    for col in ("mean_pnl", "std_pnl", "mean_ticks"):
+    for col in ("mean_pnl", "mean_ticks", "pnl_sigma"):
         summary[col] = summary[col].fillna(0.0)
     return detail, summary
 

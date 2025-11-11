@@ -129,14 +129,14 @@ def compute_insample_metrics(surface: pd.DataFrame) -> Dict[str, float]:
     default_weights = np.ones(len(surface), dtype=np.float64)
     weights = _positive_weights(surface.get("vega", default_weights))
     abs_iv = np.abs(iv_error_vol)
-    iv_rmse_vp_weighted = float(np.sqrt(np.average(np.square(iv_error_vol), weights=weights)))
-    iv_mae_vp_weighted = float(np.average(abs_iv, weights=weights))
-    iv_p90_vp_weighted = _weighted_percentile(abs_iv, weights, 0.9)
+    iv_rmse_volpts_vega_wt = float(np.sqrt(np.average(np.square(iv_error_vol), weights=weights)))
+    iv_mae_volpts_vega_wt = float(np.average(abs_iv, weights=weights))
+    iv_p90_bps = _weighted_percentile(abs_iv * 1e4, weights, 0.9)
     price_rmse_ticks = float(np.sqrt(np.mean(np.square(surface["price_error_ticks"]))))
     return {
-        "iv_rmse_vp_weighted": iv_rmse_vp_weighted,
-        "iv_mae_vp_weighted": iv_mae_vp_weighted,
-        "iv_p90_vp_weighted": iv_p90_vp_weighted,
+        "iv_rmse_volpts_vega_wt": iv_rmse_volpts_vega_wt,
+        "iv_mae_volpts_vega_wt": iv_mae_volpts_vega_wt,
+        "iv_p90_bps": iv_p90_bps,
         "price_rmse_ticks": price_rmse_ticks,
     }
 
@@ -144,14 +144,14 @@ def compute_insample_metrics(surface: pd.DataFrame) -> Dict[str, float]:
 def compute_oos_iv_metrics(surface: pd.DataFrame) -> Dict[str, float]:
     if surface.empty:
         return {
-            "iv_mae_bps_oos": 0.0,
+            "iv_mae_bps": 0.0,
         }
     default_weights = np.ones(len(surface), dtype=np.float64)
     weights = _positive_weights(surface.get("quotes", default_weights))
     iv_error_bps = surface["iv_error_bps"].to_numpy(np.float64)
     iv_mae_bps = float(np.average(np.abs(iv_error_bps), weights=weights))
     return {
-        "iv_mae_bps_oos": iv_mae_bps,
+        "iv_mae_bps": iv_mae_bps,
     }
 
 
@@ -326,7 +326,7 @@ def plot_fit(surface: pd.DataFrame, params: Dict[str, float], metrics: Dict[str,
     axes[1].set_ylabel("Price error (ticks)")
     axes[1].grid(True, ls=":", alpha=0.5)
 
-    vol_rmse_pts = metrics["iv_rmse_vp_weighted"] * 100.0
+    vol_rmse_pts = metrics["iv_rmse_volpts_vega_wt"] * 100.0
     price_rmse_ticks = metrics["price_rmse_ticks"]
     fig.suptitle(f"Heston fit | vega-wtd RMSE={vol_rmse_pts:.2f} vol pts, price RMSE={price_rmse_ticks:.2f} ticks")
     handles, labels = axes[0].get_legend_handles_labels()
@@ -343,10 +343,10 @@ def record_manifest(out_json: Path, summary: Dict[str, object], surface_csv: Pat
         "surface_csv": str(surface_csv),
         "figure": str(figure),
         "params": summary["params"],
-        "iv_rmse_vp_weighted": summary["iv_rmse_vp_weighted"],
-        "iv_mae_vp_weighted": summary["iv_mae_vp_weighted"],
-        "iv_p90_vp_weighted": summary["iv_p90_vp_weighted"],
+        "iv_rmse_volpts_vega_wt": summary["iv_rmse_volpts_vega_wt"],
+        "iv_mae_volpts_vega_wt": summary["iv_mae_volpts_vega_wt"],
+        "iv_p90_bps": summary["iv_p90_bps"],
         "price_rmse_ticks": summary["price_rmse_ticks"],
-        "iv_mae_bps_oos": summary.get("iv_mae_bps_oos"),
+        "iv_mae_bps": summary.get("iv_mae_bps"),
     }
     update_run("wrds_heston", payload, append=True)

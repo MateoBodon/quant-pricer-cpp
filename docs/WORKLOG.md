@@ -2,6 +2,12 @@
 
 # WORKLOG
 
+## 2025-11-11 (WRDS panel rename + aggregated artifacts)
+- Added `wrds_pipeline_dates_panel.yaml` (≥5 stress/calm dates), taught the pipeline to read YAML via PyYAML, renamed the in-sample metrics to `iv_rmse_volpts_vega_wt`/`iv_mae_volpts_vega_wt`/`iv_p90_bps`, and changed the OOS/PnL summaries to report `iv_mae_bps`, `price_mae_ticks`, and `pnl_sigma`.
+- Trimmed committed artifacts to the aggregated CSV/PNG set (`wrds_agg_{pricing,oos,pnl}.csv`, `wrds_multi_date_summary.png`), updated README/Results/WRDS docs, and refreshed the manifest so historical entries carry the new metric names/units.
+- Commands run: `source .venv/bin/activate && pip install pyyaml`, `source .venv/bin/activate && python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample --fast`, `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
+- Artifacts: regenerated `docs/artifacts/wrds/wrds_agg_{pricing,oos,pnl}.csv`, `docs/artifacts/wrds/wrds_multi_date_summary.png`, updated `docs/artifacts/manifest.json`.
+
 ## 2025-11-11 (Heston analytic fix + coverage site)
 - Fixed the analytic Heston pricer by applying the proper Gauss–Laguerre weighting (exp(x)) and clamping the result to intrinsic value, then reran both Release and coverage FAST suites.
 - Generated llvm-cov/gcovr reports locally (lcov, Cobertura XML, HTML) and published the HTML bundle under `docs/coverage/` with a README badge + Results.md link; taught the Docs Pages workflow to copy that folder into the deployed site.

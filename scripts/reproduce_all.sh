@@ -145,7 +145,7 @@ run_wrds_pipeline() {
     (cd "${ROOT}" && python3 -m wrds_pipeline.pipeline)
   fi
 
-  local dateset_path="${WRDS_DATESET:-wrds_pipeline/dateset.yaml}"
+  local dateset_path="${WRDS_DATESET:-wrds_pipeline_dates_panel.yaml}"
   if [[ -f "${ROOT}/${dateset_path}" ]]; then
     local -a multi_extra=(--symbol "${symbol_arg}" --dateset "${dateset_path}")
     if [[ "${WRDS_USE_SAMPLE:-0}" == "1" ]]; then

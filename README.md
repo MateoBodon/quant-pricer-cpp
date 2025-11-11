@@ -67,9 +67,9 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
   **QMC vs PRNG (equal wall-clock)** – Sobol + Brownian bridge delivers ≈1.4× lower RMSE than PRNG at matched runtime for European + Asian calls.<br>
   Reproduce: `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv --fast`  
   Data: [qmc_vs_prng_equal_time.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/qmc_vs_prng_equal_time.csv)
-- <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/heston_wrds_summary.png" alt="WRDS Heston summary" width="230"></a><br>
+- <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_multi_date_summary.png" alt="WRDS panel summary" width="230"></a><br>
   **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated over ≥5 calm/stress dates with vega-weighted IV RMSE, quotes-weighted OOS MAE, and Δ-hedged 1d buckets.<br>
-  Reproduce (sample): `python wrds_pipeline/pipeline.py --dateset wrds_pipeline/dateset.yaml --use-sample`  
+  Reproduce (sample): `python wrds_pipeline/pipeline.py --dateset wrds_pipeline_dates_panel.yaml --use-sample`  
   Data: [wrds_agg_pricing.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pricing.csv), [wrds_agg_oos.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_oos.csv), [wrds_agg_pnl.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pnl.csv)
 
 ---
@@ -931,13 +931,12 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 
 Opt-in MARKET tests under `wrds_pipeline/` pull (or fall back to deterministic samples), aggregate the SPX surface, run a vega-weighted Heston calibration, and emit anonymised CSV/PNG bundles under `docs/artifacts/wrds/`. Set `WRDS_ENABLED=1` together with `WRDS_USERNAME` / `WRDS_PASSWORD` to enable `ctest -L MARKET`; otherwise the tests are skipped. Key artifacts (all aggregated / anonymised):
 
-- [`docs/artifacts/wrds/spx_2024-06-14_surface.csv`](docs/artifacts/wrds/spx_2024-06-14_surface.csv) and [`docs/artifacts/wrds/spx_2024-06-17_surface.csv`](docs/artifacts/wrds/spx_2024-06-17_surface.csv) – tenor/moneyness buckets with mean IV/price/vega
-- [`docs/artifacts/wrds/heston_fit_table.csv`](docs/artifacts/wrds/heston_fit_table.csv) + [`docs/artifacts/wrds/heston_fit.json`](docs/artifacts/wrds/heston_fit.json) – calibrated parameters, bootstrap CIs, RMSE
-- [`docs/artifacts/wrds/oos_pricing_detail.csv`](docs/artifacts/wrds/oos_pricing_detail.csv) + summary – next-day IV/price diagnostics
-- [`docs/artifacts/wrds/delta_hedge_pnl.csv`](docs/artifacts/wrds/delta_hedge_pnl.csv) + summary – aggregated one-day delta-hedged PnL (ticks)
-- [`docs/artifacts/wrds/heston_wrds_summary.png`](docs/artifacts/wrds/heston_wrds_summary.png) – in-sample fit, OOS MAE, and PnL histogram
+- [`docs/artifacts/wrds/wrds_agg_pricing.csv`](docs/artifacts/wrds/wrds_agg_pricing.csv) – per-date vega-weighted RMSE/MAE, `iv_p90_bps`, provenance
+- [`docs/artifacts/wrds/wrds_agg_oos.csv`](docs/artifacts/wrds/wrds_agg_oos.csv) – tenor-by-date OOS IV/price MAE with quote counts
+- [`docs/artifacts/wrds/wrds_agg_pnl.csv`](docs/artifacts/wrds/wrds_agg_pnl.csv) – Δ-hedged mean ticks and `pnl_sigma` per bucket
+- [`docs/artifacts/wrds/wrds_multi_date_summary.png`](docs/artifacts/wrds/wrds_multi_date_summary.png) – overview figure (vega-wtd IV RMSE, OOS MAE heatmap, hedge mean ±σ)
 
-Regenerate the public demo bundle with `./scripts/reproduce_all.sh` (uses the bundled sample data when WRDS env vars are absent) or run `python -m wrds_pipeline.pipeline --symbol SPX --trade-date 2024-06-14` after exporting `WRDS_ENABLED=1`, `WRDS_USERNAME`, and `WRDS_PASSWORD`. The CLI automatically maps the trade date to the correct OptionMetrics annual table (e.g., `optionm.opprcd2024`).
+Regenerate the public demo bundle with `./scripts/reproduce_all.sh` (uses the bundled sample data when WRDS env vars are absent), run the multi-date sample via `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample`, or target live IvyDB after exporting `WRDS_ENABLED=1`, `WRDS_USERNAME`, and `WRDS_PASSWORD`. The CLI automatically maps any trade date to the correct OptionMetrics annual table (e.g., `optionm.opprcd2024`).
 
 ---
 

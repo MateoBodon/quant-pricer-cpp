@@ -68,21 +68,16 @@ Current QE runs still exhibit a large bias versus the analytic reference (CLI em
 
 The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `secid` via `optionm.secnmd`, pulls the year-partitioned `optionm.opprcdYYYY` table, filters stale quotes, recomputes implied vols with the project’s solver, and bins by tenor/moneyness. A vega-weighted Heston calibration (least-squares in IV space) and bootstrap CIs are emitted alongside next-day OOS errors and delta-hedged one-day PnL histograms. Only aggregated CSV/PNGs under `docs/artifacts/wrds/` are committed.
 
-- Scalar metrics from the latest bundle:
-  - `iv_rmse_vp_weighted` / `iv_mae_vp_weighted` / `iv_p90_vp_weighted` (vol pts, vega-weighted, see `heston_fit.json`)
-  - `iv_mae_bps_oos` (quotes-weighted bps, see `wrds_heston_oos.csv`)
-  - `price_rmse_ticks` (ticks, see `heston_fit.json`)
-- Multi-date snapshot: [artifacts/wrds/wrds_agg_pricing.csv](artifacts/wrds/wrds_agg_pricing.csv), [artifacts/wrds/wrds_agg_oos.csv](artifacts/wrds/wrds_agg_oos.csv), [artifacts/wrds/wrds_agg_pnl.csv](artifacts/wrds/wrds_agg_pnl.csv), and the overview figure [artifacts/wrds/wrds_multi_date_summary.png](artifacts/wrds/wrds_multi_date_summary.png)
-- Detailed tables + figures: [`docs/WRDS_Results.md`](WRDS_Results.md)
+- Scalar metrics per trade date live in [artifacts/wrds/wrds_agg_pricing.csv](artifacts/wrds/wrds_agg_pricing.csv) with the renamed columns:
+  - `iv_rmse_volpts_vega_wt`, `iv_mae_volpts_vega_wt` (vol pts, vega-weighted)
+  - `iv_p90_bps` (90th percentile IV error, basis points)
+  - `price_rmse_ticks` (RMSE vs market prices, ticks)
+- Next-day diagnostics per tenor bucket live in [artifacts/wrds/wrds_agg_oos.csv](artifacts/wrds/wrds_agg_oos.csv):
+  - `iv_mae_bps` (quotes-weighted IV MAE), `price_mae_ticks` (quotes-weighted price MAE)
+- Δ-hedged distributions per bucket are stored in [artifacts/wrds/wrds_agg_pnl.csv](artifacts/wrds/wrds_agg_pnl.csv) with `mean_ticks` and `pnl_sigma` (tick σ).
+- Overview figure: [artifacts/wrds/wrds_multi_date_summary.png](artifacts/wrds/wrds_multi_date_summary.png); detailed narrative lives in [`docs/WRDS_Results.md`](WRDS_Results.md).
 
-- Surfaces: [artifacts/wrds/spx_2024-06-14_surface.csv](artifacts/wrds/spx_2024-06-14_surface.csv), [artifacts/wrds/spx_2024-06-17_surface.csv](artifacts/wrds/spx_2024-06-17_surface.csv)
-- Calibration: [artifacts/wrds/heston_fit_table.csv](artifacts/wrds/heston_fit_table.csv), [artifacts/wrds/heston_fit.json](artifacts/wrds/heston_fit.json), [artifacts/wrds/heston_fit.png](artifacts/wrds/heston_fit.png)
-- In-sample parity: [artifacts/wrds/wrds_heston_insample.csv](artifacts/wrds/wrds_heston_insample.csv), [artifacts/wrds/wrds_heston_insample.png](artifacts/wrds/wrds_heston_insample.png)
-- OOS diagnostics: [artifacts/wrds/wrds_heston_oos.csv](artifacts/wrds/wrds_heston_oos.csv), [artifacts/wrds/wrds_heston_oos.png](artifacts/wrds/wrds_heston_oos.png)
-- Delta hedge summary: [artifacts/wrds/wrds_heston_hedge.csv](artifacts/wrds/wrds_heston_hedge.csv), [artifacts/wrds/wrds_heston_hedge.png](artifacts/wrds/wrds_heston_hedge.png)
-- Summary figure: [artifacts/wrds/heston_wrds_summary.png](artifacts/wrds/heston_wrds_summary.png)
-
-Regenerate the bundled sample snapshot with `./scripts/reproduce_all.sh` (the pipeline runs even without credentials). To hit the live WRDS database export `WRDS_ENABLED=1`, `WRDS_USERNAME`, `WRDS_PASSWORD`, then run `python wrds_pipeline/pipeline.py --symbol SPX --trade-date 2024-06-14`. MARKET tests (`ctest -L MARKET`) remain opt-in and skip automatically when the env vars are absent.
+Regenerate the bundled sample snapshot with `./scripts/reproduce_all.sh` (the pipeline runs even without credentials) or explicitly via `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample`. To hit the live WRDS database export `WRDS_ENABLED=1`, `WRDS_USERNAME`, `WRDS_PASSWORD`, then run the same command without `--use-sample`. MARKET tests (`ctest -L MARKET`) remain opt-in and skip automatically when the env vars are absent.
 
 ## Manifest & determinism
 
