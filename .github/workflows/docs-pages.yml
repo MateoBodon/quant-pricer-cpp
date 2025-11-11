@@ -7,7 +7,7 @@ on:
       - master
     tags:
       - '*'
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 permissions:
   contents: read
