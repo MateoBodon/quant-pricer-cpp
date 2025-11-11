@@ -14,6 +14,12 @@
 - Commands run: `cmake --build build --target bench_mc`, `./build/bench_mc --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_mc.json --benchmark_out_format=json`, `./build/bench_pde --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_pde.json --benchmark_out_format=json`, `python scripts/generate_bench_artifacts.py --mc-json docs/artifacts/bench/bench_mc.json --pde-json docs/artifacts/bench/bench_pde.json --out-dir docs/artifacts/bench`.
 - Artifacts: refreshed every file under `docs/artifacts/bench/` plus the benchmark entries in `docs/artifacts/manifest.json`.
 
+## 2025-11-11 (QuantLib parity harness)
+- Added `scripts/ql_parity.py` to drive `quant_cli` and QuantLib side-by-side for vanilla, barrier, and American payoffs, recording absolute price gaps (cents) plus runtime deltas; committed the CSV/PNG under `docs/artifacts/ql_parity/` and surfaced the figure on README/Results.
+- Updated `requirements-artifacts.txt` (PyYAML, QuantLib) and installed the new wheels locally.
+- Commands run: `source .venv/bin/activate && pip install QuantLib`, `python scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`.
+- Artifacts: `docs/artifacts/ql_parity/ql_parity.{csv,png}`, manifest `runs.ql_parity`.
+
 ## 2025-11-11 (Heston analytic fix + coverage site)
 - Fixed the analytic Heston pricer by applying the proper Gauss–Laguerre weighting (exp(x)) and clamping the result to intrinsic value, then reran both Release and coverage FAST suites.
 - Generated llvm-cov/gcovr reports locally (lcov, Cobertura XML, HTML) and published the HTML bundle under `docs/coverage/` with a README badge + Results.md link; taught the Docs Pages workflow to copy that folder into the deployed site.
