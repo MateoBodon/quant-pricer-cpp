@@ -88,6 +88,7 @@ BENCHMARK(BM_MC_Rmse_PRNG);
 BENCHMARK(BM_MC_Rmse_QMC);
 
 static quant::asian::McParams make_asian_params(quant::asian::Qmc mode) {
+  const std::uint64_t paths = mode == quant::asian::Qmc::None ? 400'000 : 220'000;
   return quant::asian::McParams{
       .spot = 100.0,
       .strike = 100.0,
@@ -95,7 +96,7 @@ static quant::asian::McParams make_asian_params(quant::asian::Qmc mode) {
       .dividend = 0.0,
       .vol = 0.2,
       .time = 1.0,
-      .num_paths = static_cast<std::uint64_t>(400'000),
+      .num_paths = paths,
       .seed = 2025,
       .num_steps = 64,
       .antithetic = true,
@@ -126,6 +127,7 @@ static void BM_MC_EqualTime_Asian_QMC(benchmark::State& state) {
 }
 
 static quant::mc::McParams make_barrier_params(quant::mc::McParams::Qmc mode) {
+  const std::uint64_t paths = mode == quant::mc::McParams::Qmc::None ? 300'000 : 180'000;
   quant::mc::McParams params{
       .spot = 100.0,
       .strike = 100.0,
@@ -133,7 +135,7 @@ static quant::mc::McParams make_barrier_params(quant::mc::McParams::Qmc mode) {
       .dividend = 0.0,
       .vol = 0.25,
       .time = 1.0,
-      .num_paths = static_cast<std::uint64_t>(300'000),
+      .num_paths = paths,
       .seed = 1337,
       .antithetic = true,
       .control_variate = true,
