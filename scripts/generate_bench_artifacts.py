@@ -15,6 +15,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 from manifest_utils import update_run
 
@@ -24,46 +25,60 @@ def load_benchmarks(path: Path) -> List[Dict[str, Any]]:
     return data.get("benchmarks", [])
 
 
-def parse_mc(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame]:
+def parse_mc(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     throughput_rows: List[Dict[str, Any]] = []
     rmse_rows: List[Dict[str, Any]] = []
+    equal_rows: List[Dict[str, Any]] = []
     for bench in benches:
         name: str = bench["name"]
-        counters: Dict[str, Any] = bench.get("counters", {})
+        real_time_ms = float(bench.get("real_time", 0.0)) / 1e6
         if name.startswith("BM_MC_PathsPerSecond"):
             _, threads_str = name.split("/")
             throughput_rows.append(
                 {
                     "threads": int(threads_str),
-                    "paths_per_sec": float(counters.get("paths/s", 0.0)),
+                    "paths_per_sec": float(bench.get("paths/s", 0.0)),
                 }
             )
         elif "Rmse_PRNG" in name:
             rmse_rows.append(
-                {"method": "PRNG", "std_error": float(counters.get("std_error", 0.0))}
+                {"method": "PRNG", "std_error": float(bench.get("std_error", 0.0))}
             )
         elif "Rmse_QMC" in name:
             rmse_rows.append(
-                {"method": "QMC", "std_error": float(counters.get("std_error", 0.0))}
+                {"method": "QMC", "std_error": float(bench.get("std_error", 0.0))}
             )
+        elif name.startswith("BM_MC_EqualTime"):
+            parts = name.split("/")
+            if len(parts) == 3:
+                equal_rows.append(
+                    {
+                        "payoff": parts[1],
+                        "method": parts[2],
+                        "std_error": float(bench.get("std_error", 0.0)),
+                        "real_time_ms": real_time_ms,
+                    }
+                )
     throughput_df = pd.DataFrame(throughput_rows).sort_values("threads")
     rmse_df = pd.DataFrame(rmse_rows)
-    return throughput_df, rmse_df
+    equal_df = pd.DataFrame(equal_rows)
+    return throughput_df, rmse_df, equal_df
 
 
-def parse_pde(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame]:
+def parse_pde(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     wall_rows: List[Dict[str, Any]] = []
     psor_rows: List[Dict[str, Any]] = []
+    order_rows: List[Dict[str, Any]] = []
     for bench in benches:
         name: str = bench["name"]
-        counters: Dict[str, Any] = bench.get("counters", {})
+        real_time_ms = float(bench.get("real_time", 0.0)) / 1e6
         if name.startswith("BM_PDE_WallTime"):
             _, m_str, _ = name.split("/")
             wall_rows.append(
                 {
                     "space_nodes": int(m_str),
                     "real_time_ms": float(bench.get("real_time", 0.0)) / 1e6,
-                    "price": float(counters.get("price", 0.0)),
+                    "price": float(bench.get("price", 0.0)),
                 }
             )
         elif name.startswith("BM_PSOR_Iterations"):
@@ -71,13 +86,23 @@ def parse_pde(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame
             psor_rows.append(
                 {
                     "omega": int(omega_str) / 100.0,
-                    "iterations": float(counters.get("iterations", 0.0)),
-                    "residual": float(counters.get("residual", 0.0)),
+                    "iterations": float(bench.get("iterations", 0.0)),
+                    "residual": float(bench.get("residual", 0.0)),
+                }
+            )
+        elif name.startswith("BM_PDE_OrderSlope"):
+            _, m_str, _ = name.split("/")
+            order_rows.append(
+                {
+                    "space_nodes": int(m_str),
+                    "real_time_ms": real_time_ms,
+                    "abs_error": float(bench.get("abs_error", 0.0)),
                 }
             )
     wall_df = pd.DataFrame(wall_rows).sort_values("space_nodes")
     psor_df = pd.DataFrame(psor_rows).sort_values("omega")
-    return wall_df, psor_df
+    order_df = pd.DataFrame(order_rows).sort_values("space_nodes")
+    return wall_df, psor_df, order_df
 
 
 def plot_throughput(df: pd.DataFrame, out_path: Path) -> None:
@@ -98,6 +123,43 @@ def plot_rmse(df: pd.DataFrame, out_path: Path) -> None:
     ax.set_ylabel("Std error")
     ax.set_title("MC RMSE (PRNG vs QMC)")
     ax.grid(True, axis="y", linestyle=":", alpha=0.4)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=200)
+    plt.close(fig)
+
+
+def plot_equal_time(df: pd.DataFrame, out_path: Path) -> None:
+    if df.empty:
+        return
+    payoffs = sorted(df["payoff"].unique())
+    methods = ["PRNG", "QMC"]
+    x = np.arange(len(payoffs), dtype=float)
+    width = 0.35
+    fig, ax = plt.subplots(figsize=(6.0, 3.5))
+    for idx, method in enumerate(methods):
+        subset = (
+            df[df["method"] == method]
+            .set_index("payoff")
+            .reindex(payoffs)
+        )
+        heights = subset["std_error"].to_list()
+        bars = ax.bar(x + (idx - 0.5) * width, heights, width=width, label=method)
+        for payoff_idx, bar in enumerate(bars):
+            runtime = subset["real_time_ms"].iloc[payoff_idx]
+            ax.text(
+                bar.get_x() + bar.get_width() / 2.0,
+                bar.get_height(),
+                f"{runtime:.1f} ms",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+            )
+    ax.set_xticks(x)
+    ax.set_xticklabels(payoffs)
+    ax.set_ylabel("Std error (vol pts)")
+    ax.set_title("Equal-time MC RMSE")
+    ax.grid(True, axis="y", linestyle=":", alpha=0.4)
+    ax.legend()
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)
@@ -127,6 +189,20 @@ def plot_psor(df: pd.DataFrame, out_path: Path) -> None:
     plt.close(fig)
 
 
+def plot_order(df: pd.DataFrame, out_path: Path) -> None:
+    if df.empty:
+        return
+    fig, ax = plt.subplots(figsize=(5.0, 3.0))
+    ax.loglog(df["space_nodes"], df["abs_error"], marker="o", color="#ff7f0e")
+    ax.set_xlabel("Spatial nodes")
+    ax.set_ylabel("Abs error")
+    ax.set_title("PDE convergence (log-log)")
+    ax.grid(True, which="both", linestyle=":", alpha=0.5)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=200)
+    plt.close(fig)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mc-json", default="docs/artifacts/bench/bench_mc.json")
@@ -140,23 +216,29 @@ def main() -> None:
     mc_json = Path(args.mc_json)
     pde_json = Path(args.pde_json)
 
-    throughput_df, rmse_df = parse_mc(load_benchmarks(mc_json))
-    wall_df, psor_df = parse_pde(load_benchmarks(pde_json))
+    throughput_df, rmse_df, equal_df = parse_mc(load_benchmarks(mc_json))
+    wall_df, psor_df, order_df = parse_pde(load_benchmarks(pde_json))
 
     throughput_csv = out_dir / "bench_mc_paths.csv"
     rmse_csv = out_dir / "bench_mc_rmse.csv"
     wall_csv = out_dir / "bench_pde_walltime.csv"
     psor_csv = out_dir / "bench_psor_iterations.csv"
+    equal_csv = out_dir / "bench_mc_equal_time.csv"
+    order_csv = out_dir / "bench_pde_order.csv"
 
     throughput_df.to_csv(throughput_csv, index=False)
     rmse_df.to_csv(rmse_csv, index=False)
     wall_df.to_csv(wall_csv, index=False)
     psor_df.to_csv(psor_csv, index=False)
+    equal_df.to_csv(equal_csv, index=False)
+    order_df.to_csv(order_csv, index=False)
 
     plot_throughput(throughput_df, out_dir / "bench_mc_paths.png")
     plot_rmse(rmse_df, out_dir / "bench_mc_rmse.png")
+    plot_equal_time(equal_df, out_dir / "bench_mc_equal_time.png")
     plot_walltime(wall_df, out_dir / "bench_pde_walltime.png")
     plot_psor(psor_df, out_dir / "bench_psor_iterations.png")
+    plot_order(order_df, out_dir / "bench_pde_order.png")
 
     payload = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -167,12 +249,16 @@ def main() -> None:
             str(rmse_csv),
             str(wall_csv),
             str(psor_csv),
+            str(equal_csv),
+            str(order_csv),
         ],
         "figures": [
             str(out_dir / "bench_mc_paths.png"),
             str(out_dir / "bench_mc_rmse.png"),
             str(out_dir / "bench_pde_walltime.png"),
             str(out_dir / "bench_psor_iterations.png"),
+            str(out_dir / "bench_mc_equal_time.png"),
+            str(out_dir / "bench_pde_order.png"),
         ],
     }
     update_run("benchmarks", payload, append=True, id_field="timestamp")

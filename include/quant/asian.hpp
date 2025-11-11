@@ -7,6 +7,7 @@ namespace quant::asian {
 
 enum class Payoff { FixedStrike, FloatingStrike };
 enum class Average { Arithmetic, Geometric };
+enum class Qmc { None, Sobol, SobolScrambled };
 
 struct McParams {
     double spot;
@@ -22,6 +23,7 @@ struct McParams {
     bool use_geometric_cv{true};
     Payoff payoff{Payoff::FixedStrike};
     Average avg{Average::Arithmetic};
+    Qmc qmc{Qmc::None};
 };
 
 struct McStatistic {
@@ -34,5 +36,4 @@ struct McStatistic {
 McStatistic price_mc(const McParams& p);
 
 }
-
 

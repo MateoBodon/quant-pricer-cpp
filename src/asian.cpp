@@ -1,6 +1,7 @@
 #include "quant/asian.hpp"
 #include "quant/math.hpp"
 #include "quant/stats.hpp"
+#include "quant/qmc/sobol.hpp"
 
 #include <pcg_random.hpp>
 
@@ -9,6 +10,8 @@
 #include <limits>
 #include <random>
 #include <vector>
+#include <memory>
+#include <stdexcept>
 
 namespace quant::asian {
 
@@ -31,6 +34,9 @@ asian::McStatistic price_mc(const McParams& p) {
     if (p.num_paths == 0 || p.num_steps <= 0) {
         return {0.0, 0.0, 0.0, 0.0};
     }
+    if (p.qmc != Qmc::None && p.num_steps > static_cast<int>(quant::qmc::SobolSequence::kMaxSupportedDimension)) {
+        throw std::invalid_argument("asian::price_mc: Sobol dimension exceeds supported maximum");
+    }
     const double dt = p.time / static_cast<double>(p.num_steps);
     const double df_r = std::exp(-p.rate * p.time);
     const double drift_dt = (p.rate - p.dividend - 0.5 * p.vol * p.vol) * dt;
@@ -43,6 +49,16 @@ asian::McStatistic price_mc(const McParams& p) {
     pcg64 rng(p.seed ? p.seed : 0xC0FFEEULL);
     std::normal_distribution<double> normal(0.0, 1.0);
     std::vector<double> normals(static_cast<std::size_t>(p.num_steps));
+    const bool use_qmc = p.qmc != Qmc::None;
+    std::unique_ptr<quant::qmc::SobolSequence> sobol_seq;
+    std::vector<double> sobol_point;
+    if (use_qmc) {
+        sobol_seq = std::make_unique<quant::qmc::SobolSequence>(
+            static_cast<std::size_t>(p.num_steps),
+            p.qmc == Qmc::SobolScrambled,
+            p.seed ? p.seed : 0x9E3779B97F4A7C15ULL);
+        sobol_point.resize(static_cast<std::size_t>(p.num_steps));
+    }
 
     auto run_path = [&](const std::vector<double>& draws) {
         double S = p.spot;
@@ -76,8 +92,19 @@ asian::McStatistic price_mc(const McParams& p) {
     std::vector<double> antithetic_draws(static_cast<std::size_t>(p.num_steps));
 
     for (std::uint64_t i = 0; i < p.num_paths; ++i) {
-        for (int t = 0; t < p.num_steps; ++t) {
-            normals[static_cast<std::size_t>(t)] = normal(rng);
+        if (use_qmc) {
+            sobol_seq->generate(i, sobol_point.data());
+            for (int t = 0; t < p.num_steps; ++t) {
+                const double u = std::clamp(
+                    sobol_point[static_cast<std::size_t>(t)],
+                    std::numeric_limits<double>::min(),
+                    1.0 - std::numeric_limits<double>::epsilon());
+                normals[static_cast<std::size_t>(t)] = quant::math::inverse_normal_cdf(u);
+            }
+        } else {
+            for (int t = 0; t < p.num_steps; ++t) {
+                normals[static_cast<std::size_t>(t)] = normal(rng);
+            }
         }
         double sample = run_path(normals);
         if (p.antithetic) {
