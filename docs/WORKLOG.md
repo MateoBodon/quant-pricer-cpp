@@ -1,5 +1,14 @@
 # WORKLOG
 
+# WORKLOG
+
+## 2025-11-11
+- Rebuilt the reproducibility stack: `scripts/reproduce_all.sh` now cleans/repaves `docs/artifacts/`, runs FAST+SLOW labels, regenerates benches/figures/WRDS bundles, and finalises `manifest.json` with git/system/build metadata (plus new `tri_engine_agreement` entry). Added a helper for CI-friendly `--fast` mode and routed WRDS invocations through `python -m wrds_pipeline.pipeline`.
+- Overhauled the WRDS pipeline (OptionMetrics ingestion → aggregation → vega-weighted Heston fit + bootstrap CIs → next-day OOS error buckets → delta-hedged PnL histogram) and refreshed the committed CSV/PNG artifacts under `docs/artifacts/wrds/`.
+- Added the Tri-Engine Agreement plot/script, refreshed the README tiles + docs, and rewrote `docs/Results.md` to highlight the three headline figures with reproduction commands.
+- Tightened CI coverage job (clang `llvm-cov` + gcovr/Codecov), new coverage badge, and appended the PDE second-order regression test.
+- Commands run: `./scripts/reproduce_all.sh` (multiple, final run with SLOW), `cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
+
 ## 2025-11-10 (docs pages + README badge)
 - Enabled Pages best-practice workflow (configure-pages + Doxygen) and wired Doxygen to a Markdown main page with sidebar navigation.
 - Added `docs/api/index.md`, tree view, and enabled alphabetical index so the published API docs have a real landing page.

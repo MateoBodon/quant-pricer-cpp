@@ -1,43 +1,47 @@
 #!/usr/bin/env python3
-"""Simple out-of-sample pricing diagnostic."""
+"""Out-of-sample pricing diagnostics."""
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Tuple
 
 import pandas as pd
 
+from .calibrate_heston import apply_model
 
-def evaluate(surface: pd.DataFrame, atm_iv: float) -> pd.DataFrame:
-    df = surface.copy()
-    df["bs_price"] = df["mid_iv"].apply(lambda iv: max(0.0, iv - atm_iv))
-    df["abs_diff"] = (df["mid_iv"] - atm_iv).abs()
-    return df[["tenor_bucket", "moneyness", "mid_iv", "bs_price", "abs_diff"]]
+TICK_SIZE = 0.05
 
 
-def summarize(df: pd.DataFrame) -> Dict[str, float]:
-    return {
-        "mae": float(df["abs_diff"].mean()),
-        "max_err": float(df["abs_diff"].max()),
-    }
-
-
-def write_outputs(out_csv: Path, out_summary: Path, df: pd.DataFrame, metrics: Dict[str, float]) -> None:
-    out_csv.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(out_csv, index=False)
-    pd.DataFrame([metrics]).to_csv(out_summary, index=False)
-
-
-if __name__ == "__main__":  # pragma: no cover
-    surface = pd.read_csv("docs/artifacts/wrds/spx_surface_sample.csv")
-    summary = pd.read_csv("docs/artifacts/wrds/heston_calibration_summary.csv")
-    atm_iv = float(summary["atm_iv"].iloc[0])
-    priced = evaluate(surface, atm_iv)
-    metrics = summarize(priced)
-    write_outputs(
-        Path("docs/artifacts/wrds/oos_pricing.csv"),
-        Path("docs/artifacts/wrds/oos_pricing_summary.csv"),
-        priced,
-        metrics,
+def evaluate(oos_surface: pd.DataFrame, params: Dict[str, float]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    modeled = apply_model(oos_surface.copy(), params)
+    modeled["abs_iv_bps"] = modeled["iv_error_bps"].abs()
+    modeled["abs_price_ticks"] = modeled["price_error_ticks"].abs()
+    summary = (
+        modeled.groupby("tenor_bucket", as_index=False, observed=True)
+        .agg(
+            mae_iv_bps=("abs_iv_bps", "mean"),
+            mae_price_ticks=("abs_price_ticks", "mean"),
+            quotes=("quotes", "sum"),
+        )
+        .sort_values("tenor_bucket")
     )
-    print("Wrote OOS pricing diagnostics")
+    return modeled, summary
+
+
+def write_outputs(detail_csv: Path, summary_csv: Path, detail: pd.DataFrame, summary: pd.DataFrame) -> None:
+    detail_csv.parent.mkdir(parents=True, exist_ok=True)
+    detail_cols = [
+        "symbol",
+        "trade_date",
+        "tenor_bucket",
+        "moneyness",
+        "mid_iv",
+        "model_iv",
+        "iv_error_bps",
+        "mid_price",
+        "model_price",
+        "price_error_ticks",
+        "quotes",
+    ]
+    detail[detail_cols].to_csv(detail_csv, index=False)
+    summary.to_csv(summary_csv, index=False)

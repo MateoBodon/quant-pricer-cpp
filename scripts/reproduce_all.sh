@@ -4,34 +4,68 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-${ROOT}/build}"
 BUILD_TYPE="${BUILD_TYPE:-Release}"
-ARTIFACT_DIR="${ARTIFACT_DIR:-${ROOT}/docs/artifacts}"
-LOG_DIR="${LOG_DIR:-${ARTIFACT_DIR}/logs}"
+ARTIFACT_DIR="${ROOT}/docs/artifacts"
+LOG_DIR="${ARTIFACT_DIR}/logs"
+BENCH_DIR="${ARTIFACT_DIR}/bench"
+WRDS_DIR="${ARTIFACT_DIR}/wrds"
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+REPRO_FAST_FLAG="${REPRO_FAST:-0}"
+SKIP_SLOW_FLAG="${SKIP_SLOW:-0}"
+SKIP_WRDS_FLAG="${SKIP_WRDS:-0}"
+BENCH_MIN_TIME="${BENCH_MIN_TIME:-0.05s}"
 
-mkdir -p "${ARTIFACT_DIR}" "${LOG_DIR}"
-
-echo "[reproduce] configuring ${BUILD_TYPE} build in ${BUILD_DIR}"
-cmake -S "${ROOT}" -B "${BUILD_DIR}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
-cmake --build "${BUILD_DIR}" --parallel
-
-echo "[reproduce] running FAST tests (label=FAST)"
-CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir "${BUILD_DIR}" -L FAST --output-on-failure -VV
-
-if [[ "${SKIP_SLOW:-0}" != "1" ]]; then
-  slow_log="${LOG_DIR}/slow_${TIMESTAMP}.log"
-  slow_junit="${LOG_DIR}/slow_${TIMESTAMP}.xml"
-  echo "[reproduce] running SLOW tests (label=SLOW) -> ${slow_log}"
-  CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir "${BUILD_DIR}" -L SLOW --output-on-failure -VV --output-junit "${slow_junit}" | tee "${slow_log}"
-else
-  echo "[reproduce] skipping SLOW tests (SKIP_SLOW=1)"
+export PYTHONHASHSEED="${PYTHONHASHSEED:-0}"
+export QUANT_BUILD_DIR="${BUILD_DIR}"
+FAST_ARGS=()
+if [[ "${REPRO_FAST_FLAG}" == "1" ]]; then
+  FAST_ARGS=(--fast)
 fi
 
-find_quant_cli() {
+maybe_clean_artifacts() {
+  if [[ "${CLEAN_ARTIFACTS:-1}" == "1" ]]; then
+    echo "[reproduce] cleaning ${ARTIFACT_DIR}"
+    rm -rf "${ARTIFACT_DIR}"
+  fi
+  mkdir -p "${ARTIFACT_DIR}" "${LOG_DIR}" "${BENCH_DIR}" "${WRDS_DIR}"
+}
+
+multi_config=0
+configure_build() {
+  echo "[reproduce] configuring ${BUILD_TYPE} build in ${BUILD_DIR}"
+  cmake -S "${ROOT}" -B "${BUILD_DIR}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
+  if [[ -f "${BUILD_DIR}/CMakeCache.txt" ]] && grep -q "CMAKE_CONFIGURATION_TYPES" "${BUILD_DIR}/CMakeCache.txt"; then
+    multi_config=1
+  else
+    multi_config=0
+  fi
+}
+
+build_all() {
+  local args=(--build "${BUILD_DIR}" --parallel)
+  if [[ "${multi_config}" == "1" ]]; then
+    args+=(--config "${BUILD_TYPE}")
+  fi
+  cmake "${args[@]}"
+}
+
+run_ctest_label() {
+  local label="$1"
+  shift || true
+  local args=("--test-dir" "${BUILD_DIR}" "--output-on-failure" "-VV")
+  if [[ "${multi_config}" == "1" ]]; then
+    args+=("-C" "${BUILD_TYPE}")
+  fi
+  echo "[reproduce] running tests (label=${label})"
+  CTEST_OUTPUT_ON_FAILURE=1 ctest "${args[@]}" -L "${label}" "$@"
+}
+
+find_binary() {
+  local name="$1"
   local candidates=(
-    "${BUILD_DIR}/quant_cli"
-    "${BUILD_DIR}/${BUILD_TYPE}/quant_cli"
-    "${BUILD_DIR}/quant_cli.exe"
-    "${BUILD_DIR}/${BUILD_TYPE}/quant_cli.exe"
+    "${BUILD_DIR}/${name}"
+    "${BUILD_DIR}/${BUILD_TYPE}/${name}"
+    "${BUILD_DIR}/${name}.exe"
+    "${BUILD_DIR}/${BUILD_TYPE}/${name}.exe"
   )
   for candidate in "${candidates[@]}"; do
     if [[ -x "${candidate}" ]]; then
@@ -39,15 +73,9 @@ find_quant_cli() {
       return 0
     fi
   done
-  echo "error: quant_cli not found in ${BUILD_DIR}" >&2
+  echo "error: ${name} not found under ${BUILD_DIR}" >&2
   exit 1
 }
-
-QUANT_CLI="$(find_quant_cli)"
-FAST_FLAGS=()
-if [[ "${REPRO_FAST:-0}" == "1" ]]; then
-  FAST_FLAGS=(--fast)
-fi
 
 run_py() {
   local script="${1}"
@@ -56,23 +84,115 @@ run_py() {
   python3 "${script}" "$@"
 }
 
-run_py "${ROOT}/scripts/qmc_vs_prng.py" "${FAST_FLAGS[@]}" --output "${ARTIFACT_DIR}/qmc_vs_prng.png" --csv "${ARTIFACT_DIR}/qmc_vs_prng.csv"
-run_py "${ROOT}/scripts/pde_convergence.py" "${FAST_FLAGS[@]}" --skip-build --output "${ARTIFACT_DIR}/pde_convergence.png" --csv "${ARTIFACT_DIR}/pde_convergence.csv"
-run_py "${ROOT}/scripts/mc_greeks_ci.py" "${FAST_FLAGS[@]}" --quant-cli "${QUANT_CLI}" --output "${ARTIFACT_DIR}/mc_greeks_ci.png" --csv "${ARTIFACT_DIR}/mc_greeks_ci.csv"
-run_py "${ROOT}/scripts/heston_qe_vs_analytic.py" "${FAST_FLAGS[@]}" --quant-cli "${QUANT_CLI}" --output "${ARTIFACT_DIR}/heston_qe_vs_analytic.png" --csv "${ARTIFACT_DIR}/heston_qe_vs_analytic.csv"
-
-if [[ "${RUN_WRDS_PIPELINE:-0}" == "1" ]]; then
-  extra_flags=()
-  if [[ "${WRDS_ENABLED:-0}" != "1" ]]; then
-    extra_flags+=(--use-sample)
+run_py_fast() {
+  local script="${1}"
+  shift
+  if [[ "${#FAST_ARGS[@]}" -gt 0 ]]; then
+    run_py "${script}" "${FAST_ARGS[@]}" "$@"
+  else
+    run_py "${script}" "$@"
   fi
-  wrds_symbol="${WRDS_SYMBOL:-SPX}"
-  wrds_trade_date="${WRDS_TRADE_DATE:-2023-06-14}"
-  extra_flags+=(--symbol "${wrds_symbol}" --trade-date "${wrds_trade_date}")
-  echo "[reproduce] running WRDS pipeline ${extra_flags[*]}"
-  python3 "${ROOT}/wrds_pipeline/pipeline.py" "${extra_flags[@]}"
+}
+
+generate_figures() {
+  local quant_cli="$1"
+  run_py_fast "${ROOT}/scripts/qmc_vs_prng.py" --output "${ARTIFACT_DIR}/qmc_vs_prng.png" --csv "${ARTIFACT_DIR}/qmc_vs_prng.csv"
+  run_py_fast "${ROOT}/scripts/pde_convergence.py" --skip-build --output "${ARTIFACT_DIR}/pde_convergence.png" --csv "${ARTIFACT_DIR}/pde_convergence.csv"
+  run_py_fast "${ROOT}/scripts/mc_greeks_ci.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/mc_greeks_ci.png" --csv "${ARTIFACT_DIR}/mc_greeks_ci.csv"
+  run_py_fast "${ROOT}/scripts/heston_qe_vs_analytic.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/heston_qe_vs_analytic.png" --csv "${ARTIFACT_DIR}/heston_qe_vs_analytic.csv"
+  run_py_fast "${ROOT}/scripts/tri_engine_agreement.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/tri_engine_agreement.png" --csv "${ARTIFACT_DIR}/tri_engine_agreement.csv"
+}
+
+run_benchmarks() {
+  mkdir -p "${BENCH_DIR}"
+  local bench_mc bench_pde
+  bench_mc="$(find_binary bench_mc)"
+  bench_pde="$(find_binary bench_pde)"
+  local mc_json="${BENCH_DIR}/bench_mc.json"
+  local pde_json="${BENCH_DIR}/bench_pde.json"
+  echo "[reproduce] running bench_mc -> ${mc_json}"
+  "${bench_mc}" --benchmark_min_time="${BENCH_MIN_TIME}" --benchmark_out="${mc_json}" --benchmark_out_format=json
+  echo "[reproduce] running bench_pde -> ${pde_json}"
+  "${bench_pde}" --benchmark_min_time="${BENCH_MIN_TIME}" --benchmark_out="${pde_json}" --benchmark_out_format=json
+  run_py "${ROOT}/scripts/generate_bench_artifacts.py" --mc-json "${mc_json}" --pde-json "${pde_json}" --out-dir "${BENCH_DIR}"
+}
+
+run_wrds_pipeline() {
+  if [[ "${SKIP_WRDS_FLAG}" == "1" ]]; then
+    echo "[reproduce] skipping WRDS pipeline (SKIP_WRDS=1)"
+    return
+  fi
+  mkdir -p "${WRDS_DIR}"
+  local -a extra=()
+  if [[ -n "${WRDS_SYMBOL:-}" ]]; then
+    extra+=(--symbol "${WRDS_SYMBOL}")
+  fi
+  if [[ -n "${WRDS_TRADE_DATE:-}" ]]; then
+    extra+=(--trade-date "${WRDS_TRADE_DATE}")
+  fi
+  if [[ "${WRDS_USE_SAMPLE:-0}" == "1" ]]; then
+    extra+=(--use-sample)
+  fi
+  if [[ "${REPRO_FAST_FLAG}" == "1" ]]; then
+    extra+=(--fast)
+  fi
+  local extra_desc="${extra[*]:-}"
+  echo "[reproduce] running WRDS pipeline ${extra_desc}"
+  if [[ "${#extra[@]}" -gt 0 ]]; then
+    (cd "${ROOT}" && python3 -m wrds_pipeline.pipeline "${extra[@]}")
+  else
+    (cd "${ROOT}" && python3 -m wrds_pipeline.pipeline)
+  fi
+}
+
+finalize_manifest() {
+  ROOT_DIR="${ROOT}" python3 - <<'PY'
+import os
+import sys
+
+root = os.environ["ROOT_DIR"]
+scripts_dir = os.path.join(root, "scripts")
+if scripts_dir not in sys.path:
+    sys.path.insert(0, scripts_dir)
+from manifest_utils import update_run
+
+payload = {
+    "timestamp": os.environ["TIMESTAMP"],
+    "build_dir": os.environ["BUILD_DIR"],
+    "build_type": os.environ["BUILD_TYPE"],
+    "fast": os.environ.get("REPRO_FAST_FLAG", "0") == "1",
+    "skip_slow": os.environ.get("SKIP_SLOW_FLAG", "0") == "1",
+    "skip_wrds": os.environ.get("SKIP_WRDS_FLAG", "0") == "1",
+    "bench_min_time": os.environ.get("BENCH_MIN_TIME"),
+}
+update_run("reproduce_all", payload)
+PY
+}
+
+export BUILD_DIR BUILD_TYPE TIMESTAMP REPRO_FAST_FLAG SKIP_SLOW_FLAG SKIP_WRDS_FLAG BENCH_MIN_TIME
+
+maybe_clean_artifacts
+configure_build
+build_all
+
+run_ctest_label "FAST"
+
+if [[ "${SKIP_SLOW_FLAG}" != "1" ]]; then
+  slow_log="${LOG_DIR}/slow_${TIMESTAMP}.log"
+  slow_junit="${LOG_DIR}/slow_${TIMESTAMP}.xml"
+  run_ctest_label "SLOW" --output-junit "${slow_junit}" | tee "${slow_log}"
 else
-  echo "[reproduce] skipping WRDS pipeline (set RUN_WRDS_PIPELINE=1 to enable with sample or credentials)."
+  echo "[reproduce] skipping SLOW tests (SKIP_SLOW=1)"
 fi
 
+quant_cli="$(find_binary quant_cli)"
+generate_figures "${quant_cli}"
+run_benchmarks
+run_wrds_pipeline
+
+if [[ "${RUN_MARKET_TESTS:-0}" == "1" ]]; then
+  run_ctest_label "MARKET"
+fi
+
+finalize_manifest
 echo "[reproduce] artifacts available under ${ARTIFACT_DIR}"

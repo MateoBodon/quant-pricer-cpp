@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag)](https://github.com/MateoBodon/quant-pricer-cpp/releases)
-[![codecov](https://codecov.io/gh/MateoBodon/quant-pricer-cpp/branch/main/graph/badge.svg)](https://codecov.io/gh/MateoBodon/quant-pricer-cpp)
+[![Coverage](https://img.shields.io/codecov/c/github/MateoBodon/quant-pricer-cpp/main?logo=codecov&label=Coverage)](https://codecov.io/gh/MateoBodon/quant-pricer-cpp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Docs](https://img.shields.io/website?label=Docs&url=https%3A%2F%2Fmateobodon.github.io%2Fquant-pricer-cpp%2F)](https://mateobodon.github.io/quant-pricer-cpp/index.html)
 [![Reproducibility](https://img.shields.io/badge/reproducibility-manifest-blue)](docs/artifacts/manifest.json)
@@ -41,24 +41,21 @@ See [`python/examples/quickstart.py`](python/examples/quickstart.py) for a fulle
 
 ## Results at a Glance
 
-Curated figures with reproduction commands live in [docs/Results.md](docs/Results.md).
+Curated figures (plus precise reproduction commands) live in [docs/Results.md](docs/Results.md).
 
-- <a href="docs/Results.md#qmc-vs-prng-rmse-scaling"><img src="docs/artifacts/qmc_vs_prng.png" alt="QMC vs PRNG" width="220"></a><br>
-  **QMC vs PRNG RMSE Scaling** – Sobol + Brownian bridge beats pseudorandom paths by ≈1.4× RMSE at equal wall-clock for both European and Asian payoffs.
+- <a href="docs/Results.md#tri-engine-agreement"><img src="docs/artifacts/tri_engine_agreement.png" alt="Tri-engine agreement" width="230"></a><br>
+  **Tri-Engine Agreement (BS / MC / PDE)** – Analytic, deterministic MC, and Crank–Nicolson agree to <5 bps across strikes; MC CI is shown.
+  Reproduce: `./scripts/reproduce_all.sh`
+  Data: [docs/artifacts/tri_engine_agreement.csv](docs/artifacts/tri_engine_agreement.csv)
+- <a href="docs/Results.md#qmc-vs-prng-rmse"><img src="docs/artifacts/qmc_vs_prng.png" alt="QMC vs PRNG RMSE" width="230"></a><br>
+  **QMC vs PRNG RMSE @ fixed wall-clock** – Sobol + Brownian bridge trims RMSE ≈40% vs pseudorandom paths for European + Asian calls.
   Reproduce: `./scripts/reproduce_all.sh` (`REPRO_FAST=1` for CI budgets)
   Data: [docs/artifacts/qmc_vs_prng.csv](docs/artifacts/qmc_vs_prng.csv)
-- <a href="docs/Results.md#pde-grid-convergence"><img src="docs/artifacts/pde_convergence.png" alt="PDE convergence" width="220"></a><br>
-  **PDE Grid Convergence** – Crank–Nicolson + Rannacher confirms ≈second-order slope, hitting sub-1e-4 error on a 401×400 grid.
-  Reproduce: `./scripts/reproduce_all.sh`
-  Data: [docs/artifacts/pde_convergence.csv](docs/artifacts/pde_convergence.csv)
-- <a href="docs/Results.md#mc-greeks-with-95-ci"><img src="docs/artifacts/mc_greeks_ci.png" alt="MC Greeks CI" width="220"></a><br>
-  **MC Greeks ±95% CI** – Pathwise Δ/Γ and LR Θ/Vega stay inside the analytic bands at 200k counter-based paths with deterministic seeds.
-  Reproduce: `./scripts/reproduce_all.sh`
-  Data: [docs/artifacts/mc_greeks_ci.csv](docs/artifacts/mc_greeks_ci.csv)
-- <a href="docs/Results.md#heston-qe-vs-analytic"><img src="docs/artifacts/heston_qe_vs_analytic.png" alt="Heston QE vs analytic" width="220"></a><br>
-  **Heston QE vs Analytic** – Andersen QE converges inside the analytic CI while Euler remains >2× higher error at the same 80k paths.
-  Reproduce: `./scripts/reproduce_all.sh`
-  Data: [docs/artifacts/heston_qe_vs_analytic.csv](docs/artifacts/heston_qe_vs_analytic.csv)
+- <a href="docs/Results.md#wrds-heston"><img src="docs/artifacts/wrds/heston_wrds_summary.png" alt="WRDS Heston summary" width="230"></a><br>
+  **WRDS Heston (In-sample & OOS)** – Vega-weighted Heston fit (SPX options), next-day IV MAE in bps, and delta-hedged 1d PnL histograms.
+  Reproduce (sample data): `./scripts/reproduce_all.sh`  
+  Reproduce (live WRDS): `WRDS_ENABLED=1 WRDS_USERNAME=... WRDS_PASSWORD=... ./scripts/reproduce_all.sh`
+  Data: [docs/artifacts/wrds/heston_fit_table.csv](docs/artifacts/wrds/heston_fit_table.csv), [docs/artifacts/wrds/oos_pricing_summary.csv](docs/artifacts/wrds/oos_pricing_summary.csv), [docs/artifacts/wrds/delta_hedge_pnl.csv](docs/artifacts/wrds/delta_hedge_pnl.csv)
 
 ---
 
@@ -892,14 +889,15 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 
 ### WRDS (OptionMetrics) Pipeline
 
-Opt-in MARKET tests under `wrds_pipeline/` pull (or fall back to synthetic samples), aggregate the SPX surface, run a lightweight Heston calibration, and emit anonymised CSVs under `docs/artifacts/wrds/`. Set `WRDS_ENABLED=1` together with `WRDS_USERNAME` / `WRDS_PASSWORD` to enable `ctest -L MARKET`; otherwise the tests are skipped. Key artifacts (all aggregated / anonymised):
+Opt-in MARKET tests under `wrds_pipeline/` pull (or fall back to deterministic samples), aggregate the SPX surface, run a vega-weighted Heston calibration, and emit anonymised CSV/PNG bundles under `docs/artifacts/wrds/`. Set `WRDS_ENABLED=1` together with `WRDS_USERNAME` / `WRDS_PASSWORD` to enable `ctest -L MARKET`; otherwise the tests are skipped. Key artifacts (all aggregated / anonymised):
 
-- [`docs/artifacts/wrds/spx_surface_sample.csv`](docs/artifacts/wrds/spx_surface_sample.csv) – grouped mid IV by moneyness/tenor
-- [`docs/artifacts/wrds/heston_calibration_summary.csv`](docs/artifacts/wrds/heston_calibration_summary.csv) – heuristic parameters + RMSE
-- [`docs/artifacts/wrds/oos_pricing.csv`](docs/artifacts/wrds/oos_pricing.csv) + summary – out-of-sample diagnostics
-- [`docs/artifacts/wrds/delta_hedge_pnl.csv`](docs/artifacts/wrds/delta_hedge_pnl.csv) – synthetic hedge P&L trace
+- [`docs/artifacts/wrds/spx_2024-06-14_surface.csv`](docs/artifacts/wrds/spx_2024-06-14_surface.csv) and [`docs/artifacts/wrds/spx_2024-06-17_surface.csv`](docs/artifacts/wrds/spx_2024-06-17_surface.csv) – tenor/moneyness buckets with mean IV/price/vega
+- [`docs/artifacts/wrds/heston_fit_table.csv`](docs/artifacts/wrds/heston_fit_table.csv) + [`docs/artifacts/wrds/heston_fit.json`](docs/artifacts/wrds/heston_fit.json) – calibrated parameters, bootstrap CIs, RMSE
+- [`docs/artifacts/wrds/oos_pricing_detail.csv`](docs/artifacts/wrds/oos_pricing_detail.csv) + summary – next-day IV/price diagnostics
+- [`docs/artifacts/wrds/delta_hedge_pnl.csv`](docs/artifacts/wrds/delta_hedge_pnl.csv) + summary – aggregated one-day delta-hedged PnL (ticks)
+- [`docs/artifacts/wrds/heston_wrds_summary.png`](docs/artifacts/wrds/heston_wrds_summary.png) – in-sample fit, OOS MAE, and PnL histogram
 
-Regenerate the public demo bundle with `RUN_WRDS_PIPELINE=1 ./scripts/reproduce_all.sh` (forces the sample fallback) or run `python wrds_pipeline/pipeline.py --symbol SPX --trade-date 2023-06-14` after exporting `WRDS_ENABLED=1`, `WRDS_USERNAME`, and `WRDS_PASSWORD`. The CLI automatically maps the trade date to the correct OptionMetrics annual table (e.g., `optionm.opprcd2023`).
+Regenerate the public demo bundle with `./scripts/reproduce_all.sh` (uses the bundled sample data when WRDS env vars are absent) or run `python -m wrds_pipeline.pipeline --symbol SPX --trade-date 2024-06-14` after exporting `WRDS_ENABLED=1`, `WRDS_USERNAME`, and `WRDS_PASSWORD`. The CLI automatically maps the trade date to the correct OptionMetrics annual table (e.g., `optionm.opprcd2024`).
 
 ---
 
