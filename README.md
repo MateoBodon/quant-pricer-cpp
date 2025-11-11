@@ -3,8 +3,9 @@
 **Modern C++20 option-pricing library with Black–Scholes analytics, Monte Carlo (variance reduction, pathwise/LR Greeks, QMC), and PDE (Crank–Nicolson)—with tests, benchmarks, clang-tidy, sanitizers, and CI.** [API Docs](https://mateobodon.github.io/quant-pricer-cpp/)
 
 [![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml)
-[![Docs](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/docs-pages.yml/badge.svg?branch=master&label=Docs%20Pages)](https://mateobodon.github.io/quant-pricer-cpp/)
+[![Sanitizers](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg?job=sanitizers&label=ASan%2FUBSan)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/MateoBodon/quant-pricer-cpp/branch/master/graph/badge.svg)](https://app.codecov.io/gh/MateoBodon/quant-pricer-cpp)
+[![Docs](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/docs-pages.yml/badge.svg?branch=master&label=Docs%20Pages)](https://mateobodon.github.io/quant-pricer-cpp/)
 
 [![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag)](https://github.com/MateoBodon/quant-pricer-cpp/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -42,20 +43,20 @@ See [`python/examples/quickstart.py`](python/examples/quickstart.py) for a fulle
 
 ## Results at a Glance
 
-Curated figures (plus precise reproduction commands) live in [docs/Results.md](docs/Results.md).
+Curated figures (plus precise reproduction commands) live on the [Results page](https://mateobodon.github.io/quant-pricer-cpp/Results.html).
 
-- <a href="docs/Results.md#tri-engine-agreement"><img src="docs/artifacts/tri_engine_agreement.png" alt="Tri-engine agreement" width="230"></a><br>
+- <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#tri-engine-agreement"><img src="docs/artifacts/tri_engine_agreement.png" alt="Tri-engine agreement" width="230"></a><br>
   **Tri-Engine Agreement (BS / MC / PDE)** – Analytic, deterministic MC, and Crank–Nicolson agree to <5 bps across strikes; MC CI is shown.<br>
   Reproduce: `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output docs/artifacts/tri_engine_agreement.png --csv docs/artifacts/tri_engine_agreement.csv`  
-  Data: [docs/artifacts/tri_engine_agreement.csv](docs/artifacts/tri_engine_agreement.csv)
-- <a href="docs/Results.md#qmc-vs-prng-equal-wall-clock"><img src="docs/artifacts/qmc_vs_prng_equal_time.png" alt="QMC vs PRNG equal-time RMSE" width="230"></a><br>
+  Data: [tri_engine_agreement.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/tri_engine_agreement.csv)
+- <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#qmc-vs-prng-equal-wall-clock"><img src="docs/artifacts/qmc_vs_prng_equal_time.png" alt="QMC vs PRNG equal-time RMSE" width="230"></a><br>
   **QMC vs PRNG (equal wall-clock)** – Sobol + Brownian bridge delivers ≈1.4× lower RMSE than PRNG at matched runtime for European + Asian calls.<br>
   Reproduce: `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv --fast`  
-  Data: [docs/artifacts/qmc_vs_prng_equal_time.csv](docs/artifacts/qmc_vs_prng_equal_time.csv)
-- <a href="docs/Results.md#wrds-heston"><img src="docs/artifacts/wrds/heston_wrds_summary.png" alt="WRDS Heston summary" width="230"></a><br>
-  **WRDS Heston (In-sample & OOS)** – Vega-weighted fit, next-day IV MAE, and Δ-hedged 1d PnL buckets built from OptionMetrics SPX quotes.<br>
-  Reproduce (sample): `python wrds_pipeline/pipeline.py --use-sample --fast`  
-  Data: [wrds_heston_insample.csv](docs/artifacts/wrds/wrds_heston_insample.csv), [wrds_heston_oos.csv](docs/artifacts/wrds/wrds_heston_oos.csv), [wrds_heston_hedge.csv](docs/artifacts/wrds/wrds_heston_hedge.csv)
+  Data: [qmc_vs_prng_equal_time.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/qmc_vs_prng_equal_time.csv)
+- <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/heston_wrds_summary.png" alt="WRDS Heston summary" width="230"></a><br>
+  **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated over ≥5 calm/stress dates with vega-weighted IV RMSE, quotes-weighted OOS MAE, and Δ-hedged 1d buckets.<br>
+  Reproduce (sample): `python wrds_pipeline/pipeline.py --dateset wrds_pipeline/dateset.yaml --use-sample`  
+  Data: [wrds_agg_pricing.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pricing.csv), [wrds_agg_oos.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_oos.csv), [wrds_agg_pnl.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pnl.csv)
 
 ---
 
