@@ -23,6 +23,12 @@
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DQUANT_ENABLE_OPENMP=ON`, `cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`, `CC=clang CXX=clang++ cmake -S . -B build-cov -DCMAKE_BUILD_TYPE=Debug -DQUANT_ENABLE_OPENMP=OFF -DCMAKE_CXX_FLAGS='--coverage -fprofile-instr-generate -fcoverage-mapping' -DCMAKE_EXE_LINKER_FLAGS='--coverage -fprofile-instr-generate' -DCMAKE_SHARED_LINKER_FLAGS='--coverage -fprofile-instr-generate'`, `cmake --build build-cov --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build-cov -L FAST -VV`, `.venv/bin/gcovr --root . --object-directory build-cov --filter='src/' --filter='include/' --exclude='external/' --exclude='tests/' --exclude='.*CMakeCXXCompilerId.*' --xml=docs/coverage/coverage.xml --html=docs/coverage/coverage.html --html-details=docs/coverage/index.html --gcov-executable 'xcrun llvm-cov gcov' --gcov-ignore-errors=no_working_dir_found --print-summary`.
 - Artifacts: refreshed `docs/coverage/{coverage.html,index.html,coverage.xml,*.html}`.
 
+## 2025-11-11 (release automation + validation pack)
+- Bumped the library/wheel version to v0.3.1, documented the new `validation_pack.zip` bundle in the README, and added `scripts/package_validation.py` + `requirements-artifacts.txt` so releases can zip every CSV/PNG alongside `docs/artifacts/manifest.json`.
+- Updated `release.yml` to install the artifact dependencies, run `scripts/reproduce_all.sh` (against the sample WRDS bundle), and upload both `docs/validation_pack.zip` and the manifest as GitHub release assets.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DQUANT_ENABLE_OPENMP=ON`, `cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
+- Artifacts: n/a (workflow/scripts only).
+
 ## 2025-11-11 (IV metrics + docs units)
 - Standardised WRDS calibration outputs: `calibrate_heston.py` now computes vega-weighted IV RMSE/MAE/p90 in vol points, quotes-weighted `iv_mae_bps_oos`, and price RMSE in ticks; the pipeline/plots/manifest consume the new keys.
 - Added a shared units legend to `docs/Results.md`, created `docs/WRDS_Results.md` with metric tables + figures, and linked the WRDS section to the new appendix.

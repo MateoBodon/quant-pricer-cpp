@@ -42,6 +42,19 @@ See [`python/examples/quickstart.py`](python/examples/quickstart.py) for a fulle
 
 ---
 
+## Validation Pack
+
+Each tagged release ships a `validation_pack.zip` asset containing every committed CSV/PNG plus `docs/artifacts/manifest.json`, so you can diff the published numbers without rebuilding. You can regenerate the same bundle locally (using the sample WRDS dateset) with:
+
+```bash
+WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
+python scripts/package_validation.py --artifacts docs/artifacts --output docs/validation_pack.zip
+```
+
+Upload the resulting `docs/validation_pack.zip` when drafting a GitHub release to keep reproducible evidence alongside the tag.
+
+---
+
 ## Results at a Glance
 
 Curated figures (plus precise reproduction commands) live on the [Results page](https://mateobodon.github.io/quant-pricer-cpp/Results.html).

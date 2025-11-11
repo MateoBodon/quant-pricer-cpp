@@ -4,6 +4,12 @@
 
 - feat(heston,mc): Andersen QE variance paths, deterministic counter RNG, CLI/pybind confidence intervals for MC Greeks
 
+## v0.3.1
+
+- test(cli): added `cli_smoke_fast` to exercise every quant_cli engine under JSON output and committed the full gcovr HTML bundle so `/coverage/` on gh-pages stays live.
+- chore(release): new `scripts/package_validation.py` plus a release workflow that runs `scripts/reproduce_all.sh` (sample WRDS bundle) and uploads `docs/validation_pack.zip` alongside `docs/artifacts/manifest.json`.
+- build: bumped the CMake/project/python package versions to 0.3.1 so wheels + docs advertise the new release.
+
 ## v0.3.0
 
 - feat(python): pybind bindings now expose Heston characteristic function/implied vol plus PDE + MC stats; `python/examples/quickstart.py` demonstrates the helpers.
