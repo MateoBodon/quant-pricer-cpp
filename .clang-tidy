@@ -1,6 +1,0 @@
-Checks: '-*,bugprone-*,performance-*,readability-*'
-WarningsAsErrors: ''
-HeaderFilterRegex: '.*'
-AnalyzeTemporaryDtors: false
-FormatStyle: none
-

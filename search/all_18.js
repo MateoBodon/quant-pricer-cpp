@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['v0_0',['v0',['../structquant_1_1heston_1_1_params.html#a6fafd2a84229beafeb003ec71b92893a',1,'quant::heston::Params']]],
+  ['validation_1',['Validation',['../md__r_e_a_d_m_e.html#autotoc_md60',1,'Cross-Method Validation'],['../md__r_e_a_d_m_e.html#autotoc_md63',1,'Edge Case Validation']]],
+  ['validation_20artifacts_2',['Reproduce Validation Artifacts',['../md__r_e_a_d_m_e.html#autotoc_md64',1,'']]],
+  ['validation_20framework_3',['Validation Framework',['../md__r_e_a_d_m_e.html#autotoc_md30',1,'']]],
+  ['validation_20results_4',['Validation &amp;amp; Results',['../md__r_e_a_d_m_e.html#autotoc_md59',1,'']]],
+  ['value_5',['value',['../structquant_1_1asian_1_1_mc_statistic.html#ab3e39c7d558462c20705cdae7d40d364',1,'quant::asian::McStatistic::value'],['../structquant_1_1lookback_1_1_mc_statistic.html#a646ec98070a515d5a559966fa7dc7d7a',1,'quant::lookback::McStatistic::value'],['../structquant_1_1mc_1_1_mc_statistic.html#a70640537fd08fb17fd055db79315a3f4',1,'quant::mc::McStatistic::value'],['../structquant_1_1multi_1_1_mc_stat.html#a1f01aeaa5dbdd37f8fffa00df8b6603f',1,'quant::multi::McStat::value'],['../structquant_1_1_piecewise_constant.html#af2ebaeb53997e94203c9f7c86064cf5d',1,'quant::PiecewiseConstant::value(double t) const']]],
+  ['values_6',['values',['../structquant_1_1_piecewise_constant.html#a07aec7601ac775025800876dc2efd011',1,'quant::PiecewiseConstant']]],
+  ['var_7',['var',['../structquant_1_1risk_1_1_var_es.html#ad4b85986625a9f249c3a1b90616cf5dc',1,'quant::risk::VarEs']]],
+  ['var_5fcvar_5ffrom_5fpnl_8',['var_cvar_from_pnl',['../namespacequant_1_1risk.html#acb5a7627ccb195b77091d6a7127c9d9e',1,'quant::risk']]],
+  ['var_5fcvar_5fgbm_9',['var_cvar_gbm',['../namespacequant_1_1risk.html#a866a4870c0c0a77df07fe980db222c99',1,'quant::risk']]],
+  ['var_5fcvar_5fportfolio_10',['var_cvar_portfolio',['../namespacequant_1_1risk.html#aa2bd51bebad7b3da9175a134dab42c3b',1,'quant::risk']]],
+  ['var_5fcvar_5ft_11',['var_cvar_t',['../namespacequant_1_1risk.html#a771eebc140fb44692952c376fb95749e',1,'quant::risk']]],
+  ['vares_12',['VarEs',['../structquant_1_1risk_1_1_var_es.html',1,'quant::risk']]],
+  ['variance_13',['variance',['../structquant_1_1stats_1_1_welford.html#a17323ed918a2a7ebf2e3f179c1acf919',1,'quant::stats::Welford']]],
+  ['variance_20reduction_20greeks_14',['Variance Reduction &amp;amp; Greeks',['../md__r_e_a_d_m_e.html#autotoc_md23',1,'']]],
+  ['variance_20reduction_20techniques_15',['Variance Reduction Techniques',['../md__r_e_a_d_m_e.html#autotoc_md25',1,'']]],
+  ['vega_16',['vega',['../structquant_1_1mc_1_1_greeks_result.html#a7e4df9ba06855e15b3c7aa0a95eea003',1,'quant::mc::GreeksResult::vega'],['../namespacequant_1_1bs.html#a440d4850067e734dbc14d96ac291e928',1,'quant::bs::vega()']]],
+  ['version_2ecpp_17',['version.cpp',['../version_8cpp.html',1,'']]],
+  ['version_2ehpp_18',['version.hpp',['../version_8hpp.html',1,'']]],
+  ['version_5fstring_19',['version_string',['../namespacequant.html#adacf89ccc0ea18f16fce9925070b4962',1,'quant']]],
+  ['visited_20areas_20',['Frequently Visited Areas',['../index.html#autotoc_md98',1,'']]],
+  ['vol_21',['vol',['../structquant_1_1american_1_1_params.html#a51648aa1cabc4b5eb57a95b9ecb4e406',1,'quant::american::Params::vol'],['../structquant_1_1asian_1_1_mc_params.html#a4bded10eb75de52194726a79c1899183',1,'quant::asian::McParams::vol'],['../structquant_1_1bs_1_1_params.html#a1b12592a397ee17fa9a3c79948cbdeac',1,'quant::bs::Params::vol'],['../structquant_1_1digital_1_1_params.html#a0c25956acfddde8ea625c819d5e31643',1,'quant::digital::Params::vol'],['../structquant_1_1lookback_1_1_mc_params.html#adb6d4e4151dc3f8d2832081ed3f40fdf',1,'quant::lookback::McParams::vol'],['../structquant_1_1mc_1_1_mc_params.html#a99903a7ceec2f029f03dedf475698a3a',1,'quant::mc::McParams::vol'],['../structquant_1_1multi_1_1_merton_params.html#a780896adcf3029a4681732412ccec854',1,'quant::multi::MertonParams::vol'],['../structquant_1_1pde_1_1_pde_params.html#abf6160681463f15f3d4cfc7c5cf1e044',1,'quant::pde::PdeParams::vol'],['../structquant_1_1pde_1_1_barrier_pde_params.html#ade82864fdf36fba4445270d33c352ef4',1,'quant::pde::BarrierPdeParams::vol']]],
+  ['vol_5fschedule_22',['vol_schedule',['../structquant_1_1mc_1_1_mc_params.html#ab851397db11337e923d2b2b01d9a3e32',1,'quant::mc::McParams::vol_schedule'],['../structquant_1_1pde_1_1_pde_params.html#a290f918f90f5d9e9afd4644ac0ac861e',1,'quant::pde::PdeParams::vol_schedule']]],
+  ['vols_23',['vols',['../structquant_1_1multi_1_1_basket_mc_params.html#abe8c06752108029c267caa4fc115bb30',1,'quant::multi::BasketMcParams']]],
+  ['vs_20black–scholes_20800k_20paths_20antithetic_20s_20k_20100_20r_203_20q_201_20σ_2020_20t_201_24',['MC Greeks vs Black–Scholes (800k paths, antithetic; S=K=100, r=3%, q=1%, σ=20%, T=1)',['../md__r_e_a_d_m_e.html#autotoc_md61',1,'']]]
+];

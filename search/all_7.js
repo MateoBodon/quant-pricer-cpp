@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['d1_0',['d1',['../namespacequant_1_1bs.html#aa014d8d6c8cfe28b9022838526bb4c91',1,'quant::bs']]],
+  ['d2_1',['d2',['../namespacequant_1_1bs.html#a6696ec0b9f66dc6bb2e9fcd1edce1400',1,'quant::bs']]],
+  ['delta_2',['delta',['../structquant_1_1american_1_1_greeks.html#af3611fc9837815c48c7337a9260b0894',1,'quant::american::Greeks::delta'],['../structquant_1_1mc_1_1_greeks_result.html#ad864c736e84be91804bb1cd8fdb727ba',1,'quant::mc::GreeksResult::delta'],['../structquant_1_1pde_1_1_pde_result.html#a96b9b0f7b727100183beb6897fcc0c1b',1,'quant::pde::PdeResult::delta'],['../structquant_1_1pde_1_1_barrier_pde_greeks_result.html#a20431c7abd417ddfc15481f870669d98',1,'quant::pde::BarrierPdeGreeksResult::delta']]],
+  ['delta_5fcall_3',['delta_call',['../namespacequant_1_1bs.html#af383ac3055e6844548cc05236a5b827c',1,'quant::bs']]],
+  ['delta_5fput_4',['delta_put',['../namespacequant_1_1bs.html#aca0f174afc1912a408f8af0f33909690',1,'quant::bs']]],
+  ['dependencies_5',['Dependencies',['../md__r_e_a_d_m_e.html#autotoc_md37',1,'']]],
+  ['determinism_20reproducibility_6',['Determinism &amp;amp; Reproducibility',['../md__r_e_a_d_m_e.html#autotoc_md27',1,'']]],
+  ['dev_20workflow_7',['Python bindings (dev workflow)',['../md__r_e_a_d_m_e.html#autotoc_md50',1,'']]],
+  ['developer_20experience_8',['🔧 &lt;b&gt;Developer Experience&lt;/b&gt;',['../md__r_e_a_d_m_e.html#autotoc_md12',1,'']]],
+  ['development_20workflow_9',['Development Workflow',['../md__r_e_a_d_m_e.html#autotoc_md93',1,'']]],
+  ['diag_10',['diag',['../structquant_1_1grid__utils_1_1_operator_workspace.html#ac971634862fdd22162f54e857f0adcb1',1,'quant::grid_utils::OperatorWorkspace::diag'],['../structquant_1_1american_1_1_operator_workspace.html#ac971634862fdd22162f54e857f0adcb1',1,'quant::american::OperatorWorkspace::diag']]],
+  ['diagnostics_11',['diagnostics',['../structquant_1_1american_1_1_lsmc_result.html#a8a560af20ad333ce56e4e5294dc44a74',1,'quant::american::LsmcResult']]],
+  ['diffusioncoefficients_12',['DiffusionCoefficients',['../structquant_1_1grid__utils_1_1_diffusion_coefficients.html',1,'quant::grid_utils']]],
+  ['digital_2ecpp_13',['digital.cpp',['../digital_8cpp.html',1,'']]],
+  ['digital_2ehpp_14',['digital.hpp',['../digital_8hpp.html',1,'']]],
+  ['dimension_15',['dimension',['../classquant_1_1qmc_1_1_sobol_sequence.html#ac9bbfc4aed4e07b57a15ee1390688f8d',1,'quant::qmc::SobolSequence']]],
+  ['dirichlet_16',['Dirichlet',['../structquant_1_1pde_1_1_pde_params.html#ae4220bab8d7f7a4e52c868d188d41f38abac152b762896edff34ed668ae1a546f',1,'quant::pde::PdeParams']]],
+  ['dirichlet_5fboundary_17',['dirichlet_boundary',['../namespacequant_1_1grid__utils.html#a8eca93bb7bfbaa2e51259bceb9a56c53',1,'quant::grid_utils']]],
+  ['dividend_18',['dividend',['../structquant_1_1american_1_1_params.html#a6cbdfa0c59da005f45975cbb62c7f730',1,'quant::american::Params::dividend'],['../structquant_1_1asian_1_1_mc_params.html#a76dc0a25a1d8d8b22674a35e063cddc8',1,'quant::asian::McParams::dividend'],['../structquant_1_1bs_1_1_params.html#a4250b8d481e969928a98310b551c8cd8',1,'quant::bs::Params::dividend'],['../structquant_1_1digital_1_1_params.html#a682e158728b67916893cc820c065188a',1,'quant::digital::Params::dividend'],['../structquant_1_1grid__utils_1_1_diffusion_coefficients.html#a41d326c12ac1dbc2ca1449f74bf1cc25',1,'quant::grid_utils::DiffusionCoefficients::dividend'],['../structquant_1_1grid__utils_1_1_payoff_boundary_params.html#a786408ac8727447920ecea36a68c8d90',1,'quant::grid_utils::PayoffBoundaryParams::dividend'],['../structquant_1_1heston_1_1_market_params.html#af9ce575f4b6208cc189e37fdfee86f61',1,'quant::heston::MarketParams::dividend'],['../structquant_1_1lookback_1_1_mc_params.html#ad7ed42c5583ee05634a6dc5cede9436d',1,'quant::lookback::McParams::dividend'],['../structquant_1_1mc_1_1_mc_params.html#af41771f9ad14275fa0d800ccac10758f',1,'quant::mc::McParams::dividend'],['../structquant_1_1multi_1_1_merton_params.html#a4e1093a60b17394a54219c842c67456d',1,'quant::multi::MertonParams::dividend'],['../structquant_1_1pde_1_1_pde_params.html#ad660ceccc13865ab475bfcf27e497239',1,'quant::pde::PdeParams::dividend'],['../structquant_1_1pde_1_1_barrier_pde_params.html#a1fb5993b79b5e97aeca4ca7c70cad4b2',1,'quant::pde::BarrierPdeParams::dividend']]],
+  ['dividend_5fschedule_19',['dividend_schedule',['../structquant_1_1mc_1_1_mc_params.html#aceb78039083d2e9523783c27b84c3264',1,'quant::mc::McParams::dividend_schedule'],['../structquant_1_1pde_1_1_pde_params.html#a17bdf285a83c3c6367c6313ab639fe5d',1,'quant::pde::PdeParams::dividend_schedule']]],
+  ['dividends_20',['dividends',['../structquant_1_1multi_1_1_basket_mc_params.html#a0873aa7b1839bcd3962cd71cf9efddaf',1,'quant::multi::BasketMcParams']]],
+  ['docs_21',['Docs',['../md__r_e_a_d_m_e.html#autotoc_md75',1,'']]],
+  ['documentation_22',['API Documentation',['../md__r_e_a_d_m_e.html#autotoc_md76',1,'']]],
+  ['downin_23',['DownIn',['../namespacequant.html#ac2a21f237d093fb6f2666cc5db939016a4531ddaa9e675b75bce5e37bd0966375',1,'quant']]],
+  ['downout_24',['DownOut',['../namespacequant.html#ac2a21f237d093fb6f2666cc5db939016a70bccb773b70948ddf83cbdd40c7b34d',1,'quant']]]
+];

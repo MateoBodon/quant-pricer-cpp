@@ -1,0 +1,2 @@
+\_form#0=98x21:$\varphi(x) = \frac{1}{\sqrt{2\pi}} e^{-x^2/2}$
+\_form#1=104x16:$\Phi(x) = \int_{-\infty}^x \varphi(t)\,dt$
