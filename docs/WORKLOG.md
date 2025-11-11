@@ -26,6 +26,11 @@
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
 - Artifacts: n/a (workflow plumbing only).
 
+## 2025-11-11 (Release v0.3.2 prep)
+- Bumped every version stamp (CMake, pyproject, setup.cfg, `include/quant/version.hpp`) to 0.3.2, added the release notes to `CHANGELOG.md`, and double-checked the release workflow still packages `docs/artifacts` via `scripts/package_validation.py`.
+- Commands run: n/a (metadata only).
+- Artifacts: n/a.
+
 ## 2025-11-11 (Heston analytic fix + coverage site)
 - Fixed the analytic Heston pricer by applying the proper Gauss–Laguerre weighting (exp(x)) and clamping the result to intrinsic value, then reran both Release and coverage FAST suites.
 - Generated llvm-cov/gcovr reports locally (lcov, Cobertura XML, HTML) and published the HTML bundle under `docs/coverage/` with a README badge + Results.md link; taught the Docs Pages workflow to copy that folder into the deployed site.
