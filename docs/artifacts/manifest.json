@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-11-11T18:38:58.735602+00:00",
+  "generated_at": "2025-11-11T18:45:33.767380+00:00",
   "git": {
     "branch": "master",
     "dirty": true,
-    "sha": "658acd79a90f70785d713ad0a8404b476ff3ff6e"
+    "sha": "adda79a607e8c1d39e71c55781b7c676ed94f475"
   },
   "omp_threads": 11,
   "runs": {
@@ -76,6 +76,48 @@
         "mc_json": "docs/artifacts/bench/bench_mc.json",
         "pde_json": "docs/artifacts/bench/bench_pde.json",
         "timestamp": "2025-11-11T01:53:58.557145+00:00"
+      },
+      {
+        "csv": [
+          "docs/artifacts/bench/bench_mc_paths.csv",
+          "docs/artifacts/bench/bench_mc_rmse.csv",
+          "docs/artifacts/bench/bench_pde_walltime.csv",
+          "docs/artifacts/bench/bench_psor_iterations.csv",
+          "docs/artifacts/bench/bench_mc_equal_time.csv",
+          "docs/artifacts/bench/bench_pde_order.csv"
+        ],
+        "figures": [
+          "docs/artifacts/bench/bench_mc_paths.png",
+          "docs/artifacts/bench/bench_mc_rmse.png",
+          "docs/artifacts/bench/bench_pde_walltime.png",
+          "docs/artifacts/bench/bench_psor_iterations.png",
+          "docs/artifacts/bench/bench_mc_equal_time.png",
+          "docs/artifacts/bench/bench_pde_order.png"
+        ],
+        "mc_json": "docs/artifacts/bench/bench_mc.json",
+        "pde_json": "docs/artifacts/bench/bench_pde.json",
+        "timestamp": "2025-11-11T18:43:52.629370+00:00"
+      },
+      {
+        "csv": [
+          "docs/artifacts/bench/bench_mc_paths.csv",
+          "docs/artifacts/bench/bench_mc_rmse.csv",
+          "docs/artifacts/bench/bench_pde_walltime.csv",
+          "docs/artifacts/bench/bench_psor_iterations.csv",
+          "docs/artifacts/bench/bench_mc_equal_time.csv",
+          "docs/artifacts/bench/bench_pde_order.csv"
+        ],
+        "figures": [
+          "docs/artifacts/bench/bench_mc_paths.png",
+          "docs/artifacts/bench/bench_mc_rmse.png",
+          "docs/artifacts/bench/bench_pde_walltime.png",
+          "docs/artifacts/bench/bench_psor_iterations.png",
+          "docs/artifacts/bench/bench_mc_equal_time.png",
+          "docs/artifacts/bench/bench_pde_order.png"
+        ],
+        "mc_json": "docs/artifacts/bench/bench_mc.json",
+        "pde_json": "docs/artifacts/bench/bench_pde.json",
+        "timestamp": "2025-11-11T18:45:33.766190+00:00"
       }
     ],
     "greeks_reliability": {

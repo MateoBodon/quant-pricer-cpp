@@ -8,6 +8,12 @@
 - Commands run: `source .venv/bin/activate && pip install pyyaml`, `source .venv/bin/activate && python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample --fast`, `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
 - Artifacts: regenerated `docs/artifacts/wrds/wrds_agg_{pricing,oos,pnl}.csv`, `docs/artifacts/wrds/wrds_multi_date_summary.png`, updated `docs/artifacts/manifest.json`.
 
+## 2025-11-11 (GBench snapshots + equal-time plots)
+- Tuned the `bench_mc` equal-time harness (fewer QMC paths) and upgraded `scripts/generate_bench_artifacts.py` so the throughput plot shows the OpenMP ideal line, the equal-time figure reports the time-scaled RMSE per payoff (Asian + Barrier), and the PDE convergence chart overlays the −2 reference slope + fitted slope.
+- Regenerated all benchmark JSON/CSV/PNG artifacts and documented the three headline figures on both README and `docs/Results.md`.
+- Commands run: `cmake --build build --target bench_mc`, `./build/bench_mc --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_mc.json --benchmark_out_format=json`, `./build/bench_pde --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_pde.json --benchmark_out_format=json`, `python scripts/generate_bench_artifacts.py --mc-json docs/artifacts/bench/bench_mc.json --pde-json docs/artifacts/bench/bench_pde.json --out-dir docs/artifacts/bench`.
+- Artifacts: refreshed every file under `docs/artifacts/bench/` plus the benchmark entries in `docs/artifacts/manifest.json`.
+
 ## 2025-11-11 (Heston analytic fix + coverage site)
 - Fixed the analytic Heston pricer by applying the proper Gauss–Laguerre weighting (exp(x)) and clamping the result to intrinsic value, then reran both Release and coverage FAST suites.
 - Generated llvm-cov/gcovr reports locally (lcov, Cobertura XML, HTML) and published the HTML bundle under `docs/coverage/` with a README badge + Results.md link; taught the Docs Pages workflow to copy that folder into the deployed site.

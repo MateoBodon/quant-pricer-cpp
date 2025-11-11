@@ -60,8 +60,16 @@ def parse_mc(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame,
                     }
                 )
     throughput_df = pd.DataFrame(throughput_rows).sort_values("threads")
+    if not throughput_df.empty:
+        base = max(float(throughput_df["paths_per_sec"].iloc[0]), 1e-9)
+        throughput_df["speedup"] = throughput_df["paths_per_sec"] / base
+        throughput_df["efficiency"] = throughput_df["speedup"] / throughput_df["threads"]
     rmse_df = pd.DataFrame(rmse_rows)
     equal_df = pd.DataFrame(equal_rows)
+    if not equal_df.empty:
+        equal_df["time_scaled_error"] = equal_df["std_error"] * np.sqrt(
+            equal_df["real_time_ms"].clip(lower=1e-9)
+        )
     return throughput_df, rmse_df, equal_df
 
 
@@ -106,12 +114,28 @@ def parse_pde(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame
 
 
 def plot_throughput(df: pd.DataFrame, out_path: Path) -> None:
-    fig, ax = plt.subplots(figsize=(5.0, 3.0))
-    ax.plot(df["threads"], df["paths_per_sec"] / 1e6, marker="o", color="#1f77b4")
+    fig, ax = plt.subplots(figsize=(5.5, 3.3))
+    ax.plot(df["threads"], df["paths_per_sec"] / 1e6, marker="o", color="#1f77b4", label="Measured")
+    if not df.empty:
+        base_threads = float(df["threads"].iloc[0])
+        base_val = float(df["paths_per_sec"].iloc[0]) / 1e6
+        ideal = base_val * (df["threads"] / base_threads)
+        ax.plot(df["threads"], ideal, linestyle="--", color="#949494", label="Ideal linear")
     ax.set_xlabel("Threads")
     ax.set_ylabel("Paths / sec (millions)")
-    ax.set_title("MC Throughput vs Threads")
+    ax.set_title("Monte Carlo Throughput (OpenMP)")
     ax.grid(True, linestyle=":", alpha=0.5)
+    ax.legend()
+    if "speedup" in df.columns:
+        for _, row in df.iterrows():
+            ax.text(
+                row["threads"],
+                row["paths_per_sec"] / 1e6,
+                f"{row['speedup']:.1f}×",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+            )
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)
@@ -132,34 +156,39 @@ def plot_equal_time(df: pd.DataFrame, out_path: Path) -> None:
     if df.empty:
         return
     payoffs = sorted(df["payoff"].unique())
-    methods = ["PRNG", "QMC"]
-    x = np.arange(len(payoffs), dtype=float)
-    width = 0.35
-    fig, ax = plt.subplots(figsize=(6.0, 3.5))
-    for idx, method in enumerate(methods):
+    fig, axes = plt.subplots(1, len(payoffs), figsize=(6.0 * len(payoffs), 3.5), squeeze=False)
+    colors = {"PRNG": "#d62728", "QMC": "#2ca02c"}
+    for ax, payoff in zip(axes[0], payoffs):
         subset = (
-            df[df["method"] == method]
-            .set_index("payoff")
-            .reindex(payoffs)
+            df[df["payoff"] == payoff]
+            .set_index("method")
+            .reindex(["PRNG", "QMC"])
         )
-        heights = subset["std_error"].to_list()
-        bars = ax.bar(x + (idx - 0.5) * width, heights, width=width, label=method)
-        for payoff_idx, bar in enumerate(bars):
-            runtime = subset["real_time_ms"].iloc[payoff_idx]
+        metric = "time_scaled_error" if "time_scaled_error" in subset.columns else "std_error"
+        values = subset[metric]
+        bars = ax.bar(values.index, values.fillna(0.0), color=[colors.get(m, "#1f77b4") for m in values.index])
+        improvement_text = ""
+        if "PRNG" in subset.index and "QMC" in subset.index and subset[metric].notna().all():
+            prng = float(subset.at["PRNG", metric])
+            qmc = float(subset.at["QMC", metric])
+            if prng > 0:
+                improvement = 100.0 * (1.0 - qmc / prng)
+                improvement_text = f" (QMC {improvement:+.1f}% better @ equal time)"
+        ax.set_title(f"{payoff}{improvement_text}")
+        ax.set_ylabel("σ · √ms" if ax is axes[0][0] else "")
+        ax.grid(True, axis="y", linestyle=":", alpha=0.4)
+        for method, bar in zip(values.index, bars):
+            runtime = subset.at[method, "real_time_ms"]
+            sigma = subset.at[method, "std_error"]
             ax.text(
                 bar.get_x() + bar.get_width() / 2.0,
                 bar.get_height(),
-                f"{runtime:.1f} ms",
+                f"{sigma:.3e} σ\n{runtime:.0f} ms",
                 ha="center",
                 va="bottom",
                 fontsize=8,
             )
-    ax.set_xticks(x)
-    ax.set_xticklabels(payoffs)
-    ax.set_ylabel("Std error (vol pts)")
-    ax.set_title("Equal-time MC RMSE")
-    ax.grid(True, axis="y", linestyle=":", alpha=0.4)
-    ax.legend()
+    axes[0][0].set_ylabel("Time-scaled RMSE (σ·√ms)")
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)
@@ -192,12 +221,27 @@ def plot_psor(df: pd.DataFrame, out_path: Path) -> None:
 def plot_order(df: pd.DataFrame, out_path: Path) -> None:
     if df.empty:
         return
-    fig, ax = plt.subplots(figsize=(5.0, 3.0))
-    ax.loglog(df["space_nodes"], df["abs_error"], marker="o", color="#ff7f0e")
+    fig, ax = plt.subplots(figsize=(5.0, 3.3))
+    x = df["space_nodes"].to_numpy(dtype=float)
+    y = df["abs_error"].to_numpy(dtype=float)
+    ax.loglog(x, y, marker="o", color="#ff7f0e", label="Measured")
+    if len(x) >= 2:
+        slope, intercept = np.polyfit(np.log(x), np.log(y), 1)
+        ref = y[0] * (x / x[0]) ** -2
+        ax.loglog(x, ref, linestyle="--", color="#7f7f7f", label="-2 slope ref")
+        ax.text(
+            x[-1],
+            y[-1],
+            f"slope={slope:.2f}",
+            fontsize=8,
+            ha="right",
+            va="bottom",
+        )
     ax.set_xlabel("Spatial nodes")
     ax.set_ylabel("Abs error")
     ax.set_title("PDE convergence (log-log)")
     ax.grid(True, which="both", linestyle=":", alpha=0.5)
+    ax.legend()
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)

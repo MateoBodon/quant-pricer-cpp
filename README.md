@@ -785,8 +785,9 @@ File | What it shows
 
 Reusable Google Benchmark snapshots live in `docs/artifacts/bench/` (JSON from the executables, converted into CSV + PNG via `scripts/generate_bench_artifacts.py`). Regenerate everything with `cmake --build build --target bench` (or `make bench`), then rerun the helper script.
 
-- <a href="docs/artifacts/bench/bench_mc_paths.png"><img src="docs/artifacts/bench/bench_mc_paths.png" alt="MC throughput" width="320"></a> <a href="docs/artifacts/bench/bench_mc_rmse.png"><img src="docs/artifacts/bench/bench_mc_rmse.png" alt="MC RMSE" width="320"></a>
-- <a href="docs/artifacts/bench/bench_pde_walltime.png"><img src="docs/artifacts/bench/bench_pde_walltime.png" alt="PDE wall time" width="320"></a> <a href="docs/artifacts/bench/bench_psor_iterations.png"><img src="docs/artifacts/bench/bench_psor_iterations.png" alt="PSOR iterations" width="320"></a>
+- <a href="docs/artifacts/bench/bench_mc_paths.png"><img src="docs/artifacts/bench/bench_mc_paths.png" alt="MC throughput" width="320"></a> <a href="docs/artifacts/bench/bench_mc_equal_time.png"><img src="docs/artifacts/bench/bench_mc_equal_time.png" alt="MC equal-time" width="320"></a>
+- <a href="docs/artifacts/bench/bench_pde_walltime.png"><img src="docs/artifacts/bench/bench_pde_walltime.png" alt="PDE wall time" width="320"></a> <a href="docs/artifacts/bench/bench_pde_order.png"><img src="docs/artifacts/bench/bench_pde_order.png" alt="PDE order" width="320"></a>
+- <a href="docs/artifacts/bench/bench_mc_rmse.png"><img src="docs/artifacts/bench/bench_mc_rmse.png" alt="MC RMSE" width="320"></a> <a href="docs/artifacts/bench/bench_psor_iterations.png"><img src="docs/artifacts/bench/bench_psor_iterations.png" alt="PSOR iterations" width="320"></a>
 
 ### Performance Characteristics
 

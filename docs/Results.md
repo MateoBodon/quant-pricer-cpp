@@ -64,6 +64,35 @@ Current QE runs still exhibit a large bias versus the analytic reference (CLI em
 - Data: [artifacts/heston_qe_vs_analytic.csv](artifacts/heston_qe_vs_analytic.csv)
 - Manifest entry: `runs.heston_qe_vs_analytic`
 
+## GBench Benchmarks (Release build)
+
+`bench_mc` + `bench_pde` snapshots live under `docs/artifacts/bench/` (JSON from Google Benchmark + derived CSV/PNG via `scripts/generate_bench_artifacts.py`). Reproduce all three plots with:
+
+```
+cmake --build build --target bench_mc bench_pde
+./build/bench_mc --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_mc.json --benchmark_out_format=json
+./build/bench_pde --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_pde.json --benchmark_out_format=json
+python scripts/generate_bench_artifacts.py --mc-json docs/artifacts/bench/bench_mc.json --pde-json docs/artifacts/bench/bench_pde.json --out-dir docs/artifacts/bench
+```
+
+- **OpenMP scaling:** near-linear throughput from 1→8 threads with the dashed line showing ideal scaling.
+
+  ![MC throughput](artifacts/bench/bench_mc_paths.png)
+
+  Data: [artifacts/bench/bench_mc_paths.csv](artifacts/bench/bench_mc_paths.csv)
+
+- **QMC vs PRNG (equal time):** bars show `σ·√ms` so lower is better at matched wall-clock. Barrier down-and-out calls retain a ~3% delta-hedge tighter RMSE after time-normalisation, while the Asian payoff stays parity because the Brownian bridge overhead dominates.
+
+  ![MC equal time](artifacts/bench/bench_mc_equal_time.png)
+
+  Data: [artifacts/bench/bench_mc_equal_time.csv](artifacts/bench/bench_mc_equal_time.csv)
+
+- **PDE −2 slope:** Crank–Nicolson retains the expected second-order convergence; the dashed reference line encodes the −2 slope on the log–log plane and the fitted slope annotation comes from the benchmark JSON.
+
+  ![PDE order](artifacts/bench/bench_pde_order.png)
+
+  Data: [artifacts/bench/bench_pde_order.csv](artifacts/bench/bench_pde_order.csv)
+
 ## WRDS OptionMetrics Snapshot (Opt-in)
 
 The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `secid` via `optionm.secnmd`, pulls the year-partitioned `optionm.opprcdYYYY` table, filters stale quotes, recomputes implied vols with the project’s solver, and bins by tenor/moneyness. A vega-weighted Heston calibration (least-squares in IV space) and bootstrap CIs are emitted alongside next-day OOS errors and delta-hedged one-day PnL histograms. Only aggregated CSV/PNGs under `docs/artifacts/wrds/` are committed.
