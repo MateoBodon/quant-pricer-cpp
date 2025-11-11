@@ -36,15 +36,16 @@ pricing sweep.
 - `artifacts/monte_carlo.csv` captures the GBM control-variate run (counter RNG,
   antithetic) together with standard errors and confidence intervals.
 
-## Sobol vs PRNG RMSE
+## Sobol vs PRNG (equal time)
 
-`artifacts/qmc_vs_prng.csv` shows Sobol + Brownian bridge consistently cutting
-RMSE by ~1.4× versus Euler + PRNG across 20 000–320 000 paths. The manifest’s
-`qmc_vs_prng` section includes both RMSEs and the CI bands.
+`artifacts/qmc_vs_prng_equal_time.csv` shows Sobol + Brownian bridge delivering
+≈1.4× lower RMSE than pseudorandom paths when both spend the same wall-clock
+budget. The manifest’s `qmc_vs_prng_equal_time` section records the time grid,
+per-method RMSE curves, and seeds.
 
 ## PDE convergence
 
-`artifacts/pde_convergence.csv` reports Crank–Nicolson + Rannacher error slopes
+`artifacts/pde_order_slope.csv` reports Crank–Nicolson + Rannacher error slopes
 (≈−2.0 on recent runs). Δ/Γ remain within ≈2×10⁻⁵ of Black–Scholes once the grid
 exceeds 201×200; 801×400 pushes price errors below 1e-4.
 
@@ -79,10 +80,10 @@ comparison with Black–Scholes analytics.
 
 - `docs/artifacts/manifest.json` – reproducibility metadata (compiler, flags,
   platform, executed commands, MC/Heston/Greeks/American seeds & summaries).
-- `qmc_vs_prng.csv` / `.png` – MC RMSE comparison.
+- `qmc_vs_prng_equal_time.csv` / `.png` – equal-time MC RMSE comparison.
 - `heston_qe_convergence.csv` / `.png` – Andersen QE vs Euler convergence.
 - `greeks_ci.csv` / `.png` – LR/pathwise Greeks with confidence bands.
-- `pde_convergence.csv` / `.png` – log–log error slopes for Crank–Nicolson.
+- `pde_order_slope.csv` / `.png` – log–log error slopes for Crank–Nicolson.
 - `american_convergence.csv` / `.png` – PSOR/binomial/LSMC agreement.
 - `barrier_validation.csv` / `.png` – MC + PDE vs Reiner–Rubinstein.
 

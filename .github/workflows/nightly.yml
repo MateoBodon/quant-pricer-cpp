@@ -37,7 +37,7 @@ jobs:
         run: ctest --test-dir build-nightly --output-on-failure -C Release -L FAST
 
       - name: QMC vs PRNG (full)
-        run: python scripts/qmc_vs_prng.py
+        run: python scripts/qmc_vs_prng_equal_time.py
 
       - name: American consistency (full)
         run: python scripts/american_consistency.py

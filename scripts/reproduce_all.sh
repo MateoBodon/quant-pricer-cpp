@@ -96,8 +96,8 @@ run_py_fast() {
 
 generate_figures() {
   local quant_cli="$1"
-  run_py_fast "${ROOT}/scripts/qmc_vs_prng.py" --output "${ARTIFACT_DIR}/qmc_vs_prng.png" --csv "${ARTIFACT_DIR}/qmc_vs_prng.csv"
-  run_py_fast "${ROOT}/scripts/pde_convergence.py" --skip-build --output "${ARTIFACT_DIR}/pde_convergence.png" --csv "${ARTIFACT_DIR}/pde_convergence.csv"
+  run_py_fast "${ROOT}/scripts/qmc_vs_prng_equal_time.py" --output "${ARTIFACT_DIR}/qmc_vs_prng_equal_time.png" --csv "${ARTIFACT_DIR}/qmc_vs_prng_equal_time.csv"
+  run_py_fast "${ROOT}/scripts/pde_order_slope.py" --skip-build --output "${ARTIFACT_DIR}/pde_order_slope.png" --csv "${ARTIFACT_DIR}/pde_order_slope.csv"
   run_py_fast "${ROOT}/scripts/mc_greeks_ci.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/mc_greeks_ci.png" --csv "${ARTIFACT_DIR}/mc_greeks_ci.csv"
   run_py_fast "${ROOT}/scripts/heston_qe_vs_analytic.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/heston_qe_vs_analytic.png" --csv "${ARTIFACT_DIR}/heston_qe_vs_analytic.csv"
   run_py_fast "${ROOT}/scripts/tri_engine_agreement.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/tri_engine_agreement.png" --csv "${ARTIFACT_DIR}/tri_engine_agreement.csv"

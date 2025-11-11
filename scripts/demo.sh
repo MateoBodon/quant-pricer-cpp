@@ -311,7 +311,7 @@ for paths in paths_grid:
     prng_rmse_values.append(prng_rmse)
     qmc_rmse_values.append(qmc_rmse)
 
-with open(artifact_dir / "qmc_vs_prng.csv", "w", newline="") as fh:
+with open(artifact_dir / "qmc_vs_prng_equal_time.csv", "w", newline="") as fh:
     writer = csv.DictWriter(fh, fieldnames=[
         "paths", "prng_price", "prng_se", "prng_ci_low", "prng_ci_high",
         "qmc_price", "qmc_se", "qmc_ci_low", "qmc_ci_high",
@@ -344,10 +344,10 @@ if HAS_MPL:
     plt.grid(True, which="both", linestyle="--", alpha=0.4)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(artifact_dir / "qmc_vs_prng.png", dpi=200)
+    plt.savefig(artifact_dir / "qmc_vs_prng_equal_time.png", dpi=200)
     plt.close()
 else:
-    print("warn: matplotlib unavailable; skipping qmc_vs_prng plot")
+    print("warn: matplotlib unavailable; skipping qmc_vs_prng_equal_time plot")
 
 rmse_ratio_values = [row["rmse_ratio"] for row in rmse_rows]
 
@@ -688,7 +688,7 @@ for M_nodes, N_steps in grids:
         "gamma_err": gamma_err,
     })
 
-with open(artifact_dir / "pde_convergence.csv", "w", newline="") as fh:
+with open(artifact_dir / "pde_order_slope.csv", "w", newline="") as fh:
     writer = csv.DictWriter(fh, fieldnames=["M", "N", "price", "delta", "gamma", "price_err", "delta_err", "gamma_err"])
     writer.writeheader()
     for row in pde_conv_rows:
@@ -723,10 +723,10 @@ if HAS_MPL:
     plt.grid(True, which="both", linestyle="--", alpha=0.4)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(artifact_dir / "pde_convergence.png", dpi=200)
+    plt.savefig(artifact_dir / "pde_order_slope.png", dpi=200)
     plt.close()
 else:
-    print("warn: matplotlib unavailable; skipping pde_convergence plot")
+    print("warn: matplotlib unavailable; skipping pde_order_slope plot")
 
 american_params = {
     "spot": 100.0,
@@ -1013,8 +1013,8 @@ else:
 plots = []
 if HAS_MPL:
     plots = [
-        (artifact_dir / "qmc_vs_prng.png", "MC RMSE (PRNG vs Sobol)"),
-        (artifact_dir / "pde_convergence.png", "PDE convergence"),
+        (artifact_dir / "qmc_vs_prng_equal_time.png", "MC RMSE (PRNG vs Sobol)"),
+        (artifact_dir / "pde_order_slope.png", "PDE convergence"),
         (artifact_dir / "american_convergence.png", "American convergence"),
         (artifact_dir / "barrier_validation.png", "Barrier validation"),
     ]
@@ -1123,7 +1123,7 @@ manifest = {
         "rng": mc_json.get("rng", "counter"),
         "threads": mc_json.get("threads", 1),
     },
-    "qmc_vs_prng": {
+    "qmc_vs_prng_equal_time": {
         "paths": paths_grid,
         "prng_rmse": [round(v, 6) for v in prng_rmse_values],
         "qmc_rmse": [round(v, 6) for v in qmc_rmse_values],
@@ -1172,7 +1172,7 @@ manifest = {
         "delta_abs_error": round(pde_delta_err, 6),
         "gamma_abs_error": round(pde_gamma_err, 6),
     },
-    "pde_convergence": {
+    "pde_order_slope": {
         "nodes": [row["M"] for row in pde_conv_rows],
         "price_error": [round(v, 6) for v in price_errors],
         "slope": round(slope, 2),

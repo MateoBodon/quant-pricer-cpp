@@ -8,8 +8,8 @@
 - **American Consistency**: Binomial, PSOR, and LSMC agree within PSOR tolerance / LSMC SE for American puts with dividends.
 
 ## Validation Artifacts (see `./scripts/reproduce_all.sh`)
-- `qmc_vs_prng.png`: RMSE decay (paths vs error) comparing PRNG and Sobol+Brownian bridge; shows Sobol achieving ~2× lower RMSE at equal paths.
-- `pde_convergence.png`: Price error vs grid nodes validating ≈2nd order slope and Rannacher smoothing.
+- `qmc_vs_prng_equal_time.png`: RMSE vs wall-clock comparing PRNG and Sobol+Brownian bridge; Sobol maintains ~1.4–1.5× lower error at the same runtime.
+- `pde_order_slope.png`: Price error vs grid nodes validating ≈2nd order slope and Rannacher smoothing.
 - `american_convergence.png`: PSOR versus binomial convergence plus LSMC scatter overlay (3σ band) for early-exercise options.
 - `barrier_validation.png`: Log-scale absolute error comparison for barrier MC/PDE vs Reiner–Rubinstein benchmarks.
 
