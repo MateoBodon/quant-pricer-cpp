@@ -31,6 +31,11 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
       - name: Generate docs
         run: doxygen Doxyfile
+      - name: Copy coverage bundle
+        if: ${{ hashFiles('docs/coverage/index.html') != '' }}
+        run: |
+          mkdir -p docs/html/coverage
+          cp -R docs/coverage/. docs/html/coverage/
       - name: Inject base href for project Pages path
         run: |
           python3 - <<'PY'
