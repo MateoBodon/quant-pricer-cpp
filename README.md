@@ -2,11 +2,12 @@
 
 **Modern C++20 option-pricing library with Black–Scholes analytics, Monte Carlo (variance reduction, pathwise/LR Greeks, QMC), and PDE (Crank–Nicolson)—with tests, benchmarks, clang-tidy, sanitizers, and CI.** [API Docs](https://mateobodon.github.io/quant-pricer-cpp/)
 
-[![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag)](https://github.com/MateoBodon/quant-pricer-cpp/releases)
-[![Coverage](https://codecov.io/gh/MateoBodon/quant-pricer-cpp/branch/master/graph/badge.svg)](https://app.codecov.io/gh/MateoBodon/quant-pricer-cpp)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml)
 [![Docs](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/docs-pages.yml/badge.svg?branch=master&label=Docs%20Pages)](https://mateobodon.github.io/quant-pricer-cpp/)
+[![Coverage](https://codecov.io/gh/MateoBodon/quant-pricer-cpp/branch/master/graph/badge.svg)](https://app.codecov.io/gh/MateoBodon/quant-pricer-cpp)
+
+[![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag)](https://github.com/MateoBodon/quant-pricer-cpp/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Reproducibility](https://img.shields.io/badge/reproducibility-manifest-blue)](docs/artifacts/manifest.json)
 
 **TL;DR:** A fast, tested C++ pricer that cross-checks three independent methods (analytic / MC / PDE), exposes Greeks via pathwise & likelihood-ratio estimators, and ships with benchmarks and convergence reports so results are both correct and reproducible.
@@ -44,18 +45,17 @@ See [`python/examples/quickstart.py`](python/examples/quickstart.py) for a fulle
 Curated figures (plus precise reproduction commands) live in [docs/Results.md](docs/Results.md).
 
 - <a href="docs/Results.md#tri-engine-agreement"><img src="docs/artifacts/tri_engine_agreement.png" alt="Tri-engine agreement" width="230"></a><br>
-  **Tri-Engine Agreement (BS / MC / PDE)** – Analytic, deterministic MC, and Crank–Nicolson agree to <5 bps across strikes; MC CI is shown.
-  Reproduce: `./scripts/reproduce_all.sh`
+  **Tri-Engine Agreement (BS / MC / PDE)** – Analytic, deterministic MC, and Crank–Nicolson agree to <5 bps across strikes; MC CI is shown.<br>
+  Reproduce: `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output docs/artifacts/tri_engine_agreement.png --csv docs/artifacts/tri_engine_agreement.csv`  
   Data: [docs/artifacts/tri_engine_agreement.csv](docs/artifacts/tri_engine_agreement.csv)
-- <a href="docs/Results.md#qmc-vs-prng-rmse"><img src="docs/artifacts/qmc_vs_prng.png" alt="QMC vs PRNG RMSE" width="230"></a><br>
-  **QMC vs PRNG RMSE @ fixed wall-clock** – Sobol + Brownian bridge trims RMSE ≈40% vs pseudorandom paths for European + Asian calls.
-  Reproduce: `./scripts/reproduce_all.sh` (`REPRO_FAST=1` for CI budgets)
-  Data: [docs/artifacts/qmc_vs_prng.csv](docs/artifacts/qmc_vs_prng.csv)
+- <a href="docs/Results.md#qmc-vs-prng-equal-wall-clock"><img src="docs/artifacts/qmc_vs_prng_equal_time.png" alt="QMC vs PRNG equal-time RMSE" width="230"></a><br>
+  **QMC vs PRNG (equal wall-clock)** – Sobol + Brownian bridge delivers ≈1.4× lower RMSE than PRNG at matched runtime for European + Asian calls.<br>
+  Reproduce: `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv --fast`  
+  Data: [docs/artifacts/qmc_vs_prng_equal_time.csv](docs/artifacts/qmc_vs_prng_equal_time.csv)
 - <a href="docs/Results.md#wrds-heston"><img src="docs/artifacts/wrds/heston_wrds_summary.png" alt="WRDS Heston summary" width="230"></a><br>
-  **WRDS Heston (In-sample & OOS)** – Vega-weighted Heston fit (SPX options), next-day IV MAE in bps, and delta-hedged 1d PnL histograms.
-  Reproduce (sample data): `./scripts/reproduce_all.sh`  
-  Reproduce (live WRDS): `WRDS_ENABLED=1 WRDS_USERNAME=... WRDS_PASSWORD=... ./scripts/reproduce_all.sh`
-  Data: [docs/artifacts/wrds/heston_fit_table.csv](docs/artifacts/wrds/heston_fit_table.csv), [docs/artifacts/wrds/oos_pricing_summary.csv](docs/artifacts/wrds/oos_pricing_summary.csv), [docs/artifacts/wrds/delta_hedge_pnl.csv](docs/artifacts/wrds/delta_hedge_pnl.csv)
+  **WRDS Heston (In-sample & OOS)** – Vega-weighted fit, next-day IV MAE, and Δ-hedged 1d PnL buckets built from OptionMetrics SPX quotes.<br>
+  Reproduce (sample): `python wrds_pipeline/pipeline.py --use-sample --fast`  
+  Data: [wrds_heston_insample.csv](docs/artifacts/wrds/wrds_heston_insample.csv), [wrds_heston_oos.csv](docs/artifacts/wrds/wrds_heston_oos.csv), [wrds_heston_hedge.csv](docs/artifacts/wrds/wrds_heston_hedge.csv)
 
 ---
 
@@ -686,17 +686,17 @@ The mixed gamma estimator trims the standard error by ~4× versus the pure LRM e
 
 ### Convergence Analysis
 
-**Monte Carlo Convergence:** `docs/artifacts/qmc_vs_prng.csv` shows Sobol + Brownian bridge cutting RMSE to 0.02398 (vs 0.03435) at 40 000 paths and to 0.00848 (vs 0.01215) at 320 000 paths—roughly a 1.4× gain at equal runtime.
+**Monte Carlo Convergence:** `docs/artifacts/qmc_vs_prng_equal_time.csv` shows Sobol + Brownian bridge cutting RMSE to 0.02398 (vs 0.03435) under the same time budget—roughly a 1.4× gain once the budget allows ≥8k paths.
 
 **Heston QE vs Euler:** `docs/artifacts/heston_qe_vs_analytic.csv` captures Andersen's QE scheme against the legacy Euler discretisation across 16–128 steps (80k paths). QE tracks the analytic price within ~1.3 e-4 at 64 steps while Euler lags by >2×, and the PNG shows logarithmic convergence with the counter-based RNG keeping dispersion stable across threads.
 
-**PDE Convergence:** `docs/artifacts/pde_convergence.csv` confirms ≈second-order behaviour (slope −2.0). Price errors shrink from 4.98×10⁻³ on a 101×100 grid to 8.0×10⁻⁵ on an 801×400 grid while Δ/Γ stay within 10⁻⁵ of Black–Scholes.
+**PDE Convergence:** `docs/artifacts/pde_order_slope.csv` confirms ≈second-order behaviour (slope −2.0). Price errors shrink from 4.98×10⁻³ on a 101×100 grid to 8.0×10⁻⁵ on an 801×400 grid while Δ/Γ stay within 10⁻⁵ of Black–Scholes.
 
-The reproduction script also writes plots—`docs/artifacts/qmc_vs_prng.png` compares RMSE reductions, `docs/artifacts/heston_qe_vs_analytic.png` visualises QE vs Euler convergence, and `docs/artifacts/mc_greeks_ci.png` overlays MC Greeks with 95 % confidence bands.
+The reproduction script also writes plots—`docs/artifacts/qmc_vs_prng_equal_time.png` compares equal-time RMSE reductions, `docs/artifacts/heston_qe_vs_analytic.png` visualises QE vs Euler convergence, and `docs/artifacts/mc_greeks_ci.png` overlays MC Greeks with 95 % confidence bands.
 
 Barrier validation is captured via `artifacts/barrier_validation.csv` and `artifacts/barrier_validation.png`, comparing Monte Carlo and PDE prices against Reiner–Rubinstein closed-form benchmarks for representative up/down knock-out cases.
 
-`artifacts/pde_convergence.csv` and `artifacts/pde_convergence.png` record log–log error curves versus grid size, demonstrating the expected ≈ second-order slope once the two Rannacher start-up steps have smoothed the payoff kink.
+`artifacts/pde_order_slope.csv` and `artifacts/pde_order_slope.png` record log–log error curves versus grid size, demonstrating the expected ≈ second-order slope once the two Rannacher start-up steps have smoothed the payoff kink.
 
 `artifacts/greeks_ci.csv` tabulates Delta/Vega/Gamma/Theta alongside their standard errors and 95 % confidence limits (likelihood-ratio Theta, mixed Gamma). These match Black–Scholes within the CI width and feed directly into downstream dashboards.
 
@@ -727,14 +727,14 @@ Barrier validation is captured via `artifacts/barrier_validation.csv` and `artif
 Run `./scripts/reproduce_all.sh` to build Release, execute the FAST + SLOW test labels, and regenerate the validation bundle under `docs/artifacts/`. The script refreshes `docs/artifacts/manifest.json` with compiler, git SHA, RNG, and CLI metadata. Set `REPRO_FAST=1` to shrink workloads or `SKIP_SLOW=1` if you're iterating locally and only need the deterministic CSV/PNGs.
 
 - Looking for quick links? Browse [docs/Results.md](docs/Results.md) or open the PNG/CSV pairs directly inside `docs/artifacts/`.
-- Need to rerun one plot? Each helper in `scripts/` (e.g., `qmc_vs_prng.py`, `pde_convergence.py`) accepts `--output/--csv` so you can regenerate a single artifact in isolation.
+- Need to rerun one plot? Each helper in `scripts/` (e.g., `qmc_vs_prng_equal_time.py`, `pde_order_slope.py`) accepts `--output/--csv` so you can regenerate a single artifact in isolation.
 - Legacy `scripts/demo.sh` remains for the broader PDF deck (`artifacts/onepager.pdf`, `artifacts/twopager.pdf`) if you still need that resume-ready snapshot.
 
 ### Artifact index
 File | What it shows
 ---|---
-`docs/artifacts/qmc_vs_prng.png` | Sobol vs PRNG RMSE decay (European + Asian GBM) with slope annotation.
-`docs/artifacts/pde_convergence.png` | Crank–Nicolson + Rannacher grid slope and sub-1e-4 price errors on fine meshes.
+`docs/artifacts/qmc_vs_prng_equal_time.png` | Sobol vs PRNG RMSE decay (European + Asian GBM) with equal-time slope annotation.
+`docs/artifacts/pde_order_slope.png` | Crank–Nicolson + Rannacher grid slope and sub-1e-4 price errors on fine meshes.
 `docs/artifacts/mc_greeks_ci.png` | Delta/Vega/Gamma/Theta ±95 % confidence intervals using deterministic counter RNG.
 `docs/artifacts/heston_qe_vs_analytic.png` | Andersen QE vs Euler absolute error vs time steps against the analytic benchmark.
 `docs/artifacts/manifest.json` | Deterministic metadata: compiler, git SHA, seeds, RNG mode, and CLI commands per artifact.
