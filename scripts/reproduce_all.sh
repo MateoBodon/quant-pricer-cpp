@@ -191,7 +191,11 @@ run_benchmarks
 run_wrds_pipeline
 
 if [[ "${RUN_MARKET_TESTS:-0}" == "1" ]]; then
-  run_ctest_label "MARKET"
+  market_log="${LOG_DIR}/market_${TIMESTAMP}.log"
+  market_junit="${LOG_DIR}/market_${TIMESTAMP}.xml"
+  run_ctest_label "MARKET" --output-junit "${market_junit}" | tee "${market_log}"
+else
+  echo "[reproduce] skipping MARKET tests (RUN_MARKET_TESTS=0)"
 fi
 
 finalize_manifest

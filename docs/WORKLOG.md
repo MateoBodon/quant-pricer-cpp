@@ -20,6 +20,11 @@
 - Commands run: `./scripts/reproduce_all.sh` (defaults, no WRDS env), which internally executes the documented CMake + ctest invocations.
 - Artifacts: refreshed `docs/artifacts/*` (tri-engine, equal-time QMC, PDE slope, MC Greeks, benches), new `docs/artifacts/logs/slow_20251111T003717Z.{log,xml}`, updated `docs/artifacts/manifest.json`.
 
+## 2025-11-11 (MARKET log capture + Codecov badge)
+- Taught `scripts/reproduce_all.sh` to archive MARKET `ctest` output (verbose log + JUnit) whenever `RUN_MARKET_TESTS=1` so opt-in WRDS runs mirror the stored SLOW logs.
+- Swapped the README coverage badge to the native Codecov graph so it links straight to `app.codecov.io`.
+- Commands run: n/a (doc + script updates only).
+
 ## 2025-11-10 (docs pages + README badge)
 - Enabled Pages best-practice workflow (configure-pages + Doxygen) and wired Doxygen to a Markdown main page with sidebar navigation.
 - Added `docs/api/index.md`, tree view, and enabled alphabetical index so the published API docs have a real landing page.

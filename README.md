@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag)](https://github.com/MateoBodon/quant-pricer-cpp/releases)
-[![Coverage](https://img.shields.io/codecov/c/github/MateoBodon/quant-pricer-cpp/main?logo=codecov&label=Coverage)](https://codecov.io/gh/MateoBodon/quant-pricer-cpp)
+[![Coverage](https://codecov.io/gh/MateoBodon/quant-pricer-cpp/branch/master/graph/badge.svg)](https://app.codecov.io/gh/MateoBodon/quant-pricer-cpp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Docs](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/docs-pages.yml/badge.svg?branch=master&label=Docs%20Pages)](https://mateobodon.github.io/quant-pricer-cpp/)
 [![Reproducibility](https://img.shields.io/badge/reproducibility-manifest-blue)](docs/artifacts/manifest.json)
