@@ -15,6 +15,14 @@
 - Tightened CI coverage job (clang `llvm-cov` + gcovr/Codecov), new coverage badge, and appended the PDE second-order regression test.
 - Commands run: `./scripts/reproduce_all.sh` (multiple, final run with SLOW), `cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
 
+# Worklog
+
+## 2025-11-11 (CLI coverage smoke)
+- Added `tests/test_cli_fast.py` plus a `cli_smoke_fast` FAST test that drives every `quant_cli` engine (bs/iv/mc/barrier/american/pde/digital/asian/lookback/heston/risk) via JSON to cover the large `src/main.cpp` switch and ensure the Heston analytic/MC diagnostics are exercised under coverage builds.
+- Reconfigured/rebuilt both Release + coverage trees, re-ran the FULL FAST suite (Release + `build-cov`) to pick up the new test, and regenerated the gcovr HTML/Cobertura bundle; line coverage rose from 59.6% to 82.0% and the Pages-hosted `/coverage/` now serves the refreshed report.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DQUANT_ENABLE_OPENMP=ON`, `cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`, `CC=clang CXX=clang++ cmake -S . -B build-cov -DCMAKE_BUILD_TYPE=Debug -DQUANT_ENABLE_OPENMP=OFF -DCMAKE_CXX_FLAGS='--coverage -fprofile-instr-generate -fcoverage-mapping' -DCMAKE_EXE_LINKER_FLAGS='--coverage -fprofile-instr-generate' -DCMAKE_SHARED_LINKER_FLAGS='--coverage -fprofile-instr-generate'`, `cmake --build build-cov --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build-cov -L FAST -VV`, `.venv/bin/gcovr --root . --object-directory build-cov --filter='src/' --filter='include/' --exclude='external/' --exclude='tests/' --exclude='.*CMakeCXXCompilerId.*' --xml=docs/coverage/coverage.xml --html=docs/coverage/coverage.html --html-details=docs/coverage/index.html --gcov-executable 'xcrun llvm-cov gcov' --gcov-ignore-errors=no_working_dir_found --print-summary`.
+- Artifacts: refreshed `docs/coverage/{coverage.html,index.html,coverage.xml,*.html}`.
+
 ## 2025-11-11 (IV metrics + docs units)
 - Standardised WRDS calibration outputs: `calibrate_heston.py` now computes vega-weighted IV RMSE/MAE/p90 in vol points, quotes-weighted `iv_mae_bps_oos`, and price RMSE in ticks; the pipeline/plots/manifest consume the new keys.
 - Added a shared units legend to `docs/Results.md`, created `docs/WRDS_Results.md` with metric tables + figures, and linked the WRDS section to the new appendix.
