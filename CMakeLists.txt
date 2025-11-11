@@ -194,10 +194,10 @@ add_test(
 set_tests_properties(heston_calibration_fast PROPERTIES LABELS "FAST")
 
 add_test(
-  NAME qmc_vs_prng_fast
+  NAME qmc_vs_prng_equal_time_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_qmc_fast.py
 )
-set_tests_properties(qmc_vs_prng_fast PROPERTIES LABELS "FAST")
+set_tests_properties(qmc_vs_prng_equal_time_fast PROPERTIES LABELS "FAST")
 
 add_test(
   NAME greeks_reliability_fast

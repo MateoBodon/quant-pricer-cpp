@@ -18,7 +18,7 @@ def main() -> None:
         csv_path = tmp_dir / "qmc_summary.csv"
         cmd = [
             sys.executable,
-            str(repo_root / "scripts" / "qmc_vs_prng.py"),
+            str(repo_root / "scripts" / "qmc_vs_prng_equal_time.py"),
             "--fast",
             "--seed",
             "101",
@@ -35,23 +35,23 @@ def main() -> None:
             rows = list(csv.DictReader(fh))
         if len(rows) <= 5:
             raise AssertionError("Expected >5 rows in QMC vs PRNG CSV")
-        required = {"paths", "rmse_prng", "rmse_qmc", "slope_prng", "slope_qmc"}
+        required = {"time_seconds", "paths_prng", "paths_qmc", "rmse_prng", "rmse_qmc", "rmse_ratio", "payoff"}
         missing = required - set(rows[0].keys())
         if missing:
             raise AssertionError(f"Missing columns in QMC vs PRNG CSV: {sorted(missing)}")
 
     manifest_path = repo_root / "docs" / "artifacts" / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
-    qmc_entry = manifest["runs"].get("qmc_vs_prng")
+    qmc_entry = manifest["runs"].get("qmc_vs_prng_equal_time")
     if not qmc_entry:
-        raise AssertionError("Manifest missing qmc_vs_prng entry")
+        raise AssertionError("Manifest missing qmc_vs_prng_equal_time entry")
     seed = qmc_entry.get("seed")
     if seed != 101:
-        raise AssertionError(f"Expected qmc_vs_prng seed 101, found {seed}")
+        raise AssertionError(f"Expected qmc_vs_prng_equal_time seed 101, found {seed}")
     if qmc_entry.get("csv_rows", 0) <= 5:
-        raise AssertionError("Manifest qmc_vs_prng entry reports insufficient csv_rows")
+        raise AssertionError("Manifest qmc_vs_prng_equal_time entry reports insufficient csv_rows")
     if "command" not in qmc_entry:
-        raise AssertionError("Manifest qmc_vs_prng entry missing command")
+        raise AssertionError("Manifest qmc_vs_prng_equal_time entry missing command")
 
 
 if __name__ == "__main__":

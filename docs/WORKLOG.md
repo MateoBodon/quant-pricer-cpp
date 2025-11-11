@@ -14,6 +14,12 @@
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
 - Artifacts: n/a (workflow/docs only).
 
+## 2025-11-11 (artifacts refresh: equal-time QMC + PDE slope)
+- Replaced the legacy `qmc_vs_prng` helper with `scripts/qmc_vs_prng_equal_time.py`, introduced `scripts/pde_order_slope.py`, and refreshed the `ctest` harness to keep the FAST label aligned with the new artifact set.
+- Regenerated every artifact/manifest via `./scripts/reproduce_all.sh` (Release rebuild, `ctest -L FAST`, full SLOW tier, WRDS sample bundle, and log/JUnit capture) so the committed CSV/PNGs reflect the equal-time QMC + PDE slope outputs.
+- Commands run: `./scripts/reproduce_all.sh` (defaults, no WRDS env), which internally executes the documented CMake + ctest invocations.
+- Artifacts: refreshed `docs/artifacts/*` (tri-engine, equal-time QMC, PDE slope, MC Greeks, benches), new `docs/artifacts/logs/slow_20251111T003717Z.{log,xml}`, updated `docs/artifacts/manifest.json`.
+
 ## 2025-11-10 (docs pages + README badge)
 - Enabled Pages best-practice workflow (configure-pages + Doxygen) and wired Doxygen to a Markdown main page with sidebar navigation.
 - Added `docs/api/index.md`, tree view, and enabled alphabetical index so the published API docs have a real landing page.
@@ -29,9 +35,9 @@
 
 ## 2025-11-10 (validation bundle + artifacts)
 - Moved reproducible artifacts under `docs/artifacts/`, rewrote `docs/Results.md`, and introduced `scripts/reproduce_all.sh`.
-- Generated baseline CSV/PNGs (`qmc_vs_prng`, `pde_convergence`, `mc_greeks_ci`, `heston_qe_vs_analytic`) plus refreshed `docs/artifacts/manifest.json`.
+- Generated baseline CSV/PNGs (`qmc_vs_prng_equal_time`, `pde_order_slope`, `mc_greeks_ci`, `heston_qe_vs_analytic`) plus refreshed `docs/artifacts/manifest.json`.
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel && ctest --test-dir build -L FAST --output-on-failure -VV` (multiple), `REPRO_FAST=1 ./scripts/reproduce_all.sh`, and the individual `python scripts/<artifact>.py ...` invocations to backfill the figures.
-- Artifacts: `docs/artifacts/qmc_vs_prng.{csv,png}`, `pde_convergence.{csv,png}`, `mc_greeks_ci.{csv,png}`, `heston_qe_vs_analytic.{csv,png}`, updated `docs/artifacts/manifest.json`.
+- Artifacts: `docs/artifacts/qmc_vs_prng_equal_time.{csv,png}`, `pde_order_slope.{csv,png}`, `mc_greeks_ci.{csv,png}`, `heston_qe_vs_analytic.{csv,png}`, updated `docs/artifacts/manifest.json`.
 
 ## 2025-11-10 (coverage + logs)
 - Added a CI coverage job (Debug + `gcovr` + Codecov badge) and taught `scripts/reproduce_all.sh` to capture SLOW `ctest` logs/JUnit under `docs/artifacts/logs/`.

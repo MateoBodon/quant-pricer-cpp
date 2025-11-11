@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-11-10T18:56:39-05:00",
+    "date": "2025-11-10T19:37:57-05:00",
     "host_name": "Mateos-MBP-5.stdusr.yale.internal",
     "executable": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/bench_mc",
     "num_cpus": 11,
@@ -26,7 +26,7 @@
         "num_sharing": 1
       }
     ],
-    "load_avg": [7.35303,7.10352,6.26221],
+    "load_avg": [7.94873,5.27539,4.7876],
     "library_version": "v1.9.4-45-g01deef52",
     "library_build_type": "release",
     "json_schema_version": 1
@@ -42,10 +42,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 7.3700791981536895e+07,
-      "cpu_time": 7.3290000000000075e+07,
+      "real_time": 7.7159665990620852e+07,
+      "cpu_time": 7.5670000000000015e+07,
       "time_unit": "ns",
-      "paths/s": 1.3644426251876093e+07
+      "paths/s": 1.3215276860050216e+07
     },
     {
       "name": "BM_MC_PathsPerSecond/2",
@@ -57,10 +57,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 7.4165458994684741e+07,
-      "cpu_time": 7.3600000000000104e+07,
+      "real_time": 7.8003916016314179e+07,
+      "cpu_time": 7.6206000000000000e+07,
       "time_unit": "ns",
-      "paths/s": 1.3586956521739110e+07
+      "paths/s": 1.3122326326011077e+07
     },
     {
       "name": "BM_MC_PathsPerSecond/4",
@@ -72,10 +72,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 7.2609499999089167e+07,
-      "cpu_time": 7.2453000000000104e+07,
+      "real_time": 8.1358499999623746e+07,
+      "cpu_time": 7.8403000000000000e+07,
       "time_unit": "ns",
-      "paths/s": 1.3802050984776318e+07
+      "paths/s": 1.2754613981607847e+07
     },
     {
       "name": "BM_MC_PathsPerSecond/8",
@@ -87,10 +87,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 7.1859582996694371e+07,
-      "cpu_time": 7.1694000000000149e+07,
+      "real_time": 8.1103958014864475e+07,
+      "cpu_time": 7.7964000000000149e+07,
       "time_unit": "ns",
-      "paths/s": 1.3948168605462074e+07
+      "paths/s": 1.2826432712533966e+07
     },
     {
       "name": "BM_MC_Rmse_PRNG",
@@ -102,8 +102,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 2,
-      "real_time": 2.9741979000391439e+07,
-      "cpu_time": 2.9541999999999959e+07,
+      "real_time": 3.1964770503691398e+07,
+      "cpu_time": 3.1187999999999993e+07,
       "time_unit": "ns",
       "std_error": 7.5559672132644619e-03
     },
@@ -117,8 +117,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 1.0471466250019147e+09,
-      "cpu_time": 1.0444610000000001e+09,
+      "real_time": 1.1114515830122399e+09,
+      "cpu_time": 1.0887940000000000e+09,
       "time_unit": "ns",
       "std_error": 7.5585978457951590e-03
     }

@@ -5,7 +5,7 @@
 /artifacts/*
 !/artifacts/manifest.json
 !/artifacts/heston/
-!/artifacts/qmc_vs_prng.csv
+!/artifacts/qmc_vs_prng_equal_time.csv
 !/artifacts/american_consistency.csv
 /artifacts/heston/*
 !/artifacts/heston/fit_20240614.csv

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Generate PDE grid convergence diagnostics for a vanilla call.
+Generate PDE grid convergence diagnostics (second-order slope) for a vanilla call.
 
 Outputs:
-  * artifacts/pde_convergence.csv
-  * artifacts/pde_convergence.png
+  * artifacts/pde_order_slope.csv
+  * artifacts/pde_order_slope.png
 """
 from __future__ import annotations
 
@@ -55,8 +55,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--fast", action="store_true", help="Use fewer grid nodes for CI")
     ap.add_argument("--skip-build", action="store_true", help="Assume quant_cli is already built")
-    ap.add_argument("--output", default="artifacts/pde_convergence.png")
-    ap.add_argument("--csv", default="artifacts/pde_convergence.csv")
+    ap.add_argument("--output", default="artifacts/pde_order_slope.png")
+    ap.add_argument("--csv", default="artifacts/pde_order_slope.csv")
     args = ap.parse_args()
 
     root = Path(__file__).resolve().parents[1]
@@ -115,7 +115,7 @@ def main() -> None:
     ax.loglog(df["nodes"], df["abs_error"], "o-", color="#1f77b4")
     ax.set_xlabel("Spatial Nodes")
     ax.set_ylabel("|Price - Analytic|")
-    ax.set_title("PDE Grid Convergence")
+    ax.set_title("PDE Grid Convergence (2nd-order slope)")
     ax.grid(True, which="both", ls=":", alpha=0.5)
     ax.text(0.05, 0.1, f"Slope ≈ {slope:.2f}", transform=ax.transAxes, fontsize=9)
     fig.tight_layout()
@@ -139,7 +139,7 @@ def main() -> None:
         "analytic": analytic,
         "records": records,
     }
-    update_run("pde_convergence", payload)
+    update_run("pde_order_slope", payload)
 
     print(f"Wrote {fig_path}")
     print(f"Wrote {csv_path}")

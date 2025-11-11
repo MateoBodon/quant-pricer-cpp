@@ -19,11 +19,11 @@ test 11
 11: [----------] Global test environment set-up.
 11: [----------] 1 test from MonteCarloSlow
 11: [ RUN      ] MonteCarloSlow.PriceCloseToBS
-11: [       OK ] MonteCarloSlow.PriceCloseToBS (18 ms)
-11: [----------] 1 test from MonteCarloSlow (18 ms total)
+11: [       OK ] MonteCarloSlow.PriceCloseToBS (19 ms)
+11: [----------] 1 test from MonteCarloSlow (19 ms total)
 11: 
 11: [----------] Global test environment tear-down
-11: [==========] 1 test from 1 test suite ran. (18 ms total)
+11: [==========] 1 test from 1 test suite ran. (19 ms total)
 11: [  PASSED  ] 1 test.
 1/7 Test #11: MonteCarloSlow.PriceCloseToBS .......................   Passed    0.02 sec
 test 13
@@ -57,13 +57,13 @@ test 14
 14: [----------] Global test environment set-up.
 14: [----------] 1 test from MonteCarloSlow
 14: [ RUN      ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
-14: [       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (80 ms)
-14: [----------] 1 test from MonteCarloSlow (80 ms total)
+14: [       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (84 ms)
+14: [----------] 1 test from MonteCarloSlow (84 ms total)
 14: 
 14: [----------] Global test environment tear-down
-14: [==========] 1 test from 1 test suite ran. (80 ms total)
+14: [==========] 1 test from 1 test suite ran. (84 ms total)
 14: [  PASSED  ] 1 test.
-3/7 Test #14: MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic ...   Passed    0.08 sec
+3/7 Test #14: MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic ...   Passed    0.09 sec
 test 15
     Start 15: MonteCarloSlow.ThetaCloseToPDE
 
@@ -114,36 +114,36 @@ test 17
 17: [----------] Global test environment set-up.
 17: [----------] 1 test from MonteCarloSlow
 17: [ RUN      ] MonteCarloSlow.QmcReducesErrorVsAnalytic
-17: [       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1225 ms)
-17: [----------] 1 test from MonteCarloSlow (1225 ms total)
+17: [       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1350 ms)
+17: [----------] 1 test from MonteCarloSlow (1350 ms total)
 17: 
 17: [----------] Global test environment tear-down
-17: [==========] 1 test from 1 test suite ran. (1225 ms total)
+17: [==========] 1 test from 1 test suite ran. (1350 ms total)
 17: [  PASSED  ] 1 test.
-6/7 Test #17: MonteCarloSlow.QmcReducesErrorVsAnalytic ............   Passed    1.23 sec
-test 30
-    Start 30: AmericanSlow.LsmcMatchesPsorWithinSe
+6/7 Test #17: MonteCarloSlow.QmcReducesErrorVsAnalytic ............   Passed    1.35 sec
+test 31
+    Start 31: AmericanSlow.LsmcMatchesPsorWithinSe
 
-30: Test command: /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/unit_tests "--gtest_filter=AmericanSlow.LsmcMatchesPsorWithinSe"
-30: Working Directory: /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build
-30: Test timeout computed to be: 10000000
-30: Running main() from /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/external/googletest/googletest/src/gtest_main.cc
-30: Note: Google Test filter = AmericanSlow.LsmcMatchesPsorWithinSe
-30: [==========] Running 1 test from 1 test suite.
-30: [----------] Global test environment set-up.
-30: [----------] 1 test from AmericanSlow
-30: [ RUN      ] AmericanSlow.LsmcMatchesPsorWithinSe
-30: [       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (605 ms)
-30: [----------] 1 test from AmericanSlow (605 ms total)
-30: 
-30: [----------] Global test environment tear-down
-30: [==========] 1 test from 1 test suite ran. (605 ms total)
-30: [  PASSED  ] 1 test.
-7/7 Test #30: AmericanSlow.LsmcMatchesPsorWithinSe ................   Passed    0.61 sec
+31: Test command: /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/unit_tests "--gtest_filter=AmericanSlow.LsmcMatchesPsorWithinSe"
+31: Working Directory: /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build
+31: Test timeout computed to be: 10000000
+31: Running main() from /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/external/googletest/googletest/src/gtest_main.cc
+31: Note: Google Test filter = AmericanSlow.LsmcMatchesPsorWithinSe
+31: [==========] Running 1 test from 1 test suite.
+31: [----------] Global test environment set-up.
+31: [----------] 1 test from AmericanSlow
+31: [ RUN      ] AmericanSlow.LsmcMatchesPsorWithinSe
+31: [       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (651 ms)
+31: [----------] 1 test from AmericanSlow (651 ms total)
+31: 
+31: [----------] Global test environment tear-down
+31: [==========] 1 test from 1 test suite ran. (651 ms total)
+31: [  PASSED  ] 1 test.
+7/7 Test #31: AmericanSlow.LsmcMatchesPsorWithinSe ................   Passed    0.66 sec
 
 100% tests passed, 0 tests failed out of 7
 
 Label Time Summary:
-SLOW    =   2.04 sec*proc (7 tests)
+SLOW    =   2.21 sec*proc (7 tests)
 
-Total Test time (real) =   2.04 sec
+Total Test time (real) =   2.22 sec

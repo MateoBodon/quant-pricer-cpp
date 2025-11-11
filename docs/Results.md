@@ -12,25 +12,25 @@ Analytic Black–Scholes, deterministic Monte Carlo (counter RNG + control varia
 - Data: [artifacts/tri_engine_agreement.csv](artifacts/tri_engine_agreement.csv)
 - Manifest entry: `runs.tri_engine_agreement`
 
-## QMC vs PRNG RMSE Scaling
+## QMC vs PRNG (equal wall-clock)
 
-Sobol + Brownian bridge produces steeper log–log slopes than pseudorandom paths for both GBM vanillas and Asians, yielding roughly a 1.4× tighter RMSE at equal path budgets once paths exceed a few thousand.
+Sobol + Brownian bridge delivers ≈1.4× tighter RMSE than pseudorandom paths when both spend the same time budget (European + Asian calls). The CSV tabulates the matched time grid, implied path counts, and RMSE ratio so reviewers can re-derive the advantage.
 
-![QMC vs PRNG](artifacts/qmc_vs_prng.png)
+![QMC vs PRNG equal time](artifacts/qmc_vs_prng_equal_time.png)
 
-- Reproduce: `./scripts/reproduce_all.sh` or `python scripts/qmc_vs_prng.py --output docs/artifacts/qmc_vs_prng.png --csv docs/artifacts/qmc_vs_prng.csv --fast`
-- Data: [artifacts/qmc_vs_prng.csv](artifacts/qmc_vs_prng.csv)
-- Manifest entry: `runs.qmc_vs_prng`
+- Reproduce: `./scripts/reproduce_all.sh` or `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv --fast`
+- Data: [artifacts/qmc_vs_prng_equal_time.csv](artifacts/qmc_vs_prng_equal_time.csv)
+- Manifest entry: `runs.qmc_vs_prng_equal_time`
 
 ## PDE Grid Convergence
 
 Crank–Nicolson with two Rannacher steps retains ≈second-order accuracy as the spatial grid grows; price errors fall below 1e-4 on a 401×400 grid while Δ/Γ stay within 1e-5 of Black–Scholes.
 
-![PDE grid convergence](artifacts/pde_convergence.png)
+![PDE grid convergence](artifacts/pde_order_slope.png)
 
-- Reproduce: `./scripts/reproduce_all.sh` or `python scripts/pde_convergence.py --skip-build --output docs/artifacts/pde_convergence.png --csv docs/artifacts/pde_convergence.csv`
-- Data: [artifacts/pde_convergence.csv](artifacts/pde_convergence.csv)
-- Manifest entry: `runs.pde_convergence`
+- Reproduce: `./scripts/reproduce_all.sh` or `python scripts/pde_order_slope.py --skip-build --output docs/artifacts/pde_order_slope.png --csv docs/artifacts/pde_order_slope.csv`
+- Data: [artifacts/pde_order_slope.csv](artifacts/pde_order_slope.csv)
+- Manifest entry: `runs.pde_order_slope`
 
 ## MC Greeks with 95% CI
 
@@ -58,8 +58,9 @@ The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `seci
 
 - Surfaces: [artifacts/wrds/spx_2024-06-14_surface.csv](artifacts/wrds/spx_2024-06-14_surface.csv), [artifacts/wrds/spx_2024-06-17_surface.csv](artifacts/wrds/spx_2024-06-17_surface.csv)
 - Calibration: [artifacts/wrds/heston_fit_table.csv](artifacts/wrds/heston_fit_table.csv), [artifacts/wrds/heston_fit.json](artifacts/wrds/heston_fit.json), [artifacts/wrds/heston_fit.png](artifacts/wrds/heston_fit.png)
-- OOS diagnostics: [artifacts/wrds/oos_pricing_detail.csv](artifacts/wrds/oos_pricing_detail.csv), [artifacts/wrds/oos_pricing_summary.csv](artifacts/wrds/oos_pricing_summary.csv)
-- Delta hedge trace: [artifacts/wrds/delta_hedge_pnl.csv](artifacts/wrds/delta_hedge_pnl.csv), [artifacts/wrds/delta_hedge_pnl_summary.csv](artifacts/wrds/delta_hedge_pnl_summary.csv)
+- In-sample parity: [artifacts/wrds/wrds_heston_insample.csv](artifacts/wrds/wrds_heston_insample.csv), [artifacts/wrds/wrds_heston_insample.png](artifacts/wrds/wrds_heston_insample.png)
+- OOS diagnostics: [artifacts/wrds/wrds_heston_oos.csv](artifacts/wrds/wrds_heston_oos.csv), [artifacts/wrds/wrds_heston_oos.png](artifacts/wrds/wrds_heston_oos.png)
+- Delta hedge summary: [artifacts/wrds/wrds_heston_hedge.csv](artifacts/wrds/wrds_heston_hedge.csv), [artifacts/wrds/wrds_heston_hedge.png](artifacts/wrds/wrds_heston_hedge.png)
 - Summary figure: [artifacts/wrds/heston_wrds_summary.png](artifacts/wrds/heston_wrds_summary.png)
 
 Regenerate the bundled sample snapshot with `./scripts/reproduce_all.sh` (the pipeline runs even without credentials). To hit the live WRDS database export `WRDS_ENABLED=1`, `WRDS_USERNAME`, `WRDS_PASSWORD`, then run `python wrds_pipeline/pipeline.py --symbol SPX --trade-date 2024-06-14`. MARKET tests (`ctest -L MARKET`) remain opt-in and skip automatically when the env vars are absent.
