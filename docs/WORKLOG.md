@@ -21,6 +21,12 @@
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`, `python3 -m wrds_pipeline.pipeline --use-sample`, `python3 -m wrds_pipeline.pipeline --dateset wrds_pipeline/dateset.yaml --use-sample` (multiple iterations to refresh artifacts and manifest).
 - Artifacts: refreshed `docs/artifacts/wrds/heston_fit.{json,png}` plus new `wrds_agg_{pricing,oos,pnl}.csv` and `wrds_multi_date_summary.png`.
 
+## 2025-11-11 (benchmarks: QMC vs PRNG, PDE slope)
+- Added Sobol support to the Asian MC pricer + new benchmark cases for equal-time Asian/Barrier payoffs, and extended the PDE harness with a convergence-slope benchmark and OpenMP scaling plots.
+- Updated `scripts/generate_bench_artifacts.py` to emit the new CSV/PNG bundle (`bench_mc_equal_time`, `bench_pde_order`), then rebuilt/regenerated the bench artifacts.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`, `build/bench_mc --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_mc.json --benchmark_out_format=json`, `build/bench_pde --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_pde.json --benchmark_out_format=json`, `python3 scripts/generate_bench_artifacts.py --mc-json docs/artifacts/bench/bench_mc.json --pde-json docs/artifacts/bench/bench_pde.json --out-dir docs/artifacts/bench`.
+- Artifacts: refreshed `docs/artifacts/bench/bench_mc*.{csv,png,json}`, `bench_pde*.{csv,png,json}`, plus the new `bench_mc_equal_time.{csv,png}` and `bench_pde_order.{csv,png}`.
+
 ## 2025-11-11 (docs pages base-url fix)
 - Hardened the `docs-pages` workflow with a post-Doxygen base-href injector and `.nojekyll` so GitHub Pages serves assets under `/quant-pricer-cpp/`, then swapped the README API Docs link/badge to the live site.
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
