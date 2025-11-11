@@ -2,6 +2,18 @@
 
 `./scripts/reproduce_all.sh` builds the Release target, runs both FAST and SLOW labels, and regenerates deterministic CSV/PNG artifacts under `docs/artifacts/`. Use `REPRO_FAST=1` to trim runtime when iterating locally. Every generator updates [`docs/artifacts/manifest.json`](docs/artifacts/manifest.json) with the command, seeds, compiler info, and hardware snapshot.
 
+## Units & Metric Legend
+
+| Shorthand | Definition |
+| --- | --- |
+| `vol pts` | Absolute implied-vol percentage points (0.01 = 1%). Reported RMSE/MAE stats stay in vol-space, not bps. |
+| `bps` | One basis point (1e-4). Used for quotes-weighted OOS IV MAE so reviewers can compare against surfaces from other vendors. |
+| `ticks` | Price increments of 0.05 USD, matching SPX option tick size. Price RMSE/MAE are quoted in ticks. |
+| `vega-wtd` | Weighted by per-node Black–Scholes vega before averaging errors. |
+| `quotes-wtd` | Weighted by the aggregated quote counts per tenor/moneyness bucket. |
+
+The dedicated WRDS appendix ([`docs/WRDS_Results.md`](WRDS_Results.md)) lists the current scalar metrics next to the CSV/JSON artifacts that store them.
+
 ## Tri-Engine Agreement
 
 Analytic Black–Scholes, deterministic Monte Carlo (counter RNG + control variate), and Crank–Nicolson disagree by <5 bps across strikes when configured with the same market inputs. MC error bars reflect the 95% CI from 200k paths, so the dashed PDE line and green analytic curve are visually on top of one another.
@@ -55,6 +67,12 @@ Current QE runs still exhibit a large bias versus the analytic reference (CLI em
 ## WRDS OptionMetrics Snapshot (Opt-in)
 
 The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `secid` via `optionm.secnmd`, pulls the year-partitioned `optionm.opprcdYYYY` table, filters stale quotes, recomputes implied vols with the project’s solver, and bins by tenor/moneyness. A vega-weighted Heston calibration (least-squares in IV space) and bootstrap CIs are emitted alongside next-day OOS errors and delta-hedged one-day PnL histograms. Only aggregated CSV/PNGs under `docs/artifacts/wrds/` are committed.
+
+- Scalar metrics from the latest bundle:
+  - `iv_rmse_vp_weighted` / `iv_mae_vp_weighted` / `iv_p90_vp_weighted` (vol pts, vega-weighted, see `heston_fit.json`)
+  - `iv_mae_bps_oos` (quotes-weighted bps, see `wrds_heston_oos.csv`)
+  - `price_rmse_ticks` (ticks, see `heston_fit.json`)
+- Detailed tables + figures: [`docs/WRDS_Results.md`](WRDS_Results.md)
 
 - Surfaces: [artifacts/wrds/spx_2024-06-14_surface.csv](artifacts/wrds/spx_2024-06-14_surface.csv), [artifacts/wrds/spx_2024-06-17_surface.csv](artifacts/wrds/spx_2024-06-17_surface.csv)
 - Calibration: [artifacts/wrds/heston_fit_table.csv](artifacts/wrds/heston_fit_table.csv), [artifacts/wrds/heston_fit.json](artifacts/wrds/heston_fit.json), [artifacts/wrds/heston_fit.png](artifacts/wrds/heston_fit.png)

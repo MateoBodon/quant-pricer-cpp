@@ -167,19 +167,17 @@ def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: b
     fit_json = out_dir / "heston_fit.json"
     fit_fig = out_dir / "heston_fit.png"
     calibrate_heston.write_tables(fit_csv, calib["surface"])
+    metric_keys = ("iv_rmse_vp_weighted", "iv_mae_vp_weighted", "iv_p90_vp_weighted", "price_rmse_ticks")
+    fit_metrics = {key: float(calib[key]) for key in metric_keys}
     summary_payload = {
         "trade_date": trade_date,
         "next_trade_date": next_trade_date,
         "params": calib["params"],
-        "rmse_iv_bps": calib["rmse_iv_bps"],
-        "rmse_price_ticks": calib["rmse_price_ticks"],
+        **fit_metrics,
         "bootstrap_ci": {k: list(v) for k, v in ci.items()},
         "source_today": source_today,
         "source_next": source_next,
     }
-    calibrate_heston.write_summary(fit_json, summary_payload)
-    calibrate_heston.plot_fit(calib["surface"], calib["params"], calib["rmse_iv_bps"], calib["rmse_price_ticks"], fit_fig)
-    calibrate_heston.record_manifest(fit_json, summary_payload, fit_csv, fit_fig)
 
     oos_detail_csv = out_dir / "oos_pricing_detail.csv"
     oos_summary_csv = out_dir / "oos_pricing_summary.csv"
@@ -199,7 +197,9 @@ def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: b
         ])
         oos_summary = pd.DataFrame(columns=["tenor_bucket", "mae_iv_bps", "mae_price_ticks", "quotes"])
     else:
-        oos_detail, oos_summary = oos_pricing.evaluate(agg_next, calib["params"])
+        oos_detail, oos_summary, oos_metrics = oos_pricing.evaluate(agg_next, calib["params"])
+    if agg_next.empty:
+        oos_metrics = calibrate_heston.compute_oos_iv_metrics(oos_detail)
     oos_pricing.write_outputs(oos_detail_csv, oos_summary_csv, oos_detail, oos_summary)
 
     pnl_detail_csv = out_dir / "delta_hedge_pnl.csv"
@@ -238,6 +238,11 @@ def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: b
     pnl_summary.to_csv(hedge_csv, index=False)
     hedge_fig = out_dir / "wrds_heston_hedge.png"
     _plot_hedge_distribution(pnl_detail, hedge_fig)
+
+    summary_payload.update(oos_metrics)
+    calibrate_heston.write_summary(fit_json, summary_payload)
+    calibrate_heston.plot_fit(calib["surface"], calib["params"], fit_metrics, fit_fig)
+    calibrate_heston.record_manifest(fit_json, summary_payload, fit_csv, fit_fig)
 
     update_run(
         "wrds_pipeline",

@@ -98,6 +98,63 @@ class CalibrationConfig:
     rng_seed: int = 7
 
 
+def _positive_weights(values, default: float = 1.0) -> np.ndarray:
+    arr = np.asarray(values, dtype=np.float64).copy()
+    if arr.size == 0:
+        return np.asarray([default], dtype=np.float64)
+    bad = ~np.isfinite(arr) | (arr <= 0)
+    if bad.any():
+        arr[bad] = default
+    if float(arr.sum()) <= 0.0:
+        arr[:] = default
+    return arr
+
+
+def _weighted_percentile(values: np.ndarray, weights: np.ndarray, percentile: float) -> float:
+    if values.size == 0:
+        return 0.0
+    percentile = np.clip(percentile, 0.0, 1.0)
+    order = np.argsort(values)
+    sorted_vals = values[order]
+    sorted_weights = weights[order]
+    cumulative = np.cumsum(sorted_weights)
+    cutoff = percentile * sorted_weights.sum()
+    idx = np.searchsorted(cumulative, cutoff, side="left")
+    idx = min(idx, len(sorted_vals) - 1)
+    return float(sorted_vals[idx])
+
+
+def compute_insample_metrics(surface: pd.DataFrame) -> Dict[str, float]:
+    iv_error_vol = (surface["model_iv"] - surface["mid_iv"]).to_numpy(np.float64)
+    default_weights = np.ones(len(surface), dtype=np.float64)
+    weights = _positive_weights(surface.get("vega", default_weights))
+    abs_iv = np.abs(iv_error_vol)
+    iv_rmse_vp_weighted = float(np.sqrt(np.average(np.square(iv_error_vol), weights=weights)))
+    iv_mae_vp_weighted = float(np.average(abs_iv, weights=weights))
+    iv_p90_vp_weighted = _weighted_percentile(abs_iv, weights, 0.9)
+    price_rmse_ticks = float(np.sqrt(np.mean(np.square(surface["price_error_ticks"]))))
+    return {
+        "iv_rmse_vp_weighted": iv_rmse_vp_weighted,
+        "iv_mae_vp_weighted": iv_mae_vp_weighted,
+        "iv_p90_vp_weighted": iv_p90_vp_weighted,
+        "price_rmse_ticks": price_rmse_ticks,
+    }
+
+
+def compute_oos_iv_metrics(surface: pd.DataFrame) -> Dict[str, float]:
+    if surface.empty:
+        return {
+            "iv_mae_bps_oos": 0.0,
+        }
+    default_weights = np.ones(len(surface), dtype=np.float64)
+    weights = _positive_weights(surface.get("quotes", default_weights))
+    iv_error_bps = surface["iv_error_bps"].to_numpy(np.float64)
+    iv_mae_bps = float(np.average(np.abs(iv_error_bps), weights=weights))
+    return {
+        "iv_mae_bps_oos": iv_mae_bps,
+    }
+
+
 def _objective(params_vec: np.ndarray, surface: pd.DataFrame) -> np.ndarray:
     kappa, theta, sigma, rho, v0 = params_vec
     params: Params = (max(kappa, 1e-4), max(theta, 1e-6), max(sigma, 1e-4), np.clip(rho, -0.999, 0.999), max(v0, 1e-6))
@@ -154,7 +211,8 @@ def apply_model(surface: pd.DataFrame, params_dict: Dict[str, float]) -> pd.Data
         ivs.append(iv)
     out["model_price"] = prices
     out["model_iv"] = ivs
-    out["iv_error_bps"] = (out["model_iv"] - out["mid_iv"]) * 1e4
+    out["iv_error_vol"] = out["model_iv"] - out["mid_iv"]
+    out["iv_error_bps"] = out["iv_error_vol"] * 1e4
     out["price_error_ticks"] = (out["model_price"] - out["mid_price"]) / TICK_SIZE
     return out
 
@@ -176,15 +234,17 @@ def calibrate(surface: pd.DataFrame, config: CalibrationConfig) -> Dict[str, obj
     params_vec = _from_internal(result.x)
     params = tuple(params_vec.tolist())
 
-    surface = apply_model(surface, {
-        "kappa": params[0],
-        "theta": params[1],
-        "sigma": params[2],
-        "rho": params[3],
-        "v0": params[4],
-    })
-    rmse_iv = float(np.sqrt(np.mean(np.square(surface["iv_error_bps"]))))
-    rmse_price_ticks = float(np.sqrt(np.mean(np.square(surface["price_error_ticks"]))))
+    surface = apply_model(
+        surface,
+        {
+            "kappa": params[0],
+            "theta": params[1],
+            "sigma": params[2],
+            "rho": params[3],
+            "v0": params[4],
+        },
+    )
+    insample_metrics = compute_insample_metrics(surface)
 
     return {
         "params": {
@@ -195,8 +255,7 @@ def calibrate(surface: pd.DataFrame, config: CalibrationConfig) -> Dict[str, obj
             "v0": params[4],
         },
         "surface": surface,
-        "rmse_iv_bps": rmse_iv,
-        "rmse_price_ticks": rmse_price_ticks,
+        **insample_metrics,
         "success": bool(result.success),
         "nit": int(result.nfev),
     }
@@ -252,7 +311,7 @@ def write_summary(out_json: Path, payload: Dict[str, object]) -> None:
     out_json.write_text(json.dumps(payload, indent=2) + "\n")
 
 
-def plot_fit(surface: pd.DataFrame, params: Dict[str, float], rmse_iv: float, rmse_price: float, out_path: Path) -> None:
+def plot_fit(surface: pd.DataFrame, params: Dict[str, float], metrics: Dict[str, float], out_path: Path) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
     for bucket, group in surface.groupby("tenor_bucket", observed=True):
         axes[0].plot(group["moneyness"], group["mid_iv"], "o-", label=f"{bucket} market")
@@ -267,7 +326,9 @@ def plot_fit(surface: pd.DataFrame, params: Dict[str, float], rmse_iv: float, rm
     axes[1].set_ylabel("Price error (ticks)")
     axes[1].grid(True, ls=":", alpha=0.5)
 
-    fig.suptitle(f"Heston fit | RMSE_iv={rmse_iv:.1f} bps, RMSE_price={rmse_price:.2f} ticks")
+    vol_rmse_pts = metrics["iv_rmse_vp_weighted"] * 100.0
+    price_rmse_ticks = metrics["price_rmse_ticks"]
+    fig.suptitle(f"Heston fit | vega-wtd RMSE={vol_rmse_pts:.2f} vol pts, price RMSE={price_rmse_ticks:.2f} ticks")
     handles, labels = axes[0].get_legend_handles_labels()
     axes[0].legend(handles[::2], labels[::2], fontsize=8)
     fig.tight_layout()
@@ -282,7 +343,10 @@ def record_manifest(out_json: Path, summary: Dict[str, object], surface_csv: Pat
         "surface_csv": str(surface_csv),
         "figure": str(figure),
         "params": summary["params"],
-        "rmse_iv_bps": summary["rmse_iv_bps"],
-        "rmse_price_ticks": summary["rmse_price_ticks"],
+        "iv_rmse_vp_weighted": summary["iv_rmse_vp_weighted"],
+        "iv_mae_vp_weighted": summary["iv_mae_vp_weighted"],
+        "iv_p90_vp_weighted": summary["iv_p90_vp_weighted"],
+        "price_rmse_ticks": summary["price_rmse_ticks"],
+        "iv_mae_bps_oos": summary.get("iv_mae_bps_oos"),
     }
     update_run("wrds_heston", payload, append=True)

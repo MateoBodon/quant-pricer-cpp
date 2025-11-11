@@ -9,6 +9,12 @@
 - Tightened CI coverage job (clang `llvm-cov` + gcovr/Codecov), new coverage badge, and appended the PDE second-order regression test.
 - Commands run: `./scripts/reproduce_all.sh` (multiple, final run with SLOW), `cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
 
+## 2025-11-11 (IV metrics + docs units)
+- Standardised WRDS calibration outputs: `calibrate_heston.py` now computes vega-weighted IV RMSE/MAE/p90 in vol points, quotes-weighted `iv_mae_bps_oos`, and price RMSE in ticks; the pipeline/plots/manifest consume the new keys.
+- Added a shared units legend to `docs/Results.md`, created `docs/WRDS_Results.md` with metric tables + figures, and linked the WRDS section to the new appendix.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
+- Artifacts: n/a (code/docs only).
+
 ## 2025-11-11 (docs pages base-url fix)
 - Hardened the `docs-pages` workflow with a post-Doxygen base-href injector and `.nojekyll` so GitHub Pages serves assets under `/quant-pricer-cpp/`, then swapped the README API Docs link/badge to the live site.
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
