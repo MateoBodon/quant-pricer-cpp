@@ -124,6 +124,7 @@ run_wrds_pipeline() {
   fi
   mkdir -p "${WRDS_DIR}"
   local -a extra=()
+  local symbol_arg="${WRDS_SYMBOL:-SPX}"
   if [[ -n "${WRDS_SYMBOL:-}" ]]; then
     extra+=(--symbol "${WRDS_SYMBOL}")
   fi
@@ -142,6 +143,21 @@ run_wrds_pipeline() {
     (cd "${ROOT}" && python3 -m wrds_pipeline.pipeline "${extra[@]}")
   else
     (cd "${ROOT}" && python3 -m wrds_pipeline.pipeline)
+  fi
+
+  local dateset_path="${WRDS_DATESET:-wrds_pipeline/dateset.yaml}"
+  if [[ -f "${ROOT}/${dateset_path}" ]]; then
+    local -a multi_extra=(--symbol "${symbol_arg}" --dateset "${dateset_path}")
+    if [[ "${WRDS_USE_SAMPLE:-0}" == "1" ]]; then
+      multi_extra+=(--use-sample)
+    fi
+    if [[ "${REPRO_FAST_FLAG}" == "1" ]]; then
+      multi_extra+=(--fast)
+    fi
+    echo "[reproduce] running WRDS multi-date pipeline --dateset ${dateset_path}"
+    (cd "${ROOT}" && python3 -m wrds_pipeline.pipeline "${multi_extra[@]}")
+  else
+    echo "[reproduce] skipping WRDS dateset (missing ${dateset_path})"
   fi
 }
 

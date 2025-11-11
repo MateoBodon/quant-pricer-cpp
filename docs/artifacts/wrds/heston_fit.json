@@ -1,6 +1,8 @@
 {
   "trade_date": "2024-06-14",
   "next_trade_date": "2024-06-17",
+  "label": null,
+  "regime": null,
   "params": {
     "kappa": 5.0,
     "theta": 0.07820119336932864,
@@ -8,8 +10,10 @@
     "rho": -0.8185960724212537,
     "v0": 0.001
   },
-  "rmse_iv_bps": 1833.6899074384535,
-  "rmse_price_ticks": 2643.440262742904,
+  "iv_rmse_vp_weighted": 0.16705691456874217,
+  "iv_mae_vp_weighted": 0.14541109785770598,
+  "iv_p90_vp_weighted": 0.23847372757866986,
+  "price_rmse_ticks": 2643.440262742904,
   "bootstrap_ci": {
     "kappa": [
       0.2331385441798975,
@@ -33,5 +37,6 @@
     ]
   },
   "source_today": "sample",
-  "source_next": "sample"
+  "source_next": "sample",
+  "iv_mae_bps_oos": 1746.505483184165
 }

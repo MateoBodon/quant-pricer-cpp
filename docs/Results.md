@@ -72,6 +72,7 @@ The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `seci
   - `iv_rmse_vp_weighted` / `iv_mae_vp_weighted` / `iv_p90_vp_weighted` (vol pts, vega-weighted, see `heston_fit.json`)
   - `iv_mae_bps_oos` (quotes-weighted bps, see `wrds_heston_oos.csv`)
   - `price_rmse_ticks` (ticks, see `heston_fit.json`)
+- Multi-date snapshot: [artifacts/wrds/wrds_agg_pricing.csv](artifacts/wrds/wrds_agg_pricing.csv), [artifacts/wrds/wrds_agg_oos.csv](artifacts/wrds/wrds_agg_oos.csv), [artifacts/wrds/wrds_agg_pnl.csv](artifacts/wrds/wrds_agg_pnl.csv), and the overview figure [artifacts/wrds/wrds_multi_date_summary.png](artifacts/wrds/wrds_multi_date_summary.png)
 - Detailed tables + figures: [`docs/WRDS_Results.md`](WRDS_Results.md)
 
 - Surfaces: [artifacts/wrds/spx_2024-06-14_surface.csv](artifacts/wrds/spx_2024-06-14_surface.csv), [artifacts/wrds/spx_2024-06-17_surface.csv](artifacts/wrds/spx_2024-06-17_surface.csv)
