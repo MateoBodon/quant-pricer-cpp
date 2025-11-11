@@ -9,20 +9,18 @@
 namespace quant::qmc {
 
 class SobolSequence {
-public:
+  public:
     static constexpr std::size_t kMaxSupportedDimension = 64;
     static constexpr std::size_t kMaxBits = 64;
 
-    SobolSequence(std::size_t dimension,
-                  bool scrambled = false,
-                  std::uint64_t seed = 0);
+    SobolSequence(std::size_t dimension, bool scrambled = false, std::uint64_t seed = 0);
 
     std::size_t dimension() const { return dimension_; }
 
     void generate(std::uint64_t index, double* out) const;
     std::vector<double> generate(std::uint64_t index) const;
 
-private:
+  private:
     struct DirectionRow {
         std::array<std::uint64_t, kMaxBits> values{};
     };
@@ -33,4 +31,3 @@ private:
 };
 
 } // namespace quant::qmc
-

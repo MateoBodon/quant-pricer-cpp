@@ -8,13 +8,7 @@ using namespace quant;
 
 TEST(GridUtils, BuildSpaceGridAnchorsStrike) {
     grid_utils::StretchedGridParams params{
-        .nodes = 21,
-        .lower = 0.0,
-        .upper = 400.0,
-        .anchor = 250.0,
-        .stretch = 3.0,
-        .log_space = false
-    };
+        .nodes = 21, .lower = 0.0, .upper = 400.0, .anchor = 250.0, .stretch = 3.0, .log_space = false};
     auto grid = grid_utils::build_space_grid(params);
     ASSERT_EQ(grid.coordinate.size(), static_cast<std::size_t>(params.nodes));
     ASSERT_EQ(grid.spot.size(), static_cast<std::size_t>(params.nodes));
@@ -30,12 +24,7 @@ TEST(GridUtils, BuildSpaceGridAnchorsStrike) {
 
 TEST(GridUtils, DirichletBoundaryMatchesAnalytic) {
     grid_utils::PayoffBoundaryParams p{
-        .type = OptionType::Put,
-        .strike = 100.0,
-        .rate = 0.05,
-        .dividend = 0.02,
-        .tau = 0.5
-    };
+        .type = OptionType::Put, .strike = 100.0, .rate = 0.05, .dividend = 0.02, .tau = 0.5};
     double lower = grid_utils::dirichlet_boundary(p, 40.0, true);
     double upper = grid_utils::dirichlet_boundary(p, 260.0, false);
     EXPECT_GT(lower, 0.0);

@@ -25,7 +25,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 import QuantLib as ql
-
 from manifest_utils import ARTIFACTS_ROOT, update_run
 
 
@@ -55,14 +54,18 @@ def _maturity_date(eval_date: ql.Date, tenor: float) -> ql.Date:
     return eval_date + ql.Period(days, ql.Days)
 
 
-def _build_process(spot: float, rate: float, dividend: float, vol: float, eval_date: ql.Date) -> ql.BlackScholesMertonProcess:
+def _build_process(
+    spot: float, rate: float, dividend: float, vol: float, eval_date: ql.Date
+) -> ql.BlackScholesMertonProcess:
     day_count = ql.Actual365Fixed()
     calendar = ql.NullCalendar()
     ql.Settings.instance().evaluationDate = eval_date
     spot_handle = ql.QuoteHandle(ql.SimpleQuote(spot))
     rf = ql.YieldTermStructureHandle(ql.FlatForward(eval_date, rate, day_count))
     div = ql.YieldTermStructureHandle(ql.FlatForward(eval_date, dividend, day_count))
-    vol_ts = ql.BlackVolTermStructureHandle(ql.BlackConstantVol(eval_date, calendar, vol, day_count))
+    vol_ts = ql.BlackVolTermStructureHandle(
+        ql.BlackConstantVol(eval_date, calendar, vol, day_count)
+    )
     return ql.BlackScholesMertonProcess(spot_handle, div, rf, vol_ts)
 
 
@@ -80,7 +83,9 @@ def _scenarios(fast: bool) -> List[Scenario]:
             name="vanilla_call_atm",
             label="Call ATM 6M",
             kind="vanilla",
-            params=dict(type="call", S=100.0, K=100.0, r=0.02, q=0.005, vol=0.20, T=0.5),
+            params=dict(
+                type="call", S=100.0, K=100.0, r=0.02, q=0.005, vol=0.20, T=0.5
+            ),
         ),
         Scenario(
             name="vanilla_put_otm",
@@ -216,9 +221,12 @@ def _run_cli(quant_cli: Path, scenario: Scenario) -> tuple[float, float]:
 
 def _price_quantlib(scenario: Scenario, eval_date: ql.Date) -> tuple[float, float]:
     p = scenario.params
-    process = _build_process(float(p["S"]), float(p["r"]), float(p["q"]), float(p["vol"]), eval_date)
+    process = _build_process(
+        float(p["S"]), float(p["r"]), float(p["q"]), float(p["vol"]), eval_date
+    )
     payoff = ql.PlainVanillaPayoff(
-        ql.Option.Call if str(p["type"]).lower() == "call" else ql.Option.Put, float(p["K"])
+        ql.Option.Call if str(p["type"]).lower() == "call" else ql.Option.Put,
+        float(p["K"]),
     )
     maturity = _maturity_date(eval_date, float(p["T"]))
     tic = perf_counter()
@@ -227,15 +235,27 @@ def _price_quantlib(scenario: Scenario, eval_date: ql.Date) -> tuple[float, floa
         option = ql.VanillaOption(payoff, exercise)
         option.setPricingEngine(ql.AnalyticEuropeanEngine(process))
     elif scenario.kind == "barrier":
-        style = ql.Barrier.DownOut if str(p["direction"]) == "down" else ql.Barrier.UpOut
+        style = (
+            ql.Barrier.DownOut if str(p["direction"]) == "down" else ql.Barrier.UpOut
+        )
         if str(p["style"]) == "in":
-            style = ql.Barrier.DownIn if str(p["direction"]) == "down" else ql.Barrier.UpIn
-        option = ql.BarrierOption(style, float(p["barrier"]), float(p["rebate"]), payoff, ql.EuropeanExercise(maturity))
+            style = (
+                ql.Barrier.DownIn if str(p["direction"]) == "down" else ql.Barrier.UpIn
+            )
+        option = ql.BarrierOption(
+            style,
+            float(p["barrier"]),
+            float(p["rebate"]),
+            payoff,
+            ql.EuropeanExercise(maturity),
+        )
         option.setPricingEngine(ql.AnalyticBarrierEngine(process))
     elif scenario.kind == "american":
         exercise = ql.AmericanExercise(eval_date, maturity)
         option = ql.VanillaOption(payoff, exercise)
-        option.setPricingEngine(ql.BinomialVanillaEngine(process, "crr", int(p["time_steps"])))
+        option.setPricingEngine(
+            ql.BinomialVanillaEngine(process, "crr", int(p["time_steps"]))
+        )
     else:
         raise ValueError(f"Unsupported scenario kind: {scenario.kind}")
     price = option.NPV()
@@ -308,10 +328,16 @@ def _plot(df: pd.DataFrame, out_path: Path) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--quant-cli", default=None, help="Path to quant_cli (defaults to build/quant_cli)")
+    ap.add_argument(
+        "--quant-cli",
+        default=None,
+        help="Path to quant_cli (defaults to build/quant_cli)",
+    )
     ap.add_argument("--output", default="docs/artifacts/ql_parity/ql_parity.png")
     ap.add_argument("--csv", default="docs/artifacts/ql_parity/ql_parity.csv")
-    ap.add_argument("--fast", action="store_true", help="Smaller scenario set for quicker iteration")
+    ap.add_argument(
+        "--fast", action="store_true", help="Smaller scenario set for quicker iteration"
+    )
     args = ap.parse_args()
 
     quant_cli = _find_quant_cli(args.quant_cli)
@@ -324,17 +350,19 @@ def main() -> None:
         price_ql, runtime_ql = _price_quantlib(scenario, eval_date)
         diff_cents = abs(price_cli - price_ql) * 100.0
         runtime_ratio = runtime_cli / runtime_ql if runtime_ql > 0 else math.nan
-        rows.append({
-            "name": scenario.name,
-            "label": scenario.label,
-            "category": scenario.kind,
-            "price_quant_pricer": price_cli,
-            "price_quantlib": price_ql,
-            "abs_diff_cents": diff_cents,
-            "runtime_ms_quant_pricer": runtime_cli,
-            "runtime_ms_quantlib": runtime_ql,
-            "runtime_ratio": runtime_ratio,
-        })
+        rows.append(
+            {
+                "name": scenario.name,
+                "label": scenario.label,
+                "category": scenario.kind,
+                "price_quant_pricer": price_cli,
+                "price_quantlib": price_ql,
+                "abs_diff_cents": diff_cents,
+                "runtime_ms_quant_pricer": runtime_cli,
+                "runtime_ms_quantlib": runtime_ql,
+                "runtime_ratio": runtime_ratio,
+            }
+        )
 
     df = pd.DataFrame(rows)
     out_csv = Path(args.csv)

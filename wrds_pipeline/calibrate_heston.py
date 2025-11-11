@@ -15,10 +15,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from manifest_utils import update_run
 from scipy.optimize import least_squares
 
 from .bs_utils import bs_call, bs_delta_call, bs_vega, implied_vol_from_price
-from manifest_utils import update_run
 
 Params = Tuple[float, float, float, float, float]  # kappa, theta, sigma, rho, v0
 TICK_SIZE = 0.05
@@ -34,12 +34,19 @@ def _heston_characteristic(phi, T, params: Params, r, q, log_spot, j: int):
     a = kappa * theta
     phi = np.asarray(phi, dtype=np.complex128)
     i = 1j
-    d = np.sqrt((rho * sigma * i * phi - b) ** 2 - sigma * sigma * (2.0 * u * i * phi - phi * phi))
+    d = np.sqrt(
+        (rho * sigma * i * phi - b) ** 2
+        - sigma * sigma * (2.0 * u * i * phi - phi * phi)
+    )
     g = (b - rho * sigma * i * phi + d) / (b - rho * sigma * i * phi - d + 1e-16)
     exp_dt = np.exp(-d * T)
     log_term = np.log((1.0 - g * exp_dt) / (1.0 - g + 1e-16))
-    C = (r - q) * i * phi * T + (a / (sigma * sigma)) * ((b - rho * sigma * i * phi + d) * T - 2.0 * log_term)
-    D = ((b - rho * sigma * i * phi + d) / (sigma * sigma)) * ((1.0 - exp_dt) / (1.0 - g * exp_dt + 1e-16))
+    C = (r - q) * i * phi * T + (a / (sigma * sigma)) * (
+        (b - rho * sigma * i * phi + d) * T - 2.0 * log_term
+    )
+    D = ((b - rho * sigma * i * phi + d) / (sigma * sigma)) * (
+        (1.0 - exp_dt) / (1.0 - g * exp_dt + 1e-16)
+    )
     return np.exp(C + D * v0 + i * phi * log_spot)
 
 
@@ -110,7 +117,9 @@ def _positive_weights(values, default: float = 1.0) -> np.ndarray:
     return arr
 
 
-def _weighted_percentile(values: np.ndarray, weights: np.ndarray, percentile: float) -> float:
+def _weighted_percentile(
+    values: np.ndarray, weights: np.ndarray, percentile: float
+) -> float:
     if values.size == 0:
         return 0.0
     percentile = np.clip(percentile, 0.0, 1.0)
@@ -129,7 +138,9 @@ def compute_insample_metrics(surface: pd.DataFrame) -> Dict[str, float]:
     default_weights = np.ones(len(surface), dtype=np.float64)
     weights = _positive_weights(surface.get("vega", default_weights))
     abs_iv = np.abs(iv_error_vol)
-    iv_rmse_volpts_vega_wt = float(np.sqrt(np.average(np.square(iv_error_vol), weights=weights)))
+    iv_rmse_volpts_vega_wt = float(
+        np.sqrt(np.average(np.square(iv_error_vol), weights=weights))
+    )
     iv_mae_volpts_vega_wt = float(np.average(abs_iv, weights=weights))
     iv_p90_bps = _weighted_percentile(abs_iv * 1e4, weights, 0.9)
     price_rmse_ticks = float(np.sqrt(np.mean(np.square(surface["price_error_ticks"]))))
@@ -157,7 +168,13 @@ def compute_oos_iv_metrics(surface: pd.DataFrame) -> Dict[str, float]:
 
 def _objective(params_vec: np.ndarray, surface: pd.DataFrame) -> np.ndarray:
     kappa, theta, sigma, rho, v0 = params_vec
-    params: Params = (max(kappa, 1e-4), max(theta, 1e-6), max(sigma, 1e-4), np.clip(rho, -0.999, 0.999), max(v0, 1e-6))
+    params: Params = (
+        max(kappa, 1e-4),
+        max(theta, 1e-6),
+        max(sigma, 1e-4),
+        np.clip(rho, -0.999, 0.999),
+        max(v0, 1e-6),
+    )
     residuals = []
     for _, row in surface.iterrows():
         price, iv = _model_iv(row, params)
@@ -180,7 +197,9 @@ def _from_internal(internal: np.ndarray) -> np.ndarray:
     internal = np.asarray(internal, dtype=float)
     params = np.empty_like(internal)
     for idx in POSITIVE_IDX:
-        params[idx] = float(np.clip(math.exp(internal[idx]), LOWER_BOUNDS[idx], UPPER_BOUNDS[idx]))
+        params[idx] = float(
+            np.clip(math.exp(internal[idx]), LOWER_BOUNDS[idx], UPPER_BOUNDS[idx])
+        )
     params[3] = float(np.clip(math.tanh(internal[3]), LOWER_BOUNDS[3], UPPER_BOUNDS[3]))
     return params
 
@@ -261,17 +280,31 @@ def calibrate(surface: pd.DataFrame, config: CalibrationConfig) -> Dict[str, obj
     }
 
 
-def bootstrap_confidence_intervals(surface: pd.DataFrame, params: Dict[str, float], config: CalibrationConfig) -> Dict[str, Tuple[float, float]]:
+def bootstrap_confidence_intervals(
+    surface: pd.DataFrame, params: Dict[str, float], config: CalibrationConfig
+) -> Dict[str, Tuple[float, float]]:
     rng = random.Random(config.rng_seed)
     keys = ["kappa", "theta", "sigma", "rho", "v0"]
     samples = {key: [] for key in keys}
     n = len(surface)
-    boot_iters = config.bootstrap_samples if not config.fast else max(32, config.bootstrap_samples // 3)
+    boot_iters = (
+        config.bootstrap_samples
+        if not config.fast
+        else max(32, config.bootstrap_samples // 3)
+    )
     for _ in range(boot_iters):
         idx = [rng.randrange(0, n) for _ in range(n)]
         boot = surface.iloc[idx].reset_index(drop=True)
         try:
-            res = calibrate(boot, CalibrationConfig(fast=True, max_evals=80, bootstrap_samples=0, rng_seed=rng.randrange(1, 1_000_000)))
+            res = calibrate(
+                boot,
+                CalibrationConfig(
+                    fast=True,
+                    max_evals=80,
+                    bootstrap_samples=0,
+                    rng_seed=rng.randrange(1, 1_000_000),
+                ),
+            )
         except Exception:
             continue
         for key in keys:
@@ -311,16 +344,27 @@ def write_summary(out_json: Path, payload: Dict[str, object]) -> None:
     out_json.write_text(json.dumps(payload, indent=2) + "\n")
 
 
-def plot_fit(surface: pd.DataFrame, params: Dict[str, float], metrics: Dict[str, float], out_path: Path) -> None:
+def plot_fit(
+    surface: pd.DataFrame,
+    params: Dict[str, float],
+    metrics: Dict[str, float],
+    out_path: Path,
+) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
     for bucket, group in surface.groupby("tenor_bucket", observed=True):
-        axes[0].plot(group["moneyness"], group["mid_iv"], "o-", label=f"{bucket} market")
-        axes[0].plot(group["moneyness"], group["model_iv"], "--", label=f"{bucket} model")
+        axes[0].plot(
+            group["moneyness"], group["mid_iv"], "o-", label=f"{bucket} market"
+        )
+        axes[0].plot(
+            group["moneyness"], group["model_iv"], "--", label=f"{bucket} model"
+        )
     axes[0].set_xlabel("Moneyness")
     axes[0].set_ylabel("Implied vol")
     axes[0].grid(True, ls=":", alpha=0.5)
 
-    axes[1].plot(surface["moneyness"], surface["price_error_ticks"], "s", color="#d62728")
+    axes[1].plot(
+        surface["moneyness"], surface["price_error_ticks"], "s", color="#d62728"
+    )
     axes[1].axhline(0.0, color="black", linewidth=1)
     axes[1].set_xlabel("Moneyness")
     axes[1].set_ylabel("Price error (ticks)")
@@ -328,7 +372,9 @@ def plot_fit(surface: pd.DataFrame, params: Dict[str, float], metrics: Dict[str,
 
     vol_rmse_pts = metrics["iv_rmse_volpts_vega_wt"] * 100.0
     price_rmse_ticks = metrics["price_rmse_ticks"]
-    fig.suptitle(f"Heston fit | vega-wtd RMSE={vol_rmse_pts:.2f} vol pts, price RMSE={price_rmse_ticks:.2f} ticks")
+    fig.suptitle(
+        f"Heston fit | vega-wtd RMSE={vol_rmse_pts:.2f} vol pts, price RMSE={price_rmse_ticks:.2f} ticks"
+    )
     handles, labels = axes[0].get_legend_handles_labels()
     axes[0].legend(handles[::2], labels[::2], fontsize=8)
     fig.tight_layout()
@@ -337,7 +383,9 @@ def plot_fit(surface: pd.DataFrame, params: Dict[str, float], metrics: Dict[str,
     plt.close(fig)
 
 
-def record_manifest(out_json: Path, summary: Dict[str, object], surface_csv: Path, figure: Path) -> None:
+def record_manifest(
+    out_json: Path, summary: Dict[str, object], surface_csv: Path, figure: Path
+) -> None:
     payload = {
         "summary": str(out_json),
         "surface_csv": str(surface_csv),

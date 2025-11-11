@@ -37,10 +37,9 @@ def _bs_common(
         forward_put = max(0.0, strike * df_r - spot * df_q)
         return forward_call, forward_put, 0.0, 0.0
     sqrt_t = math.sqrt(time)
-    d1 = (
-        math.log(spot / strike)
-        + (rate - dividend + 0.5 * sigma * sigma) * time
-    ) / (sigma * sqrt_t)
+    d1 = (math.log(spot / strike) + (rate - dividend + 0.5 * sigma * sigma) * time) / (
+        sigma * sqrt_t
+    )
     d2 = d1 - sigma * sqrt_t
     df_r = math.exp(-rate * time)
     df_q = math.exp(-dividend * time)
@@ -49,17 +48,23 @@ def _bs_common(
     return call, put, d1, d2
 
 
-def bs_call_price(spot: float, strike: float, rate: float, dividend: float, sigma: float, time: float) -> float:
+def bs_call_price(
+    spot: float, strike: float, rate: float, dividend: float, sigma: float, time: float
+) -> float:
     call, _, _, _ = _bs_common(spot, strike, rate, dividend, sigma, time)
     return call
 
 
-def bs_put_price(spot: float, strike: float, rate: float, dividend: float, sigma: float, time: float) -> float:
+def bs_put_price(
+    spot: float, strike: float, rate: float, dividend: float, sigma: float, time: float
+) -> float:
     _, put, _, _ = _bs_common(spot, strike, rate, dividend, sigma, time)
     return put
 
 
-def cash_or_nothing_call(spot: float, strike: float, rate: float, dividend: float, sigma: float, time: float) -> float:
+def cash_or_nothing_call(
+    spot: float, strike: float, rate: float, dividend: float, sigma: float, time: float
+) -> float:
     _, _, _, d2 = _bs_common(spot, strike, rate, dividend, sigma, time)
     if time <= 0.0 or sigma <= 0.0:
         payoff = 1.0 if spot > strike else 0.0
@@ -102,7 +107,15 @@ def smoke_cli(cli: Path) -> None:
     # Black–Scholes analytics + implied vol
     spot, strike, rate, div, vol, tenor = 100.0, 95.0, 0.01, 0.005, 0.22, 0.75
     bs_json = run_cli_json(
-        cli, "bs", f"{spot}", f"{strike}", f"{rate}", f"{div}", f"{vol}", f"{tenor}", "call"
+        cli,
+        "bs",
+        f"{spot}",
+        f"{strike}",
+        f"{rate}",
+        f"{div}",
+        f"{vol}",
+        f"{tenor}",
+        "call",
     )
     reference_call = bs_call_price(spot, strike, rate, div, vol, tenor)
     assert_close(bs_json["price"], reference_call, 5e-4, "BS call mismatch")
@@ -199,7 +212,9 @@ def smoke_cli(cli: Path) -> None:
         "--rng=mt19937",
         "--ci",
     )
-    assert_between(barrier_mc["price"], barrier_bs - 1.5, barrier_bs + 1.5, "Barrier MC off")
+    assert_between(
+        barrier_mc["price"], barrier_bs - 1.5, barrier_bs + 1.5, "Barrier MC off"
+    )
     barrier_pde = run_cli_json(
         cli,
         "barrier",
@@ -219,7 +234,9 @@ def smoke_cli(cli: Path) -> None:
         "80",
         "3.5",
     )
-    assert_between(barrier_pde["price"], barrier_bs - 0.6, barrier_bs + 0.6, "Barrier PDE mismatch")
+    assert_between(
+        barrier_pde["price"], barrier_bs - 0.6, barrier_bs + 0.6, "Barrier PDE mismatch"
+    )
     assert abs(barrier_pde["delta"]) <= 1.0
 
     # American variants
@@ -237,7 +254,12 @@ def smoke_cli(cli: Path) -> None:
         "64",
     )
     euro_call = bs_call_price(100.0, 95.0, 0.01, 0.0, 0.25, 1.0)
-    assert_close(amer_binom["price"], euro_call, 1e-2, "American binomial deviates for non-dividend call")
+    assert_close(
+        amer_binom["price"],
+        euro_call,
+        1e-2,
+        "American binomial deviates for non-dividend call",
+    )
 
     amer_psor = run_cli_json(
         cli,
@@ -317,7 +339,9 @@ def smoke_cli(cli: Path) -> None:
         "0.5",
     )
     expected_digital = cash_or_nothing_call(100.0, 110.0, 0.01, 0.0, 0.2, 0.5)
-    assert_close(digital_json["price"], expected_digital, 5e-4, "Digital price mismatch")
+    assert_close(
+        digital_json["price"], expected_digital, 5e-4, "Digital price mismatch"
+    )
 
     # Asian + lookback
     asian_json = run_cli_json(
@@ -383,8 +407,15 @@ def smoke_cli(cli: Path) -> None:
         "--heston-qe",
         "--rng=counter",
     )
-    assert_close(heston_mc["analytic"], heston_analytic, 1e-6, "Heston analytic not echoed")
-    assert_between(heston_mc["price"], heston_mc["ci_low"], heston_mc["ci_high"], "Heston MC CI invalid")
+    assert_close(
+        heston_mc["analytic"], heston_analytic, 1e-6, "Heston analytic not echoed"
+    )
+    assert_between(
+        heston_mc["price"],
+        heston_mc["ci_low"],
+        heston_mc["ci_high"],
+        "Heston MC CI invalid",
+    )
     assert heston_mc["std_error"] > 0.0
     assert heston_mc["abs_error"] >= 0.0
 
@@ -408,7 +439,9 @@ def smoke_cli(cli: Path) -> None:
 
 def main(argv: Iterable[str] | None = None) -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--quant-cli", required=True, help="Path to the quant_cli binary")
+    parser.add_argument(
+        "--quant-cli", required=True, help="Path to the quant_cli binary"
+    )
     args = parser.parse_args(argv)
     cli_path = Path(args.quant_cli)
     if not cli_path.exists():

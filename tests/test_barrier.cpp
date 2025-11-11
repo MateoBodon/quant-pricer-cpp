@@ -46,8 +46,9 @@ TEST(Barrier, MonteCarloMatchesAnalyticWithinError) {
         .num_steps = 32,
     };
 
-    const double analytic = bs::reiner_rubinstein_price(OptionType::Call, spec, params.spot, params.strike,
-                                                        params.rate, params.dividend, params.vol, params.time);
+    const double analytic =
+        bs::reiner_rubinstein_price(OptionType::Call, spec, params.spot, params.strike, params.rate,
+                                    params.dividend, params.vol, params.time);
     auto res = mc::price_barrier_option(params, params.strike, OptionType::Call, spec);
     EXPECT_LE(std::abs(res.estimate.value - analytic), 3.0 * res.estimate.std_error);
 }
@@ -64,8 +65,9 @@ TEST(Barrier, PdeMatchesAnalytic) {
     params.barrier = spec;
     params.grid = quant::pde::GridSpec{201, 200, 4.0};
 
-    const double analytic = bs::reiner_rubinstein_price(OptionType::Put, spec, params.spot, params.strike,
-                                                        params.rate, params.dividend, params.vol, params.time);
+    const double analytic =
+        bs::reiner_rubinstein_price(OptionType::Put, spec, params.spot, params.strike, params.rate,
+                                    params.dividend, params.vol, params.time);
     const double pde_price = quant::pde::price_barrier_crank_nicolson(params, OptionType::Put);
     EXPECT_NEAR(pde_price, analytic, 1e-3);
 }

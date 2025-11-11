@@ -20,7 +20,10 @@ struct BasketMcParams {
     bool antithetic{true};
 };
 
-struct McStat { double value; double std_error; };
+struct McStat {
+    double value;
+    double std_error;
+};
 
 McStat basket_european_call_mc(const BasketMcParams& p);
 
@@ -31,9 +34,9 @@ struct MertonParams {
     double dividend;
     double vol;
     double time;
-    double lambda;    // jump intensity
-    double muJ;       // mean of log jump size
-    double sigmaJ;    // std of log jump size
+    double lambda; // jump intensity
+    double muJ;    // mean of log jump size
+    double sigmaJ; // std of log jump size
     std::uint64_t num_paths;
     std::uint64_t seed;
     bool antithetic{true};
@@ -41,6 +44,4 @@ struct MertonParams {
 
 McStat merton_call_mc(const MertonParams& p);
 
-}
-
-
+} // namespace quant::multi

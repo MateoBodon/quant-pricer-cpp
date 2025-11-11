@@ -1,24 +1,22 @@
+#include "quant/black_scholes.hpp"
+#include "quant/mc.hpp"
+#include "quant/pde.hpp"
 #include <array>
 #include <gtest/gtest.h>
-#include "quant/mc.hpp"
-#include "quant/black_scholes.hpp"
-#include "quant/pde.hpp"
 
 using namespace quant;
 
 TEST(MonteCarloFast, PriceCloseToBS) {
-    mc::McParams mp{
-        .spot = 100.0,
-        .strike = 100.0,
-        .rate = 0.03,
-        .dividend = 0.0,
-        .vol = 0.2,
-        .time = 1.0,
-        .num_paths = 8000,
-        .seed = 42,
-        .antithetic = true,
-        .control_variate = true
-    };
+    mc::McParams mp{.spot = 100.0,
+                    .strike = 100.0,
+                    .rate = 0.03,
+                    .dividend = 0.0,
+                    .vol = 0.2,
+                    .time = 1.0,
+                    .num_paths = 8000,
+                    .seed = 42,
+                    .antithetic = true,
+                    .control_variate = true};
     auto res = mc::price_european_call(mp);
     double bs_price = bs::call_price(mp.spot, mp.strike, mp.rate, mp.dividend, mp.vol, mp.time);
     // Allow ~3 standard errors
@@ -26,42 +24,45 @@ TEST(MonteCarloFast, PriceCloseToBS) {
 }
 
 TEST(MonteCarloSlow, PriceCloseToBS) {
-    mc::McParams mp{
-        .spot = 100.0,
-        .strike = 100.0,
-        .rate = 0.03,
-        .dividend = 0.0,
-        .vol = 0.2,
-        .time = 1.0,
-        .num_paths = 250000,
-        .seed = 42,
-        .antithetic = true,
-        .control_variate = true
-    };
+    mc::McParams mp{.spot = 100.0,
+                    .strike = 100.0,
+                    .rate = 0.03,
+                    .dividend = 0.0,
+                    .vol = 0.2,
+                    .time = 1.0,
+                    .num_paths = 250000,
+                    .seed = 42,
+                    .antithetic = true,
+                    .control_variate = true};
     auto res = mc::price_european_call(mp);
     double bs_price = bs::call_price(mp.spot, mp.strike, mp.rate, mp.dividend, mp.vol, mp.time);
     EXPECT_NEAR(res.estimate.value, bs_price, 3.0 * res.estimate.std_error);
 }
 
 TEST(MonteCarloFast, VarianceReductionWorks) {
-    mc::McParams base{
-        .spot = 100.0,
-        .strike = 105.0,
-        .rate = 0.03,
-        .dividend = 0.01,
-        .vol = 0.25,
-        .time = 0.75,
-        .num_paths = 8000,
-        .seed = 12345,
-        .antithetic = false,
-        .control_variate = false
-    };
+    mc::McParams base{.spot = 100.0,
+                      .strike = 105.0,
+                      .rate = 0.03,
+                      .dividend = 0.01,
+                      .vol = 0.25,
+                      .time = 0.75,
+                      .num_paths = 8000,
+                      .seed = 12345,
+                      .antithetic = false,
+                      .control_variate = false};
 
     auto naive = mc::price_european_call(base);
 
-    auto anti = base; anti.antithetic = true; auto res_anti = mc::price_european_call(anti);
-    auto cv   = base; cv.control_variate = true; auto res_cv = mc::price_european_call(cv);
-    auto both = base; both.antithetic = true; both.control_variate = true; auto res_both = mc::price_european_call(both);
+    auto anti = base;
+    anti.antithetic = true;
+    auto res_anti = mc::price_european_call(anti);
+    auto cv = base;
+    cv.control_variate = true;
+    auto res_cv = mc::price_european_call(cv);
+    auto both = base;
+    both.antithetic = true;
+    both.control_variate = true;
+    auto res_both = mc::price_european_call(both);
 
     EXPECT_LT(res_anti.estimate.std_error, naive.estimate.std_error);
     EXPECT_LT(res_cv.estimate.std_error, naive.estimate.std_error);
@@ -87,23 +88,21 @@ TEST(MonteCarloSlow, GreeksCloseToAnalytic) {
     double vg = bs::vega(mp.spot, mp.strike, mp.rate, mp.dividend, mp.vol, mp.time);
     double gm = bs::gamma(mp.spot, mp.strike, mp.rate, mp.dividend, mp.vol, mp.time);
     EXPECT_NEAR(g.delta.value, dc, 3.0 * g.delta.std_error);
-    EXPECT_NEAR(g.vega.value,  vg, 3.0 * g.vega.std_error);
+    EXPECT_NEAR(g.vega.value, vg, 3.0 * g.vega.std_error);
     EXPECT_NEAR(g.gamma_lrm.value, gm, 3.0 * g.gamma_lrm.std_error);
 }
 
 TEST(MonteCarloSlow, GreeksAcrossMoneynessAndAntithetic) {
-    mc::McParams base{
-        .spot = 100.0,
-        .strike = 100.0,
-        .rate = 0.025,
-        .dividend = 0.01,
-        .vol = 0.22,
-        .time = 1.0,
-        .num_paths = 320000,
-        .seed = 246813579ULL,
-        .antithetic = true,
-        .control_variate = false
-    };
+    mc::McParams base{.spot = 100.0,
+                      .strike = 100.0,
+                      .rate = 0.025,
+                      .dividend = 0.01,
+                      .vol = 0.22,
+                      .time = 1.0,
+                      .num_paths = 320000,
+                      .seed = 246813579ULL,
+                      .antithetic = true,
+                      .control_variate = false};
 
     struct Scenario {
         const char* name;
@@ -127,47 +126,46 @@ TEST(MonteCarloSlow, GreeksAcrossMoneynessAndAntithetic) {
         params.strike = sc.strike;
         params.antithetic = sc.antithetic;
         auto g = mc::greeks_european_call(params);
-        const double delta_ref = bs::delta_call(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time);
-        const double vega_ref = bs::vega(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time);
-        const double gamma_ref = bs::gamma(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time);
+        const double delta_ref =
+            bs::delta_call(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time);
+        const double vega_ref =
+            bs::vega(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time);
+        const double gamma_ref =
+            bs::gamma(params.spot, params.strike, params.rate, params.dividend, params.vol, params.time);
 
-    EXPECT_NEAR(g.delta.value, delta_ref, kSigmaFactor * g.delta.std_error);
-    EXPECT_NEAR(g.vega.value, vega_ref, kSigmaFactor * g.vega.std_error);
-    EXPECT_NEAR(g.gamma_lrm.value, gamma_ref, kSigmaFactor * g.gamma_lrm.std_error);
-    EXPECT_NEAR(g.gamma_mixed.value, gamma_ref, kSigmaFactor * g.gamma_mixed.std_error);
-}
+        EXPECT_NEAR(g.delta.value, delta_ref, kSigmaFactor * g.delta.std_error);
+        EXPECT_NEAR(g.vega.value, vega_ref, kSigmaFactor * g.vega.std_error);
+        EXPECT_NEAR(g.gamma_lrm.value, gamma_ref, kSigmaFactor * g.gamma_lrm.std_error);
+        EXPECT_NEAR(g.gamma_mixed.value, gamma_ref, kSigmaFactor * g.gamma_mixed.std_error);
+    }
 }
 
 TEST(MonteCarloSlow, ThetaCloseToPDE) {
-    mc::McParams mp{
-        .spot = 100.0,
-        .strike = 100.0,
-        .rate = 0.02,
-        .dividend = 0.01,
-        .vol = 0.2,
-        .time = 1.0,
-        .num_paths = 320000,
-        .seed = 13579ULL,
-        .antithetic = true,
-        .control_variate = false
-    };
+    mc::McParams mp{.spot = 100.0,
+                    .strike = 100.0,
+                    .rate = 0.02,
+                    .dividend = 0.01,
+                    .vol = 0.2,
+                    .time = 1.0,
+                    .num_paths = 320000,
+                    .seed = 13579ULL,
+                    .antithetic = true,
+                    .control_variate = false};
     auto g = mc::greeks_european_call(mp);
 
     // PDE theta reference (backward difference from price)
-    quant::pde::PdeParams pp{
-        .spot = mp.spot,
-        .strike = mp.strike,
-        .rate = mp.rate,
-        .dividend = mp.dividend,
-        .vol = mp.vol,
-        .time = mp.time,
-        .type = quant::OptionType::Call,
-        .grid = quant::pde::GridSpec{321, 320, 4.0, 2.0},
-        .log_space = true,
-        .upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann,
-        .compute_theta = true,
-        .use_rannacher = true
-    };
+    quant::pde::PdeParams pp{.spot = mp.spot,
+                             .strike = mp.strike,
+                             .rate = mp.rate,
+                             .dividend = mp.dividend,
+                             .vol = mp.vol,
+                             .time = mp.time,
+                             .type = quant::OptionType::Call,
+                             .grid = quant::pde::GridSpec{321, 320, 4.0, 2.0},
+                             .log_space = true,
+                             .upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann,
+                             .compute_theta = true,
+                             .use_rannacher = true};
     auto res = quant::pde::price_crank_nicolson(pp);
     ASSERT_TRUE(res.theta.has_value());
     double theta_ref = *res.theta;
@@ -175,18 +173,16 @@ TEST(MonteCarloSlow, ThetaCloseToPDE) {
 }
 
 TEST(MonteCarloSlow, GammaMixedVarianceLowerThanLR) {
-    mc::McParams params{
-        .spot = 100.0,
-        .strike = 100.0,
-        .rate = 0.03,
-        .dividend = 0.005,
-        .vol = 0.2,
-        .time = 1.0,
-        .num_paths = 320000,
-        .seed = 424242ULL,
-        .antithetic = true,
-        .control_variate = false
-    };
+    mc::McParams params{.spot = 100.0,
+                        .strike = 100.0,
+                        .rate = 0.03,
+                        .dividend = 0.005,
+                        .vol = 0.2,
+                        .time = 1.0,
+                        .num_paths = 320000,
+                        .seed = 424242ULL,
+                        .antithetic = true,
+                        .control_variate = false};
 
     const auto g = mc::greeks_european_call(params);
     EXPECT_GT(g.gamma_lrm.std_error, 0.0);
@@ -196,23 +192,21 @@ TEST(MonteCarloSlow, GammaMixedVarianceLowerThanLR) {
 
 TEST(MonteCarloSlow, QmcReducesErrorVsAnalytic) {
     // Compare absolute error vs analytic for PRNG vs QMC
-    mc::McParams base{
-        .spot = 100.0,
-        .strike = 110.0,
-        .rate = 0.02,
-        .dividend = 0.00,
-        .vol = 0.25,
-        .time = 1.0,
-        .num_paths = 240000,
-        .seed = 2025,
-        .antithetic = false,
-        .control_variate = false
-    };
+    mc::McParams base{.spot = 100.0,
+                      .strike = 110.0,
+                      .rate = 0.02,
+                      .dividend = 0.00,
+                      .vol = 0.25,
+                      .time = 1.0,
+                      .num_paths = 240000,
+                      .seed = 2025,
+                      .antithetic = false,
+                      .control_variate = false};
     base.num_steps = 64;
     auto prng = base;
     prng.qmc = mc::McParams::Qmc::None;
     auto r1 = mc::price_european_call(prng);
-    auto qmc  = base;
+    auto qmc = base;
     qmc.qmc = mc::McParams::Qmc::Sobol;
     qmc.bridge = mc::McParams::Bridge::BrownianBridge;
     auto r2 = mc::price_european_call(qmc);

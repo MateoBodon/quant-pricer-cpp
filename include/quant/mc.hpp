@@ -2,9 +2,9 @@
 #pragma once
 
 #include <cstdint>
-#include <vector>
-#include <random>
 #include <optional>
+#include <random>
+#include <vector>
 
 #include "quant/rng.hpp"
 #include "quant/term_structures.hpp"
@@ -15,12 +15,12 @@ namespace quant::mc {
 ///
 /// Configure the simulation engine, variance reduction, and RNG sampler.
 struct McParams {
-    double spot;      // S0
-    double strike;    // K
-    double rate;      // r
-    double dividend;  // q
-    double vol;       // sigma
-    double time;      // T
+    double spot;             // S0
+    double strike;           // K
+    double rate;             // r
+    double dividend;         // q
+    double vol;              // sigma
+    double time;             // T
     std::uint64_t num_paths; // number of primary paths (antithetic doubles effective)
     std::uint64_t seed;      // RNG seed
     bool antithetic{true};
@@ -39,15 +39,15 @@ struct McParams {
 
 /// Summary of a Monte Carlo estimator (mean, standard error, 95% CI)
 struct McStatistic {
-    double value;       // sample mean
-    double std_error;   // standard error of the estimate
-    double ci_low;      // 95% confidence interval lower bound
-    double ci_high;     // 95% confidence interval upper bound
+    double value;     // sample mean
+    double std_error; // standard error of the estimate
+    double ci_low;    // 95% confidence interval lower bound
+    double ci_high;   // 95% confidence interval upper bound
 };
 
 /// Monte Carlo pricing result
 struct McResult {
-    McStatistic estimate;  // price estimate and uncertainty
+    McStatistic estimate; // price estimate and uncertainty
 };
 
 /// Price European call via terminal payoff; uses streaming for cache friendliness.
@@ -59,11 +59,11 @@ McResult price_european_call(const McParams& p);
 
 /// Monte Carlo Greeks result (mean/SE/CI per estimator).
 struct GreeksResult {
-    McStatistic delta;      // pathwise
-    McStatistic vega;       // pathwise
-    McStatistic gamma_lrm;  // likelihood-ratio
-    McStatistic gamma_mixed;// mixed (pathwise × LR)
-    McStatistic theta;      // finite-difference in time with common RNG
+    McStatistic delta;       // pathwise
+    McStatistic vega;        // pathwise
+    McStatistic gamma_lrm;   // likelihood-ratio
+    McStatistic gamma_mixed; // mixed (pathwise × LR)
+    McStatistic theta;       // finite-difference in time with common RNG
 };
 
 /// Monte Carlo Greeks under GBM.

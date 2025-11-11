@@ -12,7 +12,9 @@ from .calibrate_heston import apply_model, compute_oos_iv_metrics
 TICK_SIZE = 0.05
 
 
-def evaluate(oos_surface: pd.DataFrame, params: Dict[str, float]) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, float]]:
+def evaluate(
+    oos_surface: pd.DataFrame, params: Dict[str, float]
+) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, float]]:
     modeled = apply_model(oos_surface.copy(), params)
     modeled["abs_iv_bps"] = modeled["iv_error_bps"].abs()
     modeled["abs_price_ticks"] = modeled["price_error_ticks"].abs()
@@ -29,7 +31,9 @@ def evaluate(oos_surface: pd.DataFrame, params: Dict[str, float]) -> Tuple[pd.Da
     return modeled, summary, metrics
 
 
-def write_outputs(detail_csv: Path, summary_csv: Path, detail: pd.DataFrame, summary: pd.DataFrame) -> None:
+def write_outputs(
+    detail_csv: Path, summary_csv: Path, detail: pd.DataFrame, summary: pd.DataFrame
+) -> None:
     detail_csv.parent.mkdir(parents=True, exist_ok=True)
     detail_cols = [
         "symbol",

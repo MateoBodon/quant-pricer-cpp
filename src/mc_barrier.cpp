@@ -1,9 +1,9 @@
 #include "quant/mc_barrier.hpp"
 
 #include "quant/black_scholes.hpp"
+#include "quant/math.hpp"
 #include "quant/qmc/brownian_bridge.hpp"
 #include "quant/qmc/sobol.hpp"
-#include "quant/math.hpp"
 #include "quant/stats.hpp"
 
 #include <algorithm>
@@ -37,11 +37,7 @@ bool barrier_triggered(const BarrierSpec& spec, double S) {
     return is_up_barrier(spec) ? (S >= spec.B) : (S <= spec.B);
 }
 
-double crossing_probability(double S_prev,
-                            double S_next,
-                            double B,
-                            double sigma,
-                            double dt,
+double crossing_probability(double S_prev, double S_next, double B, double sigma, double dt,
                             bool up_barrier) {
     if (up_barrier) {
         if (S_prev >= B || S_next >= B) {
@@ -125,8 +121,7 @@ struct PathWorkspace {
     std::vector<double> sobol_point;
 };
 
-double run_path(const BarrierMcContext& ctx,
-                const std::vector<double>& increments,
+double run_path(const BarrierMcContext& ctx, const std::vector<double>& increments,
                 const std::vector<double>& uniforms) {
     double logS = std::log(ctx.params.spot);
     double S_prev = ctx.params.spot;
@@ -140,8 +135,10 @@ double run_path(const BarrierMcContext& ctx,
 
     for (int i = 0; i < steps; ++i) {
         const double incr = increments[i];
-        const double sigma_step = ctx.use_schedule ? ctx.sigma_step[static_cast<std::size_t>(i)] : ctx.params.vol;
-        const double drift_step = ctx.use_schedule ? ctx.drift_step[static_cast<std::size_t>(i)] : ctx.drift_dt;
+        const double sigma_step =
+            ctx.use_schedule ? ctx.sigma_step[static_cast<std::size_t>(i)] : ctx.params.vol;
+        const double drift_step =
+            ctx.use_schedule ? ctx.drift_step[static_cast<std::size_t>(i)] : ctx.drift_dt;
         const double logS_next = logS + drift_step + sigma_step * incr;
         const double S_next = std::exp(logS_next);
 
@@ -150,7 +147,8 @@ double run_path(const BarrierMcContext& ctx,
             if (S_prev >= ctx.barrier.B || S_next >= ctx.barrier.B) {
                 cross = true;
             } else {
-                const double p_hit = crossing_probability(S_prev, S_next, ctx.barrier.B, sigma_step, dt, true);
+                const double p_hit =
+                    crossing_probability(S_prev, S_next, ctx.barrier.B, sigma_step, dt, true);
                 if (p_hit > 0.0) {
                     const double u = uniforms[i];
                     cross = (u < p_hit);
@@ -160,7 +158,8 @@ double run_path(const BarrierMcContext& ctx,
             if (S_prev <= ctx.barrier.B || S_next <= ctx.barrier.B) {
                 cross = true;
             } else {
-                const double p_hit = crossing_probability(S_prev, S_next, ctx.barrier.B, sigma_step, dt, false);
+                const double p_hit =
+                    crossing_probability(S_prev, S_next, ctx.barrier.B, sigma_step, dt, false);
                 if (p_hit > 0.0) {
                     const double u = uniforms[i];
                     cross = (u < p_hit);
@@ -194,22 +193,20 @@ double run_path(const BarrierMcContext& ctx,
             }
             return ctx.barrier.rebate * ctx.discount;
         }
-    const double payoff = (ctx.opt == OptionType::Call)
-                                  ? std::max(0.0, S_prev - ctx.strike)
-                                  : std::max(0.0, ctx.strike - S_prev);
-    double sample = ctx.discount * payoff;
-    if (ctx.use_cv) {
-        const double cv_obs = ctx.discount * S_prev;
-        sample += (ctx.cv_expectation - cv_obs);
-    }
-    return sample;
+        const double payoff = (ctx.opt == OptionType::Call) ? std::max(0.0, S_prev - ctx.strike)
+                                                            : std::max(0.0, ctx.strike - S_prev);
+        double sample = ctx.discount * payoff;
+        if (ctx.use_cv) {
+            const double cv_obs = ctx.discount * S_prev;
+            sample += (ctx.cv_expectation - cv_obs);
+        }
+        return sample;
     }
 
     // knock-in
     if (knocked_in) {
-        const double payoff = (ctx.opt == OptionType::Call)
-                                  ? std::max(0.0, S_prev - ctx.strike)
-                                  : std::max(0.0, ctx.strike - S_prev);
+        const double payoff = (ctx.opt == OptionType::Call) ? std::max(0.0, S_prev - ctx.strike)
+                                                            : std::max(0.0, ctx.strike - S_prev);
         double sample = ctx.discount * payoff;
         if (ctx.use_cv) {
             const double cv_obs = ctx.discount * S_prev;
@@ -221,10 +218,8 @@ double run_path(const BarrierMcContext& ctx,
     return ctx.barrier.rebate * ctx.discount;
 }
 
-quant::stats::Welford simulate_range(std::uint64_t begin,
-                                  std::uint64_t end,
-                                  std::uint64_t seed_offset,
-                                  const WorkerContext& worker) {
+quant::stats::Welford simulate_range(std::uint64_t begin, std::uint64_t end, std::uint64_t seed_offset,
+                                     const WorkerContext& worker) {
     quant::stats::Welford acc;
     if (begin >= end) {
         return acc;
@@ -276,16 +271,8 @@ quant::stats::Welford simulate_range(std::uint64_t begin,
             if (ctx.params.rng == quant::rng::Mode::Counter) {
                 for (int j = 0; j < ctx.steps; ++j) {
                     const std::uint32_t step_id = static_cast<std::uint32_t>(j);
-                    const double z = quant::rng::normal(seed_offset,
-                                                        idx,
-                                                        step_id,
-                                                        0U,
-                                                        0U);
-                    const double u = quant::rng::uniform(seed_offset,
-                                                         idx,
-                                                         step_id,
-                                                         1U,
-                                                         0U);
+                    const double z = quant::rng::normal(seed_offset, idx, step_id, 0U, 0U);
+                    const double u = quant::rng::uniform(seed_offset, idx, step_id, 1U, 0U);
                     workspace.normals[j] = z;
                     workspace.uniforms[j] = u;
                     if (ctx.params.antithetic) {
@@ -308,7 +295,8 @@ quant::stats::Welford simulate_range(std::uint64_t begin,
         if (ctx.use_bridge && ctx.steps > 1) {
             bridge->transform(workspace.normals.data(), workspace.increments.data());
             if (ctx.params.antithetic) {
-                bridge_antithetic->transform(workspace.normals_antithetic.data(), workspace.increments_antithetic.data());
+                bridge_antithetic->transform(workspace.normals_antithetic.data(),
+                                             workspace.increments_antithetic.data());
             }
         } else {
             for (int j = 0; j < ctx.steps; ++j) {
@@ -321,7 +309,8 @@ quant::stats::Welford simulate_range(std::uint64_t begin,
 
         double sample = run_path(ctx, workspace.increments, workspace.uniforms);
         if (ctx.params.antithetic) {
-            const double sample_antithetic = run_path(ctx, workspace.increments_antithetic, workspace.uniforms_antithetic);
+            const double sample_antithetic =
+                run_path(ctx, workspace.increments_antithetic, workspace.uniforms_antithetic);
             sample = 0.5 * (sample + sample_antithetic);
         }
         acc.add(sample);
@@ -333,16 +322,15 @@ quant::stats::Welford simulate_range(std::uint64_t begin,
 } // namespace
 
 bool control_variate_enabled(bool request, const BarrierSpec& spec) {
-    if (!request) return false;
+    if (!request)
+        return false;
     if (spec.type == BarrierType::DownIn || spec.type == BarrierType::UpIn) {
         return false;
     }
     return true;
 }
 
-McResult price_barrier_option(const McParams& base,
-                              double strike,
-                              OptionType opt,
+McResult price_barrier_option(const McParams& base, double strike, OptionType opt,
                               const BarrierSpec& barrier) {
     if (base.num_paths == 0) {
         return McResult{McStatistic{0.0, 0.0, 0.0, 0.0}};
@@ -363,9 +351,10 @@ McResult price_barrier_option(const McParams& base,
             const double value = barrier.rebate;
             return McResult{McStatistic{value, 0.0, value, value}};
         }
-        const double vanilla = (opt == OptionType::Call)
-                                   ? ::quant::bs::call_price(base.spot, strike, base.rate, base.dividend, base.vol, base.time)
-                                   : ::quant::bs::put_price(base.spot, strike, base.rate, base.dividend, base.vol, base.time);
+        const double vanilla =
+            (opt == OptionType::Call)
+                ? ::quant::bs::call_price(base.spot, strike, base.rate, base.dividend, base.vol, base.time)
+                : ::quant::bs::put_price(base.spot, strike, base.rate, base.dividend, base.vol, base.time);
         return McResult{McStatistic{vanilla, 0.0, vanilla, vanilla}};
     }
 
@@ -381,31 +370,28 @@ McResult price_barrier_option(const McParams& base,
     }
 
     const double dt = base.time / static_cast<double>(steps);
-    BarrierMcContext ctx{
-        base,
-        strike,
-        opt,
-        barrier,
-        steps,
-        use_qmc,
-        scrambled,
-        use_bridge,
-        dt,
-        (base.rate - base.dividend - 0.5 * base.vol * base.vol) * dt,
-        std::sqrt(dt),
-        false,
-        {},
-        {},
-        0.0,
-        0.0,
-        is_knock_out(barrier),
-        is_up_barrier(barrier),
-        control_variate_enabled(base.control_variate, barrier)
-    };
+    BarrierMcContext ctx{base,
+                         strike,
+                         opt,
+                         barrier,
+                         steps,
+                         use_qmc,
+                         scrambled,
+                         use_bridge,
+                         dt,
+                         (base.rate - base.dividend - 0.5 * base.vol * base.vol) * dt,
+                         std::sqrt(dt),
+                         false,
+                         {},
+                         {},
+                         0.0,
+                         0.0,
+                         is_knock_out(barrier),
+                         is_up_barrier(barrier),
+                         control_variate_enabled(base.control_variate, barrier)};
 
-    bool has_schedule = base.rate_schedule.has_value() ||
-                        base.dividend_schedule.has_value() ||
-                        base.vol_schedule.has_value();
+    bool has_schedule =
+        base.rate_schedule.has_value() || base.dividend_schedule.has_value() || base.vol_schedule.has_value();
     double integrated_rate = 0.0;
     double integrated_div = 0.0;
     if (has_schedule) {
@@ -444,15 +430,16 @@ McResult price_barrier_option(const McParams& base,
     std::vector<quant::stats::Welford> partial(max_threads);
     const std::uint64_t counter_seed = base.seed ? base.seed : 0x517cc1b727220a95ULL;
 
-    #pragma omp parallel
+#pragma omp parallel
     {
         const int tid = omp_get_thread_num();
         const int nthreads = omp_get_num_threads();
         const std::uint64_t begin = (tid * N) / nthreads;
         const std::uint64_t end = ((tid + 1) * N) / nthreads;
-        const std::uint64_t seed_offset = (base.rng == quant::rng::Mode::Counter)
-                                              ? counter_seed
-                                              : base.seed + 0x517cc1b727220a95ULL * static_cast<std::uint64_t>(tid + 1);
+        const std::uint64_t seed_offset =
+            (base.rng == quant::rng::Mode::Counter)
+                ? counter_seed
+                : base.seed + 0x517cc1b727220a95ULL * static_cast<std::uint64_t>(tid + 1);
         partial[tid] = simulate_range(begin, end, seed_offset, worker);
     }
 

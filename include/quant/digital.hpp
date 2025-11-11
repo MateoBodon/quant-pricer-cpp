@@ -18,6 +18,4 @@ struct Params {
 // Analytic Black–Scholes formulas for digitals
 double price_bs(const Params& p, Type type);
 
-}
-
-
+} // namespace quant::digital

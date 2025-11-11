@@ -23,7 +23,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
 from manifest_utils import update_run
 
 
@@ -200,7 +199,9 @@ def main() -> None:
             )
             psor_price = american_put_psor(spec, psor_nodes, psor_steps)
             crr_price = american_put_binomial(spec, binomial_steps)
-            lsmc_price, lsmc_se = american_put_lsmc(spec, lsmc_paths, lsmc_steps, args.seed)
+            lsmc_price, lsmc_se = american_put_lsmc(
+                spec, lsmc_paths, lsmc_steps, args.seed
+            )
             rows.append(
                 {
                     "params": f"S/K={ratio:.1f};sigma={sigma:.2f}",

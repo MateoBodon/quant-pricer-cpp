@@ -40,13 +40,8 @@ SpaceGrid make_space_grid(const PdeParams& p) {
     return quant::grid_utils::build_space_grid(gp);
 }
 
-void build_system(const PdeParams& p,
-                  const SpaceGrid& grid,
-                  const std::vector<double>& V_curr,
-                  double dt,
-                  double theta,
-                  double tau_next,
-                  OperatorWorkspace& op) {
+void build_system(const PdeParams& p, const SpaceGrid& grid, const std::vector<double>& V_curr, double dt,
+                  double theta, double tau_next, OperatorWorkspace& op) {
     const int M = p.grid.num_space;
     if (static_cast<int>(grid.spot.size()) != M) {
         throw std::invalid_argument("grid size mismatch for PDE operator");
@@ -62,11 +57,8 @@ void build_system(const PdeParams& p,
 
     const double tau = tau_next;
     const auto boundary = [&](bool lower) {
-        quant::grid_utils::PayoffBoundaryParams params{
-            p.type, p.strike, r, q, tau
-        };
-        return quant::grid_utils::dirichlet_boundary(params,
-                                                     lower ? grid.spot.front() : grid.spot.back(),
+        quant::grid_utils::PayoffBoundaryParams params{p.type, p.strike, r, q, tau};
+        return quant::grid_utils::dirichlet_boundary(params, lower ? grid.spot.front() : grid.spot.back(),
                                                      lower);
     };
 
@@ -101,9 +93,7 @@ struct InterpResult {
     double gamma;
 };
 
-InterpResult interpolate_greeks(const std::vector<double>& S,
-                                const std::vector<double>& V,
-                                double S0) {
+InterpResult interpolate_greeks(const std::vector<double>& S, const std::vector<double>& V, double S0) {
     const std::size_t M = S.size();
     if (M < 3) {
         throw std::runtime_error("Need at least three spatial nodes to compute Greeks");
@@ -151,12 +141,11 @@ InterpResult interpolate_greeks(const std::vector<double>& S,
 
 } // namespace
 
-std::vector<double> solve_tridiagonal(const std::vector<double>& a,
-                                      const std::vector<double>& b,
-                                      const std::vector<double>& c,
-                                      const std::vector<double>& d) {
+std::vector<double> solve_tridiagonal(const std::vector<double>& a, const std::vector<double>& b,
+                                      const std::vector<double>& c, const std::vector<double>& d) {
     const int n = static_cast<int>(b.size());
-    if (static_cast<int>(a.size()) != n - 1 || static_cast<int>(c.size()) != n - 1 || static_cast<int>(d.size()) != n) {
+    if (static_cast<int>(a.size()) != n - 1 || static_cast<int>(c.size()) != n - 1 ||
+        static_cast<int>(d.size()) != n) {
         throw std::invalid_argument("Tridiagonal sizes mismatch");
     }
     std::vector<double> cp(c);

@@ -1,8 +1,8 @@
 /// Streaming statistics utilities
 #pragma once
 
-#include <cstdint>
 #include <algorithm>
+#include <cstdint>
 
 namespace quant::stats {
 
@@ -20,8 +20,12 @@ struct Welford {
     }
 
     inline void merge(const Welford& other) {
-        if (other.count == 0) return;
-        if (count == 0) { *this = other; return; }
+        if (other.count == 0)
+            return;
+        if (count == 0) {
+            *this = other;
+            return;
+        }
         const double total = static_cast<double>(count + other.count);
         const double delta = other.mean - mean;
         mean += delta * static_cast<double>(other.count) / total;
@@ -29,11 +33,7 @@ struct Welford {
         count += other.count;
     }
 
-    inline double variance() const {
-        return (count > 1) ? m2 / static_cast<double>(count - 1) : 0.0;
-    }
+    inline double variance() const { return (count > 1) ? m2 / static_cast<double>(count - 1) : 0.0; }
 };
 
 } // namespace quant::stats
-
-

@@ -14,4 +14,3 @@ struct BarrierSpec {
 };
 
 } // namespace quant
-

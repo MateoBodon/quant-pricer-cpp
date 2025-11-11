@@ -24,7 +24,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
 from manifest_utils import describe_inputs, update_run
 
 
@@ -39,24 +38,38 @@ class McSpec:
     bump: float = 0.01
 
 
-def _delta_pathwise(st: np.ndarray, payoff_mask: np.ndarray, spec: McSpec, discount: float) -> np.ndarray:
+def _delta_pathwise(
+    st: np.ndarray, payoff_mask: np.ndarray, spec: McSpec, discount: float
+) -> np.ndarray:
     return discount * payoff_mask * (st / spec.spot)
 
 
-def _delta_lr(payoff: np.ndarray, z: np.ndarray, spec: McSpec, discount: float) -> np.ndarray:
+def _delta_lr(
+    payoff: np.ndarray, z: np.ndarray, spec: McSpec, discount: float
+) -> np.ndarray:
     return discount * payoff * (z / (spec.spot * spec.vol * math.sqrt(spec.time)))
 
 
-def _delta_fd(payoff_up: np.ndarray, payoff_dn: np.ndarray, spec: McSpec, discount: float) -> np.ndarray:
+def _delta_fd(
+    payoff_up: np.ndarray, payoff_dn: np.ndarray, spec: McSpec, discount: float
+) -> np.ndarray:
     return discount * (payoff_up - payoff_dn) / (2.0 * spec.spot * spec.bump)
 
 
-def _gamma_lr(payoff: np.ndarray, z: np.ndarray, spec: McSpec, discount: float) -> np.ndarray:
+def _gamma_lr(
+    payoff: np.ndarray, z: np.ndarray, spec: McSpec, discount: float
+) -> np.ndarray:
     denom = (spec.spot * spec.vol) ** 2 * spec.time
     return discount * payoff * ((z * z - 1.0) / denom)
 
 
-def _gamma_fd(payoff_up: np.ndarray, payoff: np.ndarray, payoff_dn: np.ndarray, spec: McSpec, discount: float) -> np.ndarray:
+def _gamma_fd(
+    payoff_up: np.ndarray,
+    payoff: np.ndarray,
+    payoff_dn: np.ndarray,
+    spec: McSpec,
+    discount: float,
+) -> np.ndarray:
     denom = (spec.spot * spec.bump) ** 2
     return discount * (payoff_up - 2.0 * payoff + payoff_dn) / denom
 
@@ -120,7 +133,13 @@ def _plot(df: pd.DataFrame, output_png: Path) -> None:
         subset = df[df["greek"] == greek]
         for method, frame in subset.groupby("method"):
             frame = frame.sort_values("N")
-            ax.loglog(frame["N"], frame["std_error"], marker="o", linewidth=1.5, label=method.replace("_", " "))
+            ax.loglog(
+                frame["N"],
+                frame["std_error"],
+                marker="o",
+                linewidth=1.5,
+                label=method.replace("_", " "),
+            )
         ax.set_title(f"{greek.capitalize()} estimator std. error")
         ax.set_xlabel("Paths (N)")
         ax.set_ylabel("Std error")
@@ -134,7 +153,9 @@ def _plot(df: pd.DataFrame, output_png: Path) -> None:
 
 def _parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Monte Carlo Greeks reliability sweep.")
-    ap.add_argument("--fast", action="store_true", help="Use a short path grid for CI/PR workflows.")
+    ap.add_argument(
+        "--fast", action="store_true", help="Use a short path grid for CI/PR workflows."
+    )
     ap.add_argument(
         "--paths",
         nargs="*",
@@ -142,10 +163,14 @@ def _parse_args() -> argparse.Namespace:
         default=[],
         help="Custom list of path counts (overrides --fast defaults).",
     )
-    ap.add_argument("--seed", type=int, default=2024, help="RNG seed for reproducibility.")
+    ap.add_argument(
+        "--seed", type=int, default=2024, help="RNG seed for reproducibility."
+    )
     ap.add_argument("--output-csv", default="artifacts/greeks_reliability.csv")
     ap.add_argument("--output-png", default="artifacts/greeks_reliability.png")
-    ap.add_argument("--skip-manifest", action="store_true", help="Suppress manifest logging.")
+    ap.add_argument(
+        "--skip-manifest", action="store_true", help="Suppress manifest logging."
+    )
     return ap.parse_args()
 
 

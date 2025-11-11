@@ -11,13 +11,15 @@ double price_bs(const Params& p, Type type) {
     const double df_q = std::exp(-p.dividend * p.time);
     if (p.time <= 0.0) {
         bool in = p.call ? (p.spot > p.strike) : (p.spot < p.strike);
-        if (type == Type::CashOrNothing) return in ? 1.0 : 0.0;
+        if (type == Type::CashOrNothing)
+            return in ? 1.0 : 0.0;
         return in ? p.spot : 0.0;
     }
     if (p.vol <= 0.0) {
         const double forward = p.spot * df_q / df_r;
         bool in = p.call ? (forward > p.strike) : (forward < p.strike);
-        if (type == Type::CashOrNothing) return df_r * (in ? 1.0 : 0.0);
+        if (type == Type::CashOrNothing)
+            return df_r * (in ? 1.0 : 0.0);
         return df_q * (in ? p.spot : 0.0);
     }
     const double d1v = d1(p.spot, p.strike, p.rate, p.dividend, p.vol, p.time);
@@ -32,5 +34,3 @@ double price_bs(const Params& p, Type type) {
 }
 
 } // namespace quant::digital
-
-

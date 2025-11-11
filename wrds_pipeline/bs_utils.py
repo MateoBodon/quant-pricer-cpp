@@ -10,7 +10,9 @@ def _norm_cdf(x: float) -> float:
     return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
 
 
-def bs_call(spot: float, strike: float, rate: float, div: float, vol: float, T: float) -> float:
+def bs_call(
+    spot: float, strike: float, rate: float, div: float, vol: float, T: float
+) -> float:
     if T <= 0.0:
         return max(spot - strike, 0.0)
     if vol <= 0.0:
@@ -19,18 +21,21 @@ def bs_call(spot: float, strike: float, rate: float, div: float, vol: float, T: 
     sqrtT = math.sqrt(T)
     d1 = (math.log(spot / strike) + (rate - div + 0.5 * vol * vol) * T) / (vol * sqrtT)
     d2 = d1 - vol * sqrtT
-    return (
-        spot * math.exp(-div * T) * _norm_cdf(d1)
-        - strike * math.exp(-rate * T) * _norm_cdf(d2)
-    )
+    return spot * math.exp(-div * T) * _norm_cdf(d1) - strike * math.exp(
+        -rate * T
+    ) * _norm_cdf(d2)
 
 
-def bs_put(spot: float, strike: float, rate: float, div: float, vol: float, T: float) -> float:
+def bs_put(
+    spot: float, strike: float, rate: float, div: float, vol: float, T: float
+) -> float:
     call = bs_call(spot, strike, rate, div, vol, T)
     return call - spot * math.exp(-div * T) + strike * math.exp(-rate * T)
 
 
-def bs_delta_call(spot: float, strike: float, rate: float, div: float, vol: float, T: float) -> float:
+def bs_delta_call(
+    spot: float, strike: float, rate: float, div: float, vol: float, T: float
+) -> float:
     if T <= 0.0 or spot <= 0.0 or strike <= 0.0:
         return 0.0
     sqrtT = math.sqrt(T)
@@ -40,12 +45,20 @@ def bs_delta_call(spot: float, strike: float, rate: float, div: float, vol: floa
     return math.exp(-div * T) * _norm_cdf(d1)
 
 
-def bs_vega(spot: float, strike: float, rate: float, div: float, vol: float, T: float) -> float:
+def bs_vega(
+    spot: float, strike: float, rate: float, div: float, vol: float, T: float
+) -> float:
     if T <= 0.0 or vol <= 0.0:
         return 0.0
     sqrtT = math.sqrt(T)
     d1 = (math.log(spot / strike) + (rate - div + 0.5 * vol * vol) * T) / (vol * sqrtT)
-    return spot * math.exp(-div * T) * math.sqrt(T) * (1.0 / math.sqrt(2 * math.pi)) * math.exp(-0.5 * d1 * d1)
+    return (
+        spot
+        * math.exp(-div * T)
+        * math.sqrt(T)
+        * (1.0 / math.sqrt(2 * math.pi))
+        * math.exp(-0.5 * d1 * d1)
+    )
 
 
 def implied_vol_from_price(

@@ -28,7 +28,6 @@ from typing import Iterable, Optional
 import numpy as np
 import pandas as pd
 
-
 COLUMN_ALIASES = {
     "quote_date": ["quote_date", "trade_date", "date"],
     "expiration": ["expiration", "expiration_date", "expiry"],
@@ -139,9 +138,7 @@ def main() -> None:
     col = _find_column(df.columns, COLUMN_ALIASES["quote_date"])
     if col is None and not args.trade_date:
         raise ValueError("Trade date column missing; pass --trade-date")
-    trade_date = (
-        _parse_date(df[col].iloc[0]) if col else _parse_date(args.trade_date)
-    )
+    trade_date = _parse_date(df[col].iloc[0]) if col else _parse_date(args.trade_date)
 
     exp_col = _find_column(df.columns, COLUMN_ALIASES["expiration"])
     if exp_col is None:

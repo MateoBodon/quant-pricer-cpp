@@ -34,9 +34,7 @@ std::vector<double> cholesky_lower(const std::vector<double>& corr, std::size_t 
     return L;
 }
 
-double payoff_european_call(double strike, double basket) {
-    return std::max(0.0, basket - strike);
-}
+double payoff_european_call(double strike, double basket) { return std::max(0.0, basket - strike); }
 
 } // namespace
 
@@ -95,7 +93,8 @@ McStat basket_european_call_mc(const BasketMcParams& p) {
     }
 
     const double variance = acc.variance();
-    const double se = (acc.count > 0) ? std::sqrt(std::max(0.0, variance / static_cast<double>(acc.count))) : 0.0;
+    const double se =
+        (acc.count > 0) ? std::sqrt(std::max(0.0, variance / static_cast<double>(acc.count))) : 0.0;
     return {acc.mean, se};
 }
 
@@ -140,7 +139,8 @@ McStat merton_call_mc(const MertonParams& p) {
     }
 
     const double variance = acc.variance();
-    const double se = (acc.count > 0) ? std::sqrt(std::max(0.0, variance / static_cast<double>(acc.count))) : 0.0;
+    const double se =
+        (acc.count > 0) ? std::sqrt(std::max(0.0, variance / static_cast<double>(acc.count))) : 0.0;
     return {acc.mean, se};
 }
 

@@ -7,15 +7,8 @@
 namespace quant::qmc {
 
 BrownianBridge::BrownianBridge(std::size_t steps, double maturity)
-    : size_(steps),
-      maturity_(maturity),
-      times_(steps),
-      bridge_index_(steps),
-      left_index_(steps),
-      right_index_(steps),
-      left_weight_(steps),
-      right_weight_(steps),
-      std_dev_(steps) {
+    : size_(steps), maturity_(maturity), times_(steps), bridge_index_(steps), left_index_(steps),
+      right_index_(steps), left_weight_(steps), right_weight_(steps), std_dev_(steps) {
     if (steps == 0) {
         throw std::invalid_argument("BrownianBridge: number of steps must be positive");
     }

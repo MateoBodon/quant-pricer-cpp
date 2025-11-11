@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "quant/digital.hpp"
+#include <gtest/gtest.h>
 
 using namespace quant::digital;
 
@@ -17,5 +17,3 @@ TEST(Digital, AssetOrNothing_Sanity) {
     double price_call = price_bs(p, Type::AssetOrNothing);
     EXPECT_GT(price_call, 0.0);
 }
-
-

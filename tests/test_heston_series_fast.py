@@ -44,7 +44,9 @@ def main() -> None:
     with csv_path.open(newline="") as fh:
         rows = list(csv.DictReader(fh))
     if len(rows) < 2:
-        raise AssertionError("Heston params_series.csv should contain at least two dates")
+        raise AssertionError(
+            "Heston params_series.csv should contain at least two dates"
+        )
 
     columns = rows[0].keys()
     required_cols = {"date", "kappa", "theta", "sigma_v", "rho", "v0", "rmspe_vol_pct"}

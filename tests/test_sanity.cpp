@@ -1,16 +1,11 @@
+#include "quant/term_structures.hpp"
 #include <gtest/gtest.h>
 #include <vector>
-#include "quant/term_structures.hpp"
 
-TEST(Sanity, TrueIsTrue) {
-    EXPECT_TRUE(true);
-}
+TEST(Sanity, TrueIsTrue) { EXPECT_TRUE(true); }
 
 TEST(PiecewiseConstant, RightClosedIntervals) {
-    quant::PiecewiseConstant pc{
-        .times = {0.25, 0.50, 1.00},
-        .values = {1.0, 2.0, 3.0}
-    };
+    quant::PiecewiseConstant pc{.times = {0.25, 0.50, 1.00}, .values = {1.0, 2.0, 3.0}};
 
     // t <= first knot uses first value
     EXPECT_DOUBLE_EQ(pc.value(0.00), 1.0);

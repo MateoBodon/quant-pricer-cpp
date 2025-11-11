@@ -62,19 +62,19 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
 
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#tri-engine-agreement"><img src="docs/artifacts/tri_engine_agreement.png" alt="Tri-engine agreement" width="230"></a><br>
   **Tri-Engine Agreement (BS / MC / PDE)** – Analytic, deterministic MC, and Crank–Nicolson agree to <5 bps across strikes; MC CI is shown.<br>
-  Reproduce: `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output docs/artifacts/tri_engine_agreement.png --csv docs/artifacts/tri_engine_agreement.csv`  
+  Reproduce: `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output docs/artifacts/tri_engine_agreement.png --csv docs/artifacts/tri_engine_agreement.csv`
   Data: [tri_engine_agreement.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/tri_engine_agreement.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#qmc-vs-prng-equal-wall-clock"><img src="docs/artifacts/qmc_vs_prng_equal_time.png" alt="QMC vs PRNG equal-time RMSE" width="230"></a><br>
   **QMC vs PRNG (equal wall-clock)** – Sobol + Brownian bridge delivers ≈1.4× lower RMSE than PRNG at matched runtime for European + Asian calls.<br>
-  Reproduce: `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv --fast`  
+  Reproduce: `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv --fast`
   Data: [qmc_vs_prng_equal_time.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/qmc_vs_prng_equal_time.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_multi_date_summary.png" alt="WRDS panel summary" width="230"></a><br>
   **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated over ≥5 calm/stress dates with vega-weighted IV RMSE, quotes-weighted OOS MAE, and Δ-hedged 1d buckets.<br>
-  Reproduce (sample): `python wrds_pipeline/pipeline.py --dateset wrds_pipeline_dates_panel.yaml --use-sample`  
+  Reproduce (sample): `python wrds_pipeline/pipeline.py --dateset wrds_pipeline_dates_panel.yaml --use-sample`
   Data: [wrds_agg_pricing.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pricing.csv), [wrds_agg_oos.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_oos.csv), [wrds_agg_pnl.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pnl.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#quantlib-parity"><img src="docs/artifacts/ql_parity/ql_parity.png" alt="QuantLib parity" width="230"></a><br>
   **QuantLib Parity (vanilla/barrier/American)** – quant-pricer-cpp prices match QuantLib within ≈1¢ while exposing runtime deltas for each product.<br>
-  Reproduce: `python scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`  
+  Reproduce: `python scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`
   Data: [ql_parity.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/ql_parity/ql_parity.csv)
 
 ---

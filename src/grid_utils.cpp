@@ -37,15 +37,13 @@ SpaceGrid build_space_grid(const StretchedGridParams& params) {
 
     const double anchor_clamped = std::clamp(params.anchor, params.lower, params.upper);
     const double denom = params.upper - params.lower;
-    const double xi_anchor = (params.nodes == 1)
-                                 ? 0.0
-                                 : std::clamp((anchor_clamped - params.lower) / denom, 0.0, 1.0);
+    const double xi_anchor =
+        (params.nodes == 1) ? 0.0 : std::clamp((anchor_clamped - params.lower) / denom, 0.0, 1.0);
 
     if (!params.log_space) {
         for (int i = 0; i < params.nodes; ++i) {
-            const double xi = (params.nodes == 1)
-                                  ? 0.0
-                                  : static_cast<double>(i) / static_cast<double>(params.nodes - 1);
+            const double xi =
+                (params.nodes == 1) ? 0.0 : static_cast<double>(i) / static_cast<double>(params.nodes - 1);
             const double mapped = stretch_map(xi, xi_anchor, params.stretch);
             const double S = params.lower + (params.upper - params.lower) * mapped;
             grid.coordinate[static_cast<std::size_t>(i)] = S;
@@ -55,13 +53,11 @@ SpaceGrid build_space_grid(const StretchedGridParams& params) {
         const double x_lower = std::log(params.lower);
         const double x_upper = std::log(params.upper);
         const double denom_x = x_upper - x_lower;
-        const double xi0 = (params.nodes == 1)
-                               ? 0.0
-                               : std::clamp((std::log(anchor_clamped) - x_lower) / denom_x, 0.0, 1.0);
+        const double xi0 =
+            (params.nodes == 1) ? 0.0 : std::clamp((std::log(anchor_clamped) - x_lower) / denom_x, 0.0, 1.0);
         for (int i = 0; i < params.nodes; ++i) {
-            const double xi = (params.nodes == 1)
-                                  ? 0.0
-                                  : static_cast<double>(i) / static_cast<double>(params.nodes - 1);
+            const double xi =
+                (params.nodes == 1) ? 0.0 : static_cast<double>(i) / static_cast<double>(params.nodes - 1);
             const double mapped = stretch_map(xi, xi0, params.stretch);
             const double x = x_lower + (x_upper - x_lower) * mapped;
             const double S = std::exp(x);
@@ -72,12 +68,8 @@ SpaceGrid build_space_grid(const StretchedGridParams& params) {
     return grid;
 }
 
-void assemble_operator(const SpaceGrid& grid,
-                       const DiffusionCoefficients& coeffs,
-                       double dt,
-                       double theta,
-                       const std::vector<double>& v_curr,
-                       OperatorWorkspace& op) {
+void assemble_operator(const SpaceGrid& grid, const DiffusionCoefficients& coeffs, double dt, double theta,
+                       const std::vector<double>& v_curr, OperatorWorkspace& op) {
     const std::size_t M = grid.spot.size();
     if (grid.coordinate.size() != M) {
         throw std::invalid_argument("grid coordinate/spot size mismatch");
@@ -134,27 +126,25 @@ void assemble_operator(const SpaceGrid& grid,
         op.diag[i] = 1.0 - theta * dt * L_i;
         op.upper[i] = -theta * dt * L_ip1;
 
-        op.rhs[i] = v_curr[i] + (1.0 - theta) * dt *
-            (L_im1 * v_curr[i - 1] + L_i * v_curr[i] + L_ip1 * v_curr[i + 1]);
+        op.rhs[i] = v_curr[i] +
+                    (1.0 - theta) * dt * (L_im1 * v_curr[i - 1] + L_i * v_curr[i] + L_ip1 * v_curr[i + 1]);
     }
 }
 
-double dirichlet_boundary(const PayoffBoundaryParams& params,
-                          double spot,
-                          bool is_lower) {
+double dirichlet_boundary(const PayoffBoundaryParams& params, double spot, bool is_lower) {
     const double df_r = std::exp(-params.rate * params.tau);
     const double df_q = std::exp(-params.dividend * params.tau);
     switch (params.type) {
-        case ::quant::OptionType::Call:
-            if (is_lower) {
-                return 0.0;
-            }
-            return spot * df_q - params.strike * df_r;
-        case ::quant::OptionType::Put:
-            if (is_lower) {
-                return params.strike * df_r - spot * df_q;
-            }
+    case ::quant::OptionType::Call:
+        if (is_lower) {
             return 0.0;
+        }
+        return spot * df_q - params.strike * df_r;
+    case ::quant::OptionType::Put:
+        if (is_lower) {
+            return params.strike * df_r - spot * df_q;
+        }
+        return 0.0;
     }
     throw std::logic_error("unknown option type");
 }

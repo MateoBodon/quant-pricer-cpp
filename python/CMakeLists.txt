@@ -22,5 +22,3 @@ target_compile_features(pyquant_pricer PRIVATE cxx_std_20)
 install(TARGETS pyquant_pricer
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
-
-

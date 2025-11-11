@@ -24,9 +24,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.stats import norm, qmc
-
 from manifest_utils import update_run
+from scipy.stats import norm, qmc
 
 
 @dataclass
@@ -40,7 +39,14 @@ class MarketSpec:
 
 
 def black_scholes_call(mkt: MarketSpec) -> float:
-    S, K, r, q, sigma, T = mkt.spot, mkt.strike, mkt.rate, mkt.dividend, mkt.vol, mkt.tenor
+    S, K, r, q, sigma, T = (
+        mkt.spot,
+        mkt.strike,
+        mkt.rate,
+        mkt.dividend,
+        mkt.vol,
+        mkt.tenor,
+    )
     if T <= 0:
         return max(S - K, 0.0)
     sqrtT = math.sqrt(T)
@@ -186,18 +192,24 @@ def main() -> None:
                     reps=reps,
                     base_seed=args.seed + idx * 199,
                 )
-                stats.append({
-                    "paths": paths,
-                    "rmse": rmse,
-                    "mean": mean_est,
-                    "duration": duration,
-                })
+                stats.append(
+                    {
+                        "paths": paths,
+                        "rmse": rmse,
+                        "mean": mean_est,
+                        "duration": duration,
+                    }
+                )
             log_paths = np.log([s["paths"] for s in stats])
             log_rmse = np.log([s["rmse"] for s in stats])
             slope, intercept = np.polyfit(log_paths, log_rmse, 1)
             time_per_run = np.array([s["duration"] / reps for s in stats], dtype=float)
-            time_per_path = time_per_run / np.array([s["paths"] for s in stats], dtype=float)
-            rmse_constant = float(np.mean([s["rmse"] * math.sqrt(s["paths"]) for s in stats]))
+            time_per_path = time_per_run / np.array(
+                [s["paths"] for s in stats], dtype=float
+            )
+            rmse_constant = float(
+                np.mean([s["rmse"] * math.sqrt(s["paths"]) for s in stats])
+            )
             avg_time_per_path = float(np.mean(time_per_path))
             stats_dict = {
                 "paths": [s["paths"] for s in stats],
@@ -232,27 +244,31 @@ def main() -> None:
                 effective_paths = max(1.0, budget / avg_time)
                 paths_vs_time.append(effective_paths)
                 rmse_vs_time.append(rmse_const / math.sqrt(effective_paths))
-                plot_rows.append({
-                    "payoff": kind,
-                    "method": method,
-                    "time_seconds": budget,
-                    "rmse": rmse_vs_time[-1],
-                })
+                plot_rows.append(
+                    {
+                        "payoff": kind,
+                        "method": method,
+                        "time_seconds": budget,
+                        "rmse": rmse_vs_time[-1],
+                    }
+                )
             method_stats[method]["rmse_vs_time"] = rmse_vs_time  # type: ignore[index]
             method_stats[method]["paths_vs_time"] = paths_vs_time  # type: ignore[index]
 
         for idx, budget in enumerate(time_grid):
             rmse_prng = method_stats["prng"]["rmse_vs_time"][idx]  # type: ignore[index]
             rmse_qmc = method_stats["qmc"]["rmse_vs_time"][idx]  # type: ignore[index]
-            summary_rows.append({
-                "payoff": kind,
-                "time_seconds": float(budget),
-                "paths_prng": float(method_stats["prng"]["paths_vs_time"][idx]),  # type: ignore[index]
-                "paths_qmc": float(method_stats["qmc"]["paths_vs_time"][idx]),  # type: ignore[index]
-                "rmse_prng": float(rmse_prng),
-                "rmse_qmc": float(rmse_qmc),
-                "rmse_ratio": float(rmse_prng / rmse_qmc),
-            })
+            summary_rows.append(
+                {
+                    "payoff": kind,
+                    "time_seconds": float(budget),
+                    "paths_prng": float(method_stats["prng"]["paths_vs_time"][idx]),  # type: ignore[index]
+                    "paths_qmc": float(method_stats["qmc"]["paths_vs_time"][idx]),  # type: ignore[index]
+                    "rmse_prng": float(rmse_prng),
+                    "rmse_qmc": float(rmse_qmc),
+                    "rmse_ratio": float(rmse_prng / rmse_qmc),
+                }
+            )
 
     csv_path = Path(args.csv)
     csv_path.parent.mkdir(parents=True, exist_ok=True)
@@ -271,7 +287,13 @@ def main() -> None:
             ("qmc", "s--", "#ff7f0e"),
         ]:
             data = subset[subset["method"] == method].sort_values("time_seconds")
-            ax.loglog(data["time_seconds"], data["rmse"], marker, color=color, label=method.upper())
+            ax.loglog(
+                data["time_seconds"],
+                data["rmse"],
+                marker,
+                color=color,
+                label=method.upper(),
+            )
         gains = summary_df[summary_df["payoff"] == kind]["rmse_ratio"].to_numpy()
         avg_gain = float(np.mean(gains)) if len(gains) else 1.0
         ax.text(
