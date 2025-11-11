@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-11-11T18:45:33.767380+00:00",
+  "generated_at": "2025-11-11T18:51:14.864388+00:00",
   "git": {
     "branch": "master",
     "dirty": true,
-    "sha": "adda79a607e8c1d39e71c55781b7c676ed94f475"
+    "sha": "72a1cce311689ccf5f68128321d6417841437615"
   },
   "omp_threads": 11,
   "runs": {
@@ -616,6 +616,20 @@
       "tenor": 1.0,
       "vol": 0.2
     },
+    "ql_parity": [
+      {
+        "csv": "docs/artifacts/ql_parity/ql_parity.csv",
+        "fast": false,
+        "figure": "docs/artifacts/ql_parity/ql_parity.png",
+        "quant_cli": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/quant_cli",
+        "scenarios": [
+          "vanilla_call_atm",
+          "vanilla_put_otm",
+          "barrier_do_call",
+          "american_put_psor"
+        ]
+      }
+    ],
     "qmc_vs_prng_equal_time": {
       "budget_count": 6,
       "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpyssdguau/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpyssdguau/qmc_summary.csv",

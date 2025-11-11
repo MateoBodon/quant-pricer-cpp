@@ -93,6 +93,16 @@ python scripts/generate_bench_artifacts.py --mc-json docs/artifacts/bench/bench_
 
   Data: [artifacts/bench/bench_pde_order.csv](artifacts/bench/bench_pde_order.csv)
 
+## QuantLib Parity (Vanilla / Barrier / American)
+
+QuantLib serves as an industry reference point. The parity harness exercises `quant_cli` (analytic BS, barrier PDE, American PSOR) and QuantLib engines (analytic, analytic barrier, binomial CRR) on the same scenarios, then reports price gaps in cents plus runtime deltas.
+
+![QuantLib parity](artifacts/ql_parity/ql_parity.png)
+
+- Reproduce: `python scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`
+- Data: [artifacts/ql_parity/ql_parity.csv](artifacts/ql_parity/ql_parity.csv)
+- Result: all four scenarios land within 1¢ of QuantLib; quant-pricer’s PDE-heavy engines are ~15–95× slower than QuantLib’s analytic/binomial counterparts but stay deterministic and grid-configurable for regression tests.
+
 ## WRDS OptionMetrics Snapshot (Opt-in)
 
 The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `secid` via `optionm.secnmd`, pulls the year-partitioned `optionm.opprcdYYYY` table, filters stale quotes, recomputes implied vols with the project’s solver, and bins by tenor/moneyness. A vega-weighted Heston calibration (least-squares in IV space) and bootstrap CIs are emitted alongside next-day OOS errors and delta-hedged one-day PnL histograms. Only aggregated CSV/PNGs under `docs/artifacts/wrds/` are committed.

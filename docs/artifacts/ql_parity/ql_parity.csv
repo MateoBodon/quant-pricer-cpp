@@ -1,0 +1,5 @@
+name,label,category,price_quant_pricer,price_quantlib,abs_diff_cents,runtime_ms_quant_pricer,runtime_ms_quantlib,runtime_ratio
+vanilla_call_atm,Call ATM 6M,vanilla,5.9826400000,5.9740241657,0.8615834347,5.5688749999,0.0839999993,66.2961314772
+vanilla_put_otm,Put OTM 1.5y,vanilla,16.2381000000,16.2419765268,0.3876526792,3.1730839983,0.0335420191,94.6002681140
+barrier_do_call,Down-&-Out Call,barrier,7.5758500000,7.5762607152,0.0410715241,3.4686659928,0.0677909993,51.1670579891
+american_put_psor,American Put,american,9.4994900000,9.5074775157,0.7987515700,15.8117079991,1.0603749834,14.9114306234
