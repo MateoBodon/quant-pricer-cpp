@@ -2,6 +2,7 @@
 #include "quant/pde.hpp"
 #include "quant/black_scholes.hpp"
 #include <cmath>
+#include <vector>
 
 using namespace quant;
 
@@ -136,4 +137,40 @@ TEST(PDE, RannacherImprovesAccuracy) {
     double err_no = std::abs(no_rannacher.price - analytic);
     double err_yes = std::abs(with_rannacher.price - analytic);
     EXPECT_LT(err_yes, err_no);
+}
+
+TEST(PDE, SecondOrderSlope) {
+    pde::PdeParams base{
+        .spot = 100.0,
+        .strike = 100.0,
+        .rate = 0.02,
+        .dividend = 0.00,
+        .vol = 0.2,
+        .time = 1.0,
+        .type = quant::OptionType::Call,
+        .grid = pde::GridSpec{0, 0, 4.0, 2.0},
+        .log_space = true,
+        .upper_boundary = pde::PdeParams::UpperBoundary::Neumann,
+        .compute_theta = false,
+        .use_rannacher = true
+    };
+    const double bs_price = bs::call_price(base.spot, base.strike, base.rate, base.dividend, base.vol, base.time);
+    std::vector<int> nodes{101, 201, 401};
+    std::vector<double> errors;
+    for (int m : nodes) {
+        auto spec = base;
+        spec.grid = pde::GridSpec{m, m - 1, 4.0, 2.0};
+        auto res = pde::price_crank_nicolson(spec);
+        errors.push_back(std::abs(res.price - bs_price));
+    }
+    double slope = 0.0;
+    if (errors.size() >= 3) {
+        double log_e1 = std::log(errors[1] / errors[0]);
+        double log_e2 = std::log(errors[2] / errors[1]);
+        double log_ratio = std::log(static_cast<double>(nodes[1]) / nodes[0]);
+        slope = -log_e1 / log_ratio;
+        double slope2 = -log_e2 / std::log(static_cast<double>(nodes[2]) / nodes[1]);
+        slope = 0.5 * (slope + slope2);
+    }
+    EXPECT_NEAR(slope, 2.0, 0.3);
 }

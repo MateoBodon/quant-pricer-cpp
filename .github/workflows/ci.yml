@@ -48,6 +48,8 @@ jobs:
     needs: lint
     name: Coverage (Ubuntu)
     runs-on: ubuntu-latest
+    env:
+      LLVM_PROFILE_FILE: build-cov/coverage-%p-%m.profraw
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,31 +57,47 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install gcovr
+      - name: Install coverage toolchain
         run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm
           python -m pip install --upgrade pip
           python -m pip install gcovr
-      - name: Configure (coverage flags)
+      - name: Configure (clang + llvm-cov)
         env:
-          CC: gcc
-          CXX: g++
-        run: >
-          cmake -S . -B build-cov -DCMAKE_BUILD_TYPE=Debug
-          -DCMAKE_CXX_FLAGS="--coverage"
-          -DCMAKE_EXE_LINKER_FLAGS="--coverage"
-          -DCMAKE_SHARED_LINKER_FLAGS="--coverage"
+          CC: clang
+          CXX: clang++
+        run: |
+          cmake -S . -B build-cov -DCMAKE_BUILD_TYPE=Debug \
+            -DQUANT_ENABLE_OPENMP=OFF \
+            -DCMAKE_CXX_FLAGS="--coverage -fprofile-instr-generate -fcoverage-mapping" \
+            -DCMAKE_EXE_LINKER_FLAGS="--coverage -fprofile-instr-generate" \
+            -DCMAKE_SHARED_LINKER_FLAGS="--coverage -fprofile-instr-generate"
       - name: Build
         run: cmake --build build-cov --parallel
       - name: Test (FAST tier)
         run: ctest --test-dir build-cov --output-on-failure -L FAST
-      - name: Generate coverage report
+      - name: Merge llvm profiles
         run: |
-          gcovr -r . \
+          llvm-profdata merge -sparse build-cov/coverage-*.profraw -o build-cov/coverage.profdata
+      - name: llvm-cov reports
+        run: |
+          llvm-cov export ./build-cov/unit_tests --format=lcov \
+            -instr-profile=build-cov/coverage.profdata \
+            > build-cov/coverage.lcov
+          llvm-cov report ./build-cov/unit_tests \
+            -instr-profile=build-cov/coverage.profdata \
+            --ignore-filename-regex='external/|tests/' \
+            > build-cov/coverage.txt
+      - name: Gcovr (Cobertura + HTML)
+        run: |
+          gcovr --root . \
+            --object-directory build-cov \
+            --filter='src/' --filter='include/' \
+            --exclude='external/' --exclude='tests/' \
             --xml -o build-cov/coverage.xml \
             --html --html-details -o build-cov/coverage.html \
-            --txt -o build-cov/coverage.txt \
-            --filter='src/' --filter='include/' \
-            --exclude='external/' --exclude='tests/'
+            --gcov-executable "llvm-cov gcov"
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
@@ -88,10 +106,11 @@ jobs:
             build-cov/coverage.xml
             build-cov/coverage.html
             build-cov/coverage.txt
+            build-cov/coverage.lcov
       - name: Upload to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: build-cov/coverage.xml
+          files: build-cov/coverage.lcov
           flags: unittests
           fail_ci_if_error: true
 

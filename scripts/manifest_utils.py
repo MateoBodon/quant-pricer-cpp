@@ -9,13 +9,21 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
-ARTIFACTS_ROOT = Path("docs") / "artifacts"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ARTIFACTS_ROOT = REPO_ROOT / "docs" / "artifacts"
 MANIFEST_PATH = ARTIFACTS_ROOT / "manifest.json"
+
+
+def _rel_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(REPO_ROOT))
+    except ValueError:
+        return str(path)
 
 
 def _git_info() -> Dict[str, Any]:
     def run(cmd: List[str]) -> str:
-        return subprocess.check_output(cmd, text=True).strip()
+        return subprocess.check_output(cmd, cwd=REPO_ROOT, text=True).strip()
 
     sha = run(["git", "rev-parse", "HEAD"])
     branch = run(["git", "rev-parse", "--abbrev-ref", "HEAD"])
@@ -71,8 +79,15 @@ def _cmake_value(lines: List[str], key: str) -> str | None:
     return None
 
 
+def _cmake_cache_path() -> Path:
+    build_dir = os.environ.get("QUANT_BUILD_DIR")
+    if build_dir:
+        return Path(build_dir) / "CMakeCache.txt"
+    return REPO_ROOT / "build" / "CMakeCache.txt"
+
+
 def _compile_info() -> Dict[str, Any]:
-    cache = Path("build") / "CMakeCache.txt"
+    cache = _cmake_cache_path()
     if not cache.exists():
         return {"available": False}
     try:
@@ -82,6 +97,7 @@ def _compile_info() -> Dict[str, Any]:
     info = {
         "available": True,
         "generator": _cmake_value(lines, "CMAKE_GENERATOR") or "",
+        "build_type": _cmake_value(lines, "CMAKE_BUILD_TYPE") or "",
         "compiler_id": _cmake_value(lines, "CMAKE_CXX_COMPILER_ID") or "",
         "compiler_version": _cmake_value(lines, "CMAKE_CXX_COMPILER_VERSION") or "",
         "compiler_path": _cmake_value(lines, "CMAKE_CXX_COMPILER") or "",
@@ -140,7 +156,7 @@ def describe_inputs(paths: Iterable[str | Path]) -> List[Dict[str, Any]]:
         path = Path(raw)
         if not path:
             continue
-        record: Dict[str, Any] = {"path": str(path)}
+        record: Dict[str, Any] = {"path": _rel_path(path.resolve())}
         if path.exists() and path.is_file():
             try:
                 record["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()

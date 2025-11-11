@@ -1,28 +1,63 @@
 #!/usr/bin/env python3
-"""Toy delta-hedge PnL generator (synthetic)."""
+"""Delta-hedged 1-day PnL simulation."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List
+from typing import Tuple
 
+import numpy as np
 import pandas as pd
 
-
-def simulate(days: int = 10, seed: int = 42) -> pd.DataFrame:
-    rng = pd.Series(range(days), dtype=float)
-    pnl = 0.1 * (rng - rng.mean())  # deterministic ramp for reproducibility
-    start = datetime(2024, 6, 14)
-    dates: List[str] = [(start + timedelta(days=int(i))).strftime("%Y-%m-%d") for i in rng]
-    return pd.DataFrame({"date": dates, "pnl": pnl})
+from .bs_utils import bs_delta_call
 
 
-def write_outputs(out_path: Path, df: pd.DataFrame) -> None:
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(out_path, index=False)
+def simulate(today: pd.DataFrame, tomorrow: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    merged = pd.merge(
+        today,
+        tomorrow,
+        on=["tenor_bucket", "moneyness"],
+        suffixes=("_t", "_t1"),
+    )
+    if merged.empty:
+        return pd.DataFrame(), pd.DataFrame()
+
+    spot_t = float(today["spot"].mean())
+    spot_t1 = float(tomorrow["spot"].mean())
+    spot_change = spot_t1 - spot_t
+
+    def _delta(row) -> float:
+        return bs_delta_call(
+            spot=spot_t,
+            strike=float(row["strike_t"]),
+            rate=float(row["rate_t"]),
+            div=float(row["dividend_t"]),
+            vol=float(row["mid_iv_t"]),
+            T=float(row["ttm_years_t"]),
+        )
+
+    merged["delta"] = merged.apply(_delta, axis=1)
+    merged["pnl"] = (merged["mid_price_t1"] - merged["mid_price_t"]) - merged["delta"] * spot_change
+    merged["pnl_per_tick"] = merged["pnl"] / 0.05
+    merged["quotes"] = merged["quotes_t"]
+
+    detail = merged[["tenor_bucket", "moneyness", "pnl", "pnl_per_tick", "quotes"]].copy()
+
+    exploded = detail.loc[detail.index.repeat(detail["quotes"].clip(lower=1).astype(int))].reset_index(drop=True)
+    summary = (
+        exploded.groupby("tenor_bucket", as_index=False, observed=True)
+        .agg(
+            mean_pnl=("pnl", "mean"),
+            std_pnl=("pnl", "std"),
+            mean_ticks=("pnl_per_tick", "mean"),
+            count=("pnl", "size"),
+        )
+    )
+    for col in ("mean_pnl", "std_pnl", "mean_ticks"):
+        summary[col] = summary[col].fillna(0.0)
+    return detail, summary
 
 
-if __name__ == "__main__":  # pragma: no cover
-    out = Path("docs/artifacts/wrds/delta_hedge_pnl.csv")
-    write_outputs(out, simulate())
-    print(f"Wrote {out}")
+def write_outputs(detail_csv: Path, summary_csv: Path, detail: pd.DataFrame, summary: pd.DataFrame) -> None:
+    detail_csv.parent.mkdir(parents=True, exist_ok=True)
+    detail.to_csv(detail_csv, index=False)
+    summary.to_csv(summary_csv, index=False)

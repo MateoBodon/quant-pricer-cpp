@@ -1,6 +1,16 @@
 # Results
 
-`./scripts/reproduce_all.sh` builds the Release target, runs both FAST and SLOW labels, and regenerates deterministic CSV/PNG artifacts under `docs/artifacts/`. Use `REPRO_FAST=1` to trim runtime when iterating locally. Every generator updates [`artifacts/manifest.json`](artifacts/manifest.json) with the command, seeds, compiler info, and hardware snapshot.
+`./scripts/reproduce_all.sh` builds the Release target, runs both FAST and SLOW labels, and regenerates deterministic CSV/PNG artifacts under `docs/artifacts/`. Use `REPRO_FAST=1` to trim runtime when iterating locally. Every generator updates [`docs/artifacts/manifest.json`](docs/artifacts/manifest.json) with the command, seeds, compiler info, and hardware snapshot.
+
+## Tri-Engine Agreement
+
+Analytic Black–Scholes, deterministic Monte Carlo (counter RNG + control variate), and Crank–Nicolson disagree by <5 bps across strikes when configured with the same market inputs. MC error bars reflect the 95% CI from 200k paths, so the dashed PDE line and green analytic curve are visually on top of one another.
+
+![Tri-engine agreement](artifacts/tri_engine_agreement.png)
+
+- Reproduce: `./scripts/reproduce_all.sh` or `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output docs/artifacts/tri_engine_agreement.png --csv docs/artifacts/tri_engine_agreement.csv`
+- Data: [artifacts/tri_engine_agreement.csv](artifacts/tri_engine_agreement.csv)
+- Manifest entry: `runs.tri_engine_agreement`
 
 ## QMC vs PRNG RMSE Scaling
 
@@ -44,14 +54,15 @@ Current QE runs still exhibit a large bias versus the analytic reference (CLI em
 
 ## WRDS OptionMetrics Snapshot (Opt-in)
 
-The WRDS pipeline ingests a single SPX trading day (OptionMetrics IvyDB), bins mid IVs by tenor/moneyness, performs a coarse Heston calibration, and emits only aggregated diagnostics. MARKET tests (`ctest -L MARKET`) are gated by `WRDS_ENABLED=1` plus credentials; without them we fall back to the bundled sample file so the CSVs stay reproducible. When credentials are present we map the requested trade date to the year-partitioned OptionMetrics tables (e.g., `optionm.opprcd2023`) via the ticker’s `secid`.
+The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `secid` via `optionm.secnmd`, pulls the year-partitioned `optionm.opprcdYYYY` table, filters stale quotes, recomputes implied vols with the project’s solver, and bins by tenor/moneyness. A vega-weighted Heston calibration (least-squares in IV space) and bootstrap CIs are emitted alongside next-day OOS errors and delta-hedged one-day PnL histograms. Only aggregated CSV/PNGs under `docs/artifacts/wrds/` are committed.
 
-- Surface buckets: [artifacts/wrds/spx_surface_sample.csv](artifacts/wrds/spx_surface_sample.csv)
-- Calibration summary: [artifacts/wrds/heston_calibration_summary.csv](artifacts/wrds/heston_calibration_summary.csv)
-- OOS diagnostics: [artifacts/wrds/oos_pricing.csv](artifacts/wrds/oos_pricing.csv) / [artifacts/wrds/oos_pricing_summary.csv](artifacts/wrds/oos_pricing_summary.csv)
-- Delta hedge trace: [artifacts/wrds/delta_hedge_pnl.csv](artifacts/wrds/delta_hedge_pnl.csv)
+- Surfaces: [artifacts/wrds/spx_2024-06-14_surface.csv](artifacts/wrds/spx_2024-06-14_surface.csv), [artifacts/wrds/spx_2024-06-17_surface.csv](artifacts/wrds/spx_2024-06-17_surface.csv)
+- Calibration: [artifacts/wrds/heston_fit_table.csv](artifacts/wrds/heston_fit_table.csv), [artifacts/wrds/heston_fit.json](artifacts/wrds/heston_fit.json), [artifacts/wrds/heston_fit.png](artifacts/wrds/heston_fit.png)
+- OOS diagnostics: [artifacts/wrds/oos_pricing_detail.csv](artifacts/wrds/oos_pricing_detail.csv), [artifacts/wrds/oos_pricing_summary.csv](artifacts/wrds/oos_pricing_summary.csv)
+- Delta hedge trace: [artifacts/wrds/delta_hedge_pnl.csv](artifacts/wrds/delta_hedge_pnl.csv), [artifacts/wrds/delta_hedge_pnl_summary.csv](artifacts/wrds/delta_hedge_pnl_summary.csv)
+- Summary figure: [artifacts/wrds/heston_wrds_summary.png](artifacts/wrds/heston_wrds_summary.png)
 
-Regenerate offline with `RUN_WRDS_PIPELINE=1 ./scripts/reproduce_all.sh` (forces the sample fallback) or call `python wrds_pipeline/pipeline.py --symbol SPX --trade-date 2023-06-14` after exporting the WRDS env vars to hit the live database. Use `--use-sample` to stay offline.
+Regenerate the bundled sample snapshot with `./scripts/reproduce_all.sh` (the pipeline runs even without credentials). To hit the live WRDS database export `WRDS_ENABLED=1`, `WRDS_USERNAME`, `WRDS_PASSWORD`, then run `python wrds_pipeline/pipeline.py --symbol SPX --trade-date 2024-06-14`. MARKET tests (`ctest -L MARKET`) remain opt-in and skip automatically when the env vars are absent.
 
 ## Manifest & determinism
 
