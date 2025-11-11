@@ -92,7 +92,8 @@ inline double P_j(int j, double lnK,
             phi = heston_phi(u, S0, r, q, T, h);
         }
         const std::complex<double> integrand = std::exp(-i * u * lnK) * phi / (denom_base * u);
-        sum += w * std::real(integrand);
+        // Transform ∫ f(u) du into Laguerre form ∫ e^{-x} [e^{x} f(x)] dx
+        sum += w * std::exp(x) * std::real(integrand);
     }
     return 0.5 + (1.0 / M_PI) * sum;
 }
@@ -105,7 +106,12 @@ double call_analytic(const MarketParams& mkt, const Params& h) {
     const double P2 = P_j(2, lnK, mkt, h);
     const double df_r = std::exp(-mkt.rate * mkt.time);
     const double df_q = std::exp(-mkt.dividend * mkt.time);
-    return mkt.spot * df_q * P1 - mkt.strike * df_r * P2;
+    const double intrinsic = std::max(0.0, mkt.spot * df_q - mkt.strike * df_r);
+    double price = mkt.spot * df_q * P1 - mkt.strike * df_r * P2;
+    if (price < intrinsic) {
+        price = intrinsic;
+    }
+    return price;
 }
 
 std::complex<double> characteristic_function(double u,
