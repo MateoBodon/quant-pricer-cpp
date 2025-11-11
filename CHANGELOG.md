@@ -4,6 +4,14 @@
 
 - feat(heston,mc): Andersen QE variance paths, deterministic counter RNG, CLI/pybind confidence intervals for MC Greeks
 
+## v0.3.2
+
+- feat(wrds): multi-date OptionMetrics panel (vega-weighted RMSE/MAE, OOS bps, Δ-hedged PnL) with aggregated CSV/PNG artifacts, manifest updates, and deterministic sample bundle.
+- bench: refreshed Google Benchmark harness + plots (OpenMP throughput, equal-time Asian/Barrier, PDE −2 slope) and wired the data into the docs + manifest.
+- docs(parity): added `scripts/ql_parity.py` to diff quant-pricer against QuantLib (vanilla/barrier/American) with published CSV/PNG + manifest entry.
+- docs(pages): Pages workflow now copies `docs/artifacts/` + coverage HTML, injects `<base href='/quant-pricer-cpp/'>`, disables Jekyll, and README badges link to the live Results and coverage pages.
+- build/release: bumped the project/pybind/setup versions to 0.3.2 so wheels, CMake, and docs advertise the new release.
+
 ## v0.3.1
 
 - test(cli): added `cli_smoke_fast` to exercise every quant_cli engine under JSON output and committed the full gcovr HTML bundle so `/coverage/` on gh-pages stays live.
