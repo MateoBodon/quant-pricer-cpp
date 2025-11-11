@@ -22,6 +22,9 @@ from manifest_utils import update_run
 
 Params = Tuple[float, float, float, float, float]  # kappa, theta, sigma, rho, v0
 TICK_SIZE = 0.05
+LOWER_BOUNDS = np.array([0.1, 0.001, 0.05, -0.999, 0.001], dtype=float)
+UPPER_BOUNDS = np.array([5.0, 0.5, 2.5, 0.999, 0.5], dtype=float)
+POSITIVE_IDX = [0, 1, 2, 4]
 
 
 def _heston_characteristic(phi, T, params: Params, r, q, log_spot, j: int):
@@ -106,6 +109,30 @@ def _objective(params_vec: np.ndarray, surface: pd.DataFrame) -> np.ndarray:
     return np.asarray(residuals)
 
 
+def _to_internal(params: np.ndarray) -> np.ndarray:
+    params = np.asarray(params, dtype=float)
+    internal = np.empty_like(params)
+    for idx in POSITIVE_IDX:
+        internal[idx] = math.log(max(params[idx], LOWER_BOUNDS[idx]))
+    rho = float(np.clip(params[3], LOWER_BOUNDS[3] + 1e-6, UPPER_BOUNDS[3] - 1e-6))
+    internal[3] = math.atanh(rho)
+    return internal
+
+
+def _from_internal(internal: np.ndarray) -> np.ndarray:
+    internal = np.asarray(internal, dtype=float)
+    params = np.empty_like(internal)
+    for idx in POSITIVE_IDX:
+        params[idx] = float(np.clip(math.exp(internal[idx]), LOWER_BOUNDS[idx], UPPER_BOUNDS[idx]))
+    params[3] = float(np.clip(math.tanh(internal[3]), LOWER_BOUNDS[3], UPPER_BOUNDS[3]))
+    return params
+
+
+def _objective_internal(internal_vec: np.ndarray, surface: pd.DataFrame) -> np.ndarray:
+    params_vec = _from_internal(internal_vec)
+    return _objective(params_vec, surface)
+
+
 def _params_tuple(params_dict: Dict[str, float]) -> Params:
     return (
         float(params_dict["kappa"]),
@@ -137,19 +164,17 @@ def calibrate(surface: pd.DataFrame, config: CalibrationConfig) -> Dict[str, obj
     surface["vega"] = surface["vega"].where(surface["vega"] > 0, 1.0)
 
     x0 = np.array([1.0, 0.05, 0.5, -0.5, 0.04])
-    bounds = (
-        np.array([0.1, 0.001, 0.05, -0.999, 0.001]),
-        np.array([5.0, 0.5, 2.5, 0.999, 0.5]),
-    )
+    internal0 = _to_internal(x0)
     result = least_squares(
-        _objective,
-        x0=x0,
-        bounds=bounds,
+        _objective_internal,
+        x0=internal0,
         args=(surface,),
         max_nfev=config.max_evals,
         method="trf",
+        diff_step=1e-2,
     )
-    params = tuple(result.x.tolist())
+    params_vec = _from_internal(result.x)
+    params = tuple(params_vec.tolist())
 
     surface = apply_model(surface, {
         "kappa": params[0],

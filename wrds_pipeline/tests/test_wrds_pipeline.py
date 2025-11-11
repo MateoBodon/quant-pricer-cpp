@@ -25,14 +25,16 @@ def _has_wrds_env() -> bool:
 def _expected_artifacts(root: Path) -> list[Path]:
     base = root / "docs" / "artifacts" / "wrds"
     return [
-        base / "spx_surface_2024-06-14_surface.csv",
-        base / "spx_surface_2024-06-17_surface.csv",
+        base / "spx_2024-06-14_surface.csv",
+        base / "spx_2024-06-17_surface.csv",
         base / "heston_fit_table.csv",
         base / "heston_fit.json",
-        base / "oos_pricing_detail.csv",
-        base / "oos_pricing_summary.csv",
-        base / "delta_hedge_pnl.csv",
-        base / "delta_hedge_pnl_summary.csv",
+        base / "wrds_heston_insample.csv",
+        base / "wrds_heston_oos.csv",
+        base / "wrds_heston_hedge.csv",
+        base / "wrds_heston_insample.png",
+        base / "wrds_heston_oos.png",
+        base / "wrds_heston_hedge.png",
         base / "heston_wrds_summary.png",
     ]
 
