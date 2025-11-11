@@ -9,6 +9,11 @@
 - Tightened CI coverage job (clang `llvm-cov` + gcovr/Codecov), new coverage badge, and appended the PDE second-order regression test.
 - Commands run: `./scripts/reproduce_all.sh` (multiple, final run with SLOW), `cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
 
+## 2025-11-11 (docs pages base-url fix)
+- Hardened the `docs-pages` workflow with a post-Doxygen base-href injector and `.nojekyll` so GitHub Pages serves assets under `/quant-pricer-cpp/`, then swapped the README API Docs link/badge to the live site.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `ctest --test-dir build -L FAST --output-on-failure -VV`.
+- Artifacts: n/a (workflow/docs only).
+
 ## 2025-11-10 (docs pages + README badge)
 - Enabled Pages best-practice workflow (configure-pages + Doxygen) and wired Doxygen to a Markdown main page with sidebar navigation.
 - Added `docs/api/index.md`, tree view, and enabled alphabetical index so the published API docs have a real landing page.

@@ -31,6 +31,27 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
       - name: Generate docs
         run: doxygen Doxyfile
+      - name: Inject base href for project Pages path
+        run: |
+          python3 - <<'PY'
+from pathlib import Path
+import re
+
+root = Path("docs/html")
+if not root.exists():
+    raise SystemExit("docs/html not found (run doxygen first)")
+pattern = re.compile(r"<head>", flags=re.IGNORECASE)
+snippet = '<base href="/quant-pricer-cpp/">'
+for html in root.rglob("*.html"):
+    text = html.read_text(encoding="utf-8")
+    if snippet in text:
+        continue
+    replaced, count = pattern.subn(lambda m: f"{m.group(0)}\n  {snippet}", text, count=1)
+    if count:
+        html.write_text(replaced, encoding="utf-8")
+PY
+      - name: Disable Jekyll
+        run: touch docs/html/.nojekyll
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
