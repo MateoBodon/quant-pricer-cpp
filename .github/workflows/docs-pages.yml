@@ -1,12 +1,6 @@
 name: Docs Pages
 
 on:
-  push:
-    branches:
-      - main
-      - master
-    tags:
-      - '*'
   workflow_dispatch: {}
 
 permissions:
