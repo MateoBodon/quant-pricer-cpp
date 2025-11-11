@@ -5,6 +5,7 @@
 [![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml)
 [![Sanitizers](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg?job=sanitizers&label=ASan%2FUBSan)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/MateoBodon/quant-pricer-cpp/branch/master/graph/badge.svg)](https://app.codecov.io/gh/MateoBodon/quant-pricer-cpp)
+[![Coverage HTML](https://img.shields.io/badge/coverage-HTML-blue)](https://mateobodon.github.io/quant-pricer-cpp/coverage/)
 [![Docs](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/docs-pages.yml/badge.svg?branch=master&label=Docs%20Pages)](https://mateobodon.github.io/quant-pricer-cpp/)
 
 [![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag)](https://github.com/MateoBodon/quant-pricer-cpp/releases)
