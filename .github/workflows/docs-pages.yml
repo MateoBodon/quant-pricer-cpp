@@ -30,6 +30,10 @@ jobs:
         run: |
           mkdir -p docs/html/coverage
           cp -R docs/coverage/. docs/html/coverage/
+      - name: Copy published artifacts
+        run: |
+          mkdir -p docs/html/artifacts
+          cp -R docs/artifacts/. docs/html/artifacts/
       - name: Inject base href for project Pages path
         run: |
           python3 - <<'PY'
