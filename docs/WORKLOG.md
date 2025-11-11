@@ -2,6 +2,12 @@
 
 # WORKLOG
 
+## 2025-11-11 (Heston analytic fix + coverage site)
+- Fixed the analytic Heston pricer by applying the proper Gauss–Laguerre weighting (exp(x)) and clamping the result to intrinsic value, then reran both Release and coverage FAST suites.
+- Generated llvm-cov/gcovr reports locally (lcov, Cobertura XML, HTML) and published the HTML bundle under `docs/coverage/` with a README badge + Results.md link; taught the Docs Pages workflow to copy that folder into the deployed site.
+- Commands run: `brew install doxygen graphviz`, `.venv/bin/pip install gcovr`, `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `ctest --test-dir build --output-on-failure -L FAST`, `CC=clang CXX=clang++ cmake -S . -B build-cov ...`, `cmake --build build-cov --parallel`, `ctest --test-dir build-cov --output-on-failure -L FAST`, `xcrun llvm-profdata merge ...`, `xcrun llvm-cov export/report ...`, `.venv/bin/gcovr ...`.
+- Artifacts: `docs/coverage/index.html`, `docs/coverage/coverage.css`, refreshed coverage outputs in `build-cov/`.
+
 ## 2025-11-11
 - Rebuilt the reproducibility stack: `scripts/reproduce_all.sh` now cleans/repaves `docs/artifacts/`, runs FAST+SLOW labels, regenerates benches/figures/WRDS bundles, and finalises `manifest.json` with git/system/build metadata (plus new `tri_engine_agreement` entry). Added a helper for CI-friendly `--fast` mode and routed WRDS invocations through `python -m wrds_pipeline.pipeline`.
 - Overhauled the WRDS pipeline (OptionMetrics ingestion → aggregation → vega-weighted Heston fit + bootstrap CIs → next-day OOS error buckets → delta-hedged PnL histogram) and refreshed the committed CSV/PNG artifacts under `docs/artifacts/wrds/`.
