@@ -25,6 +25,11 @@
 - Swapped the README coverage badge to the native Codecov graph so it links straight to `app.codecov.io`.
 - Commands run: n/a (doc + script updates only).
 
+## 2025-11-11 (WRDS pipeline: calibration transform + aggregated artifacts)
+- Added log/atanh transforms to the WRDS Heston solver, recorded bootstrap summaries, emitted the new `wrds_heston_{insample,oos,hedge}` CSV/PNG bundle, and tightened the MARKET test expectations.
+- Commands run: covered by the earlier `./scripts/reproduce_all.sh` refresh (WRDS sample bundle rebuilt without live creds).
+- Artifacts: `docs/artifacts/wrds/wrds_heston_insample.{csv,png}`, `wrds_heston_oos.{csv,png}`, `wrds_heston_hedge.{csv,png}`, refreshed `heston_fit.{json,png}`, `heston_wrds_summary.png`, `oos_pricing_*`, `delta_hedge_pnl_*`.
+
 ## 2025-11-10 (docs pages + README badge)
 - Enabled Pages best-practice workflow (configure-pages + Doxygen) and wired Doxygen to a Markdown main page with sidebar navigation.
 - Added `docs/api/index.md`, tree view, and enabled alphabetical index so the published API docs have a real landing page.

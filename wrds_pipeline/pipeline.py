@@ -78,6 +78,64 @@ def _plot_wrds_summary(surface: pd.DataFrame, oos: pd.DataFrame, pnl: pd.DataFra
     plt.close(fig)
 
 
+def _plot_insample_surface(surface: pd.DataFrame, out_path: Path) -> None:
+    fig, ax = plt.subplots(figsize=(6, 4))
+    for bucket, group in surface.groupby("tenor_bucket", observed=True):
+        ax.plot(group["moneyness"], group["mid_iv"], "o-", label=f"{bucket} mkt")
+        ax.plot(group["moneyness"], group["model_iv"], "--", label=f"{bucket} model")
+    ax.set_title("WRDS Heston – in-sample IV parity")
+    ax.set_xlabel("Moneyness")
+    ax.set_ylabel("Implied vol")
+    ax.grid(True, ls=":", alpha=0.4)
+    ax.legend(fontsize=8, ncol=2)
+    fig.tight_layout()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=220)
+    plt.close(fig)
+
+
+def _plot_oos_summary(oos: pd.DataFrame, out_path: Path) -> None:
+    fig, ax = plt.subplots(figsize=(6, 4))
+    if oos.empty:
+        ax.text(0.5, 0.5, "No OOS data", ha="center", va="center")
+    else:
+        ax.bar(oos["tenor_bucket"], oos["mae_iv_bps"], color="#1f77b4", label="IV (bps)")
+        ax.set_ylabel("IV MAE (bps)")
+        ax2 = ax.twinx()
+        ax2.plot(oos["tenor_bucket"], oos["mae_price_ticks"], "s--", color="#ff7f0e", label="Price ticks")
+        ax2.set_ylabel("Price MAE (ticks)")
+        lines, labels = ax.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax2.legend(lines + lines2, labels + labels2, loc="upper right", fontsize=8)
+    ax.set_title("WRDS Heston – next-day OOS errors")
+    ax.set_xlabel("Tenor bucket")
+    ax.grid(True, axis="y", ls=":", alpha=0.4)
+    fig.tight_layout()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=220)
+    plt.close(fig)
+
+
+def _plot_hedge_distribution(pnl_detail: pd.DataFrame, out_path: Path) -> None:
+    fig, ax = plt.subplots(figsize=(6, 4))
+    if pnl_detail.empty:
+        ax.text(0.5, 0.5, "No hedge data", ha="center", va="center")
+    else:
+        hist_data = pnl_detail.loc[
+            pnl_detail.index.repeat(pnl_detail["quotes"].clip(lower=1).astype(int)),
+            "pnl_per_tick",
+        ]
+        ax.hist(hist_data, bins=20, color="#2ca02c", alpha=0.85)
+    ax.set_title("WRDS Heston – Δ-hedged 1d PnL (ticks)")
+    ax.set_xlabel("PnL (ticks)")
+    ax.set_ylabel("Frequency")
+    ax.grid(True, ls=":", alpha=0.4)
+    fig.tight_layout()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=220)
+    plt.close(fig)
+
+
 def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: bool, fast: bool) -> Dict[str, Path]:
     out_dir = ARTIFACTS_ROOT / "wrds"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -152,6 +210,35 @@ def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: b
     summary_fig = out_dir / "heston_wrds_summary.png"
     _plot_wrds_summary(calib["surface"], oos_summary, pnl_detail, summary_fig)
 
+    insample_cols = [
+        "symbol",
+        "trade_date",
+        "tenor_bucket",
+        "moneyness",
+        "ttm_years",
+        "mid_iv",
+        "model_iv",
+        "iv_error_bps",
+        "mid_price",
+        "model_price",
+        "price_error_ticks",
+        "quotes",
+    ]
+    insample_csv = out_dir / "wrds_heston_insample.csv"
+    calib["surface"][insample_cols].to_csv(insample_csv, index=False)
+    insample_fig = out_dir / "wrds_heston_insample.png"
+    _plot_insample_surface(calib["surface"], insample_fig)
+
+    oos_csv = out_dir / "wrds_heston_oos.csv"
+    oos_summary.to_csv(oos_csv, index=False)
+    oos_fig = out_dir / "wrds_heston_oos.png"
+    _plot_oos_summary(oos_summary, oos_fig)
+
+    hedge_csv = out_dir / "wrds_heston_hedge.csv"
+    pnl_summary.to_csv(hedge_csv, index=False)
+    hedge_fig = out_dir / "wrds_heston_hedge.png"
+    _plot_hedge_distribution(pnl_detail, hedge_fig)
+
     update_run(
         "wrds_pipeline",
         {
@@ -170,6 +257,12 @@ def run(symbol: str, trade_date: str, next_trade_date: str | None, use_sample: b
             "pnl_detail": str(pnl_detail_csv),
             "pnl_summary": str(pnl_summary_csv),
             "summary_fig": str(summary_fig),
+            "wrds_heston_insample_csv": str(insample_csv),
+            "wrds_heston_insample_fig": str(insample_fig),
+            "wrds_heston_oos_csv": str(oos_csv),
+            "wrds_heston_oos_fig": str(oos_fig),
+            "wrds_heston_hedge_csv": str(hedge_csv),
+            "wrds_heston_hedge_fig": str(hedge_fig),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         },
         append=True,
