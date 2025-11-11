@@ -1,19 +1,19 @@
-#include <pybind11/pybind11.h>
 #include <pybind11/complex.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 // Optional: add numpy later for zero-copy arrays
-//#include <pybind11/numpy.h>
+// #include <pybind11/numpy.h>
 
-#include "quant/black_scholes.hpp"
-#include "quant/mc.hpp"
-#include "quant/pde.hpp"
 #include "quant/american.hpp"
+#include "quant/black_scholes.hpp"
 #include "quant/bs_barrier.hpp"
-#include "quant/mc_barrier.hpp"
-#include "quant/pde_barrier.hpp"
 #include "quant/heston.hpp"
-#include "quant/risk.hpp"
+#include "quant/mc.hpp"
+#include "quant/mc_barrier.hpp"
 #include "quant/multi.hpp"
+#include "quant/pde.hpp"
+#include "quant/pde_barrier.hpp"
+#include "quant/risk.hpp"
 
 namespace py = pybind11;
 
@@ -21,24 +21,24 @@ PYBIND11_MODULE(pyquant_pricer, m) {
     m.doc() = "Python bindings for quant-pricer-cpp (BS/MC/PDE subset)";
 
     // Black–Scholes
-    m.def("bs_call", (double (*)(double,double,double,double,double,double)) &quant::bs::call_price, "Black-Scholes call price",
-          py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"), py::arg("sigma"), py::arg("T"));
-    m.def("bs_put", (double (*)(double,double,double,double,double,double)) &quant::bs::put_price, "Black-Scholes put price",
-          py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"), py::arg("sigma"), py::arg("T"));
-    m.def("bs_delta_call", &quant::bs::delta_call, "BS call delta",
-          py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"), py::arg("sigma"), py::arg("T"));
-    m.def("bs_gamma", &quant::bs::gamma, "BS gamma",
-          py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"), py::arg("sigma"), py::arg("T"));
-    m.def("bs_vega", &quant::bs::vega, "BS vega",
-          py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"), py::arg("sigma"), py::arg("T"));
-    m.def("bs_iv_call", &quant::bs::implied_vol_call, "BS implied vol from call",
-          py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"), py::arg("T"), py::arg("price"));
+    m.def("bs_call", (double (*)(double, double, double, double, double, double))&quant::bs::call_price,
+          "Black-Scholes call price", py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"),
+          py::arg("sigma"), py::arg("T"));
+    m.def("bs_put", (double (*)(double, double, double, double, double, double))&quant::bs::put_price,
+          "Black-Scholes put price", py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"), py::arg("sigma"),
+          py::arg("T"));
+    m.def("bs_delta_call", &quant::bs::delta_call, "BS call delta", py::arg("S"), py::arg("K"), py::arg("r"),
+          py::arg("q"), py::arg("sigma"), py::arg("T"));
+    m.def("bs_gamma", &quant::bs::gamma, "BS gamma", py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"),
+          py::arg("sigma"), py::arg("T"));
+    m.def("bs_vega", &quant::bs::vega, "BS vega", py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"),
+          py::arg("sigma"), py::arg("T"));
+    m.def("bs_iv_call", &quant::bs::implied_vol_call, "BS implied vol from call", py::arg("S"), py::arg("K"),
+          py::arg("r"), py::arg("q"), py::arg("T"), py::arg("price"));
 
     // Monte Carlo: price and Greeks
-    m.def("mc_european_call", &quant::mc::price_european_call, "MC price (European call)",
-          py::arg("params"));
-    m.def("mc_greeks_call", &quant::mc::greeks_european_call, "MC Greeks (European call)",
-          py::arg("params"));
+    m.def("mc_european_call", &quant::mc::price_european_call, "MC price (European call)", py::arg("params"));
+    m.def("mc_greeks_call", &quant::mc::greeks_european_call, "MC Greeks (European call)", py::arg("params"));
 
     py::class_<quant::PiecewiseConstant>(m, "PiecewiseConstant")
         .def(py::init<>())
@@ -85,8 +85,7 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readonly("ci_low", &quant::mc::McStatistic::ci_low)
         .def_readonly("ci_high", &quant::mc::McStatistic::ci_high);
 
-    py::class_<quant::mc::McResult>(m, "McResult")
-        .def_readonly("estimate", &quant::mc::McResult::estimate);
+    py::class_<quant::mc::McResult>(m, "McResult").def_readonly("estimate", &quant::mc::McResult::estimate);
 
     py::class_<quant::mc::GreeksResult>(m, "McGreeks")
         .def_readonly("delta", &quant::mc::GreeksResult::delta)
@@ -121,10 +120,11 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readonly("price", &quant::pde::PdeResult::price)
         .def_readonly("delta", &quant::pde::PdeResult::delta)
         .def_readonly("gamma", &quant::pde::PdeResult::gamma)
-        .def_property_readonly("theta", [](const quant::pde::PdeResult& r){ return r.theta.has_value() ? py::cast(*r.theta) : py::none(); });
+        .def_property_readonly("theta", [](const quant::pde::PdeResult& r) {
+            return r.theta.has_value() ? py::cast(*r.theta) : py::none();
+        });
 
-    m.def("pde_price", &quant::pde::price_crank_nicolson, "PDE price (Crank–Nicolson)",
-          py::arg("params"));
+    m.def("pde_price", &quant::pde::price_crank_nicolson, "PDE price (Crank–Nicolson)", py::arg("params"));
 
     // American
     py::enum_<quant::OptionType>(m, "OptionType")
@@ -187,10 +187,11 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readwrite("B", &quant::BarrierSpec::B)
         .def_readwrite("rebate", &quant::BarrierSpec::rebate);
 
-    m.def("barrier_bs", &quant::bs::reiner_rubinstein_price, py::arg("opt"), py::arg("barrier"),
-          py::arg("S"), py::arg("K"), py::arg("r"), py::arg("q"), py::arg("sigma"), py::arg("T"));
+    m.def("barrier_bs", &quant::bs::reiner_rubinstein_price, py::arg("opt"), py::arg("barrier"), py::arg("S"),
+          py::arg("K"), py::arg("r"), py::arg("q"), py::arg("sigma"), py::arg("T"));
 
-    m.def("barrier_mc", &quant::mc::price_barrier_option, py::arg("params"), py::arg("K"), py::arg("opt"), py::arg("barrier"));
+    m.def("barrier_mc", &quant::mc::price_barrier_option, py::arg("params"), py::arg("K"), py::arg("opt"),
+          py::arg("barrier"));
 
     m.def("barrier_pde_price", &quant::pde::price_barrier_crank_nicolson, py::arg("params"), py::arg("opt"));
 
@@ -212,11 +213,9 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readwrite("time", &quant::heston::MarketParams::time);
 
     m.def("heston_call_analytic", &quant::heston::call_analytic, py::arg("mkt"), py::arg("params"));
-    m.def("heston_characteristic_fn", &quant::heston::characteristic_function,
-          py::arg("u"), py::arg("mkt"), py::arg("params"),
-          "Risk-neutral characteristic function φ(u)");
-    m.def("heston_implied_vol", &quant::heston::implied_vol_call,
-          py::arg("mkt"), py::arg("params"),
+    m.def("heston_characteristic_fn", &quant::heston::characteristic_function, py::arg("u"), py::arg("mkt"),
+          py::arg("params"), "Risk-neutral characteristic function φ(u)");
+    m.def("heston_implied_vol", &quant::heston::implied_vol_call, py::arg("mkt"), py::arg("params"),
           "Black–Scholes implied vol implied by Heston analytic price");
 
     py::enum_<quant::heston::McParams::Scheme>(m, "HestonScheme")
@@ -247,7 +246,8 @@ PYBIND11_MODULE(pyquant_pricer, m) {
 
     m.def("var_cvar_from_pnl", &quant::risk::var_cvar_from_pnl, py::arg("pnl"), py::arg("alpha"));
     m.def("var_cvar_gbm", &quant::risk::var_cvar_gbm, py::arg("spot"), py::arg("mu"), py::arg("sigma"),
-          py::arg("horizon_years"), py::arg("position"), py::arg("num_sims"), py::arg("seed"), py::arg("alpha"));
+          py::arg("horizon_years"), py::arg("position"), py::arg("num_sims"), py::arg("seed"),
+          py::arg("alpha"));
     py::class_<quant::risk::BacktestStats>(m, "BacktestStats")
         .def_readonly("alpha", &quant::risk::BacktestStats::alpha)
         .def_readonly("T", &quant::risk::BacktestStats::T)
@@ -258,9 +258,11 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readonly("p_ind", &quant::risk::BacktestStats::p_ind)
         .def_readonly("lr_cc", &quant::risk::BacktestStats::lr_cc)
         .def_readonly("p_cc", &quant::risk::BacktestStats::p_cc);
-    m.def("kupiec_christoffersen", &quant::risk::kupiec_christoffersen, py::arg("exceptions"), py::arg("alpha"));
+    m.def("kupiec_christoffersen", &quant::risk::kupiec_christoffersen, py::arg("exceptions"),
+          py::arg("alpha"));
     m.def("var_cvar_t", &quant::risk::var_cvar_t, py::arg("mu"), py::arg("sigma"), py::arg("nu"),
-          py::arg("horizon_years"), py::arg("position"), py::arg("num_sims"), py::arg("seed"), py::arg("alpha"));
+          py::arg("horizon_years"), py::arg("position"), py::arg("num_sims"), py::arg("seed"),
+          py::arg("alpha"));
 
     // Multi-asset & jumps
     py::class_<quant::multi::BasketMcParams>(m, "BasketMcParams")

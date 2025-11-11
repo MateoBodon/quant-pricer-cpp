@@ -17,63 +17,81 @@ namespace quant::heston {
 // Heston analytic via characteristic function and Gauss-Laguerre quadrature
 namespace {
 
-struct GL32 { static constexpr int N = 32; };
+struct GL32 {
+    static constexpr int N = 32;
+};
 
 // 32-point Gauss–Laguerre nodes (x) and weights (w) for ∫_0^∞ w(x) f(x) dx
-static const double kGL32_x[32] = {
-    0.044489365833267, 0.234526109519619, 0.576884629301886, 1.07244875381782,
-    1.72240877644465, 2.52833670642579, 3.49221327302199, 4.61645676974977,
-    5.90395850417424, 7.35812673318624, 8.98294092421260, 10.7830186325399,
-    12.7636979867427, 14.9311397555226, 17.2924543367153, 19.8558609403361,
-    22.6308890131960, 25.6286360224592, 28.8621018163235, 32.3466291539647,
-    36.1004948057519, 40.1457197715394, 44.5092079957549, 49.2243949873086,
-    54.3337213333969, 59.8925091621340, 65.9738932315048, 72.6764856363483,
-    80.1456711922165, 88.7250222336802, 99.3663896266145, 116.498428833741
-};
-static const double kGL32_w[32] = {
-    0.109218341952385, 0.210443107938813, 0.235213229669847, 0.195903335972881,
-    0.129983786286072, 0.068212565104719, 0.028248880785091, 0.009025579689953,
-    0.002169537515914, 0.000359246582804, 0.000040069955161, 2.67678014474e-06,
-    9.73806705861e-08, 1.56920701086e-09, 8.00611520883e-12, 4.40455033387e-15,
-    2.06776392922e-19, 4.99469948627e-25, 1.03614617085e-32, 1.42362101688e-43,
-    1.30902850238e-59, 7.91001810658e-86, 2.69453204242e-130, 3.32235353348e-206,
-    9.37858201788e-342, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-};
+static const double kGL32_x[32] = {0.044489365833267, 0.234526109519619, 0.576884629301886, 1.07244875381782,
+                                   1.72240877644465,  2.52833670642579,  3.49221327302199,  4.61645676974977,
+                                   5.90395850417424,  7.35812673318624,  8.98294092421260,  10.7830186325399,
+                                   12.7636979867427,  14.9311397555226,  17.2924543367153,  19.8558609403361,
+                                   22.6308890131960,  25.6286360224592,  28.8621018163235,  32.3466291539647,
+                                   36.1004948057519,  40.1457197715394,  44.5092079957549,  49.2243949873086,
+                                   54.3337213333969,  59.8925091621340,  65.9738932315048,  72.6764856363483,
+                                   80.1456711922165,  88.7250222336802,  99.3663896266145,  116.498428833741};
+static const double kGL32_w[32] = {0.109218341952385,
+                                   0.210443107938813,
+                                   0.235213229669847,
+                                   0.195903335972881,
+                                   0.129983786286072,
+                                   0.068212565104719,
+                                   0.028248880785091,
+                                   0.009025579689953,
+                                   0.002169537515914,
+                                   0.000359246582804,
+                                   0.000040069955161,
+                                   2.67678014474e-06,
+                                   9.73806705861e-08,
+                                   1.56920701086e-09,
+                                   8.00611520883e-12,
+                                   4.40455033387e-15,
+                                   2.06776392922e-19,
+                                   4.99469948627e-25,
+                                   1.03614617085e-32,
+                                   1.42362101688e-43,
+                                   1.30902850238e-59,
+                                   7.91001810658e-86,
+                                   2.69453204242e-130,
+                                   3.32235353348e-206,
+                                   9.37858201788e-342,
+                                   0.0,
+                                   0.0,
+                                   0.0,
+                                   0.0,
+                                   0.0,
+                                   0.0,
+                                   0.0};
 
 inline std::complex<double> iunit() { return std::complex<double>(0.0, 1.0); }
 
-inline std::complex<double> heston_phi(double u,
-                                       double S0,
-                                       double r,
-                                       double q,
-                                       double T,
-                                       const Params& h) {
+inline std::complex<double> heston_phi(double u, double S0, double r, double q, double T, const Params& h) {
     using cd = std::complex<double>;
     const cd i = iunit();
     const cd iu = i * u;
     const double kappa = h.kappa;
     const double theta = h.theta;
     const double sigma = h.sigma;
-    const double rho   = h.rho;
-    const double v0    = h.v0;
+    const double rho = h.rho;
+    const double v0 = h.v0;
 
-    const cd d = std::sqrt( std::pow(rho * sigma * iu - kappa, 2.0) + sigma * sigma * (iu + iu * iu) );
+    const cd d = std::sqrt(std::pow(rho * sigma * iu - kappa, 2.0) + sigma * sigma * (iu + iu * iu));
     const cd g = (kappa - rho * sigma * iu - d) / (kappa - rho * sigma * iu + d);
-    const cd C = iu * (std::log(S0) + (r - q) * T)
-                 + (kappa * theta) / (sigma * sigma)
-                   * ( (kappa - rho * sigma * iu - d) * T - 2.0 * std::log( (1.0 - g * std::exp(-d * T)) / (1.0 - g) ) );
-    const cd D = ((kappa - rho * sigma * iu - d) / (sigma * sigma)) * ( (1.0 - std::exp(-d * T)) / (1.0 - g * std::exp(-d * T)) );
+    const cd C =
+        iu * (std::log(S0) + (r - q) * T) +
+        (kappa * theta) / (sigma * sigma) *
+            ((kappa - rho * sigma * iu - d) * T - 2.0 * std::log((1.0 - g * std::exp(-d * T)) / (1.0 - g)));
+    const cd D = ((kappa - rho * sigma * iu - d) / (sigma * sigma)) *
+                 ((1.0 - std::exp(-d * T)) / (1.0 - g * std::exp(-d * T)));
     return std::exp(C + D * v0);
 }
 
-inline double P_j(int j, double lnK,
-                  const MarketParams& mkt,
-                  const Params& h) {
+inline double P_j(int j, double lnK, const MarketParams& mkt, const Params& h) {
     // Carr–Madan style integrals via Laguerre: ∫ Re( e^{-iu lnK} φ_j(u) / (i u) ) du
     const double S0 = mkt.spot;
-    const double r  = mkt.rate;
-    const double q  = mkt.dividend;
-    const double T  = mkt.time;
+    const double r = mkt.rate;
+    const double q = mkt.dividend;
+    const double T = mkt.time;
     const std::complex<double> i = iunit();
     const std::complex<double> denom_base = i; // for 1/(i u)
 
@@ -83,7 +101,8 @@ inline double P_j(int j, double lnK,
     for (int k = 0; k < 32; ++k) {
         const double x = kGL32_x[k];
         const double w = kGL32_w[k];
-        if (w == 0.0) continue;
+        if (w == 0.0)
+            continue;
         const double u = x; // Laguerre transforms ∫_0^∞ f(u) e^{-u} du ≈ Σ w_k f(x_k)
         std::complex<double> phi;
         if (j == 1) {
@@ -114,9 +133,7 @@ double call_analytic(const MarketParams& mkt, const Params& h) {
     return price;
 }
 
-std::complex<double> characteristic_function(double u,
-                                             const MarketParams& mkt,
-                                             const Params& h) {
+std::complex<double> characteristic_function(double u, const MarketParams& mkt, const Params& h) {
     return heston_phi(u, mkt.spot, mkt.rate, mkt.dividend, mkt.time, h);
 }
 
@@ -175,8 +192,10 @@ McResult call_qe_mc(const McParams& p) {
         if (use_counter) {
             for (int s = 0; s < steps; ++s) {
                 const std::uint32_t step_id = static_cast<std::uint32_t>(s);
-                d.z_var[static_cast<std::size_t>(s)] = quant::rng::normal(master_seed, path_id, step_id, 0U, 0U);
-                d.z_perp[static_cast<std::size_t>(s)] = quant::rng::normal(master_seed, path_id, step_id, 1U, 0U);
+                d.z_var[static_cast<std::size_t>(s)] =
+                    quant::rng::normal(master_seed, path_id, step_id, 0U, 0U);
+                d.z_perp[static_cast<std::size_t>(s)] =
+                    quant::rng::normal(master_seed, path_id, step_id, 1U, 0U);
                 d.u[static_cast<std::size_t>(s)] = quant::rng::uniform(master_seed, path_id, step_id, 2U, 0U);
             }
         } else {
@@ -229,8 +248,8 @@ McResult call_qe_mc(const McParams& p) {
             } else if (sigma == 0.0) {
                 s2 = 0.0;
             } else {
-                s2 = v * sigma2 * exp_kdt * one_minus_exp / kappa
-                     + theta * sigma2 * one_minus_exp * one_minus_exp / (2.0 * kappa);
+                s2 = v * sigma2 * exp_kdt * one_minus_exp / kappa +
+                     theta * sigma2 * one_minus_exp * one_minus_exp / (2.0 * kappa);
             }
             s2 = std::max(s2, 0.0);
 
@@ -283,9 +302,7 @@ McResult call_qe_mc(const McParams& p) {
     }
 
     const double price = acc.mean;
-    const double se = (acc.count > 1)
-                          ? std::sqrt(acc.variance() / static_cast<double>(acc.count))
-                          : 0.0;
+    const double se = (acc.count > 1) ? std::sqrt(acc.variance() / static_cast<double>(acc.count)) : 0.0;
     return McResult{price, se};
 }
 

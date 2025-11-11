@@ -14,8 +14,8 @@ import sys
 
 def fetch_wrds(ticker: str, start: str, end: str):
     try:
-        import wrds
         import pandas as pd
+        import wrds
     except Exception as e:
         raise RuntimeError(f"wrds not available: {e}")
     db = wrds.Connection()
@@ -28,7 +28,7 @@ def fetch_wrds(ticker: str, start: str, end: str):
     names = db.raw_sql(qmap)
     if names.empty:
         raise RuntimeError(f"No CRSP permco for ticker {ticker}")
-    permco = int(names['permco'].iloc[0])
+    permco = int(names["permco"].iloc[0])
     q = f"""
         select date, ret, prc as close
         from crsp.dsf
@@ -36,32 +36,32 @@ def fetch_wrds(ticker: str, start: str, end: str):
           and date between '{start}' and '{end}'
     """
     df = db.raw_sql(q)
-    df = df.dropna(subset=['ret'])
-    df = df.sort_values('date')
+    df = df.dropna(subset=["ret"])
+    df = df.sort_values("date")
     return df
 
 
 def fetch_yf(ticker: str, start: str, end: str):
     try:
-        import yfinance as yf
         import pandas as pd
+        import yfinance as yf
     except Exception as e:
         raise RuntimeError(f"yfinance not available: {e}")
     data = yf.download(ticker, start=start, end=end, progress=False)
     if data.empty:
         raise RuntimeError("No data from yfinance")
-    data['ret'] = data['Adj Close'].pct_change()
-    out = data[['ret', 'Adj Close']].dropna().rename(columns={'Adj Close': 'close'})
-    out = out.reset_index().rename(columns={'Date': 'date'})
+    data["ret"] = data["Adj Close"].pct_change()
+    out = data[["ret", "Adj Close"]].dropna().rename(columns={"Adj Close": "close"})
+    out = out.reset_index().rename(columns={"Date": "date"})
     return out
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--ticker', required=True)
-    ap.add_argument('--start', required=True)
-    ap.add_argument('--end', required=True)
-    ap.add_argument('--out', required=True)
+    ap.add_argument("--ticker", required=True)
+    ap.add_argument("--start", required=True)
+    ap.add_argument("--end", required=True)
+    ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
     try:
@@ -69,12 +69,10 @@ def main():
     except Exception:
         df = fetch_yf(args.ticker, args.start, args.end)
 
-    os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
+    os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     df.to_csv(args.out, index=False)
-    print('wrote', args.out)
+    print("wrote", args.out)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
-

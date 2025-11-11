@@ -22,7 +22,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
 from manifest_utils import update_run
 
 
@@ -30,7 +29,9 @@ def run(cmd: List[str], cwd: Path | None = None) -> str:
     return subprocess.check_output(cmd, cwd=cwd, text=True).strip()
 
 
-def black_scholes_call(S: float, K: float, r: float, q: float, sigma: float, T: float) -> float:
+def black_scholes_call(
+    S: float, K: float, r: float, q: float, sigma: float, T: float
+) -> float:
     if T <= 0:
         return max(S - K, 0.0)
     sqrtT = math.sqrt(T)
@@ -54,7 +55,9 @@ def ensure_build(root: Path, build_dir: Path, skip: bool) -> Path:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--fast", action="store_true", help="Use fewer grid nodes for CI")
-    ap.add_argument("--skip-build", action="store_true", help="Assume quant_cli is already built")
+    ap.add_argument(
+        "--skip-build", action="store_true", help="Assume quant_cli is already built"
+    )
     ap.add_argument("--output", default="artifacts/pde_order_slope.png")
     ap.add_argument("--csv", default="artifacts/pde_order_slope.csv")
     args = ap.parse_args()
@@ -93,12 +96,14 @@ def main() -> None:
         out = run(cmd)
         price = float(out.split()[0])
         error = abs(price - analytic)
-        records.append({
-            "nodes": M,
-            "timesteps": N,
-            "price": price,
-            "abs_error": error,
-        })
+        records.append(
+            {
+                "nodes": M,
+                "timesteps": N,
+                "price": price,
+                "abs_error": error,
+            }
+        )
 
     df = pd.DataFrame(records)
     csv_path = Path(args.csv)

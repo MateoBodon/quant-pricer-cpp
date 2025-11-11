@@ -11,8 +11,8 @@ namespace quant::rng {
 
 /// RNG mode selection: traditional PRNG or deterministic counter-based
 enum class Mode {
-    Mt19937,  ///< PCG/Mersenne Twister style PRNG (per-thread stateful)
-    Counter   ///< Counter-based, reproducible across threading schedules
+    Mt19937, ///< PCG/Mersenne Twister style PRNG (per-thread stateful)
+    Counter  ///< Counter-based, reproducible across threading schedules
 };
 
 namespace detail {
@@ -46,11 +46,8 @@ inline double to_unit_interval(std::uint64_t bits) {
 } // namespace detail
 
 /// Deterministic hash of RNG identifiers -> uniform (0,1)
-inline double uniform(std::uint64_t master_seed,
-                      std::uint64_t path_id,
-                      std::uint32_t step_id,
-                      std::uint32_t dim_id,
-                      std::uint32_t stream_id) {
+inline double uniform(std::uint64_t master_seed, std::uint64_t path_id, std::uint32_t step_id,
+                      std::uint32_t dim_id, std::uint32_t stream_id) {
     using detail::hash_combine;
     std::uint64_t h = detail::splitmix64(master_seed + detail::kMixConst1);
     h = hash_combine(h, path_id);
@@ -60,14 +57,10 @@ inline double uniform(std::uint64_t master_seed,
 }
 
 /// Deterministic standard normal draw via inverse CDF transform
-inline double normal(std::uint64_t master_seed,
-                     std::uint64_t path_id,
-                     std::uint32_t step_id,
-                     std::uint32_t dim_id,
-                     std::uint32_t stream_id) {
+inline double normal(std::uint64_t master_seed, std::uint64_t path_id, std::uint32_t step_id,
+                     std::uint32_t dim_id, std::uint32_t stream_id) {
     const double u = uniform(master_seed, path_id, step_id, dim_id, stream_id);
     return quant::math::inverse_normal_cdf(u);
 }
 
 } // namespace quant::rng
-

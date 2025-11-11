@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include "quant/risk.hpp"
 #include "quant/math.hpp"
+#include "quant/risk.hpp"
 
 #include <cmath>
-#include <vector>
 #include <limits>
+#include <vector>
 
 namespace {
 
@@ -14,9 +14,7 @@ double chi_square_tail_df1(double x) {
     return std::erfc(std::sqrt(std::max(0.0, x)) / std::sqrt(2.0));
 }
 
-double chi_square_tail_df2(double x) {
-    return std::exp(-0.5 * x);
-}
+double chi_square_tail_df2(double x) { return std::exp(-0.5 * x); }
 
 } // namespace
 
@@ -63,16 +61,13 @@ TEST(RiskBacktest, StudentTRequiresFiniteVariance) {
     const unsigned long seed = 42;
     const double alpha = 0.99;
 
-    EXPECT_THROW(
-        quant::risk::var_cvar_t(mu, sigma, 2.0, horizon, position, sims, seed, alpha),
-        std::invalid_argument);
+    EXPECT_THROW(quant::risk::var_cvar_t(mu, sigma, 2.0, horizon, position, sims, seed, alpha),
+                 std::invalid_argument);
 
-    EXPECT_THROW(
-        quant::risk::var_cvar_t(mu, sigma, 1.5, horizon, position, sims, seed, alpha),
-        std::invalid_argument);
+    EXPECT_THROW(quant::risk::var_cvar_t(mu, sigma, 1.5, horizon, position, sims, seed, alpha),
+                 std::invalid_argument);
 
-    EXPECT_NO_THROW(
-        quant::risk::var_cvar_t(mu, sigma, 5.0, horizon, position, sims, seed, alpha));
+    EXPECT_NO_THROW(quant::risk::var_cvar_t(mu, sigma, 5.0, horizon, position, sims, seed, alpha));
 }
 
 TEST(RiskBacktest, GbmVarMatchesAnalyticQuantile) {

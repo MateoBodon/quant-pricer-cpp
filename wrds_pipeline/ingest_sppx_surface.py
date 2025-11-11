@@ -124,7 +124,9 @@ def _load_sample(symbol: str, trade_date: str) -> pd.DataFrame:
     ]
 
 
-def load_surface(symbol: str, trade_date: str, force_sample: bool = False) -> Tuple[pd.DataFrame, str]:
+def load_surface(
+    symbol: str, trade_date: str, force_sample: bool = False
+) -> Tuple[pd.DataFrame, str]:
     trade_date = pd.to_datetime(trade_date).date()
     if not force_sample and _has_wrds_credentials():
         try:
@@ -133,7 +135,9 @@ def load_surface(symbol: str, trade_date: str, force_sample: bool = False) -> Tu
             raw.drop(columns=["date"], inplace=True)
             return raw, "wrds"
         except Exception as exc:  # pragma: no cover
-            print(f"[wrds_pipeline] WRDS fetch failed ({exc}); falling back to sample data")
+            print(
+                f"[wrds_pipeline] WRDS fetch failed ({exc}); falling back to sample data"
+            )
     sample = _load_sample(symbol, str(trade_date))
     return sample, "sample"
 
@@ -147,11 +151,7 @@ def _prepare_quotes(df: pd.DataFrame) -> pd.DataFrame:
     df["ttm_years"] = df["days_to_expiration"] / 365.0
     df["option_mid"] = 0.5 * (df["best_bid"] + df["best_offer"])
     df = df[(df["option_mid"] > 0.01)]
-    df["spot"] = (
-        df.get("spot")
-        .fillna(df.get("forward_price"))
-        .fillna(SPOT_FALLBACK)
-    )
+    df["spot"] = df.get("spot").fillna(df.get("forward_price")).fillna(SPOT_FALLBACK)
     df["spot"] = np.clip(df["spot"], 1000.0, 20000.0)
     df["rate"] = df.get("rate", 0.015).fillna(0.015)
     df["dividend"] = df.get("dividend", df.get("divyield", 0.01)).fillna(0.01)
@@ -201,23 +201,27 @@ def aggregate_surface(df: pd.DataFrame) -> pd.DataFrame:
     )
     quotes = quotes.dropna(subset=["tenor_bucket"])
     quotes["moneyness_bucket"] = np.round(quotes["moneyness"], 2)
-    grouped = quotes.groupby(
-        ["tenor_bucket", "moneyness_bucket"],
-        observed=True,
-        as_index=True,
-    ).agg(
-        trade_date=("trade_date", "first"),
-        spot=("spot", "mean"),
-        strike=("strike", "mean"),
-        rate=("rate", "mean"),
-        dividend=("dividend", "mean"),
-        ttm_years=("ttm_years", "mean"),
-        days_to_expiration=("days_to_expiration", "mean"),
-        mid_price=("option_mid", "mean"),
-        mid_iv=("mid_iv", "mean"),
-        vega=("vega", "mean"),
-        quotes=("option_mid", "count"),
-    ).reset_index()
+    grouped = (
+        quotes.groupby(
+            ["tenor_bucket", "moneyness_bucket"],
+            observed=True,
+            as_index=True,
+        )
+        .agg(
+            trade_date=("trade_date", "first"),
+            spot=("spot", "mean"),
+            strike=("strike", "mean"),
+            rate=("rate", "mean"),
+            dividend=("dividend", "mean"),
+            ttm_years=("ttm_years", "mean"),
+            days_to_expiration=("days_to_expiration", "mean"),
+            mid_price=("option_mid", "mean"),
+            mid_iv=("mid_iv", "mean"),
+            vega=("vega", "mean"),
+            quotes=("option_mid", "count"),
+        )
+        .reset_index()
+    )
     grouped = grouped[grouped["quotes"] >= 1]
     grouped["symbol"] = "SPX"
     grouped["moneyness"] = grouped["moneyness_bucket"]
@@ -237,7 +241,11 @@ def aggregate_surface(df: pd.DataFrame) -> pd.DataFrame:
         "vega",
         "quotes",
     ]
-    return grouped[columns].sort_values(["tenor_bucket", "moneyness"]).reset_index(drop=True)
+    return (
+        grouped[columns]
+        .sort_values(["tenor_bucket", "moneyness"])
+        .reset_index(drop=True)
+    )
 
 
 def write_surface(out_path: Path, df: pd.DataFrame) -> None:

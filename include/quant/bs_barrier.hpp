@@ -5,14 +5,7 @@
 
 namespace quant::bs {
 
-double reiner_rubinstein_price(OptionType opt,
-                               const BarrierSpec& barrier,
-                               double S,
-                               double K,
-                               double r,
-                               double q,
-                               double sigma,
-                               double T);
+double reiner_rubinstein_price(OptionType opt, const BarrierSpec& barrier, double S, double K, double r,
+                               double q, double sigma, double T);
 
 }
-

@@ -6,19 +6,15 @@
 
 namespace {
 
-quant::heston::McParams make_mc_params(const quant::heston::MarketParams& mkt,
-                                       const quant::heston::Params& h,
-                                       std::uint64_t paths,
-                                       std::uint64_t seed,
-                                       int steps) {
+quant::heston::McParams make_mc_params(const quant::heston::MarketParams& mkt, const quant::heston::Params& h,
+                                       std::uint64_t paths, std::uint64_t seed, int steps) {
     quant::heston::McParams mc{mkt, h, paths, seed, steps, true};
     mc.rng = quant::rng::Mode::Counter;
     mc.scheme = quant::heston::McParams::Scheme::QE;
     return mc;
 }
 
-void expect_mc_within_ci(const quant::heston::McResult& mc,
-                         double reference,
+void expect_mc_within_ci(const quant::heston::McResult& mc, double reference,
                          double z_threshold = quant::math::kZ95) {
     ASSERT_GT(mc.std_error, 0.0);
     const double diff = std::abs(mc.price - reference);

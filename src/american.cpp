@@ -34,8 +34,8 @@ SpaceGrid make_space_grid(const PsorParams& params) {
     gp.anchor = params.base.strike;
     if (!params.log_space) {
         gp.lower = 0.0;
-        gp.upper = std::max(params.base.spot * params.grid.s_max_mult,
-                            params.base.strike * params.grid.s_max_mult);
+        gp.upper =
+            std::max(params.base.spot * params.grid.s_max_mult, params.base.strike * params.grid.s_max_mult);
         if (!(gp.upper > gp.lower)) {
             throw std::invalid_argument("Invalid S_max for American grid");
         }
@@ -56,33 +56,19 @@ double intrinsic_value(OptionType type, double strike, double S) {
     return std::max(0.0, strike - S);
 }
 
-void build_system(const PsorParams& params,
-                  const SpaceGrid& grid,
-                  const std::vector<double>& V_curr,
-                  double dt,
-                  double theta,
-                  double tau_next,
-                  OperatorWorkspace& op) {
+void build_system(const PsorParams& params, const SpaceGrid& grid, const std::vector<double>& V_curr,
+                  double dt, double theta, double tau_next, OperatorWorkspace& op) {
     const int M = params.grid.num_space;
     if (static_cast<int>(grid.spot.size()) != M) {
         throw std::invalid_argument("grid size mismatch for PSOR operator");
     }
 
-    quant::grid_utils::DiffusionCoefficients coeffs{
-        params.base.vol,
-        params.base.rate,
-        params.base.dividend,
-        params.log_space
-    };
+    quant::grid_utils::DiffusionCoefficients coeffs{params.base.vol, params.base.rate, params.base.dividend,
+                                                    params.log_space};
     quant::grid_utils::assemble_operator(grid, coeffs, dt, theta, V_curr, op);
 
-    quant::grid_utils::PayoffBoundaryParams boundary_params{
-        params.base.type,
-        params.base.strike,
-        params.base.rate,
-        params.base.dividend,
-        tau_next
-    };
+    quant::grid_utils::PayoffBoundaryParams boundary_params{params.base.type, params.base.strike,
+                                                            params.base.rate, params.base.dividend, tau_next};
 
     const double lower_bc = quant::grid_utils::dirichlet_boundary(boundary_params, grid.spot.front(), true);
     const double upper_bc = quant::grid_utils::dirichlet_boundary(boundary_params, grid.spot.back(), false);
@@ -110,9 +96,7 @@ void build_system(const PsorParams& params,
     }
 }
 
-double interpolate_price(const std::vector<double>& S,
-                         const std::vector<double>& V,
-                         double S0) {
+double interpolate_price(const std::vector<double>& S, const std::vector<double>& V, double S0) {
     const std::size_t M = S.size();
     if (M == 0) {
         return 0.0;
@@ -565,12 +549,14 @@ LsmcResult price_lsmc(const LsmcParams& params) {
         bool allow_exercise = itm_count >= params.min_itm && regression_samples >= 4;
         if (allow_exercise) {
             solution = solve_normal_equations(eq, params.ridge_lambda);
-            if (!solution.success || !std::isfinite(solution.condition_number) || solution.condition_number > 1.0e12) {
+            if (!solution.success || !std::isfinite(solution.condition_number) ||
+                solution.condition_number > 1.0e12) {
                 allow_exercise = false;
             }
         }
 
-        cond_rev.push_back(solution.success ? solution.condition_number : std::numeric_limits<double>::infinity());
+        cond_rev.push_back(solution.success ? solution.condition_number
+                                            : std::numeric_limits<double>::infinity());
         itm_counts_rev.push_back(itm_count);
         reg_counts_rev.push_back(regression_samples);
 

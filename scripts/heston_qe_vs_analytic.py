@@ -17,7 +17,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from manifest_utils import ARTIFACTS_ROOT, update_run
 
 
@@ -53,9 +52,13 @@ def _run_cli_json(cli: Path, args: List[Any]) -> Dict[str, Any]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quant-cli", help="Path to quant_cli executable")
-    ap.add_argument("--paths", type=int, default=80_000, help="Monte Carlo paths per run")
+    ap.add_argument(
+        "--paths", type=int, default=80_000, help="Monte Carlo paths per run"
+    )
     ap.add_argument("--seed", type=int, default=2025, help="RNG seed")
-    ap.add_argument("--fast", action="store_true", help="Skip the largest timestep for CI pipelines")
+    ap.add_argument(
+        "--fast", action="store_true", help="Skip the largest timestep for CI pipelines"
+    )
     ap.add_argument(
         "--output",
         default=str(ARTIFACTS_ROOT / "heston_qe_vs_analytic.png"),

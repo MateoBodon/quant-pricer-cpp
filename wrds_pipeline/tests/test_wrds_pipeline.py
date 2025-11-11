@@ -35,7 +35,9 @@ def _expected_artifacts(root: Path) -> list[Path]:
 def main() -> None:
     repo_root = _root()
     if not _has_wrds_env():
-        print("SKIP: WRDS pipeline disabled (set WRDS_ENABLED=1 with WRDS_USERNAME/WRDS_PASSWORD).")
+        print(
+            "SKIP: WRDS pipeline disabled (set WRDS_ENABLED=1 with WRDS_USERNAME/WRDS_PASSWORD)."
+        )
         raise SystemExit(SKIP_CODE)
 
     cmd = [sys.executable, str(repo_root / "wrds_pipeline" / "pipeline.py")]
@@ -44,7 +46,9 @@ def main() -> None:
 
     missing = [path for path in _expected_artifacts(repo_root) if not path.exists()]
     if missing:
-        raise SystemExit(f"Missing WRDS artifacts: {', '.join(str(path) for path in missing)}")
+        raise SystemExit(
+            f"Missing WRDS artifacts: {', '.join(str(path) for path in missing)}"
+        )
     print("WRDS pipeline artifacts ready.")
 
 

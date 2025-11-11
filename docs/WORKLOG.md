@@ -31,6 +31,12 @@
 - Commands run: n/a (metadata only).
 - Artifacts: n/a.
 
+## 2025-11-11 (CI lint + docs deploy automation)
+- Fixed the failing `pre-commit` job by upgrading the clang-format hook, excluding committed artifacts, and reformatting the C++/Python sources so the repo is lint-clean again; `pre-commit run --all-files` now passes locally.
+- Hooked the Docs Pages workflow to `push` (master/main), added an artifact copy step, and injected the `<base>` tag via an indented Python snippet so the published Results/coverage links stay live without manual triggers.
+- Commands run: `pre-commit run --all-files` (multiple, until clean), `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
+- Artifacts: auto-generated coverage/docs bundles under `docs/html` (published via workflow).
+
 ## 2025-11-11 (Heston analytic fix + coverage site)
 - Fixed the analytic Heston pricer by applying the proper Gauss–Laguerre weighting (exp(x)) and clamping the result to intrinsic value, then reran both Release and coverage FAST suites.
 - Generated llvm-cov/gcovr reports locally (lcov, Cobertura XML, HTML) and published the HTML bundle under `docs/coverage/` with a README badge + Results.md link; taught the Docs Pages workflow to copy that folder into the deployed site.

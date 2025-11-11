@@ -25,10 +25,7 @@ for path in (REPO_ROOT, SCRIPTS_DIR):
 
 from manifest_utils import ARTIFACTS_ROOT, update_run
 
-from . import calibrate_heston
-from . import delta_hedge_pnl
-from . import ingest_sppx_surface
-from . import oos_pricing
+from . import calibrate_heston, delta_hedge_pnl, ingest_sppx_surface, oos_pricing
 
 
 def _next_business_day(trade_date: str) -> str:
@@ -39,12 +36,16 @@ def _next_business_day(trade_date: str) -> str:
             return date.isoformat()
 
 
-def _plot_wrds_summary(surface: pd.DataFrame, oos: pd.DataFrame, pnl: pd.DataFrame, out_path: Path) -> None:
+def _plot_wrds_summary(
+    surface: pd.DataFrame, oos: pd.DataFrame, pnl: pd.DataFrame, out_path: Path
+) -> None:
     fig, axes = plt.subplots(1, 3, figsize=(14, 4))
 
     for bucket, group in surface.groupby("tenor_bucket", observed=True):
         axes[0].plot(group["moneyness"], group["mid_iv"], "o-", label=f"{bucket} mkt")
-        axes[0].plot(group["moneyness"], group["model_iv"], "--", label=f"{bucket} model")
+        axes[0].plot(
+            group["moneyness"], group["model_iv"], "--", label=f"{bucket} model"
+        )
     axes[0].set_title("In-sample IV vs model")
     axes[0].set_xlabel("Moneyness")
     axes[0].set_ylabel("Implied vol (vol pts)")
@@ -56,7 +57,13 @@ def _plot_wrds_summary(surface: pd.DataFrame, oos: pd.DataFrame, pnl: pd.DataFra
         axes[1].set_title("Next-day IV MAE (bps)")
         axes[1].set_ylabel("IV MAE (bps)")
         axes2 = axes[1].twinx()
-        axes2.plot(oos["tenor_bucket"], oos["price_mae_ticks"], "s--", color="#ff7f0e", label="Price ticks")
+        axes2.plot(
+            oos["tenor_bucket"],
+            oos["price_mae_ticks"],
+            "s--",
+            color="#ff7f0e",
+            label="Price ticks",
+        )
         axes2.set_ylabel("Price MAE (ticks)")
         axes2.legend(loc="upper right", fontsize=7)
     else:
@@ -64,7 +71,9 @@ def _plot_wrds_summary(surface: pd.DataFrame, oos: pd.DataFrame, pnl: pd.DataFra
     axes[1].grid(True, axis="y", ls=":", alpha=0.5)
 
     if not pnl.empty:
-        hist_data = pnl.loc[pnl.index.repeat(pnl["quotes"].clip(lower=1).astype(int)), "pnl_per_tick"]
+        hist_data = pnl.loc[
+            pnl.index.repeat(pnl["quotes"].clip(lower=1).astype(int)), "pnl_per_tick"
+        ]
         axes[2].hist(hist_data, bins=15, color="#2ca02c", alpha=0.8)
         axes[2].set_title("Delta-hedged 1d PnL (ticks)")
     else:
@@ -100,10 +109,18 @@ def _plot_oos_summary(oos: pd.DataFrame, out_path: Path) -> None:
     if oos.empty:
         ax.text(0.5, 0.5, "No OOS data", ha="center", va="center")
     else:
-        ax.bar(oos["tenor_bucket"], oos["iv_mae_bps"], color="#1f77b4", label="IV (bps)")
+        ax.bar(
+            oos["tenor_bucket"], oos["iv_mae_bps"], color="#1f77b4", label="IV (bps)"
+        )
         ax.set_ylabel("IV MAE (bps)")
         ax2 = ax.twinx()
-        ax2.plot(oos["tenor_bucket"], oos["price_mae_ticks"], "s--", color="#ff7f0e", label="Price ticks")
+        ax2.plot(
+            oos["tenor_bucket"],
+            oos["price_mae_ticks"],
+            "s--",
+            color="#ff7f0e",
+            label="Price ticks",
+        )
         ax2.set_ylabel("Price MAE (ticks)")
         lines, labels = ax.get_legend_handles_labels()
         lines2, labels2 = ax2.get_legend_handles_labels()
@@ -137,7 +154,9 @@ def _plot_hedge_distribution(pnl_detail: pd.DataFrame, out_path: Path) -> None:
     plt.close(fig)
 
 
-def _plot_multi_date_summary(pricing: pd.DataFrame, oos: pd.DataFrame, pnl: pd.DataFrame, out_path: Path) -> None:
+def _plot_multi_date_summary(
+    pricing: pd.DataFrame, oos: pd.DataFrame, pnl: pd.DataFrame, out_path: Path
+) -> None:
     if pricing.empty:
         return
     color_map = {"stress": "#d62728", "calm": "#1f77b4", "unknown": "#7f7f7f"}
@@ -157,10 +176,12 @@ def _plot_multi_date_summary(pricing: pd.DataFrame, oos: pd.DataFrame, pnl: pd.D
     if oos.empty:
         axes[1].text(0.5, 0.5, "No OOS data", ha="center", va="center")
     else:
-        pivot = (
-            oos.pivot_table(index="tenor_bucket", columns="trade_date", values="iv_mae_bps", observed=True)
-            .sort_index()
-        )
+        pivot = oos.pivot_table(
+            index="tenor_bucket",
+            columns="trade_date",
+            values="iv_mae_bps",
+            observed=True,
+        ).sort_index()
         im = axes[1].imshow(pivot, aspect="auto", cmap="viridis")
         axes[1].set_title("OOS IV MAE (bps)")
         axes[1].set_xlabel("Trade date")
@@ -175,7 +196,9 @@ def _plot_multi_date_summary(pricing: pd.DataFrame, oos: pd.DataFrame, pnl: pd.D
         axes[2].text(0.5, 0.5, "No hedge data", ha="center", va="center")
     else:
         pnl_avg = (
-            pnl.groupby(["trade_date", "regime", "label"], observed=True, as_index=False)
+            pnl.groupby(
+                ["trade_date", "regime", "label"], observed=True, as_index=False
+            )
             .agg(mean_ticks=("mean_ticks", "mean"), pnl_sigma=("pnl_sigma", "mean"))
             .sort_values("trade_date")
         )
@@ -232,8 +255,12 @@ def run(
     out_dir = output_dir or (ARTIFACTS_ROOT / "wrds")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    raw_today, source_today = ingest_sppx_surface.load_surface(symbol, trade_date, force_sample=use_sample)
-    raw_next, source_next = ingest_sppx_surface.load_surface(symbol, next_trade_date, force_sample=use_sample)
+    raw_today, source_today = ingest_sppx_surface.load_surface(
+        symbol, trade_date, force_sample=use_sample
+    )
+    raw_next, source_next = ingest_sppx_surface.load_surface(
+        symbol, next_trade_date, force_sample=use_sample
+    )
 
     agg_today = ingest_sppx_surface.aggregate_surface(raw_today)
     try:
@@ -253,13 +280,20 @@ def run(
         rng_seed=19,
     )
     calib = calibrate_heston.calibrate(agg_today, config)
-    ci = calibrate_heston.bootstrap_confidence_intervals(agg_today, calib["params"], config)
+    ci = calibrate_heston.bootstrap_confidence_intervals(
+        agg_today, calib["params"], config
+    )
 
     fit_csv = out_dir / "heston_fit_table.csv"
     fit_json = out_dir / "heston_fit.json"
     fit_fig = out_dir / "heston_fit.png"
     calibrate_heston.write_tables(fit_csv, calib["surface"])
-    metric_keys = ("iv_rmse_volpts_vega_wt", "iv_mae_volpts_vega_wt", "iv_p90_bps", "price_rmse_ticks")
+    metric_keys = (
+        "iv_rmse_volpts_vega_wt",
+        "iv_mae_volpts_vega_wt",
+        "iv_p90_bps",
+        "price_rmse_ticks",
+    )
     fit_metrics = {key: float(calib[key]) for key in metric_keys}
     summary_payload = {
         "trade_date": trade_date,
@@ -276,22 +310,28 @@ def run(
     oos_detail_csv = out_dir / "oos_pricing_detail.csv"
     oos_summary_csv = out_dir / "oos_pricing_summary.csv"
     if agg_next.empty:
-        oos_detail = pd.DataFrame(columns=[
-            "symbol",
-            "trade_date",
-            "tenor_bucket",
-            "moneyness",
-            "mid_iv",
-            "model_iv",
-            "iv_error_bps",
-            "mid_price",
-            "model_price",
-            "price_error_ticks",
-            "quotes",
-        ])
-        oos_summary = pd.DataFrame(columns=["tenor_bucket", "mae_iv_bps", "mae_price_ticks", "quotes"])
+        oos_detail = pd.DataFrame(
+            columns=[
+                "symbol",
+                "trade_date",
+                "tenor_bucket",
+                "moneyness",
+                "mid_iv",
+                "model_iv",
+                "iv_error_bps",
+                "mid_price",
+                "model_price",
+                "price_error_ticks",
+                "quotes",
+            ]
+        )
+        oos_summary = pd.DataFrame(
+            columns=["tenor_bucket", "mae_iv_bps", "mae_price_ticks", "quotes"]
+        )
     else:
-        oos_detail, oos_summary, oos_metrics = oos_pricing.evaluate(agg_next, calib["params"])
+        oos_detail, oos_summary, oos_metrics = oos_pricing.evaluate(
+            agg_next, calib["params"]
+        )
     if agg_next.empty:
         oos_metrics = calibrate_heston.compute_oos_iv_metrics(oos_detail)
     oos_pricing.write_outputs(oos_detail_csv, oos_summary_csv, oos_detail, oos_summary)
@@ -299,7 +339,9 @@ def run(
     pnl_detail_csv = out_dir / "delta_hedge_pnl.csv"
     pnl_summary_csv = out_dir / "delta_hedge_pnl_summary.csv"
     pnl_detail, pnl_summary = delta_hedge_pnl.simulate(agg_today, agg_next)
-    delta_hedge_pnl.write_outputs(pnl_detail_csv, pnl_summary_csv, pnl_detail, pnl_summary)
+    delta_hedge_pnl.write_outputs(
+        pnl_detail_csv, pnl_summary_csv, pnl_detail, pnl_summary
+    )
 
     summary_fig = out_dir / "heston_wrds_summary.png"
     _plot_wrds_summary(calib["surface"], oos_summary, pnl_detail, summary_fig)
@@ -386,7 +428,9 @@ def run(
     }
 
 
-def run_dateset(symbol: str, dateset_path: Path, use_sample: bool, fast: bool) -> Dict[str, Path]:
+def run_dateset(
+    symbol: str, dateset_path: Path, use_sample: bool, fast: bool
+) -> Dict[str, Path]:
     payload = _load_dateset_payload(dateset_path)
     entries = payload.get("dates", [])
     if not entries:
@@ -402,7 +446,9 @@ def run_dateset(symbol: str, dateset_path: Path, use_sample: bool, fast: bool) -
 
     for entry in entries:
         trade_date = entry["trade_date"]
-        next_trade_date = entry.get("next_trade_date") or _next_business_day(entry["trade_date"])
+        next_trade_date = entry.get("next_trade_date") or _next_business_day(
+            entry["trade_date"]
+        )
         label = entry.get("label")
         regime = entry.get("regime")
         comment = entry.get("comment")
@@ -420,45 +466,51 @@ def run_dateset(symbol: str, dateset_path: Path, use_sample: bool, fast: bool) -
             )
         except Exception as exc:  # pragma: no cover
             print(f"[wrds_pipeline] {trade_date} failed: {exc}")
-            pricing_rows.append({
-                "trade_date": trade_date,
-                "next_trade_date": next_trade_date,
-                "label": label,
-                "regime": regime,
-                "comment": comment,
-                "status": "error",
-                "iv_rmse_volpts_vega_wt": np.nan,
-                "iv_mae_volpts_vega_wt": np.nan,
-                "iv_p90_bps": np.nan,
-                "price_rmse_ticks": np.nan,
-                "iv_mae_bps": np.nan,
-                "price_mae_ticks": np.nan,
-                "error": str(exc),
-            })
+            pricing_rows.append(
+                {
+                    "trade_date": trade_date,
+                    "next_trade_date": next_trade_date,
+                    "label": label,
+                    "regime": regime,
+                    "comment": comment,
+                    "status": "error",
+                    "iv_rmse_volpts_vega_wt": np.nan,
+                    "iv_mae_volpts_vega_wt": np.nan,
+                    "iv_p90_bps": np.nan,
+                    "price_rmse_ticks": np.nan,
+                    "iv_mae_bps": np.nan,
+                    "price_mae_ticks": np.nan,
+                    "error": str(exc),
+                }
+            )
             continue
         summary = result["summary"]
         oos_df = result["oos_summary"].copy()
         if not oos_df.empty:
             weights = np.asarray(oos_df["quotes"].clip(lower=1), dtype=np.float64)
-            price_mae_ticks = float(np.average(oos_df["price_mae_ticks"], weights=weights))
+            price_mae_ticks = float(
+                np.average(oos_df["price_mae_ticks"], weights=weights)
+            )
         else:
             price_mae_ticks = float("nan")
-        pricing_rows.append({
-            "trade_date": summary["trade_date"],
-            "next_trade_date": summary["next_trade_date"],
-            "label": summary.get("label"),
-            "regime": summary.get("regime"),
-            "comment": comment,
-            "status": "ok",
-            "source_today": summary.get("source_today"),
-            "source_next": summary.get("source_next"),
-            "iv_rmse_volpts_vega_wt": summary["iv_rmse_volpts_vega_wt"],
-            "iv_mae_volpts_vega_wt": summary["iv_mae_volpts_vega_wt"],
-            "iv_p90_bps": summary["iv_p90_bps"],
-            "price_rmse_ticks": summary["price_rmse_ticks"],
-            "iv_mae_bps": summary.get("iv_mae_bps"),
-            "price_mae_ticks": price_mae_ticks,
-        })
+        pricing_rows.append(
+            {
+                "trade_date": summary["trade_date"],
+                "next_trade_date": summary["next_trade_date"],
+                "label": summary.get("label"),
+                "regime": summary.get("regime"),
+                "comment": comment,
+                "status": "ok",
+                "source_today": summary.get("source_today"),
+                "source_next": summary.get("source_next"),
+                "iv_rmse_volpts_vega_wt": summary["iv_rmse_volpts_vega_wt"],
+                "iv_mae_volpts_vega_wt": summary["iv_mae_volpts_vega_wt"],
+                "iv_p90_bps": summary["iv_p90_bps"],
+                "price_rmse_ticks": summary["price_rmse_ticks"],
+                "iv_mae_bps": summary.get("iv_mae_bps"),
+                "price_mae_ticks": price_mae_ticks,
+            }
+        )
 
         if not oos_df.empty:
             oos_df["trade_date"] = summary["trade_date"]
@@ -480,14 +532,35 @@ def run_dateset(symbol: str, dateset_path: Path, use_sample: bool, fast: bool) -
     if oos_rows:
         oos_df = pd.concat(oos_rows, ignore_index=True)
     else:
-        oos_df = pd.DataFrame(columns=["trade_date", "label", "regime", "tenor_bucket", "iv_mae_bps", "price_mae_ticks", "quotes"])
+        oos_df = pd.DataFrame(
+            columns=[
+                "trade_date",
+                "label",
+                "regime",
+                "tenor_bucket",
+                "iv_mae_bps",
+                "price_mae_ticks",
+                "quotes",
+            ]
+        )
     oos_csv = agg_dir / "wrds_agg_oos.csv"
     oos_df.to_csv(oos_csv, index=False)
 
     if pnl_rows:
         pnl_df = pd.concat(pnl_rows, ignore_index=True)
     else:
-        pnl_df = pd.DataFrame(columns=["trade_date", "label", "regime", "tenor_bucket", "mean_pnl", "mean_ticks", "pnl_sigma", "count"])
+        pnl_df = pd.DataFrame(
+            columns=[
+                "trade_date",
+                "label",
+                "regime",
+                "tenor_bucket",
+                "mean_pnl",
+                "mean_ticks",
+                "pnl_sigma",
+                "count",
+            ]
+        )
     pnl_csv = agg_dir / "wrds_agg_pnl.csv"
     pnl_df.to_csv(pnl_csv, index=False)
 
@@ -523,7 +596,11 @@ def main() -> None:
     ap.add_argument("--next-trade-date", default=None)
     ap.add_argument("--use-sample", action="store_true")
     ap.add_argument("--fast", action="store_true")
-    ap.add_argument("--dateset", default=None, help="Path to a YAML/JSON file listing trade dates to batch-process")
+    ap.add_argument(
+        "--dateset",
+        default=None,
+        help="Path to a YAML/JSON file listing trade dates to batch-process",
+    )
     args = ap.parse_args()
     next_trade = args.next_trade_date or _next_business_day(args.trade_date)
     use_sample = args.use_sample or not ingest_sppx_surface.has_wrds_credentials()

@@ -1,27 +1,27 @@
-#include <algorithm>
-#include <cmath>
-#include <cctype>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <optional>
-#include "quant/version.hpp"
-#include "quant/black_scholes.hpp"
+#include "quant/american.hpp"
+#include "quant/asian.hpp"
 #include "quant/barrier.hpp"
+#include "quant/black_scholes.hpp"
 #include "quant/bs_barrier.hpp"
-#include "quant/mc.hpp"
+#include "quant/digital.hpp"
+#include "quant/heston.hpp"
+#include "quant/lookback.hpp"
 #include "quant/math.hpp"
+#include "quant/mc.hpp"
 #include "quant/mc_barrier.hpp"
 #include "quant/pde.hpp"
 #include "quant/pde_barrier.hpp"
-#include "quant/american.hpp"
-#include "quant/digital.hpp"
-#include "quant/asian.hpp"
-#include "quant/lookback.hpp"
-#include "quant/heston.hpp"
 #include "quant/risk.hpp"
+#include "quant/version.hpp"
+#include <algorithm>
+#include <cctype>
+#include <cmath>
+#include <cstdlib>
+#include <iomanip>
+#include <iostream>
+#include <optional>
+#include <string>
+#include <vector>
 
 #ifdef QUANT_HAS_OPENMP
 #include <omp.h>
@@ -38,26 +38,30 @@ std::string to_lower(std::string s) {
 
 quant::OptionType parse_option(const std::string& token) {
     std::string v = to_lower(token);
-    if (v == "call" || v == "c") return quant::OptionType::Call;
-    if (v == "put" || v == "p") return quant::OptionType::Put;
+    if (v == "call" || v == "c")
+        return quant::OptionType::Call;
+    if (v == "put" || v == "p")
+        return quant::OptionType::Put;
     throw std::runtime_error("Unknown option type: " + token);
 }
 
-quant::OptionType parse_pde_option(const std::string& token) {
-    return parse_option(token);
-}
+quant::OptionType parse_pde_option(const std::string& token) { return parse_option(token); }
 
 quant::mc::McParams::Qmc parse_qmc_sampler(const std::string& token) {
     std::string v = to_lower(token);
-    if (v == "none" || v == "0" || v.empty()) return quant::mc::McParams::Qmc::None;
-    if (v == "sobol" || v == "1") return quant::mc::McParams::Qmc::Sobol;
-    if (v == "sobol_scrambled" || v == "scrambled" || v == "2") return quant::mc::McParams::Qmc::SobolScrambled;
+    if (v == "none" || v == "0" || v.empty())
+        return quant::mc::McParams::Qmc::None;
+    if (v == "sobol" || v == "1")
+        return quant::mc::McParams::Qmc::Sobol;
+    if (v == "sobol_scrambled" || v == "scrambled" || v == "2")
+        return quant::mc::McParams::Qmc::SobolScrambled;
     throw std::runtime_error("Unknown sampler: " + token);
 }
 
 quant::mc::McParams::Bridge parse_bridge_mode(const std::string& token) {
     std::string v = to_lower(token);
-    if (v == "none" || v == "0" || v.empty()) return quant::mc::McParams::Bridge::None;
+    if (v == "none" || v == "0" || v.empty())
+        return quant::mc::McParams::Bridge::None;
     if (v == "bb" || v == "brownian" || v == "bridge" || v == "brownianbridge" || v == "1")
         return quant::mc::McParams::Bridge::BrownianBridge;
     throw std::runtime_error("Unknown bridge mode: " + token);
@@ -65,8 +69,10 @@ quant::mc::McParams::Bridge parse_bridge_mode(const std::string& token) {
 
 quant::rng::Mode parse_rng_mode(const std::string& token) {
     std::string v = to_lower(token);
-    if (v == "counter" || v == "cb") return quant::rng::Mode::Counter;
-    if (v == "mt19937" || v == "mt" || v == "pcg") return quant::rng::Mode::Mt19937;
+    if (v == "counter" || v == "cb")
+        return quant::rng::Mode::Counter;
+    if (v == "mt19937" || v == "mt" || v == "pcg")
+        return quant::rng::Mode::Mt19937;
     throw std::runtime_error("Unknown rng mode: " + token);
 }
 
@@ -82,16 +88,14 @@ void apply_thread_override(int threads) {
 
 void print_mc_result(const quant::mc::McResult& res, bool json, bool show_ci) {
     if (json) {
-        std::cout << "{\"price\":" << res.estimate.value
-                  << ",\"std_error\":" << res.estimate.std_error
-                  << ",\"ci_low\":" << res.estimate.ci_low
-                  << ",\"ci_high\":" << res.estimate.ci_high
+        std::cout << "{\"price\":" << res.estimate.value << ",\"std_error\":" << res.estimate.std_error
+                  << ",\"ci_low\":" << res.estimate.ci_low << ",\"ci_high\":" << res.estimate.ci_high
                   << "}\n";
     } else {
         std::cout << res.estimate.value;
         if (show_ci) {
-            std::cout << " +/- " << res.estimate.std_error
-                      << " (95% CI=[" << res.estimate.ci_low << ", " << res.estimate.ci_high << "])\n";
+            std::cout << " +/- " << res.estimate.std_error << " (95% CI=[" << res.estimate.ci_low << ", "
+                      << res.estimate.ci_high << "])\n";
         } else {
             std::cout << " (se=" << res.estimate.std_error << ")\n";
         }
@@ -108,25 +112,23 @@ void print_scalar(double value, bool json) {
 
 void print_psor(const quant::american::PsorResult& res, bool json) {
     if (json) {
-        std::cout << "{\"price\":" << res.price
-                  << ",\"iterations\":" << res.total_iterations
-                  << ",\"max_residual\":" << res.max_residual
-                  << "}\n";
+        std::cout << "{\"price\":" << res.price << ",\"iterations\":" << res.total_iterations
+                  << ",\"max_residual\":" << res.max_residual << "}\n";
     } else {
-        std::cout << res.price << " (iterations=" << res.total_iterations
-                  << ", residual=" << res.max_residual << ")\n";
+        std::cout << res.price << " (iterations=" << res.total_iterations << ", residual=" << res.max_residual
+                  << ")\n";
     }
 }
 
 void print_lsmc(const quant::american::LsmcResult& res, bool json) {
     if (json) {
-        std::cout << "{\"price\":" << res.price
-                  << ",\"std_error\":" << res.std_error;
+        std::cout << "{\"price\":" << res.price << ",\"std_error\":" << res.std_error;
         const auto& diag = res.diagnostics;
         auto emit_array = [](const auto& arr) {
             std::cout << "[";
             for (std::size_t i = 0; i < arr.size(); ++i) {
-                if (i) std::cout << ",";
+                if (i)
+                    std::cout << ",";
                 std::cout << arr[i];
             }
             std::cout << "]";
@@ -158,9 +160,7 @@ void print_lsmc(const quant::american::LsmcResult& res, bool json) {
     }
 }
 
-bool starts_with_dash(const char* arg) {
-    return arg != nullptr && arg[0] == '-';
-}
+bool starts_with_dash(const char* arg) { return arg != nullptr && arg[0] == '-'; }
 
 } // namespace
 
@@ -215,15 +215,28 @@ int main(int argc, char** argv) {
         double T = std::atof(argv[7]);
         double price = std::atof(argv[8]);
         bool json = false;
-        for (int idx = 9; idx < argc; ++idx) { std::string flag = argv[idx]; if (flag == "--json") json = true; else { std::cerr << "Unknown flag " << flag << "\n"; return 1; } }
-        double iv = (type == "call") ? quant::bs::implied_vol_call(S,K,r,q,T,price)
-                                      : quant::bs::implied_vol_put(S,K,r,q,T,price);
-        if (json) std::cout << "{\"iv\":" << iv << "}\n"; else std::cout << iv << "\n";
+        for (int idx = 9; idx < argc; ++idx) {
+            std::string flag = argv[idx];
+            if (flag == "--json")
+                json = true;
+            else {
+                std::cerr << "Unknown flag " << flag << "\n";
+                return 1;
+            }
+        }
+        double iv = (type == "call") ? quant::bs::implied_vol_call(S, K, r, q, T, price)
+                                     : quant::bs::implied_vol_put(S, K, r, q, T, price);
+        if (json)
+            std::cout << "{\"iv\":" << iv << "}\n";
+        else
+            std::cout << iv << "\n";
         return 0;
     } else if (engine == "mc") {
         if (argc < 12) {
-            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc_mode> [bridge_mode] [num_steps]"
-                         " [--sampler=] [--bridge=] [--steps=] [--rng=counter|mt19937] [--threads=] [--greeks] [--ci] [--json]\n";
+            std::cerr << "mc <S> <K> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc_mode> "
+                         "[bridge_mode] [num_steps]"
+                         " [--sampler=] [--bridge=] [--steps=] [--rng=counter|mt19937] [--threads=] "
+                         "[--greeks] [--ci] [--json]\n";
             return 1;
         }
         quant::mc::McParams p{};
@@ -318,26 +331,24 @@ int main(int argc, char** argv) {
 #else
             (void)thread_override;
 #endif
-            std::cout << "{\"price\":" << res.estimate.value
-                      << ",\"std_error\":" << res.estimate.std_error
-                      << ",\"ci_low\":" << res.estimate.ci_low
-                      << ",\"ci_high\":" << res.estimate.ci_high
-                      << ",\"paths\":" << p.num_paths
-                      << ",\"seed\":" << p.seed
-                      << ",\"antithetic\":" << (p.antithetic ? 1 : 0)
-                      << ",\"sampler\":\"" << (p.qmc == quant::mc::McParams::Qmc::None ? "prng" : (p.qmc == quant::mc::McParams::Qmc::Sobol ? "sobol" : "sobol_scrambled")) << "\""
-                      << ",\"bridge\":\"" << (p.bridge == quant::mc::McParams::Bridge::None ? "none" : "bb") << "\""
-                      << ",\"steps\":" << p.num_steps
-                      << ",\"rng\":\"" << (p.rng == quant::rng::Mode::Counter ? "counter" : "mt19937") << "\""
+            std::cout << "{\"price\":" << res.estimate.value << ",\"std_error\":" << res.estimate.std_error
+                      << ",\"ci_low\":" << res.estimate.ci_low << ",\"ci_high\":" << res.estimate.ci_high
+                      << ",\"paths\":" << p.num_paths << ",\"seed\":" << p.seed
+                      << ",\"antithetic\":" << (p.antithetic ? 1 : 0) << ",\"sampler\":\""
+                      << (p.qmc == quant::mc::McParams::Qmc::None
+                              ? "prng"
+                              : (p.qmc == quant::mc::McParams::Qmc::Sobol ? "sobol" : "sobol_scrambled"))
+                      << "\""
+                      << ",\"bridge\":\"" << (p.bridge == quant::mc::McParams::Bridge::None ? "none" : "bb")
+                      << "\""
+                      << ",\"steps\":" << p.num_steps << ",\"rng\":\""
+                      << (p.rng == quant::rng::Mode::Counter ? "counter" : "mt19937") << "\""
                       << ",\"threads\":" << threads_used;
             if (greeks) {
                 auto emit_stat = [&](const char* name, const quant::mc::McStatistic& stat) {
                     std::cout << "\"" << name << "\":{"
-                              << "\"value\":" << stat.value
-                              << ",\"std_error\":" << stat.std_error
-                              << ",\"ci_low\":" << stat.ci_low
-                              << ",\"ci_high\":" << stat.ci_high
-                              << "}";
+                              << "\"value\":" << stat.value << ",\"std_error\":" << stat.std_error
+                              << ",\"ci_low\":" << stat.ci_low << ",\"ci_high\":" << stat.ci_high << "}";
                 };
                 std::cout << ",\"greeks\":{";
                 emit_stat("delta", greeks->delta);
@@ -358,8 +369,8 @@ int main(int argc, char** argv) {
                 auto print_stat = [&](const std::string& label, const quant::mc::McStatistic& stat) {
                     std::cout << label << ": " << stat.value;
                     if (show_ci) {
-                        std::cout << " +/- " << stat.std_error
-                                  << " (95% CI=[" << stat.ci_low << ", " << stat.ci_high << "])";
+                        std::cout << " +/- " << stat.std_error << " (95% CI=[" << stat.ci_low << ", "
+                                  << stat.ci_high << "])";
                     } else {
                         std::cout << " (se=" << stat.std_error << ")";
                     }
@@ -382,22 +393,30 @@ int main(int argc, char** argv) {
         std::string method = argv[2];
         auto parse_barrier_dir = [&](const std::string& s) -> bool {
             std::string v = to_lower(s);
-            if (v == "up") return true;
-            if (v == "down") return false;
+            if (v == "up")
+                return true;
+            if (v == "down")
+                return false;
             throw std::runtime_error("Unknown barrier direction: " + s);
         };
         auto parse_barrier_style = [&](const std::string& s) -> bool {
             std::string v = to_lower(s);
-            if (v == "out") return true;
-            if (v == "in") return false;
+            if (v == "out")
+                return true;
+            if (v == "in")
+                return false;
             throw std::runtime_error("Unknown barrier style: " + s);
         };
         auto build_spec = [&](bool up, bool out, double B, double rebate) {
             quant::BarrierSpec spec{};
-            if (up && out) spec.type = quant::BarrierType::UpOut;
-            else if (up && !out) spec.type = quant::BarrierType::UpIn;
-            else if (!up && out) spec.type = quant::BarrierType::DownOut;
-            else spec.type = quant::BarrierType::DownIn;
+            if (up && out)
+                spec.type = quant::BarrierType::UpOut;
+            else if (up && !out)
+                spec.type = quant::BarrierType::UpIn;
+            else if (!up && out)
+                spec.type = quant::BarrierType::DownOut;
+            else
+                spec.type = quant::BarrierType::DownIn;
             spec.B = B;
             spec.rebate = rebate;
             return spec;
@@ -405,7 +424,8 @@ int main(int argc, char** argv) {
 
         if (method == "bs") {
             if (argc < 14) {
-                std::cerr << "barrier bs <call|put> <up|down> <in|out> <S> <K> <B> <rebate> <r> <q> <sigma> <T>\n";
+                std::cerr
+                    << "barrier bs <call|put> <up|down> <in|out> <S> <K> <B> <rebate> <r> <q> <sigma> <T>\n";
                 return 1;
             }
             try {
@@ -431,7 +451,8 @@ int main(int argc, char** argv) {
         }
         if (method == "mc") {
             if (argc < 20) {
-                std::cerr << "barrier mc <call|put> <up|down> <in|out> <S> <K> <B> <rebate> <r> <q> <sigma> <T> <paths> <seed> <antithetic:0|1> <qmc_mode> <bridge_mode> <num_steps>\n";
+                std::cerr << "barrier mc <call|put> <up|down> <in|out> <S> <K> <B> <rebate> <r> <q> <sigma> "
+                             "<T> <paths> <seed> <antithetic:0|1> <qmc_mode> <bridge_mode> <num_steps>\n";
                 return 1;
             }
             try {
@@ -480,7 +501,8 @@ int main(int argc, char** argv) {
                         show_ci = true;
                     } else if (flag == "--cv") {
                         p.control_variate = true;
-                        std::cerr << "warning: barrier MC control variate is experimental and may introduce bias\n";
+                        std::cerr
+                            << "warning: barrier MC control variate is experimental and may introduce bias\n";
                     } else if (flag.rfind("--sampler=", 0) == 0) {
                         p.qmc = parse_qmc_sampler(flag.substr(10));
                     } else if (flag.rfind("--bridge=", 0) == 0) {
@@ -513,16 +535,19 @@ int main(int argc, char** argv) {
                     std::cout << "{\"price\":" << res.estimate.value
                               << ",\"std_error\":" << res.estimate.std_error
                               << ",\"ci_low\":" << res.estimate.ci_low
-                              << ",\"ci_high\":" << res.estimate.ci_high
-                              << ",\"paths\":" << p.num_paths
-                              << ",\"seed\":" << p.seed
-                              << ",\"antithetic\":" << (p.antithetic ? 1 : 0)
-                              << ",\"sampler\":\"" << (p.qmc == quant::mc::McParams::Qmc::None ? "prng" : (p.qmc == quant::mc::McParams::Qmc::Sobol ? "sobol" : "sobol_scrambled")) << "\""
-                              << ",\"bridge\":\"" << (p.bridge == quant::mc::McParams::Bridge::None ? "none" : "bb") << "\""
-                              << ",\"steps\":" << p.num_steps
-                              << ",\"rng\":\"" << (p.rng == quant::rng::Mode::Counter ? "counter" : "mt19937") << "\""
-                              << ",\"threads\":" << threads_used
-                              << "}\n";
+                              << ",\"ci_high\":" << res.estimate.ci_high << ",\"paths\":" << p.num_paths
+                              << ",\"seed\":" << p.seed << ",\"antithetic\":" << (p.antithetic ? 1 : 0)
+                              << ",\"sampler\":\""
+                              << (p.qmc == quant::mc::McParams::Qmc::None
+                                      ? "prng"
+                                      : (p.qmc == quant::mc::McParams::Qmc::Sobol ? "sobol"
+                                                                                  : "sobol_scrambled"))
+                              << "\""
+                              << ",\"bridge\":\""
+                              << (p.bridge == quant::mc::McParams::Bridge::None ? "none" : "bb") << "\""
+                              << ",\"steps\":" << p.num_steps << ",\"rng\":\""
+                              << (p.rng == quant::rng::Mode::Counter ? "counter" : "mt19937") << "\""
+                              << ",\"threads\":" << threads_used << "}\n";
                 } else {
                     print_mc_result(res, false, show_ci);
                 }
@@ -534,7 +559,8 @@ int main(int argc, char** argv) {
         }
         if (method == "pde") {
             if (argc < 17) {
-                std::cerr << "barrier pde <call|put> <up|down> <in|out> <S> <K> <B> <rebate> <r> <q> <sigma> <T> <space_nodes> <time_steps> <smax_mult> [--json]\n";
+                std::cerr << "barrier pde <call|put> <up|down> <in|out> <S> <K> <B> <rebate> <r> <q> <sigma> "
+                             "<T> <space_nodes> <time_steps> <smax_mult> [--json]\n";
                 return 1;
             }
             try {
@@ -566,14 +592,17 @@ int main(int argc, char** argv) {
                 bool json = false;
                 for (int idx = 17; idx < argc; ++idx) {
                     std::string flag = argv[idx];
-                    if (flag == "--json") json = true; else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
+                    if (flag == "--json")
+                        json = true;
+                    else {
+                        std::cerr << "Unknown flag " << flag << "\n";
+                        return 1;
+                    }
                 }
                 if (json) {
                     auto gres = quant::pde::price_barrier_crank_nicolson_greeks(p, opt);
-                    std::cout << "{\"price\":" << gres.price
-                              << ",\"delta\":" << gres.delta
-                              << ",\"gamma\":" << gres.gamma
-                              << "}\n";
+                    std::cout << "{\"price\":" << gres.price << ",\"delta\":" << gres.delta
+                              << ",\"gamma\":" << gres.gamma << "}\n";
                 } else {
                     double value = quant::pde::price_barrier_crank_nicolson(p, opt);
                     std::cout << value << "\n";
@@ -604,15 +633,13 @@ int main(int argc, char** argv) {
                 std::cerr << ex.what() << "\n";
                 return 1;
             }
-            quant::american::Params base{
-                .spot = std::atof(argv[4]),
-                .strike = std::atof(argv[5]),
-                .rate = std::atof(argv[6]),
-                .dividend = std::atof(argv[7]),
-                .vol = std::atof(argv[8]),
-                .time = std::atof(argv[9]),
-                .type = opt
-            };
+            quant::american::Params base{.spot = std::atof(argv[4]),
+                                         .strike = std::atof(argv[5]),
+                                         .rate = std::atof(argv[6]),
+                                         .dividend = std::atof(argv[7]),
+                                         .vol = std::atof(argv[8]),
+                                         .time = std::atof(argv[9]),
+                                         .type = opt};
             int steps = std::max(1, std::atoi(argv[10]));
             bool json = false;
             for (int idx = 11; idx < argc; ++idx) {
@@ -630,7 +657,8 @@ int main(int argc, char** argv) {
         }
         if (method == "psor") {
             if (argc < 15) {
-                std::cerr << "american psor <call|put> <S> <K> <r> <q> <sigma> <T> <M> <N> <SmaxMult> [logspace:0|1] [neumann:0|1] [stretch] [omega] [max_iter] [tol] [--json]\n";
+                std::cerr << "american psor <call|put> <S> <K> <r> <q> <sigma> <T> <M> <N> <SmaxMult> "
+                             "[logspace:0|1] [neumann:0|1] [stretch] [omega] [max_iter] [tol] [--json]\n";
                 return 1;
             }
             quant::OptionType opt;
@@ -641,15 +669,13 @@ int main(int argc, char** argv) {
                 return 1;
             }
             quant::american::PsorParams params{
-                .base = {
-                    .spot = std::atof(argv[4]),
-                    .strike = std::atof(argv[5]),
-                    .rate = std::atof(argv[6]),
-                    .dividend = std::atof(argv[7]),
-                    .vol = std::atof(argv[8]),
-                    .time = std::atof(argv[9]),
-                    .type = opt
-                },
+                .base = {.spot = std::atof(argv[4]),
+                         .strike = std::atof(argv[5]),
+                         .rate = std::atof(argv[6]),
+                         .dividend = std::atof(argv[7]),
+                         .vol = std::atof(argv[8]),
+                         .time = std::atof(argv[9]),
+                         .type = opt},
                 .grid = quant::pde::GridSpec{std::atoi(argv[10]), std::atoi(argv[11]), std::atof(argv[12])},
                 .log_space = true,
                 .upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann,
@@ -657,8 +683,7 @@ int main(int argc, char** argv) {
                 .omega = 1.5,
                 .max_iterations = 8000,
                 .tolerance = 1e-8,
-                .use_rannacher = true
-            };
+                .use_rannacher = true};
             int idx = 13;
             if (argc > idx) {
                 params.log_space = std::atoi(argv[idx]) != 0;
@@ -666,8 +691,8 @@ int main(int argc, char** argv) {
             }
             if (argc > idx) {
                 params.upper_boundary = (std::atoi(argv[idx]) != 0)
-                    ? quant::pde::PdeParams::UpperBoundary::Neumann
-                    : quant::pde::PdeParams::UpperBoundary::Dirichlet;
+                                            ? quant::pde::PdeParams::UpperBoundary::Neumann
+                                            : quant::pde::PdeParams::UpperBoundary::Dirichlet;
                 ++idx;
             }
             if (argc > idx) {
@@ -689,7 +714,8 @@ int main(int argc, char** argv) {
             bool json = false;
             for (int flag_idx = idx; flag_idx < argc; ++flag_idx) {
                 std::string flag = argv[flag_idx];
-                if (flag == "--json") json = true;
+                if (flag == "--json")
+                    json = true;
                 else {
                     std::cerr << "Unknown flag " << flag << "\n";
                     return 1;
@@ -701,7 +727,8 @@ int main(int argc, char** argv) {
         }
         if (method == "lsmc") {
             if (argc < 12) {
-                std::cerr << "american lsmc <call|put> <S> <K> <r> <q> <sigma> <T> <paths> <steps> <seed> [antithetic:0|1] [--json]\n";
+                std::cerr << "american lsmc <call|put> <S> <K> <r> <q> <sigma> <T> <paths> <steps> <seed> "
+                             "[antithetic:0|1] [--json]\n";
                 return 1;
             }
             quant::OptionType opt;
@@ -711,21 +738,17 @@ int main(int argc, char** argv) {
                 std::cerr << ex.what() << "\n";
                 return 1;
             }
-            quant::american::LsmcParams params{
-                .base = {
-                    .spot = std::atof(argv[4]),
-                    .strike = std::atof(argv[5]),
-                    .rate = std::atof(argv[6]),
-                    .dividend = std::atof(argv[7]),
-                    .vol = std::atof(argv[8]),
-                    .time = std::atof(argv[9]),
-                    .type = opt
-                },
-                .num_paths = static_cast<std::uint64_t>(std::atoll(argv[10])),
-                .seed = static_cast<std::uint64_t>(std::atoll(argv[12])),
-                .num_steps = std::max(1, std::atoi(argv[11])),
-                .antithetic = false
-            };
+            quant::american::LsmcParams params{.base = {.spot = std::atof(argv[4]),
+                                                        .strike = std::atof(argv[5]),
+                                                        .rate = std::atof(argv[6]),
+                                                        .dividend = std::atof(argv[7]),
+                                                        .vol = std::atof(argv[8]),
+                                                        .time = std::atof(argv[9]),
+                                                        .type = opt},
+                                               .num_paths = static_cast<std::uint64_t>(std::atoll(argv[10])),
+                                               .seed = static_cast<std::uint64_t>(std::atoll(argv[12])),
+                                               .num_steps = std::max(1, std::atoi(argv[11])),
+                                               .antithetic = false};
             int idx = 13;
             if (argc > idx && !starts_with_dash(argv[idx])) {
                 params.antithetic = std::atoi(argv[idx]) != 0;
@@ -734,7 +757,8 @@ int main(int argc, char** argv) {
             bool json = false;
             for (int flag_idx = idx; flag_idx < argc; ++flag_idx) {
                 std::string flag = argv[flag_idx];
-                if (flag == "--json") json = true;
+                if (flag == "--json")
+                    json = true;
                 else {
                     std::cerr << "Unknown flag " << flag << "\n";
                     return 1;
@@ -748,7 +772,8 @@ int main(int argc, char** argv) {
         return 1;
     } else if (engine == "pde") {
         if (argc < 12) {
-            std::cerr << "pde <S> <K> <r> <q> <sigma> <T> <call|put> <M> <N> <SmaxMult> [logspace:0|1] [neumann:0|1] [stretch] [theta:0|1] [rannacher:0|1] [--json]\n";
+            std::cerr << "pde <S> <K> <r> <q> <sigma> <T> <call|put> <M> <N> <SmaxMult> [logspace:0|1] "
+                         "[neumann:0|1] [stretch] [theta:0|1] [rannacher:0|1] [--json]\n";
             return 1;
         }
         quant::pde::PdeParams pp{};
@@ -770,9 +795,8 @@ int main(int argc, char** argv) {
             ++idx;
         }
         if (argc > idx && !starts_with_dash(argv[idx])) {
-            pp.upper_boundary = (std::atoi(argv[idx]) != 0)
-                ? quant::pde::PdeParams::UpperBoundary::Neumann
-                : quant::pde::PdeParams::UpperBoundary::Dirichlet;
+            pp.upper_boundary = (std::atoi(argv[idx]) != 0) ? quant::pde::PdeParams::UpperBoundary::Neumann
+                                                            : quant::pde::PdeParams::UpperBoundary::Dirichlet;
             ++idx;
         }
         if (argc > idx && !starts_with_dash(argv[idx])) {
@@ -793,7 +817,8 @@ int main(int argc, char** argv) {
         bool json = false;
         for (int flag_idx = idx; flag_idx < argc; ++flag_idx) {
             std::string flag = argv[flag_idx];
-            if (flag == "--json") json = true;
+            if (flag == "--json")
+                json = true;
             else {
                 std::cerr << "Unknown flag " << flag << "\n";
                 return 1;
@@ -802,8 +827,7 @@ int main(int argc, char** argv) {
 
         quant::pde::PdeResult res = quant::pde::price_crank_nicolson(pp);
         if (json) {
-            std::cout << "{\"price\":" << res.price
-                      << ",\"delta\":" << res.delta
+            std::cout << "{\"price\":" << res.price << ",\"delta\":" << res.delta
                       << ",\"gamma\":" << res.gamma;
             if (res.theta.has_value()) {
                 std::cout << ",\"theta\":" << *res.theta;
@@ -826,105 +850,125 @@ int main(int argc, char** argv) {
         }
         std::string kind = argv[2];
         std::string type = argv[3];
-        quant::digital::Params p{
-            .spot = std::atof(argv[4]),
-            .strike = std::atof(argv[5]),
-            .rate = std::atof(argv[6]),
-            .dividend = std::atof(argv[7]),
-            .vol = std::atof(argv[8]),
-            .time = std::atof(argv[9]),
-            .call = (type == "call")
-        };
+        quant::digital::Params p{.spot = std::atof(argv[4]),
+                                 .strike = std::atof(argv[5]),
+                                 .rate = std::atof(argv[6]),
+                                 .dividend = std::atof(argv[7]),
+                                 .vol = std::atof(argv[8]),
+                                 .time = std::atof(argv[9]),
+                                 .call = (type == "call")};
         bool json = false;
         for (int idx = 10; idx < argc; ++idx) {
             std::string flag = argv[idx];
-            if (flag == "--json") json = true; else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
+            if (flag == "--json")
+                json = true;
+            else {
+                std::cerr << "Unknown flag " << flag << "\n";
+                return 1;
+            }
         }
-        quant::digital::Type t = (kind == "cash") ? quant::digital::Type::CashOrNothing : quant::digital::Type::AssetOrNothing;
+        quant::digital::Type t =
+            (kind == "cash") ? quant::digital::Type::CashOrNothing : quant::digital::Type::AssetOrNothing;
         double price = quant::digital::price_bs(p, t);
         print_scalar(price, json);
         return 0;
     } else if (engine == "asian") {
         if (argc < 15) {
-            std::cerr << "asian <arith|geom> <fixed|float> <S> <K> <r> <q> <sigma> <T> <paths> <steps> <seed> [--no_cv] [--json]\n";
+            std::cerr << "asian <arith|geom> <fixed|float> <S> <K> <r> <q> <sigma> <T> <paths> <steps> "
+                         "<seed> [--no_cv] [--json]\n";
             return 1;
         }
         std::string avg = argv[2];
         std::string pay = argv[3];
-        quant::asian::McParams p{
-            .spot = std::atof(argv[4]),
-            .strike = std::atof(argv[5]),
-            .rate = std::atof(argv[6]),
-            .dividend = std::atof(argv[7]),
-            .vol = std::atof(argv[8]),
-            .time = std::atof(argv[9]),
-            .num_paths = static_cast<std::uint64_t>(std::atoll(argv[10])),
-            .seed = static_cast<std::uint64_t>(std::atoll(argv[12])),
-            .num_steps = std::max(1, std::atoi(argv[11])),
-            .antithetic = true,
-            .use_geometric_cv = true,
-            .payoff = (pay == "fixed") ? quant::asian::Payoff::FixedStrike : quant::asian::Payoff::FloatingStrike,
-            .avg = (avg == "arith") ? quant::asian::Average::Arithmetic : quant::asian::Average::Geometric
-        };
+        quant::asian::McParams p{.spot = std::atof(argv[4]),
+                                 .strike = std::atof(argv[5]),
+                                 .rate = std::atof(argv[6]),
+                                 .dividend = std::atof(argv[7]),
+                                 .vol = std::atof(argv[8]),
+                                 .time = std::atof(argv[9]),
+                                 .num_paths = static_cast<std::uint64_t>(std::atoll(argv[10])),
+                                 .seed = static_cast<std::uint64_t>(std::atoll(argv[12])),
+                                 .num_steps = std::max(1, std::atoi(argv[11])),
+                                 .antithetic = true,
+                                 .use_geometric_cv = true,
+                                 .payoff = (pay == "fixed") ? quant::asian::Payoff::FixedStrike
+                                                            : quant::asian::Payoff::FloatingStrike,
+                                 .avg = (avg == "arith") ? quant::asian::Average::Arithmetic
+                                                         : quant::asian::Average::Geometric};
         bool json = false;
         for (int idx = 13; idx < argc; ++idx) {
             std::string flag = argv[idx];
-            if (flag == "--no_cv") p.use_geometric_cv = false;
-            else if (flag == "--json") json = true;
-            else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
+            if (flag == "--no_cv")
+                p.use_geometric_cv = false;
+            else if (flag == "--json")
+                json = true;
+            else {
+                std::cerr << "Unknown flag " << flag << "\n";
+                return 1;
+            }
         }
         auto res = quant::asian::price_mc(p);
         if (json) {
             std::cout << "{\"price\":" << res.value << ",\"std_error\":" << res.std_error
                       << ",\"ci_low\":" << res.ci_low << ",\"ci_high\":" << res.ci_high << "}\n";
         } else {
-            std::cout << res.value << " (se=" << res.std_error << ", 95% CI=[" << res.ci_low << ", " << res.ci_high << "])\n";
+            std::cout << res.value << " (se=" << res.std_error << ", 95% CI=[" << res.ci_low << ", "
+                      << res.ci_high << "])\n";
         }
         return 0;
     } else if (engine == "lookback") {
         if (argc < 14) {
-            std::cerr << "lookback <fixed|float> <call|put> <S> <K> <r> <q> <sigma> <T> <paths> <steps> <seed> [--no_anti] [--json]\n";
+            std::cerr << "lookback <fixed|float> <call|put> <S> <K> <r> <q> <sigma> <T> <paths> <steps> "
+                         "<seed> [--no_anti] [--json]\n";
             return 1;
         }
         std::string kind = argv[2];
         quant::OptionType opt = parse_option(argv[3]);
-        quant::lookback::McParams p{
-            .spot = std::atof(argv[4]),
-            .strike = std::atof(argv[5]),
-            .rate = std::atof(argv[6]),
-            .dividend = std::atof(argv[7]),
-            .vol = std::atof(argv[8]),
-            .time = std::atof(argv[9]),
-            .num_paths = static_cast<std::uint64_t>(std::atoll(argv[10])),
-            .seed = static_cast<std::uint64_t>(std::atoll(argv[12])),
-            .num_steps = std::max(1, std::atoi(argv[11])),
-            .antithetic = true,
-            .use_bridge = true,
-            .opt = opt,
-            .type = (kind == "fixed") ? quant::lookback::Type::FixedStrike : quant::lookback::Type::FloatingStrike
-        };
+        quant::lookback::McParams p{.spot = std::atof(argv[4]),
+                                    .strike = std::atof(argv[5]),
+                                    .rate = std::atof(argv[6]),
+                                    .dividend = std::atof(argv[7]),
+                                    .vol = std::atof(argv[8]),
+                                    .time = std::atof(argv[9]),
+                                    .num_paths = static_cast<std::uint64_t>(std::atoll(argv[10])),
+                                    .seed = static_cast<std::uint64_t>(std::atoll(argv[12])),
+                                    .num_steps = std::max(1, std::atoi(argv[11])),
+                                    .antithetic = true,
+                                    .use_bridge = true,
+                                    .opt = opt,
+                                    .type = (kind == "fixed") ? quant::lookback::Type::FixedStrike
+                                                              : quant::lookback::Type::FloatingStrike};
         bool json = false;
         for (int idx = 13; idx < argc; ++idx) {
             std::string flag = argv[idx];
-            if (flag == "--no_anti") p.antithetic = false;
-            else if (flag == "--json") json = true;
-            else { std::cerr << "Unknown flag " << flag << "\n"; return 1; }
+            if (flag == "--no_anti")
+                p.antithetic = false;
+            else if (flag == "--json")
+                json = true;
+            else {
+                std::cerr << "Unknown flag " << flag << "\n";
+                return 1;
+            }
         }
         auto res = quant::lookback::price_mc(p);
         if (json) {
             std::cout << "{\"price\":" << res.value << ",\"std_error\":" << res.std_error
                       << ",\"ci_low\":" << res.ci_low << ",\"ci_high\":" << res.ci_high << "}\n";
         } else {
-            std::cout << res.value << " (se=" << res.std_error << ", 95% CI=[" << res.ci_low << ", " << res.ci_high << "])\n";
+            std::cout << res.value << " (se=" << res.std_error << ", 95% CI=[" << res.ci_low << ", "
+                      << res.ci_high << "])\n";
         }
         return 0;
     } else if (engine == "heston") {
         if (argc < 15) {
-            std::cerr << "heston <kappa> <theta> <sigma_v> <rho> <v0> <S> <K> <r> <q> <T> <paths> <steps> <seed> [--mc] [--json]\n";
+            std::cerr << "heston <kappa> <theta> <sigma_v> <rho> <v0> <S> <K> <r> <q> <T> <paths> <steps> "
+                         "<seed> [--mc] [--json]\n";
             return 1;
         }
-        quant::heston::Params h{std::atof(argv[2]), std::atof(argv[3]), std::atof(argv[4]), std::atof(argv[5]), std::atof(argv[6])};
-        quant::heston::MarketParams mkt{std::atof(argv[7]), std::atof(argv[8]), std::atof(argv[9]), std::atof(argv[10]), std::atof(argv[11])};
+        quant::heston::Params h{std::atof(argv[2]), std::atof(argv[3]), std::atof(argv[4]),
+                                std::atof(argv[5]), std::atof(argv[6])};
+        quant::heston::MarketParams mkt{std::atof(argv[7]), std::atof(argv[8]), std::atof(argv[9]),
+                                        std::atof(argv[10]), std::atof(argv[11])};
         std::uint64_t paths = static_cast<std::uint64_t>(std::atoll(argv[12]));
         int steps = std::max(1, std::atoi(argv[13]));
         std::uint64_t seed = static_cast<std::uint64_t>(std::atoll(argv[14]));
@@ -970,35 +1014,31 @@ int main(int argc, char** argv) {
         const double err = std::abs(res.price - analytic);
         const double tolerance = std::max(1e-3, 5.0 * res.std_error);
         if (err > tolerance) {
-            std::cerr << "warning: Heston MC deviates from analytic price by "
-                      << err << " (tolerance=" << tolerance << "); treat MC output as diagnostic only.\n";
+            std::cerr << "warning: Heston MC deviates from analytic price by " << err
+                      << " (tolerance=" << tolerance << "); treat MC output as diagnostic only.\n";
         }
         const double half_width = quant::math::kZ95 * res.std_error;
         const double ci_low = res.price - half_width;
         const double ci_high = res.price + half_width;
         if (json) {
-            std::cout << "{\"price\":" << res.price
-                      << ",\"std_error\":" << res.std_error
-                      << ",\"ci_low\":" << ci_low
-                      << ",\"ci_high\":" << ci_high
-                      << ",\"analytic\":" << analytic
-                      << ",\"abs_error\":" << err
-                      << ",\"rng\":\"" << (mc_params.rng == quant::rng::Mode::Counter ? "counter" : "mt19937") << "\""
-                      << ",\"scheme\":\"" << (mc_params.scheme == quant::heston::McParams::Scheme::QE ? "qe" : "euler") << "\""
+            std::cout << "{\"price\":" << res.price << ",\"std_error\":" << res.std_error
+                      << ",\"ci_low\":" << ci_low << ",\"ci_high\":" << ci_high
+                      << ",\"analytic\":" << analytic << ",\"abs_error\":" << err << ",\"rng\":\""
+                      << (mc_params.rng == quant::rng::Mode::Counter ? "counter" : "mt19937") << "\""
+                      << ",\"scheme\":\""
+                      << (mc_params.scheme == quant::heston::McParams::Scheme::QE ? "qe" : "euler") << "\""
                       << "}\n";
         } else {
             std::cout << res.price;
             if (show_ci) {
-                std::cout << " +/- " << res.std_error
-                          << " (95% CI=[" << ci_low << ", " << ci_high << "])";
+                std::cout << " +/- " << res.std_error << " (95% CI=[" << ci_low << ", " << ci_high << "])";
             } else {
                 std::cout << " (se=" << res.std_error << ")";
             }
-            std::cout << " (analytic=" << analytic
-                      << ", |err|=" << err
+            std::cout << " (analytic=" << analytic << ", |err|=" << err
                       << ", rng=" << (mc_params.rng == quant::rng::Mode::Counter ? "counter" : "mt19937")
-                      << ", scheme=" << (mc_params.scheme == quant::heston::McParams::Scheme::QE ? "QE" : "Euler")
-                      << ")\n";
+                      << ", scheme="
+                      << (mc_params.scheme == quant::heston::McParams::Scheme::QE ? "QE" : "Euler") << ")\n";
         }
         return 0;
     } else if (engine == "risk") {
@@ -1007,7 +1047,10 @@ int main(int argc, char** argv) {
             return 1;
         }
         std::string method = argv[2];
-        if (method != "gbm") { std::cerr << "Unknown risk method\n"; return 1; }
+        if (method != "gbm") {
+            std::cerr << "Unknown risk method\n";
+            return 1;
+        }
         double S = std::atof(argv[3]);
         double mu = std::atof(argv[4]);
         double sig = std::atof(argv[5]);
@@ -1017,10 +1060,20 @@ int main(int argc, char** argv) {
         unsigned long seed = static_cast<unsigned long>(std::atol(argv[9]));
         double alpha = std::atof(argv[10]);
         bool json = false;
-        for (int idx = 11; idx < argc; ++idx) { std::string flag = argv[idx]; if (flag == "--json") json = true; else { std::cerr << "Unknown flag " << flag << "\n"; return 1; } }
+        for (int idx = 11; idx < argc; ++idx) {
+            std::string flag = argv[idx];
+            if (flag == "--json")
+                json = true;
+            else {
+                std::cerr << "Unknown flag " << flag << "\n";
+                return 1;
+            }
+        }
         auto res = quant::risk::var_cvar_gbm(S, mu, sig, T, pos, sims, seed, alpha);
-        if (json) std::cout << "{\"var\":" << res.var << ",\"cvar\":" << res.cvar << "}\n";
-        else std::cout << "VaR=" << res.var << ", CVaR=" << res.cvar << "\n";
+        if (json)
+            std::cout << "{\"var\":" << res.var << ",\"cvar\":" << res.cvar << "}\n";
+        else
+            std::cout << "VaR=" << res.var << ", CVaR=" << res.cvar << "\n";
         return 0;
     }
     std::cerr << "Unknown engine: " << engine << "\n";

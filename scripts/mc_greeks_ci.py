@@ -17,7 +17,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from manifest_utils import ARTIFACTS_ROOT, update_run
 
 
@@ -60,7 +59,9 @@ def main() -> None:
     ap.add_argument("--paths", type=int, default=200_000, help="Number of MC paths")
     ap.add_argument("--seed", type=int, default=2025, help="RNG seed")
     ap.add_argument("--steps", type=int, default=1, help="Time steps per path")
-    ap.add_argument("--fast", action="store_true", help="Halve the number of paths for CI pipelines")
+    ap.add_argument(
+        "--fast", action="store_true", help="Halve the number of paths for CI pipelines"
+    )
     ap.add_argument(
         "--output",
         default=str(ARTIFACTS_ROOT / "mc_greeks_ci.png"),
@@ -108,7 +109,9 @@ def main() -> None:
     result = _run_cli_json(cli, cmd)
     greeks = result.get("greeks", {})
     if not greeks:
-        raise SystemExit("quant_cli did not return Greeks payload; ensure build enables Greeks")
+        raise SystemExit(
+            "quant_cli did not return Greeks payload; ensure build enables Greeks"
+        )
 
     records = []
     ordering = [
@@ -174,4 +177,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

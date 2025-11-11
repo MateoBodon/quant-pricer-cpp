@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
 #include "quant/black_scholes.hpp"
 #include <cmath>
+#include <gtest/gtest.h>
 
 using namespace quant::bs;
 
@@ -47,8 +47,8 @@ TEST(BlackScholesGreeks, SignsAndKnown) {
 
     double dc = delta_call(S, K, r, q, sigma, T);
     double dp = delta_put(S, K, r, q, sigma, T);
-    double g  = gamma(S, K, r, q, sigma, T);
-    double v  = vega(S, K, r, q, sigma, T);
+    double g = gamma(S, K, r, q, sigma, T);
+    double v = vega(S, K, r, q, sigma, T);
     double thc = theta_call(S, K, r, q, sigma, T);
     double thp = theta_put(S, K, r, q, sigma, T);
     double rhc = rho_call(S, K, r, q, sigma, T);
@@ -56,8 +56,8 @@ TEST(BlackScholesGreeks, SignsAndKnown) {
 
     EXPECT_GT(dc, 0.0);
     EXPECT_LT(dp, 0.0);
-    EXPECT_GT(g,  0.0);
-    EXPECT_GT(v,  0.0);
+    EXPECT_GT(g, 0.0);
+    EXPECT_GT(v, 0.0);
     // Theta: calls typically negative (time decay). Puts can be negative too depending on params.
     EXPECT_LT(thc, 0.0);
     EXPECT_GT(rhc, 0.0);
@@ -88,5 +88,3 @@ TEST(BlackScholes, ImpliedVolCallPut) {
     EXPECT_NEAR(ivc, sigma, 1e-6);
     EXPECT_NEAR(ivp, sigma, 1e-6);
 }
-
-

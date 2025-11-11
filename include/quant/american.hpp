@@ -54,9 +54,9 @@ struct LsmcParams {
 };
 
 struct LsmcDiagnostics {
-    std::vector<std::size_t> itm_counts;          // number of truly ITM paths per exercise date
-    std::vector<std::size_t> regression_counts;   // number of samples entering regression per date
-    std::vector<double> condition_numbers;        // condition number of normal equations matrix per date
+    std::vector<std::size_t> itm_counts;        // number of truly ITM paths per exercise date
+    std::vector<std::size_t> regression_counts; // number of samples entering regression per date
+    std::vector<double> condition_numbers;      // condition number of normal equations matrix per date
 };
 
 struct LsmcResult {
@@ -74,6 +74,6 @@ struct Greeks {
 
 // Compute Greeks via bump-and-reprice around spot using PSOR as pricer.
 // rel_bump is a small relative bump (e.g., 1e-3)
-Greeks greeks_psor_bump( PsorParams params, double rel_bump );
+Greeks greeks_psor_bump(PsorParams params, double rel_bump);
 
 } // namespace quant::american

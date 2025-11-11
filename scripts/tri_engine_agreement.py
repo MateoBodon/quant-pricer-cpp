@@ -18,7 +18,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
 
 
@@ -128,8 +127,12 @@ def build_dataset(
     rows = []
     for strike in strikes:
         bs_price = _bs_call(spot, strike, r, q, sigma, T)
-        mc_price, mc_se = _mc_price(quant_cli, spot, strike, r, q, sigma, T, paths, seed, steps)
-        pde_price = _pde_price(quant_cli, spot, strike, r, q, sigma, T, nodes, nodes - 1)
+        mc_price, mc_se = _mc_price(
+            quant_cli, spot, strike, r, q, sigma, T, paths, seed, steps
+        )
+        pde_price = _pde_price(
+            quant_cli, spot, strike, r, q, sigma, T, nodes, nodes - 1
+        )
         rows.append(
             {
                 "strike": strike,
@@ -146,15 +149,29 @@ def build_dataset(
 
 def plot(df: pd.DataFrame, out_path: Path) -> None:
     fig, axes = plt.subplots(2, 1, figsize=(6.5, 6.5), sharex=True)
-    axes[0].plot(df["strike"], df["bs_price"], label="Analytic (BS)", color="#2ca02c", linewidth=2)
-    axes[0].plot(df["strike"], df["mc_price"], "o-", label="Monte Carlo", color="#1f77b4")
-    axes[0].plot(df["strike"], df["pde_price"], "s--", label="PDE (CN)", color="#ff7f0e")
+    axes[0].plot(
+        df["strike"],
+        df["bs_price"],
+        label="Analytic (BS)",
+        color="#2ca02c",
+        linewidth=2,
+    )
+    axes[0].plot(
+        df["strike"], df["mc_price"], "o-", label="Monte Carlo", color="#1f77b4"
+    )
+    axes[0].plot(
+        df["strike"], df["pde_price"], "s--", label="PDE (CN)", color="#ff7f0e"
+    )
     axes[0].set_ylabel("Call price")
     axes[0].grid(True, ls=":", alpha=0.4)
     axes[0].legend()
 
-    axes[1].semilogy(df["strike"], df["mc_abs_error"], "o-", color="#1f77b4", label="|MC - BS|")
-    axes[1].semilogy(df["strike"], df["pde_abs_error"], "s--", color="#ff7f0e", label="|PDE - BS|")
+    axes[1].semilogy(
+        df["strike"], df["mc_abs_error"], "o-", color="#1f77b4", label="|MC - BS|"
+    )
+    axes[1].semilogy(
+        df["strike"], df["pde_abs_error"], "s--", color="#ff7f0e", label="|PDE - BS|"
+    )
     axes[1].set_xlabel("Strike")
     axes[1].set_ylabel("Absolute error")
     axes[1].grid(True, which="both", ls=":", alpha=0.4)
@@ -181,9 +198,15 @@ def plot(df: pd.DataFrame, out_path: Path) -> None:
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quant-cli", required=True, help="Path to quant_cli executable")
-    ap.add_argument("--output", type=Path, default=ARTIFACTS_ROOT / "tri_engine_agreement.png")
-    ap.add_argument("--csv", type=Path, default=ARTIFACTS_ROOT / "tri_engine_agreement.csv")
-    ap.add_argument("--fast", action="store_true", help="Reduce paths/grid for CI runtime")
+    ap.add_argument(
+        "--output", type=Path, default=ARTIFACTS_ROOT / "tri_engine_agreement.png"
+    )
+    ap.add_argument(
+        "--csv", type=Path, default=ARTIFACTS_ROOT / "tri_engine_agreement.csv"
+    )
+    ap.add_argument(
+        "--fast", action="store_true", help="Reduce paths/grid for CI runtime"
+    )
     ap.add_argument("--spot", type=float, default=100.0)
     ap.add_argument("--rate", type=float, default=0.02)
     ap.add_argument("--div", type=float, default=0.0)

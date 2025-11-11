@@ -56,18 +56,24 @@ def main(argv: list[str] | None = None) -> None:
 
     files = gather_files(artifacts_dir, allowed_exts)
     if not files:
-        raise SystemExit(f"No files with extensions {sorted(allowed_exts)} under {artifacts_dir}")
+        raise SystemExit(
+            f"No files with extensions {sorted(allowed_exts)} under {artifacts_dir}"
+        )
 
     output_path = args.output.resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
+    with zipfile.ZipFile(
+        output_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+    ) as zf:
         for path in files:
             arcname = Path("artifacts") / path.relative_to(artifacts_dir)
             zf.write(path, arcname)
 
     total_bytes = sum(f.stat().st_size for f in files)
-    print(f"[validation-pack] wrote {output_path} ({len(files)} files, {total_bytes} bytes)")
+    print(
+        f"[validation-pack] wrote {output_path} ({len(files)} files, {total_bytes} bytes)"
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover

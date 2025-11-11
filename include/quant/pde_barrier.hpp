@@ -19,8 +19,7 @@ struct BarrierPdeParams {
 
 // Price barrier option via CN in log-space.
 // Returns present value only (price).
-double price_barrier_crank_nicolson(const BarrierPdeParams& params,
-                                    ::quant::OptionType opt);
+double price_barrier_crank_nicolson(const BarrierPdeParams& params, ::quant::OptionType opt);
 
 struct BarrierPdeGreeksResult {
     double price;

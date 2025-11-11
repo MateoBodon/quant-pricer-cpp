@@ -35,5 +35,4 @@ struct McStatistic {
 
 McStatistic price_mc(const McParams& p);
 
-}
-
+} // namespace quant::asian

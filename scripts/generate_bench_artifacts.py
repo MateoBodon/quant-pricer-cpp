@@ -14,9 +14,8 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 from manifest_utils import update_run
 
 
@@ -25,7 +24,9 @@ def load_benchmarks(path: Path) -> List[Dict[str, Any]]:
     return data.get("benchmarks", [])
 
 
-def parse_mc(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def parse_mc(
+    benches: List[Dict[str, Any]]
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     throughput_rows: List[Dict[str, Any]] = []
     rmse_rows: List[Dict[str, Any]] = []
     equal_rows: List[Dict[str, Any]] = []
@@ -63,7 +64,9 @@ def parse_mc(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame,
     if not throughput_df.empty:
         base = max(float(throughput_df["paths_per_sec"].iloc[0]), 1e-9)
         throughput_df["speedup"] = throughput_df["paths_per_sec"] / base
-        throughput_df["efficiency"] = throughput_df["speedup"] / throughput_df["threads"]
+        throughput_df["efficiency"] = (
+            throughput_df["speedup"] / throughput_df["threads"]
+        )
     rmse_df = pd.DataFrame(rmse_rows)
     equal_df = pd.DataFrame(equal_rows)
     if not equal_df.empty:
@@ -73,7 +76,9 @@ def parse_mc(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame,
     return throughput_df, rmse_df, equal_df
 
 
-def parse_pde(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def parse_pde(
+    benches: List[Dict[str, Any]]
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     wall_rows: List[Dict[str, Any]] = []
     psor_rows: List[Dict[str, Any]] = []
     order_rows: List[Dict[str, Any]] = []
@@ -115,12 +120,20 @@ def parse_pde(benches: List[Dict[str, Any]]) -> tuple[pd.DataFrame, pd.DataFrame
 
 def plot_throughput(df: pd.DataFrame, out_path: Path) -> None:
     fig, ax = plt.subplots(figsize=(5.5, 3.3))
-    ax.plot(df["threads"], df["paths_per_sec"] / 1e6, marker="o", color="#1f77b4", label="Measured")
+    ax.plot(
+        df["threads"],
+        df["paths_per_sec"] / 1e6,
+        marker="o",
+        color="#1f77b4",
+        label="Measured",
+    )
     if not df.empty:
         base_threads = float(df["threads"].iloc[0])
         base_val = float(df["paths_per_sec"].iloc[0]) / 1e6
         ideal = base_val * (df["threads"] / base_threads)
-        ax.plot(df["threads"], ideal, linestyle="--", color="#949494", label="Ideal linear")
+        ax.plot(
+            df["threads"], ideal, linestyle="--", color="#949494", label="Ideal linear"
+        )
     ax.set_xlabel("Threads")
     ax.set_ylabel("Paths / sec (millions)")
     ax.set_title("Monte Carlo Throughput (OpenMP)")
@@ -156,19 +169,29 @@ def plot_equal_time(df: pd.DataFrame, out_path: Path) -> None:
     if df.empty:
         return
     payoffs = sorted(df["payoff"].unique())
-    fig, axes = plt.subplots(1, len(payoffs), figsize=(6.0 * len(payoffs), 3.5), squeeze=False)
+    fig, axes = plt.subplots(
+        1, len(payoffs), figsize=(6.0 * len(payoffs), 3.5), squeeze=False
+    )
     colors = {"PRNG": "#d62728", "QMC": "#2ca02c"}
     for ax, payoff in zip(axes[0], payoffs):
-        subset = (
-            df[df["payoff"] == payoff]
-            .set_index("method")
-            .reindex(["PRNG", "QMC"])
+        subset = df[df["payoff"] == payoff].set_index("method").reindex(["PRNG", "QMC"])
+        metric = (
+            "time_scaled_error"
+            if "time_scaled_error" in subset.columns
+            else "std_error"
         )
-        metric = "time_scaled_error" if "time_scaled_error" in subset.columns else "std_error"
         values = subset[metric]
-        bars = ax.bar(values.index, values.fillna(0.0), color=[colors.get(m, "#1f77b4") for m in values.index])
+        bars = ax.bar(
+            values.index,
+            values.fillna(0.0),
+            color=[colors.get(m, "#1f77b4") for m in values.index],
+        )
         improvement_text = ""
-        if "PRNG" in subset.index and "QMC" in subset.index and subset[metric].notna().all():
+        if (
+            "PRNG" in subset.index
+            and "QMC" in subset.index
+            and subset[metric].notna().all()
+        ):
             prng = float(subset.at["PRNG", metric])
             qmc = float(subset.at["QMC", metric])
             if prng > 0:

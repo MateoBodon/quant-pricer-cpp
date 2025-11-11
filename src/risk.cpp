@@ -11,25 +11,21 @@
 namespace quant::risk {
 
 VarEs var_cvar_from_pnl(const std::vector<double>& pnl, double alpha) {
-    if (pnl.empty()) return {0.0, 0.0};
+    if (pnl.empty())
+        return {0.0, 0.0};
     std::vector<double> sorted = pnl;
     std::sort(sorted.begin(), sorted.end());
     const std::size_t idx = static_cast<std::size_t>(std::floor((1.0 - alpha) * sorted.size()));
     const double var = -sorted[idx];
     double es_sum = 0.0;
-    for (std::size_t i = 0; i <= idx; ++i) es_sum += -sorted[i];
+    for (std::size_t i = 0; i <= idx; ++i)
+        es_sum += -sorted[i];
     const double cvar = es_sum / static_cast<double>(idx + 1);
     return {var, cvar};
 }
 
-VarEs var_cvar_gbm(double spot,
-                   double mu,
-                   double sigma,
-                   double horizon_years,
-                   double position,
-                   unsigned long num_sims,
-                   unsigned long seed,
-                   double alpha) {
+VarEs var_cvar_gbm(double spot, double mu, double sigma, double horizon_years, double position,
+                   unsigned long num_sims, unsigned long seed, double alpha) {
     pcg64 rng(seed ? seed : 0xDEADBEEF);
     std::normal_distribution<double> normal(0.0, 1.0);
     std::vector<double> pnl;
@@ -45,42 +41,44 @@ VarEs var_cvar_gbm(double spot,
     return var_cvar_from_pnl(pnl, alpha);
 }
 
-VarEs var_cvar_portfolio(const std::vector<double>& mu,
-                         const std::vector<double>& sigma,
-                         const std::vector<double>& corr,
-                         const std::vector<double>& weights,
-                         double horizon_years,
-                         unsigned long num_sims,
-                         unsigned long seed,
-                         double alpha) {
+VarEs var_cvar_portfolio(const std::vector<double>& mu, const std::vector<double>& sigma,
+                         const std::vector<double>& corr, const std::vector<double>& weights,
+                         double horizon_years, unsigned long num_sims, unsigned long seed, double alpha) {
     const std::size_t N = mu.size();
-    if (sigma.size() != N || weights.size() != N) return {0.0, 0.0};
-    if (corr.size() != N * N) return {0.0, 0.0};
+    if (sigma.size() != N || weights.size() != N)
+        return {0.0, 0.0};
+    if (corr.size() != N * N)
+        return {0.0, 0.0};
     // Cholesky of corr
     std::vector<double> L(corr);
     for (std::size_t i = 0; i < N; ++i) {
         for (std::size_t j = 0; j <= i; ++j) {
-            double sum = L[i*N + j];
-            for (std::size_t k = 0; k < j; ++k) sum -= L[i*N + k] * L[j*N + k];
+            double sum = L[i * N + j];
+            for (std::size_t k = 0; k < j; ++k)
+                sum -= L[i * N + k] * L[j * N + k];
             if (i == j) {
-                L[i*N + j] = (sum > 0.0) ? std::sqrt(sum) : 0.0;
+                L[i * N + j] = (sum > 0.0) ? std::sqrt(sum) : 0.0;
             } else {
-                L[i*N + j] = (L[j*N + j] > 0.0) ? (sum / L[j*N + j]) : 0.0;
+                L[i * N + j] = (L[j * N + j] > 0.0) ? (sum / L[j * N + j]) : 0.0;
             }
         }
-        for (std::size_t j = i + 1; j < N; ++j) L[i*N + j] = 0.0;
+        for (std::size_t j = i + 1; j < N; ++j)
+            L[i * N + j] = 0.0;
     }
 
     pcg64 rng(seed ? seed : 0xBADDCAFE);
     std::normal_distribution<double> normal(0.0, 1.0);
-    std::vector<double> pnl; pnl.reserve(num_sims);
+    std::vector<double> pnl;
+    pnl.reserve(num_sims);
     for (unsigned long s = 0; s < num_sims; ++s) {
         std::vector<double> z(N);
-        for (std::size_t i = 0; i < N; ++i) z[i] = normal(rng);
+        for (std::size_t i = 0; i < N; ++i)
+            z[i] = normal(rng);
         // correlate: y = L * z
         std::vector<double> y(N, 0.0);
         for (std::size_t i = 0; i < N; ++i) {
-            for (std::size_t k = 0; k <= i; ++k) y[i] += L[i*N + k] * z[k];
+            for (std::size_t k = 0; k <= i; ++k)
+                y[i] += L[i * N + k] * z[k];
         }
         double pl = 0.0;
         for (std::size_t i = 0; i < N; ++i) {
@@ -111,7 +109,7 @@ static inline double chi2_cdf_complement(double x, double k) {
     const double tail = std::exp(-0.5 * x);
     return std::clamp(tail, 0.0, 1.0);
 }
-}
+} // namespace
 
 BacktestStats kupiec_christoffersen(const std::vector<int>& exceptions, double alpha) {
     BacktestStats out{};
@@ -119,7 +117,9 @@ BacktestStats kupiec_christoffersen(const std::vector<int>& exceptions, double a
     const unsigned long T = static_cast<unsigned long>(exceptions.size());
     out.T = T;
     unsigned long N = 0;
-    for (int e : exceptions) if (e) ++N;
+    for (int e : exceptions)
+        if (e)
+            ++N;
     out.N = N;
     const double pi = static_cast<double>(N) / std::max(1UL, T);
     // Kupiec POF LR = -2 log( ((1-alpha)^{T-N} alpha^N) / ((1-pi)^{T-N} pi^N) )
@@ -133,17 +133,22 @@ BacktestStats kupiec_christoffersen(const std::vector<int>& exceptions, double a
     for (unsigned long t = 1; t < T; ++t) {
         int a = exceptions[t - 1] ? 1 : 0;
         int b = exceptions[t] ? 1 : 0;
-        if (a == 0 && b == 0) ++n00;
-        else if (a == 0 && b == 1) ++n01;
-        else if (a == 1 && b == 0) ++n10;
-        else ++n11;
+        if (a == 0 && b == 0)
+            ++n00;
+        else if (a == 0 && b == 1)
+            ++n01;
+        else if (a == 1 && b == 0)
+            ++n10;
+        else
+            ++n11;
     }
     const double pi0 = (n00 + n01) ? static_cast<double>(n01) / static_cast<double>(n00 + n01) : 0.0;
     const double pi1 = (n10 + n11) ? static_cast<double>(n11) / static_cast<double>(n10 + n11) : 0.0;
-    const double pi_bar = (n01 + n11) ? static_cast<double>(n01 + n11) / static_cast<double>(n00 + n01 + n10 + n11) : 0.0;
-    auto safe_log = [](double x){ return std::log(std::max(1e-12, x)); };
-    const double ll_ind = (n00 + n01) * safe_log(1.0 - pi0) + n01 * safe_log(pi0)
-                        + (n10 + n11) * safe_log(1.0 - pi1) + n11 * safe_log(pi1);
+    const double pi_bar =
+        (n01 + n11) ? static_cast<double>(n01 + n11) / static_cast<double>(n00 + n01 + n10 + n11) : 0.0;
+    auto safe_log = [](double x) { return std::log(std::max(1e-12, x)); };
+    const double ll_ind = (n00 + n01) * safe_log(1.0 - pi0) + n01 * safe_log(pi0) +
+                          (n10 + n11) * safe_log(1.0 - pi1) + n11 * safe_log(pi1);
     const double ll_null = (n00 + n01 + n10 + n11) * safe_log(1.0 - pi_bar) + (n01 + n11) * safe_log(pi_bar);
     out.lr_ind = -2.0 * (ll_null - ll_ind);
     out.p_ind = chi2_cdf_complement(out.lr_ind, 1.0);
@@ -153,20 +158,15 @@ BacktestStats kupiec_christoffersen(const std::vector<int>& exceptions, double a
     return out;
 }
 
-quant::risk::VarEs var_cvar_t(double mu,
-                 double sigma,
-                 double nu,
-                 double horizon_years,
-                 double position,
-                 unsigned long num_sims,
-                 unsigned long seed,
-                 double alpha) {
+quant::risk::VarEs var_cvar_t(double mu, double sigma, double nu, double horizon_years, double position,
+                              unsigned long num_sims, unsigned long seed, double alpha) {
     if (nu <= 2.0) {
         throw std::invalid_argument("Student-t degrees of freedom must exceed 2 for finite variance");
     }
     pcg64 rng(seed ? seed : 0xABCD1234);
     std::student_t_distribution<double> tdist(nu);
-    std::vector<double> pnl; pnl.reserve(num_sims);
+    std::vector<double> pnl;
+    pnl.reserve(num_sims);
     const double scale = sigma * std::sqrt(horizon_years) * std::sqrt((nu - 2.0) / nu);
     const double drift = mu * horizon_years;
     for (unsigned long i = 0; i < num_sims; ++i) {
@@ -179,4 +179,3 @@ quant::risk::VarEs var_cvar_t(double mu,
 }
 
 } // namespace quant::risk
-

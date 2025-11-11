@@ -1,5 +1,5 @@
-#include <algorithm>
 #include "quant/black_scholes.hpp"
+#include <algorithm>
 
 namespace quant::bs {
 
@@ -87,9 +87,9 @@ double theta_call(double S, double K, double r, double q, double sigma, double T
     const double d2v = d2(d1v, sigma, T);
     const double df_r = std::exp(-r * T);
     const double df_q = std::exp(-q * T);
-    const double term1 = - (S * df_q * normal_pdf(d1v) * sigma) / (2.0 * std::sqrt(T));
+    const double term1 = -(S * df_q * normal_pdf(d1v) * sigma) / (2.0 * std::sqrt(T));
     const double term2 = q * S * df_q * normal_cdf(d1v);
-    const double term3 = - r * K * df_r * normal_cdf(d2v);
+    const double term3 = -r * K * df_r * normal_cdf(d2v);
     return term1 + term2 + term3;
 }
 
@@ -102,15 +102,15 @@ double theta_put(double S, double K, double r, double q, double sigma, double T)
         const double df_r = std::exp(-r * T);
         const double itm = forward < K ? 1.0 : 0.0;
         const double payoff = std::max(0.0, K - forward);
-        return df_r * (- (r - q) * forward * itm - r * payoff);
+        return df_r * (-(r - q) * forward * itm - r * payoff);
     }
     const double d1v = d1(S, K, r, q, sigma, T);
     const double d2v = d2(d1v, sigma, T);
     const double df_r = std::exp(-r * T);
     const double df_q = std::exp(-q * T);
-    const double term1 = - (S * df_q * normal_pdf(d1v) * sigma) / (2.0 * std::sqrt(T));
-    const double term2 = - q * S * df_q * normal_cdf(-d1v);
-    const double term3 = + r * K * df_r * normal_cdf(-d2v);
+    const double term1 = -(S * df_q * normal_pdf(d1v) * sigma) / (2.0 * std::sqrt(T));
+    const double term2 = -q * S * df_q * normal_cdf(-d1v);
+    const double term3 = +r * K * df_r * normal_cdf(-d2v);
     return term1 + term2 + term3;
 }
 
@@ -157,17 +157,19 @@ double price_call_with_sigma(double S, double K, double r, double q, double sigm
 double price_put_with_sigma(double S, double K, double r, double q, double sigma, double T) {
     return put_price(S, K, r, q, sigma, T);
 }
-}
+} // namespace
 
 static double implied_vol_bracketed(double S, double K, double r, double q, double T, double target,
                                     bool is_call) {
-    if (T <= 0.0 || S <= 0.0 || K <= 0.0) return std::numeric_limits<double>::quiet_NaN();
+    if (T <= 0.0 || S <= 0.0 || K <= 0.0)
+        return std::numeric_limits<double>::quiet_NaN();
     const double df_r = std::exp(-r * T);
     const double df_q = std::exp(-q * T);
     const double forward = S * df_q / df_r;
-    const double intrinsic = is_call ? std::max(0.0, S * df_q - K * df_r)
-                                     : std::max(0.0, K * df_r - S * df_q);
-    if (target < intrinsic - 1e-14) return std::numeric_limits<double>::quiet_NaN();
+    const double intrinsic =
+        is_call ? std::max(0.0, S * df_q - K * df_r) : std::max(0.0, K * df_r - S * df_q);
+    if (target < intrinsic - 1e-14)
+        return std::numeric_limits<double>::quiet_NaN();
 
     double lo = 1e-6, hi = 5.0;
     auto price_at = [&](double sigma) {
@@ -177,42 +179,73 @@ static double implied_vol_bracketed(double S, double K, double r, double q, doub
 
     double f_lo = price_at(lo) - target;
     double f_hi = price_at(hi) - target;
-    if (f_lo > 0.0) return lo; // essentially zero vol
+    if (f_lo > 0.0)
+        return lo; // essentially zero vol
     int iters = 0;
     while (f_hi < 0.0 && hi < 10.0 && iters < 20) {
         hi *= 1.5;
         f_hi = price_at(hi) - target;
         ++iters;
     }
-    if (f_hi < 0.0) return std::numeric_limits<double>::quiet_NaN();
+    if (f_hi < 0.0)
+        return std::numeric_limits<double>::quiet_NaN();
 
     // Brent's method (simple implementation)
     double a = lo, b = hi, c = hi;
     double fa = f_lo, fb = f_hi, fc = f_hi;
     double d = 0.0, e = 0.0;
     for (int iter = 0; iter < 100; ++iter) {
-        if ((fb > 0 && fc > 0) || (fb < 0 && fc < 0)) { c = a; fc = fa; d = e = b - a; }
-        if (std::abs(fc) < std::abs(fb)) { a = b; b = c; c = a; fa = fb; fb = fc; fc = fa; }
+        if ((fb > 0 && fc > 0) || (fb < 0 && fc < 0)) {
+            c = a;
+            fc = fa;
+            d = e = b - a;
+        }
+        if (std::abs(fc) < std::abs(fb)) {
+            a = b;
+            b = c;
+            c = a;
+            fa = fb;
+            fb = fc;
+            fc = fa;
+        }
         const double tol1 = 2.0 * std::numeric_limits<double>::epsilon() * std::abs(b) + 1e-12;
         const double xm = 0.5 * (c - b);
-        if (std::abs(xm) <= tol1 || fb == 0.0) return b;
+        if (std::abs(xm) <= tol1 || fb == 0.0)
+            return b;
         if (std::abs(e) >= tol1 && std::abs(fa) > std::abs(fb)) {
             double s = fb / fa;
             double p, qv;
-            if (a == c) { p = 2.0 * xm * s; qv = 1.0 - s; }
-            else {
-                double q2 = fa / fc; double r2 = fb / fc;
+            if (a == c) {
+                p = 2.0 * xm * s;
+                qv = 1.0 - s;
+            } else {
+                double q2 = fa / fc;
+                double r2 = fb / fc;
                 p = s * (2.0 * xm * q2 * (q2 - r2) - (b - a) * (r2 - 1.0));
                 qv = (q2 - 1.0) * (r2 - 1.0) * (s - 1.0);
             }
-            if (p > 0) qv = -qv; p = std::abs(p);
+            if (p > 0)
+                qv = -qv;
+            p = std::abs(p);
             double min1 = 3.0 * xm * qv - std::abs(tol1 * qv);
             double min2 = std::abs(e * qv);
-            if (2.0 * p < (min1 < min2 ? min1 : min2)) { e = d; d = p / qv; }
-            else { d = xm; e = d; }
-        } else { d = xm; e = d; }
-        a = b; fa = fb;
-        if (std::abs(d) > tol1) b += d; else b += (xm > 0 ? +tol1 : -tol1);
+            if (2.0 * p < (min1 < min2 ? min1 : min2)) {
+                e = d;
+                d = p / qv;
+            } else {
+                d = xm;
+                e = d;
+            }
+        } else {
+            d = xm;
+            e = d;
+        }
+        a = b;
+        fa = fb;
+        if (std::abs(d) > tol1)
+            b += d;
+        else
+            b += (xm > 0 ? +tol1 : -tol1);
         fb = price_at(b) - target;
     }
     return b;
@@ -227,5 +260,3 @@ double implied_vol_put(double S, double K, double r, double q, double T, double 
 }
 
 } // namespace quant::bs
-
-

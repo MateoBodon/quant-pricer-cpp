@@ -1,6 +1,6 @@
 #include "quant/lookback.hpp"
-#include "quant/qmc/brownian_bridge.hpp"
 #include "quant/math.hpp"
+#include "quant/qmc/brownian_bridge.hpp"
 #include "quant/stats.hpp"
 
 #include <pcg_random.hpp>
@@ -13,7 +13,8 @@ namespace quant::lookback {
 
 McStatistic price_mc(const McParams& p) {
     using quant::stats::Welford;
-    if (p.num_paths == 0 || p.num_steps <= 0) return {0.0,0.0,0.0,0.0};
+    if (p.num_paths == 0 || p.num_steps <= 0)
+        return {0.0, 0.0, 0.0, 0.0};
     const double dt = p.time / static_cast<double>(p.num_steps);
     const double drift_dt = (p.rate - p.dividend - 0.5 * p.vol * p.vol) * dt;
     const double vol_sdt = p.vol * std::sqrt(dt);
@@ -42,7 +43,8 @@ McStatistic price_mc(const McParams& p) {
             double S_min = S;
             double S_max = S;
             if (bridge) {
-                for (int t = 0; t < p.num_steps; ++t) normals[static_cast<std::size_t>(t)] = normal(rng) * sign;
+                for (int t = 0; t < p.num_steps; ++t)
+                    normals[static_cast<std::size_t>(t)] = normal(rng) * sign;
                 bridge->transform(normals.data(), increments.data());
                 for (int t = 0; t < p.num_steps; ++t) {
                     const double dw = increments[static_cast<std::size_t>(t)]; // N(0, dt)
@@ -60,16 +62,21 @@ McStatistic price_mc(const McParams& p) {
             }
             double payoff = 0.0;
             if (p.type == Type::FixedStrike) {
-                if (p.opt == ::quant::OptionType::Call) payoff = std::max(0.0, S_max - p.strike);
-                else payoff = std::max(0.0, p.strike - S_min);
+                if (p.opt == ::quant::OptionType::Call)
+                    payoff = std::max(0.0, S_max - p.strike);
+                else
+                    payoff = std::max(0.0, p.strike - S_min);
             } else { // Floating strike
-                if (p.opt == ::quant::OptionType::Call) payoff = std::max(0.0, S - S_min);
-                else payoff = std::max(0.0, S_max - S);
+                if (p.opt == ::quant::OptionType::Call)
+                    payoff = std::max(0.0, S - S_min);
+                else
+                    payoff = std::max(0.0, S_max - S);
             }
             return disc * payoff;
         };
         double sample = simulate_once(+1);
-        if (p.antithetic) sample = 0.5 * (sample + simulate_once(-1));
+        if (p.antithetic)
+            sample = 0.5 * (sample + simulate_once(-1));
         acc.add(sample);
     }
 
@@ -79,5 +86,3 @@ McStatistic price_mc(const McParams& p) {
 }
 
 } // namespace quant::lookback
-
-

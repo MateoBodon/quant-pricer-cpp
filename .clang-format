@@ -7,5 +7,5 @@ BreakBeforeBraces: Attach
 DerivePointerAlignment: false
 PointerAlignment: Left
 ReflowComments: true
-Standard: Cpp20
+Standard: Latest
 UseTab: Never

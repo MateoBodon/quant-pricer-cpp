@@ -15,12 +15,12 @@ struct SpaceGrid {
 double stretch_map(double xi, double anchor, double stretch);
 
 struct StretchedGridParams {
-    int nodes;           // number of grid points (>= 1)
-    double lower;        // lower bound in spot space (S-space)
-    double upper;        // upper bound in spot space (S-space)
-    double anchor;       // anchor spot value to focus grid density (typically strike)
-    double stretch;      // tanh stretch parameter (0 => uniform)
-    bool log_space;      // when true, coordinate is ln(S)
+    int nodes;      // number of grid points (>= 1)
+    double lower;   // lower bound in spot space (S-space)
+    double upper;   // upper bound in spot space (S-space)
+    double anchor;  // anchor spot value to focus grid density (typically strike)
+    double stretch; // tanh stretch parameter (0 => uniform)
+    bool log_space; // when true, coordinate is ln(S)
 };
 
 SpaceGrid build_space_grid(const StretchedGridParams& params);
@@ -41,12 +41,8 @@ struct OperatorWorkspace {
 
 // Assemble interior tridiagonal coefficients for a backward Euler/Crank-Nicolson step.
 // "theta" = 1 corresponds to fully implicit, 0.5 => Crank-Nicolson.
-void assemble_operator(const SpaceGrid& grid,
-                       const DiffusionCoefficients& coeffs,
-                       double dt,
-                       double theta,
-                       const std::vector<double>& v_curr,
-                       OperatorWorkspace& op);
+void assemble_operator(const SpaceGrid& grid, const DiffusionCoefficients& coeffs, double dt, double theta,
+                       const std::vector<double>& v_curr, OperatorWorkspace& op);
 
 struct PayoffBoundaryParams {
     ::quant::OptionType type;
@@ -56,8 +52,6 @@ struct PayoffBoundaryParams {
     double tau; // remaining time to maturity (years)
 };
 
-double dirichlet_boundary(const PayoffBoundaryParams& params,
-                          double spot,
-                          bool is_lower);
+double dirichlet_boundary(const PayoffBoundaryParams& params, double spot, bool is_lower);
 
 } // namespace quant::grid_utils

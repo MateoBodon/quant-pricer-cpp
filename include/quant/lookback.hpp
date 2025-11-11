@@ -1,8 +1,8 @@
 /// Lookback option Monte Carlo (fixed/floating strike) with optional bridge
 #pragma once
 
-#include <cstdint>
 #include "quant/barrier.hpp"
+#include <cstdint>
 
 namespace quant::lookback {
 
@@ -10,14 +10,14 @@ enum class Type { FixedStrike, FloatingStrike };
 
 struct McParams {
     double spot;
-    double strike;         // used for fixed-strike
+    double strike; // used for fixed-strike
     double rate;
     double dividend;
     double vol;
     double time;
     std::uint64_t num_paths;
     std::uint64_t seed;
-    int num_steps;         // discretization steps
+    int num_steps; // discretization steps
     bool antithetic{true};
     bool use_bridge{true};
     ::quant::OptionType opt; // call/put
@@ -33,6 +33,4 @@ struct McStatistic {
 
 McStatistic price_mc(const McParams& p);
 
-}
-
-
+} // namespace quant::lookback

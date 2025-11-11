@@ -11,7 +11,15 @@ class QuantPricerRecipe(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"with_openmp": [True, False]}
     default_options = {"with_openmp": True}
-    exports_sources = "CMakeLists.txt", "cmake/*", "include/*", "src/*", "external/*", "tests/*", "benchmarks/*"
+    exports_sources = (
+        "CMakeLists.txt",
+        "cmake/*",
+        "include/*",
+        "src/*",
+        "external/*",
+        "tests/*",
+        "benchmarks/*",
+    )
 
     def layout(self):
         cmake_layout(self)
@@ -33,5 +41,3 @@ class QuantPricerRecipe(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["quant_pricer"]
-
-

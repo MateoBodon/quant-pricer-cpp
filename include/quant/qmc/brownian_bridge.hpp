@@ -7,14 +7,14 @@
 namespace quant::qmc {
 
 class BrownianBridge {
-public:
+  public:
     BrownianBridge(std::size_t steps, double maturity);
 
     std::size_t size() const { return size_; }
 
     void transform(const double* normals, double* increments) const;
 
-private:
+  private:
     void initialize();
 
     std::size_t size_{};

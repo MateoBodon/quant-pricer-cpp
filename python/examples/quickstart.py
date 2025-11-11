@@ -37,7 +37,9 @@ def price_barrier() -> None:
     dividend = 0.0
     vol = 0.2
     expiry = 1.0
-    price = qp.barrier_bs(qp.OptionType.Call, barrier, spot, strike, rate, dividend, vol, expiry)
+    price = qp.barrier_bs(
+        qp.OptionType.Call, barrier, spot, strike, rate, dividend, vol, expiry
+    )
     print(f"Down-and-out call (analytic RR): {price:.4f}")
 
 
@@ -58,13 +60,17 @@ def heston_helpers() -> None:
 
     iv = qp.heston_implied_vol(market, params)
     phi = qp.heston_characteristic_fn(1.0, market, params)
-    print(f"Heston analytic call IV: {iv:.4%} | phi(1) = {phi.real:.4f} + {phi.imag:.4f}i")
+    print(
+        f"Heston analytic call IV: {iv:.4%} | phi(1) = {phi.real:.4f} + {phi.imag:.4f}i"
+    )
 
 
 def maybe_run_heston(repo_root: Path) -> None:
     samples_dir = repo_root / "data" / "samples"
     normalized_dir = repo_root / "data" / "normalized"
-    candidates = list(samples_dir.glob("spx_*.csv")) + list(normalized_dir.glob("spy_*.csv"))
+    candidates = list(samples_dir.glob("spx_*.csv")) + list(
+        normalized_dir.glob("spy_*.csv")
+    )
     if not candidates:
         print("No normalized surfaces found; skipping Heston demo.")
         return
