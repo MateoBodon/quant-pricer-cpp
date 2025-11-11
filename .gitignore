@@ -35,5 +35,11 @@ CTestTestfile.cmake
 
 # OS
 .DS_Store
+**/__pycache__/
 docs/artifacts/wrds/per_date/
+docs/artifacts/wrds/*
+!docs/artifacts/wrds/wrds_agg_pricing.csv
+!docs/artifacts/wrds/wrds_agg_oos.csv
+!docs/artifacts/wrds/wrds_agg_pnl.csv
+!docs/artifacts/wrds/wrds_multi_date_summary.png
 docs/validation_pack.zip
