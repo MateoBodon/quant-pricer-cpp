@@ -20,6 +20,12 @@
 - Commands run: `source .venv/bin/activate && pip install QuantLib`, `python scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`.
 - Artifacts: `docs/artifacts/ql_parity/ql_parity.{csv,png}`, manifest `runs.ql_parity`.
 
+## 2025-11-11 (Docs/coverage publishing fixes)
+- Hooked `docs/Results.md` and `docs/WRDS_Results.md` into the Doxygen build, taught the Pages workflow to copy `docs/artifacts/` into the published site (so the Markdown figures resolve), and added a README badge that links directly to the hosted `Results.html`.
+- Verified the Release build + FAST suite after the workflow changes.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
+- Artifacts: n/a (workflow plumbing only).
+
 ## 2025-11-11 (Heston analytic fix + coverage site)
 - Fixed the analytic Heston pricer by applying the proper Gauss–Laguerre weighting (exp(x)) and clamping the result to intrinsic value, then reran both Release and coverage FAST suites.
 - Generated llvm-cov/gcovr reports locally (lcov, Cobertura XML, HTML) and published the HTML bundle under `docs/coverage/` with a README badge + Results.md link; taught the Docs Pages workflow to copy that folder into the deployed site.
