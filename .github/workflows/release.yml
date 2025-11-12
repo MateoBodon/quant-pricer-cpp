@@ -17,6 +17,7 @@ jobs:
           submodules: true
       - name: Drop committed venv (not needed in CI)
         run: rm -rf .venv
+        shell: bash
       - name: Set up dependencies
         run: |
           sudo apt-get update
