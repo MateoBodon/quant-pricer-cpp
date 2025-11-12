@@ -29,3 +29,5 @@ cmake.minimum-version = "3.16"
 build-dir = "build-py"
 wheel.packages = []
 cmake.define = { QUANT_ENABLE_PYBIND = "ON", CMAKE_BUILD_TYPE = "Release" }
+wheel.exclude = [".venv", ".venv/*"]
+sdist.exclude = [".venv", ".venv/*"]
