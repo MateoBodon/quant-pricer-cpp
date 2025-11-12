@@ -38,16 +38,19 @@ jobs:
           cp -R docs/artifacts/. docs/html/artifacts/
       - name: Create friendly doc aliases
         run: |
-          declare -A aliases=(
-            ["_results_8md.html"]="Results.html"
-            ["_w_r_d_s___results_8md.html"]="WRDS_Results.html"
-            ["_r_e_a_d_m_e_8md.html"]="README.html"
-            ["_validationhighlights_8md.html"]="ValidationHighlights.html"
+          declare -A alias_sources=(
+            ["Results.html"]="md_docs_2Results.html Results_8md.html _results_8md.html"
+            ["WRDS_Results.html"]="md_docs_2WRDS__Results.html WRDS__Results_8md.html _w_r_d_s___results_8md.html"
+            ["README.html"]="md__r_e_a_d_m_e.html _r_e_a_d_m_e_8md.html"
+            ["ValidationHighlights.html"]="md_docs_2ValidationHighlights.html _validationhighlights_8md.html"
           )
-          for src in "${!aliases[@]}"; do
-            if [[ -f "docs/html/$src" ]]; then
-              cp "docs/html/$src" "docs/html/${aliases[$src]}"
-            fi
+          for target in "${!alias_sources[@]}"; do
+            for src in ${alias_sources[$target]}; do
+              if [[ -f "docs/html/$src" ]]; then
+                cp "docs/html/$src" "docs/html/$target"
+                break
+              fi
+            done
           done
       - name: Inject base href for project Pages path
         run: |
