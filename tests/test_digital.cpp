@@ -1,4 +1,5 @@
 #include "quant/digital.hpp"
+#include <cmath>
 #include <gtest/gtest.h>
 
 using namespace quant::digital;

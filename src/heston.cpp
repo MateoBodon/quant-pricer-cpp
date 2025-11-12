@@ -9,6 +9,7 @@
 #include <cmath>
 #include <complex>
 #include <limits>
+#include <numbers>
 #include <random>
 #include <vector>
 
@@ -114,7 +115,7 @@ inline double P_j(int j, double lnK, const MarketParams& mkt, const Params& h) {
         // Transform ∫ f(u) du into Laguerre form ∫ e^{-x} [e^{x} f(x)] dx
         sum += w * std::exp(x) * std::real(integrand);
     }
-    return 0.5 + (1.0 / M_PI) * sum;
+    return 0.5 + (sum / std::numbers::pi);
 }
 
 } // namespace

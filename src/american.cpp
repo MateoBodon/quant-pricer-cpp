@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <limits>
 #include <random>
 #include <stdexcept>
@@ -487,9 +488,12 @@ LsmcResult price_lsmc(const LsmcParams& params) {
 
     std::vector<double> cashflow(path_count);
     std::vector<char> exercised(path_count, 0);
+    const std::int64_t path_count_i = static_cast<std::int64_t>(path_count);
+    const std::int64_t base_paths_i = static_cast<std::int64_t>(base_paths);
 
-    for (std::size_t i = 0; i < path_count; ++i) {
-        cashflow[i] = intrinsic_value(params.base.type, params.base.strike, spot_tp1[i]);
+    for (std::int64_t i = 0; i < path_count_i; ++i) {
+        const std::size_t idx = static_cast<std::size_t>(i);
+        cashflow[idx] = intrinsic_value(params.base.type, params.base.strike, spot_tp1[idx]);
     }
 
     std::vector<std::size_t> itm_counts_rev;
@@ -503,23 +507,25 @@ LsmcResult price_lsmc(const LsmcParams& params) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-        for (std::size_t i = 0; i < path_count; ++i) {
-            cashflow[i] *= disc;
+        for (std::int64_t i = 0; i < path_count_i; ++i) {
+            cashflow[static_cast<std::size_t>(i)] *= disc;
         }
 
         float* row = shocks.data() + static_cast<std::size_t>(step) * shock_cols;
         if (!use_antithetic) {
-            for (std::size_t i = 0; i < path_count; ++i) {
-                double z = static_cast<double>(row[i]);
+            for (std::int64_t i = 0; i < path_count_i; ++i) {
+                const std::size_t idx = static_cast<std::size_t>(i);
+                double z = static_cast<double>(row[idx]);
                 const double step_mult = std::exp(drift + vol_step * z);
-                spot_t[i] = spot_tp1[i] / step_mult;
+                spot_t[idx] = spot_tp1[idx] / step_mult;
             }
         } else {
-            for (std::size_t pair = 0; pair < base_paths; ++pair) {
-                double z = static_cast<double>(row[pair]);
+            for (std::int64_t pair = 0; pair < base_paths_i; ++pair) {
+                const std::size_t pair_idx = static_cast<std::size_t>(pair);
+                double z = static_cast<double>(row[pair_idx]);
                 const double mult_plus = std::exp(drift + vol_step * z);
                 const double mult_minus = std::exp(drift - vol_step * z);
-                std::size_t idx = pair * 2;
+                std::size_t idx = static_cast<std::size_t>(pair * 2);
                 spot_t[idx] = spot_tp1[idx] / mult_plus;
                 spot_t[idx + 1] = spot_tp1[idx + 1] / mult_minus;
             }
@@ -529,18 +535,19 @@ LsmcResult price_lsmc(const LsmcParams& params) {
         std::size_t regression_samples = 0;
         std::size_t itm_count = 0;
 
-        for (std::size_t i = 0; i < path_count; ++i) {
-            if (exercised[i]) {
+        for (std::int64_t i = 0; i < path_count_i; ++i) {
+            const std::size_t idx = static_cast<std::size_t>(i);
+            if (exercised[idx]) {
                 continue;
             }
-            const double S = spot_t[i];
+            const double S = spot_t[idx];
             const double intrinsic = intrinsic_value(params.base.type, params.base.strike, S);
             const double moneyness = S / params.base.strike - 1.0;
             if (intrinsic > 0.0) {
                 ++itm_count;
             }
             if (intrinsic > 0.0 || std::abs(moneyness) <= params.itm_moneyness_eps) {
-                eq.add(polynomial_features(moneyness), cashflow[i]);
+                eq.add(polynomial_features(moneyness), cashflow[idx]);
                 ++regression_samples;
             }
         }
@@ -565,11 +572,12 @@ LsmcResult price_lsmc(const LsmcParams& params) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-            for (std::size_t i = 0; i < path_count; ++i) {
-                if (exercised[i]) {
+            for (std::int64_t i = 0; i < path_count_i; ++i) {
+                const std::size_t idx = static_cast<std::size_t>(i);
+                if (exercised[idx]) {
                     continue;
                 }
-                const double S = spot_t[i];
+                const double S = spot_t[idx];
                 const double intrinsic = intrinsic_value(params.base.type, params.base.strike, S);
                 if (intrinsic <= 0.0) {
                     continue;
@@ -577,8 +585,8 @@ LsmcResult price_lsmc(const LsmcParams& params) {
                 const double x = S / params.base.strike - 1.0;
                 const double cont = beta[0] + beta[1] * x + beta[2] * x * x + beta[3] * x * x * x;
                 if (cont <= intrinsic) {
-                    cashflow[i] = intrinsic;
-                    exercised[i] = 1;
+                    cashflow[idx] = intrinsic;
+                    exercised[idx] = 1;
                 }
             }
         }
