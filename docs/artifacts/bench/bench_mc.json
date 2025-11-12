@@ -1,8 +1,8 @@
 {
   "context": {
-    "date": "2025-11-11T21:46:35-05:00",
-    "host_name": "Mateos-MBP-5.stdusr.yale.internal",
-    "executable": "./build-omp/bench_mc",
+    "date": "2025-11-12T12:07:27-05:00",
+    "host_name": "Mateos-MBP-6.stdusr.yale.internal",
+    "executable": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/bench_mc",
     "num_cpus": 11,
     "mhz_per_cpu": 24,
     "cpu_scaling_enabled": false,
@@ -26,7 +26,7 @@
         "num_sharing": 1
       }
     ],
-    "load_avg": [58.876,150.785,98.5156],
+    "load_avg": [9.60791,14.2402,18.2671],
     "library_version": "v1.9.4-45-g01deef52",
     "library_build_type": "release",
     "json_schema_version": 1
@@ -42,10 +42,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 7.5814249983523041e+07,
-      "cpu_time": 7.4844999999999940e+07,
+      "real_time": 7.2673542000075027e+07,
+      "cpu_time": 7.2240000000000075e+07,
       "time_unit": "ns",
-      "paths/s": 1.3360945954973623e+07
+      "paths/s": 1.3842746400885921e+07
     },
     {
       "name": "BM_MC_PathsPerSecond/2",
@@ -56,11 +56,11 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 2,
-      "real_time": 3.7933041516225785e+07,
-      "cpu_time": 3.7144500000000022e+07,
+      "iterations": 1,
+      "real_time": 7.2696208000024855e+07,
+      "cpu_time": 7.2282999999999985e+07,
       "time_unit": "ns",
-      "paths/s": 2.6921886147343464e+07
+      "paths/s": 1.3834511572568933e+07
     },
     {
       "name": "BM_MC_PathsPerSecond/4",
@@ -71,11 +71,11 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 4,
-      "real_time": 2.0068614510819316e+07,
-      "cpu_time": 1.9348250000000011e+07,
+      "iterations": 1,
+      "real_time": 7.6009708000128746e+07,
+      "cpu_time": 7.5064999999999940e+07,
       "time_unit": "ns",
-      "paths/s": 5.1684260850464486e+07
+      "paths/s": 1.3321787783920614e+07
     },
     {
       "name": "BM_MC_PathsPerSecond/8",
@@ -86,11 +86,11 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 6,
-      "real_time": 1.8066944331318762e+07,
-      "cpu_time": 1.1769166666666681e+07,
+      "iterations": 1,
+      "real_time": 7.5347792000002295e+07,
+      "cpu_time": 7.4164999999999821e+07,
       "time_unit": "ns",
-      "paths/s": 8.4967783048927158e+07
+      "paths/s": 1.3483449066271186e+07
     },
     {
       "name": "BM_MC_Rmse_PRNG",
@@ -101,11 +101,11 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 18,
-      "real_time": 6.1927522797810119e+06,
-      "cpu_time": 3.9249444444444422e+06,
+      "iterations": 2,
+      "real_time": 3.0153416499956619e+07,
+      "cpu_time": 2.9704500000000022e+07,
       "time_unit": "ns",
-      "std_error": 7.5559672132643725e-03
+      "std_error": 7.5559672132644619e-03
     },
     {
       "name": "BM_MC_Rmse_QMC",
@@ -117,10 +117,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 2.0059512497391552e+08,
-      "cpu_time": 1.6759299999999988e+08,
+      "real_time": 1.0897974169999998e+09,
+      "cpu_time": 1.0769010000000000e+09,
       "time_unit": "ns",
-      "std_error": 7.5585978457950523e-03
+      "std_error": 7.5585978457951590e-03
     },
     {
       "name": "BM_MC_EqualTime/Asian/PRNG",
@@ -132,8 +132,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 6.8098370899679136e+08,
-      "cpu_time": 6.7265000000000000e+08,
+      "real_time": 6.5717279099999356e+08,
+      "cpu_time": 6.5172699999999976e+08,
       "time_unit": "ns",
       "std_error": 2.7597557117775687e-04
     },
@@ -147,8 +147,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 7.5060854200273752e+08,
-      "cpu_time": 7.3502600000000000e+08,
+      "real_time": 7.4931145799996555e+08,
+      "cpu_time": 7.3571800000000036e+08,
       "time_unit": "ns",
       "std_error": 2.5942826811772060e-04
     },
@@ -162,10 +162,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 1.7242795799393207e+08,
-      "cpu_time": 1.1928600000000022e+08,
+      "real_time": 7.1733920800011218e+08,
+      "cpu_time": 7.0838499999999940e+08,
       "time_unit": "ns",
-      "std_error": 4.5259737018409751e-03
+      "std_error": 4.5259737018410297e-03
     },
     {
       "name": "BM_MC_EqualTime/Barrier/QMC",
@@ -177,10 +177,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 9.5052917022258043e+07,
-      "cpu_time": 8.2230999999999717e+07,
+      "real_time": 5.0639104200013208e+08,
+      "cpu_time": 5.0196400000000095e+08,
       "time_unit": "ns",
-      "std_error": 4.2688339815527936e-03
+      "std_error": 4.2688339815528040e-03
     }
   ]
 }

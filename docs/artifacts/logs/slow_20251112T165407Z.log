@@ -57,13 +57,13 @@ test 14
 14: [----------] Global test environment set-up.
 14: [----------] 1 test from MonteCarloSlow
 14: [ RUN      ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
-14: [       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (84 ms)
-14: [----------] 1 test from MonteCarloSlow (84 ms total)
+14: [       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (93 ms)
+14: [----------] 1 test from MonteCarloSlow (93 ms total)
 14: 
 14: [----------] Global test environment tear-down
-14: [==========] 1 test from 1 test suite ran. (84 ms total)
+14: [==========] 1 test from 1 test suite ran. (93 ms total)
 14: [  PASSED  ] 1 test.
-3/7 Test #14: MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic ...   Passed    0.09 sec
+3/7 Test #14: MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic ...   Passed    0.10 sec
 test 15
     Start 15: MonteCarloSlow.ThetaCloseToPDE
 
@@ -76,13 +76,13 @@ test 15
 15: [----------] Global test environment set-up.
 15: [----------] 1 test from MonteCarloSlow
 15: [ RUN      ] MonteCarloSlow.ThetaCloseToPDE
-15: [       OK ] MonteCarloSlow.ThetaCloseToPDE (29 ms)
-15: [----------] 1 test from MonteCarloSlow (29 ms total)
+15: [       OK ] MonteCarloSlow.ThetaCloseToPDE (35 ms)
+15: [----------] 1 test from MonteCarloSlow (35 ms total)
 15: 
 15: [----------] Global test environment tear-down
-15: [==========] 1 test from 1 test suite ran. (29 ms total)
+15: [==========] 1 test from 1 test suite ran. (35 ms total)
 15: [  PASSED  ] 1 test.
-4/7 Test #15: MonteCarloSlow.ThetaCloseToPDE ......................   Passed    0.03 sec
+4/7 Test #15: MonteCarloSlow.ThetaCloseToPDE ......................   Passed    0.04 sec
 test 16
     Start 16: MonteCarloSlow.GammaMixedVarianceLowerThanLR
 
@@ -95,11 +95,11 @@ test 16
 16: [----------] Global test environment set-up.
 16: [----------] 1 test from MonteCarloSlow
 16: [ RUN      ] MonteCarloSlow.GammaMixedVarianceLowerThanLR
-16: [       OK ] MonteCarloSlow.GammaMixedVarianceLowerThanLR (28 ms)
-16: [----------] 1 test from MonteCarloSlow (28 ms total)
+16: [       OK ] MonteCarloSlow.GammaMixedVarianceLowerThanLR (29 ms)
+16: [----------] 1 test from MonteCarloSlow (29 ms total)
 16: 
 16: [----------] Global test environment tear-down
-16: [==========] 1 test from 1 test suite ran. (28 ms total)
+16: [==========] 1 test from 1 test suite ran. (29 ms total)
 16: [  PASSED  ] 1 test.
 5/7 Test #16: MonteCarloSlow.GammaMixedVarianceLowerThanLR ........   Passed    0.03 sec
 test 17
@@ -114,13 +114,13 @@ test 17
 17: [----------] Global test environment set-up.
 17: [----------] 1 test from MonteCarloSlow
 17: [ RUN      ] MonteCarloSlow.QmcReducesErrorVsAnalytic
-17: [       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1350 ms)
-17: [----------] 1 test from MonteCarloSlow (1350 ms total)
+17: [       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1281 ms)
+17: [----------] 1 test from MonteCarloSlow (1281 ms total)
 17: 
 17: [----------] Global test environment tear-down
-17: [==========] 1 test from 1 test suite ran. (1350 ms total)
+17: [==========] 1 test from 1 test suite ran. (1281 ms total)
 17: [  PASSED  ] 1 test.
-6/7 Test #17: MonteCarloSlow.QmcReducesErrorVsAnalytic ............   Passed    1.35 sec
+6/7 Test #17: MonteCarloSlow.QmcReducesErrorVsAnalytic ............   Passed    1.28 sec
 test 31
     Start 31: AmericanSlow.LsmcMatchesPsorWithinSe
 
@@ -133,17 +133,17 @@ test 31
 31: [----------] Global test environment set-up.
 31: [----------] 1 test from AmericanSlow
 31: [ RUN      ] AmericanSlow.LsmcMatchesPsorWithinSe
-31: [       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (651 ms)
-31: [----------] 1 test from AmericanSlow (651 ms total)
+31: [       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (627 ms)
+31: [----------] 1 test from AmericanSlow (627 ms total)
 31: 
 31: [----------] Global test environment tear-down
-31: [==========] 1 test from 1 test suite ran. (651 ms total)
+31: [==========] 1 test from 1 test suite ran. (627 ms total)
 31: [  PASSED  ] 1 test.
-7/7 Test #31: AmericanSlow.LsmcMatchesPsorWithinSe ................   Passed    0.66 sec
+7/7 Test #31: AmericanSlow.LsmcMatchesPsorWithinSe ................   Passed    0.64 sec
 
 100% tests passed, 0 tests failed out of 7
 
 Label Time Summary:
-SLOW    =   2.21 sec*proc (7 tests)
+SLOW    =   2.14 sec*proc (7 tests)
 
-Total Test time (real) =   2.22 sec
+Total Test time (real) =   2.15 sec
