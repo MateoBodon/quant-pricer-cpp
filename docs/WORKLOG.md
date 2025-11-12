@@ -26,6 +26,11 @@
 - Commands run: `python -m pip install QuantLib`, `python scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`, `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
 - Artifacts: refreshed `docs/artifacts/ql_parity/ql_parity.{csv,png}` and appended the `ql_parity` section in `docs/artifacts/manifest.json`.
 
+## 2025-11-12 (Release/wheels submodule fix)
+- The v0.3.2 release job failed because `actions/checkout` skipped submodules, so `pcg_random.hpp` was missing; updated both `release.yml` and `wheels.yml` to checkout submodules before building.
+- Commands run: `git tag -a v0.3.2 -m 'Release v0.3.2'` (initial attempt), `git push origin v0.3.2`, identified the failure in run `19284861635`, then patched the workflows (`.github/workflows/release.yml`, `.github/workflows/wheels.yml`).
+- Artifacts: n/a (workflow plumbing only, but required for the validation pack + cibuildwheel jobs to succeed on tags).
+
 ## 2025-11-11 (WRDS panel rename + aggregated artifacts)
 - Added `wrds_pipeline_dates_panel.yaml` (≥5 stress/calm dates), taught the pipeline to read YAML via PyYAML, renamed the in-sample metrics to `iv_rmse_volpts_vega_wt`/`iv_mae_volpts_vega_wt`/`iv_p90_bps`, and changed the OOS/PnL summaries to report `iv_mae_bps`, `price_mae_ticks`, and `pnl_sigma`.
 - Trimmed committed artifacts to the aggregated CSV/PNG set (`wrds_agg_{pricing,oos,pnl}.csv`, `wrds_multi_date_summary.png`), updated README/Results/WRDS docs, and refreshed the manifest so historical entries carry the new metric names/units.
