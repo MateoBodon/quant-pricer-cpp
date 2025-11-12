@@ -21,6 +21,9 @@ pybind11_add_module(pyquant_pricer MODULE pybind_module.cpp)
 target_link_libraries(pyquant_pricer PRIVATE quant_pricer)
 target_compile_features(pyquant_pricer PRIVATE cxx_std_20)
 
-install(TARGETS pyquant_pricer
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+install(
+  TARGETS pyquant_pricer
+  LIBRARY DESTINATION .
+  RUNTIME DESTINATION .
+  ARCHIVE DESTINATION .
 )

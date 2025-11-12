@@ -2,6 +2,12 @@
 
 # WORKLOG
 
+## 2025-11-12 (Python wheel import path fix)
+- Resolved the cibuildwheel smoke failure (`ModuleNotFoundError: pyquant_pricer`) by installing the pybind module to the wheel root (site-packages) so the import path matches the package name on every platform.
+- Verified the fix locally via a Release rebuild plus the FAST ctest suite; next wheel/release runs should see the module import inside `python/scripts/cibw_smoke.py` succeed.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`, `cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
+- Artifacts: n/a (build/test only; workflows consume the fix on the next tag run).
+
 ## 2025-11-12 (CI coverage fallback + Pages branch policy)
 - Reworked the CI coverage job to ignore `CompilerId` gcov noise, skip Codecov uploads unless `CODECOV_TOKEN` is present, and tightened the README badges (drop duplicate CI badge, track Docs Pages workflow instead).
 - Added the `master` branch to the `github-pages` environment policy so GitHub Actions can deploy again (previously restricted to `gh-pages` only).
