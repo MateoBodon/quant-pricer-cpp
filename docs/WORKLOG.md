@@ -15,6 +15,12 @@
 - Commands run: `python -m pip install 'numpy==2.1.3'`, `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample --fast`, `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
 - Artifacts: refreshed `docs/artifacts/wrds/wrds_agg_{pricing,oos,pnl}.csv`, `docs/artifacts/wrds/wrds_multi_date_summary.png`, and the manifest `runs.wrds_dateset` entry.
 
+## 2025-11-12 (Benchmarks: QMC equal-time + OpenMP scaling)
+- Installed Homebrew `libomp`, produced a dedicated OpenMP-enabled build (`build-omp`), and tuned the MC benchmark harness so the equal-time plot now covers Asian + Barrier payoffs with a clear QMC advantage (time-scaled RMSE lower for both).
+- Re-ran `bench_mc`/`bench_pde` to regenerate JSON, CSV, and PNG bundles (throughput scaling now shows ~6.4× speedup on 8 threads, PDE log-log fit overlays the −2 slope reference), then updated the manifest entry.
+- Commands run: `brew install libomp`, `cmake -S . -B build-omp -DCMAKE_BUILD_TYPE=Release -DQUANT_ENABLE_OPENMP=ON ...`, `cmake --build build-omp --target bench_mc bench_pde`, `OMP_PROC_BIND=spread ./build-omp/bench_mc --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_mc.json --benchmark_out_format=json`, `./build-omp/bench_pde --benchmark_min_time=0.05s --benchmark_out=docs/artifacts/bench/bench_pde.json --benchmark_out_format=json`, `python scripts/generate_bench_artifacts.py --mc-json docs/artifacts/bench/bench_mc.json --pde-json docs/artifacts/bench/bench_pde.json --out-dir docs/artifacts/bench`, `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
+- Artifacts: refreshed every file under `docs/artifacts/bench/` plus the `benchmarks` block inside `docs/artifacts/manifest.json`.
+
 ## 2025-11-11 (WRDS panel rename + aggregated artifacts)
 - Added `wrds_pipeline_dates_panel.yaml` (≥5 stress/calm dates), taught the pipeline to read YAML via PyYAML, renamed the in-sample metrics to `iv_rmse_volpts_vega_wt`/`iv_mae_volpts_vega_wt`/`iv_p90_bps`, and changed the OOS/PnL summaries to report `iv_mae_bps`, `price_mae_ticks`, and `pnl_sigma`.
 - Trimmed committed artifacts to the aggregated CSV/PNG set (`wrds_agg_{pricing,oos,pnl}.csv`, `wrds_multi_date_summary.png`), updated README/Results/WRDS docs, and refreshed the manifest so historical entries carry the new metric names/units.
