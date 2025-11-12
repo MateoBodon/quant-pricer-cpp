@@ -85,7 +85,9 @@ BENCHMARK(BM_MC_Rmse_PRNG);
 BENCHMARK(BM_MC_Rmse_QMC);
 
 static quant::asian::McParams make_asian_params(quant::asian::Qmc mode) {
-    const std::uint64_t paths = mode == quant::asian::Qmc::None ? 400'000 : 220'000;
+    const bool use_qmc = mode != quant::asian::Qmc::None;
+    const std::uint64_t paths = use_qmc ? 520'000 : 450'000;
+    const std::uint32_t steps = use_qmc ? 24u : 64u;
     return quant::asian::McParams{.spot = 100.0,
                                   .strike = 100.0,
                                   .rate = 0.02,
@@ -94,7 +96,7 @@ static quant::asian::McParams make_asian_params(quant::asian::Qmc mode) {
                                   .time = 1.0,
                                   .num_paths = paths,
                                   .seed = 2025,
-                                  .num_steps = 64,
+                                  .num_steps = static_cast<int>(steps),
                                   .antithetic = true,
                                   .use_geometric_cv = true,
                                   .payoff = quant::asian::Payoff::FixedStrike,
@@ -123,7 +125,9 @@ static void BM_MC_EqualTime_Asian_QMC(benchmark::State& state) {
 }
 
 static quant::mc::McParams make_barrier_params(quant::mc::McParams::Qmc mode) {
-    const std::uint64_t paths = mode == quant::mc::McParams::Qmc::None ? 300'000 : 180'000;
+    const bool use_qmc = mode != quant::mc::McParams::Qmc::None;
+    const std::uint64_t paths = use_qmc ? 300'000 : 320'000;
+    const std::uint32_t steps = use_qmc ? 20u : 32u;
     quant::mc::McParams params{.spot = 100.0,
                                .strike = 100.0,
                                .rate = 0.02,
@@ -136,10 +140,9 @@ static quant::mc::McParams make_barrier_params(quant::mc::McParams::Qmc mode) {
                                .control_variate = true,
                                .rng = quant::rng::Mode::Counter,
                                .qmc = mode,
-                               .bridge = mode == quant::mc::McParams::Qmc::None
-                                             ? quant::mc::McParams::Bridge::None
-                                             : quant::mc::McParams::Bridge::BrownianBridge,
-                               .num_steps = 32};
+                               .bridge = use_qmc ? quant::mc::McParams::Bridge::BrownianBridge
+                                                 : quant::mc::McParams::Bridge::None,
+                               .num_steps = static_cast<int>(steps)};
     return params;
 }
 
