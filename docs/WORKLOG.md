@@ -9,6 +9,12 @@
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
 - Artifacts: n/a (workflow + docs wiring).
 
+## 2025-11-12 (WRDS panel sample refresh)
+- Reinstalled `numpy==2.1.3` inside the repo venv (restores `numpy.testing` for SciPy) and re-ran the 5-date WRDS panel pipeline against the bundled sample OptionMetrics snapshot.
+- Documented in the WORKLOG that WRDS credentials are absent on this host, so the regenerated artifacts correspond to the sample dataset until MARKET secrets are available.
+- Commands run: `python -m pip install 'numpy==2.1.3'`, `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample --fast`, `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
+- Artifacts: refreshed `docs/artifacts/wrds/wrds_agg_{pricing,oos,pnl}.csv`, `docs/artifacts/wrds/wrds_multi_date_summary.png`, and the manifest `runs.wrds_dateset` entry.
+
 ## 2025-11-11 (WRDS panel rename + aggregated artifacts)
 - Added `wrds_pipeline_dates_panel.yaml` (≥5 stress/calm dates), taught the pipeline to read YAML via PyYAML, renamed the in-sample metrics to `iv_rmse_volpts_vega_wt`/`iv_mae_volpts_vega_wt`/`iv_p90_bps`, and changed the OOS/PnL summaries to report `iv_mae_bps`, `price_mae_ticks`, and `pnl_sigma`.
 - Trimmed committed artifacts to the aggregated CSV/PNG set (`wrds_agg_{pricing,oos,pnl}.csv`, `wrds_multi_date_summary.png`), updated README/Results/WRDS docs, and refreshed the manifest so historical entries carry the new metric names/units.
