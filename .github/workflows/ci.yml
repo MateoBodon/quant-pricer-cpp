@@ -101,11 +101,12 @@ jobs:
         run: |
           gcovr --root . \
             --object-directory build-cov \
-            --filter='src/' --filter='include/' \
-            --exclude='external/' --exclude='tests/' \
-            --xml -o build-cov/coverage.xml \
-            --html --html-details -o build-cov/coverage.html \
-            --gcov-executable "llvm-cov gcov"
+          --filter='src/' --filter='include/' \
+          --exclude='external/' --exclude='tests/' \
+          --xml -o build-cov/coverage.xml \
+          --html --html-details -o build-cov/coverage.html \
+          --gcov-executable "llvm-cov gcov" \
+          --gcov-ignore-errors no_working_dir_found
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:

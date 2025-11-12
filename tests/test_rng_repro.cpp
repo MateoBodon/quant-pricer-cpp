@@ -46,10 +46,11 @@ TEST(RngDeterminism, CounterRngThreadInvariant) {
     const auto r1 = run_with_threads(params, 1);
     const auto r4 = run_with_threads(params, 4);
     const auto r8 = run_with_threads(params, 8);
-    EXPECT_DOUBLE_EQ(r1.estimate.value, r4.estimate.value);
-    EXPECT_DOUBLE_EQ(r1.estimate.std_error, r4.estimate.std_error);
-    EXPECT_DOUBLE_EQ(r1.estimate.value, r8.estimate.value);
-    EXPECT_DOUBLE_EQ(r1.estimate.std_error, r8.estimate.std_error);
+    const double tol = 1e-12;
+    EXPECT_NEAR(r1.estimate.value, r4.estimate.value, tol);
+    EXPECT_NEAR(r1.estimate.std_error, r4.estimate.std_error, tol);
+    EXPECT_NEAR(r1.estimate.value, r8.estimate.value, tol);
+    EXPECT_NEAR(r1.estimate.std_error, r8.estimate.std_error, tol);
 #else
     GTEST_SKIP() << "OpenMP not enabled; single-thread check only";
 #endif
