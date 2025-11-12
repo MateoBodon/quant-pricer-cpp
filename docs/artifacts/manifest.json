@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-11-12T02:47:35.926543+00:00",
+  "generated_at": "2025-11-12T02:49:39.651705+00:00",
   "git": {
     "branch": "master",
     "dirty": true,
-    "sha": "c9ba12ef5e2f8da7723cd73b3e1721fd8242a3e2"
+    "sha": "72586acdc6084c01d23be3487fe923c21d3a989d"
   },
   "omp_threads": 11,
   "runs": {
@@ -702,6 +702,18 @@
       "vol": 0.2
     },
     "ql_parity": [
+      {
+        "csv": "docs/artifacts/ql_parity/ql_parity.csv",
+        "fast": false,
+        "figure": "docs/artifacts/ql_parity/ql_parity.png",
+        "quant_cli": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/build/quant_cli",
+        "scenarios": [
+          "vanilla_call_atm",
+          "vanilla_put_otm",
+          "barrier_do_call",
+          "american_put_psor"
+        ]
+      },
       {
         "csv": "docs/artifacts/ql_parity/ql_parity.csv",
         "fast": false,
