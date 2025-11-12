@@ -2,9 +2,8 @@
 
 **Modern C++20 option-pricing library with Black–Scholes analytics, Monte Carlo (variance reduction, pathwise/LR Greeks, QMC), and PDE (Crank–Nicolson)—with tests, benchmarks, clang-tidy, sanitizers, and CI.** [API Docs](https://mateobodon.github.io/quant-pricer-cpp/)
 
-[![CI](https://github.com/mateobodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml)
-[![Sanitizers](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg?job=sanitizers&label=ASan%2FUBSan)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/MateoBodon/quant-pricer-cpp/branch/master/graph/badge.svg)](https://app.codecov.io/gh/MateoBodon/quant-pricer-cpp)
+[![CI](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml)
+[![Docs Pages](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/docs-pages.yml/badge.svg)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/docs-pages.yml)
 [![Coverage HTML](https://img.shields.io/badge/coverage-HTML-blue)](https://mateobodon.github.io/quant-pricer-cpp/coverage/)
 [![Docs](https://img.shields.io/badge/docs-gh--pages-blue)](https://mateobodon.github.io/quant-pricer-cpp/)
 [![Results](https://img.shields.io/badge/results-live-green)](https://mateobodon.github.io/quant-pricer-cpp/Results.html)
