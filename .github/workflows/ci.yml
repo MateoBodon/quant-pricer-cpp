@@ -57,6 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LLVM_PROFILE_FILE: build-cov/coverage-%p-%m.profraw
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -119,14 +120,14 @@ jobs:
             build-cov/coverage.txt
             build-cov/coverage.lcov
       - name: Upload to Codecov
-        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        if: ${{ env.CODECOV_TOKEN != '' }}
         uses: codecov/codecov-action@v4
         with:
           files: build-cov/coverage.lcov
           flags: unittests
           fail_ci_if_error: true
         env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          CODECOV_TOKEN: ${{ env.CODECOV_TOKEN }}
 
   sanitizers:
     needs: lint
