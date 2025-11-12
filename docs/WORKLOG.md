@@ -2,6 +2,12 @@
 
 # WORKLOG
 
+## 2025-11-12 (artifact + parity refresh)
+- Ran the full deterministic pipeline via `./scripts/reproduce_all.sh` (Release rebuild, `ctest -L FAST -VV`, artifact regeneration) so `docs/artifacts/{bench,wrds}` and `manifest.json` were repopulated after the earlier clean.
+- Installed the QuantLib Python wheel locally and re-rendered `scripts/ql_parity.py` so the CSV/PNG bundle (`docs/artifacts/ql_parity/`) and manifest entry match the refreshed benches/WRDS outputs.
+- Commands run: `./scripts/reproduce_all.sh`, `python3 -m pip install --user QuantLib`, `python3 scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`.
+- Artifacts: refreshed `docs/artifacts/bench/*`, `docs/artifacts/wrds/wrds_*`, `docs/artifacts/ql_parity/ql_parity.{csv,png}`, and `docs/artifacts/manifest.json`.
+
 ## 2025-11-12 (Python wheel import path fix)
 - Resolved the cibuildwheel smoke failure (`ModuleNotFoundError: pyquant_pricer`) by installing the pybind module to the wheel root (site-packages) so the import path matches the package name on every platform.
 - Verified the fix locally via a Release rebuild plus the FAST ctest suite; next wheel/release runs should see the module import inside `python/scripts/cibw_smoke.py` succeed.

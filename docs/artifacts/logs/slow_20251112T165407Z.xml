@@ -6,9 +6,9 @@
 	skipped="0"
 	hostname=""
 	time="2"
-	timestamp="2025-11-10T19:37:37"
+	timestamp="2025-11-12T12:06:57"
 	>
-	<testcase name="MonteCarloSlow.PriceCloseToBS" classname="MonteCarloSlow.PriceCloseToBS" time="0.0229424" status="run">
+	<testcase name="MonteCarloSlow.PriceCloseToBS" classname="MonteCarloSlow.PriceCloseToBS" time="0.0230087" status="run">
 		<properties>
 			<property name="cmake_labels" value="SLOW"/>
 		</properties>
@@ -26,7 +26,7 @@ Note: Google Test filter = MonteCarloSlow.PriceCloseToBS
 [  PASSED  ] 1 test.
 </system-out>
 	</testcase>
-	<testcase name="MonteCarloSlow.GreeksCloseToAnalytic" classname="MonteCarloSlow.GreeksCloseToAnalytic" time="0.0314017" status="run">
+	<testcase name="MonteCarloSlow.GreeksCloseToAnalytic" classname="MonteCarloSlow.GreeksCloseToAnalytic" time="0.0308596" status="run">
 		<properties>
 			<property name="cmake_labels" value="SLOW"/>
 		</properties>
@@ -44,7 +44,7 @@ Note: Google Test filter = MonteCarloSlow.GreeksCloseToAnalytic
 [  PASSED  ] 1 test.
 </system-out>
 	</testcase>
-	<testcase name="MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic" classname="MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic" time="0.0876343" status="run">
+	<testcase name="MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic" classname="MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic" time="0.096837" status="run">
 		<properties>
 			<property name="cmake_labels" value="SLOW"/>
 		</properties>
@@ -54,15 +54,15 @@ Note: Google Test filter = MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
 [----------] Global test environment set-up.
 [----------] 1 test from MonteCarloSlow
 [ RUN      ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
-[       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (84 ms)
-[----------] 1 test from MonteCarloSlow (84 ms total)
+[       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (93 ms)
+[----------] 1 test from MonteCarloSlow (93 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (84 ms total)
+[==========] 1 test from 1 test suite ran. (93 ms total)
 [  PASSED  ] 1 test.
 </system-out>
 	</testcase>
-	<testcase name="MonteCarloSlow.ThetaCloseToPDE" classname="MonteCarloSlow.ThetaCloseToPDE" time="0.0320488" status="run">
+	<testcase name="MonteCarloSlow.ThetaCloseToPDE" classname="MonteCarloSlow.ThetaCloseToPDE" time="0.0391115" status="run">
 		<properties>
 			<property name="cmake_labels" value="SLOW"/>
 		</properties>
@@ -72,15 +72,15 @@ Note: Google Test filter = MonteCarloSlow.ThetaCloseToPDE
 [----------] Global test environment set-up.
 [----------] 1 test from MonteCarloSlow
 [ RUN      ] MonteCarloSlow.ThetaCloseToPDE
-[       OK ] MonteCarloSlow.ThetaCloseToPDE (29 ms)
-[----------] 1 test from MonteCarloSlow (29 ms total)
+[       OK ] MonteCarloSlow.ThetaCloseToPDE (35 ms)
+[----------] 1 test from MonteCarloSlow (35 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (29 ms total)
+[==========] 1 test from 1 test suite ran. (35 ms total)
 [  PASSED  ] 1 test.
 </system-out>
 	</testcase>
-	<testcase name="MonteCarloSlow.GammaMixedVarianceLowerThanLR" classname="MonteCarloSlow.GammaMixedVarianceLowerThanLR" time="0.0310296" status="run">
+	<testcase name="MonteCarloSlow.GammaMixedVarianceLowerThanLR" classname="MonteCarloSlow.GammaMixedVarianceLowerThanLR" time="0.0325789" status="run">
 		<properties>
 			<property name="cmake_labels" value="SLOW"/>
 		</properties>
@@ -90,15 +90,15 @@ Note: Google Test filter = MonteCarloSlow.GammaMixedVarianceLowerThanLR
 [----------] Global test environment set-up.
 [----------] 1 test from MonteCarloSlow
 [ RUN      ] MonteCarloSlow.GammaMixedVarianceLowerThanLR
-[       OK ] MonteCarloSlow.GammaMixedVarianceLowerThanLR (28 ms)
-[----------] 1 test from MonteCarloSlow (28 ms total)
+[       OK ] MonteCarloSlow.GammaMixedVarianceLowerThanLR (29 ms)
+[----------] 1 test from MonteCarloSlow (29 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (28 ms total)
+[==========] 1 test from 1 test suite ran. (29 ms total)
 [  PASSED  ] 1 test.
 </system-out>
 	</testcase>
-	<testcase name="MonteCarloSlow.QmcReducesErrorVsAnalytic" classname="MonteCarloSlow.QmcReducesErrorVsAnalytic" time="1.35307" status="run">
+	<testcase name="MonteCarloSlow.QmcReducesErrorVsAnalytic" classname="MonteCarloSlow.QmcReducesErrorVsAnalytic" time="1.28367" status="run">
 		<properties>
 			<property name="cmake_labels" value="SLOW"/>
 		</properties>
@@ -108,15 +108,15 @@ Note: Google Test filter = MonteCarloSlow.QmcReducesErrorVsAnalytic
 [----------] Global test environment set-up.
 [----------] 1 test from MonteCarloSlow
 [ RUN      ] MonteCarloSlow.QmcReducesErrorVsAnalytic
-[       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1350 ms)
-[----------] 1 test from MonteCarloSlow (1350 ms total)
+[       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1281 ms)
+[----------] 1 test from MonteCarloSlow (1281 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (1350 ms total)
+[==========] 1 test from 1 test suite ran. (1281 ms total)
 [  PASSED  ] 1 test.
 </system-out>
 	</testcase>
-	<testcase name="AmericanSlow.LsmcMatchesPsorWithinSe" classname="AmericanSlow.LsmcMatchesPsorWithinSe" time="0.655443" status="run">
+	<testcase name="AmericanSlow.LsmcMatchesPsorWithinSe" classname="AmericanSlow.LsmcMatchesPsorWithinSe" time="0.638658" status="run">
 		<properties>
 			<property name="cmake_labels" value="SLOW"/>
 		</properties>
@@ -126,11 +126,11 @@ Note: Google Test filter = AmericanSlow.LsmcMatchesPsorWithinSe
 [----------] Global test environment set-up.
 [----------] 1 test from AmericanSlow
 [ RUN      ] AmericanSlow.LsmcMatchesPsorWithinSe
-[       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (651 ms)
-[----------] 1 test from AmericanSlow (651 ms total)
+[       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (627 ms)
+[----------] 1 test from AmericanSlow (627 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (651 ms total)
+[==========] 1 test from 1 test suite ran. (627 ms total)
 [  PASSED  ] 1 test.
 </system-out>
 	</testcase>
