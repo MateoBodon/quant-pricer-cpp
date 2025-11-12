@@ -5,6 +5,7 @@
 ## 2025-11-12 (CI coverage fallback + Pages branch policy)
 - Reworked the CI coverage job to ignore `CompilerId` gcov noise, skip Codecov uploads unless `CODECOV_TOKEN` is present, and tightened the README badges (drop duplicate CI badge, track Docs Pages workflow instead).
 - Added the `master` branch to the `github-pages` environment policy so GitHub Actions can deploy again (previously restricted to `gh-pages` only).
+- Added a Docs-Pages alias step so `_results_8md.html` and friends are copied to `Results.html`/`WRDS_Results.html`/`README.html`/`ValidationHighlights.html`, matching the public URLs linked from the README badges.
 - Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
 - Artifacts: n/a (workflow + docs wiring).
 

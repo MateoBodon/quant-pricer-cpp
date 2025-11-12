@@ -36,6 +36,19 @@ jobs:
         run: |
           mkdir -p docs/html/artifacts
           cp -R docs/artifacts/. docs/html/artifacts/
+      - name: Create friendly doc aliases
+        run: |
+          declare -A aliases=(
+            ["_results_8md.html"]="Results.html"
+            ["_w_r_d_s___results_8md.html"]="WRDS_Results.html"
+            ["_r_e_a_d_m_e_8md.html"]="README.html"
+            ["_validationhighlights_8md.html"]="ValidationHighlights.html"
+          )
+          for src in "${!aliases[@]}"; do
+            if [[ -f "docs/html/$src" ]]; then
+              cp "docs/html/$src" "docs/html/${aliases[$src]}"
+            fi
+          done
       - name: Inject base href for project Pages path
         run: |
           python3 - <<'PY'
