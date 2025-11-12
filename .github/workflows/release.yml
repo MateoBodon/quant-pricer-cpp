@@ -15,6 +15,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Drop committed venv (not needed in CI)
+        run: rm -rf .venv
       - name: Set up dependencies
         run: |
           sudo apt-get update

@@ -27,7 +27,7 @@
 - Artifacts: refreshed `docs/artifacts/ql_parity/ql_parity.{csv,png}` and appended the `ql_parity` section in `docs/artifacts/manifest.json`.
 
 ## 2025-11-12 (Release/wheels submodule fix)
-- The v0.3.2 release job failed because `actions/checkout` skipped submodules, so `pcg_random.hpp` was missing; updated both `release.yml` and `wheels.yml` to checkout submodules before building and excluded `.venv` from the scikit-build wheel/sdist payload.
+- The v0.3.2 release job failed because `actions/checkout` skipped submodules, so `pcg_random.hpp` was missing; updated both `release.yml` and `wheels.yml` to checkout submodules before building, drop the repo’s tracked `.venv/`, and exclude `.venv` from the scikit-build wheel/sdist payload.
 - Commands run: `git tag -a v0.3.2 -m 'Release v0.3.2'` (initial attempt), `git push origin v0.3.2`, identified the failure in run `19284861635`, then patched the workflows (`.github/workflows/release.yml`, `.github/workflows/wheels.yml`).
 - Artifacts: n/a (workflow plumbing only, but required for the validation pack + cibuildwheel jobs to succeed on tags).
 

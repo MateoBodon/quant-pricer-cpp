@@ -17,6 +17,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Drop committed venv (not needed in CI)
+        run: rm -rf .venv
       - uses: pypa/cibuildwheel@v2.17.0
         env:
           CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
