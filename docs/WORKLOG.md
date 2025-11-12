@@ -2,6 +2,12 @@
 
 # WORKLOG
 
+## 2025-11-12 (CI coverage fallback + Pages branch policy)
+- Reworked the CI coverage job to ignore `CompilerId` gcov noise, skip Codecov uploads unless `CODECOV_TOKEN` is present, and tightened the README badges (drop duplicate CI badge, track Docs Pages workflow instead).
+- Added the `master` branch to the `github-pages` environment policy so GitHub Actions can deploy again (previously restricted to `gh-pages` only).
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel`, `CTEST_OUTPUT_ON_FAILURE=1 ctest --test-dir build -L FAST -VV`.
+- Artifacts: n/a (workflow + docs wiring).
+
 ## 2025-11-11 (WRDS panel rename + aggregated artifacts)
 - Added `wrds_pipeline_dates_panel.yaml` (≥5 stress/calm dates), taught the pipeline to read YAML via PyYAML, renamed the in-sample metrics to `iv_rmse_volpts_vega_wt`/`iv_mae_volpts_vega_wt`/`iv_p90_bps`, and changed the OOS/PnL summaries to report `iv_mae_bps`, `price_mae_ticks`, and `pnl_sigma`.
 - Trimmed committed artifacts to the aggregated CSV/PNG set (`wrds_agg_{pricing,oos,pnl}.csv`, `wrds_multi_date_summary.png`), updated README/Results/WRDS docs, and refreshed the manifest so historical entries carry the new metric names/units.
