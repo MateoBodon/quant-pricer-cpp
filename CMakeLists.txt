@@ -110,6 +110,8 @@ add_library(quant_pricer
   src/multi.cpp
 )
 
+set_target_properties(quant_pricer PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 add_library(quant_pricer::quant_pricer ALIAS quant_pricer)
 
 target_compile_features(quant_pricer PUBLIC cxx_std_20)
