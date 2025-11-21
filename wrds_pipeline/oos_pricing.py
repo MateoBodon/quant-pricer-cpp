@@ -5,9 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, Tuple
 
+import numpy as np
 import pandas as pd
 
-from .calibrate_heston import apply_model, compute_oos_iv_metrics
+from .calibrate_heston import apply_model, compute_oos_iv_metrics, _vega_quote_weights
 
 TICK_SIZE = 0.05
 
@@ -21,15 +22,22 @@ def evaluate(
     modeled = modeled[mask].copy()
     modeled["abs_iv_bps"] = modeled["iv_error_bps"].abs()
     modeled["abs_price_ticks"] = modeled["price_error_ticks"].abs()
-    summary = (
-        modeled.groupby("tenor_bucket", as_index=False, observed=True)
-        .agg(
-            iv_mae_bps=("abs_iv_bps", "mean"),
-            price_mae_ticks=("abs_price_ticks", "mean"),
-            quotes=("quotes", "sum"),
+    modeled["weight"] = _vega_quote_weights(modeled, default=1.0)
+    summary = []
+    for bucket, group in modeled.groupby("tenor_bucket", observed=True):
+        weights = group["weight"].to_numpy(np.float64)
+        summary.append(
+            {
+                "tenor_bucket": bucket,
+                "iv_mae_bps": float(np.average(group["abs_iv_bps"], weights=weights)),
+                "price_mae_ticks": float(
+                    np.average(group["abs_price_ticks"], weights=weights)
+                ),
+                "quotes": group["quotes"].sum(),
+                "weight": float(weights.sum()),
+            }
         )
-        .sort_values("tenor_bucket")
-    )
+    summary = pd.DataFrame(summary).sort_values("tenor_bucket")
     metrics = compute_oos_iv_metrics(modeled)
     return modeled, summary, metrics
 
@@ -43,6 +51,7 @@ def write_outputs(
         "trade_date",
         "tenor_bucket",
         "moneyness",
+        "vega",
         "mid_iv",
         "model_iv",
         "iv_error_bps",
@@ -50,6 +59,7 @@ def write_outputs(
         "model_price",
         "price_error_ticks",
         "quotes",
+        "weight",
     ]
     detail[detail_cols].to_csv(detail_csv, index=False)
     summary.to_csv(summary_csv, index=False)

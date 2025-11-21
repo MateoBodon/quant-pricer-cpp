@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-11-21T16:19:58.436473+00:00",
+  "generated_at": "2025-11-21T19:47:49.948177+00:00",
   "git": {
     "branch": "master",
     "dirty": true,
-    "sha": "63f05f6cfb3b42d0b5344177cece407d85d8fcf1"
+    "sha": "b6a428be9c4aa9262c70cb7b8343bdd7bbc06d45"
   },
   "omp_threads": 11,
   "runs": {
@@ -66,37 +66,37 @@
     },
     "heston": [
       {
-        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/calibrate_heston.py --input /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpogfw8ob1",
-        "cost": 0.10009447660567011,
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/calibrate_heston.py --input /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpqemnint6",
+        "cost": 0.10009447642300245,
         "csv_rows": 12,
         "date": "2024-06-14",
         "diagnostics": {
           "attempts": [
             {
-              "feller": -0.005346835466190358,
-              "nit": 43,
-              "rmse_price": 159.9671008310968,
-              "rmse_vol": 0.11992482093380687,
+              "feller": -0.005345529990833604,
+              "nit": 36,
+              "rmse_price": 159.96767429709146,
+              "rmse_vol": 0.11992470876057322,
               "success": true
             },
             {
-              "feller": -0.05674098216400479,
-              "nit": 37,
-              "rmse_price": 338.6432310104845,
-              "rmse_vol": 0.18735120917254153,
+              "feller": -0.05674608832765095,
+              "nit": 36,
+              "rmse_price": 338.63797711092536,
+              "rmse_vol": 0.18734896437577817,
               "success": true
             }
           ],
           "feller_violation": true,
           "param_transform": "exp",
-          "residual_norm": 0.4474248017391757,
+          "residual_norm": 0.44742480133090967,
           "retry_failures": 0,
           "warnings": [],
           "weight_mode": "vega"
         },
         "fast": true,
-        "feller": -0.005346835466190358,
-        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpogfw8ob1/fit_20240614.png",
+        "feller": -0.005345529990833604,
+        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpqemnint6/fit_20240614.png",
         "input": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv",
         "inputs": [
           {
@@ -110,25 +110,25 @@
         "n_maturities": 2,
         "n_obs": 12,
         "n_strikes": 6,
-        "nit": 43,
+        "nit": 36,
         "param_transform": "exp",
         "params": {
-          "kappa": 2.0355910378232185,
-          "rho": -0.9309381242886762,
-          "sigma": 0.08592104808493421,
+          "kappa": 2.035381962728983,
+          "rho": -0.9309384750701263,
+          "sigma": 0.08591223401566617,
           "theta": 0.0005,
           "v0": 0.0005
         },
-        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpogfw8ob1/params_20240614.json",
+        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpqemnint6/params_20240614.json",
         "retries": 2,
-        "rmse_price": 159.9671008310968,
-        "rmse_vol": 0.11992482093380687,
-        "rmspe_price": 0.7346744479212332,
-        "rmspe_price_pct": 73.46744479212332,
-        "rmspe_vol": 0.5456522442121358,
-        "rmspe_vol_pct": 54.56522442121358,
+        "rmse_price": 159.96767429709146,
+        "rmse_vol": 0.11992470876057322,
+        "rmspe_price": 0.7346779304651722,
+        "rmspe_price_pct": 73.46779304651722,
+        "rmspe_vol": 0.5456518491996617,
+        "rmspe_vol_pct": 54.56518491996617,
         "seed": 19,
-        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpogfw8ob1/fit_20240614.csv",
+        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpqemnint6/fit_20240614.csv",
         "warnings": [
           "WARNING: Feller condition violated (-0.0053) for 2024-06-14"
         ],
@@ -171,23 +171,23 @@
           "diagnostics": {
             "attempts": [
               {
-                "feller": -0.0751829360338987,
-                "nit": 34,
-                "rmse_price": 1.1343069027090056,
-                "rmse_vol": 0.12470152898284761,
+                "feller": -0.0751828184262149,
+                "nit": 32,
+                "rmse_price": 1.1343050843152138,
+                "rmse_vol": 0.12470154157860311,
                 "success": true
               },
               {
-                "feller": 0.17914820775075047,
-                "nit": 31,
-                "rmse_price": 3.3314567971069247,
-                "rmse_vol": 0.25080732289014096,
+                "feller": 0.17914510463236394,
+                "nit": 32,
+                "rmse_price": 3.3314376146379705,
+                "rmse_vol": 0.2508070201902321,
                 "success": true
               }
             ],
             "feller_violation": true,
             "param_transform": "none",
-            "residual_norm": 31.846378467814958,
+            "residual_norm": 31.846332149203835,
             "retry_failures": 0,
             "warnings": [],
             "weight_mode": "iv"
@@ -195,21 +195,21 @@
           "fast_mode": true,
           "figure_png": "artifacts/heston/series_runs/fit_20230601.png",
           "input_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/normalized/spy_20230601.csv",
-          "kappa": 1.648401208784239,
+          "kappa": 1.648402252108925,
           "metric": "price",
           "n_maturities": 2,
           "n_obs": 12,
           "n_strikes": 12,
           "param_transform": "none",
           "params_json": "artifacts/heston/series_runs/params_20230601.json",
-          "rho": -0.7035308980977216,
-          "rmse_price": 1.1343069027090056,
-          "rmse_vol": 0.12470152898284761,
-          "rmspe_vol_pct": 71.53089289465197,
-          "sigma_v": 0.3821737560915302,
+          "rho": -0.7035306661564006,
+          "rmse_price": 1.1343050843152138,
+          "rmse_vol": 0.12470154157860311,
+          "rmspe_vol_pct": 71.53088823906005,
+          "sigma_v": 0.38217299370740815,
           "table_csv": "artifacts/heston/series_runs/fit_20230601.csv",
-          "theta": 0.021497752923719946,
-          "v0": 0.0005000112268043826,
+          "theta": 0.02149759823562304,
+          "v0": 0.0005000090117344774,
           "weight_mode": "iv"
         },
         {
@@ -217,17 +217,17 @@
           "diagnostics": {
             "attempts": [
               {
-                "feller": -1.1211696209004385,
+                "feller": -1.1130200315504828,
                 "nit": 6,
-                "rmse_price": 260.34774347151205,
-                "rmse_vol": 0.21375344446621175,
+                "rmse_price": 256.68846089503654,
+                "rmse_vol": 0.2108312654288685,
                 "success": true
               },
               {
-                "feller": -0.08366917221498471,
+                "feller": -0.08366904592135438,
                 "nit": 2,
-                "rmse_price": 4720.513374857605,
-                "rmse_vol": 1.1018569756727399,
+                "rmse_price": 4720.90810430816,
+                "rmse_vol": 1.102133282121854,
                 "success": true
               }
             ],
@@ -241,21 +241,21 @@
           "fast_mode": true,
           "figure_png": "artifacts/heston/series_runs/fit_20240614.png",
           "input_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv",
-          "kappa": -0.6899073169753539,
+          "kappa": -0.6825275385040155,
           "metric": "price",
           "n_maturities": 2,
           "n_obs": 12,
           "n_strikes": 6,
           "param_transform": "none",
           "params_json": "artifacts/heston/series_runs/params_20240614.json",
-          "rho": -0.7150904250921818,
-          "rmse_price": 260.34774347151205,
-          "rmse_vol": 0.21375344446621175,
-          "rmspe_vol_pct": 92.99321387088277,
-          "sigma_v": -0.8875921616681673,
+          "rho": -0.715072851092029,
+          "rmse_price": 256.68846089503654,
+          "rmse_vol": 0.2108312654288685,
+          "rmspe_vol_pct": 91.70041880430429,
+          "sigma_v": -0.8867003586218594,
           "table_csv": "artifacts/heston/series_runs/fit_20240614.csv",
-          "theta": 0.24159025947653257,
-          "v0": -0.07605020606441087,
+          "theta": 0.23939144366731382,
+          "v0": -0.07594915395827576,
           "weight_mode": "iv"
         }
       ],
@@ -894,6 +894,14 @@
         "inputs": [],
         "png": "artifacts/parity_checks.png",
         "rows": 15
+      },
+      {
+        "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
       }
     ],
     "pde_order_slope": {
@@ -966,12 +974,12 @@
     ],
     "qmc_vs_prng_equal_time": {
       "budget_count": 6,
-      "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp2ceb8kj_/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp2ceb8kj_/qmc_summary.csv",
-      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp2ceb8kj_/qmc_summary.csv",
+      "command": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/.venv/bin/python3.12 /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpqp6xw_ff/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpqp6xw_ff/qmc_summary.csv",
+      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpqp6xw_ff/qmc_summary.csv",
       "csv_rows": 12,
       "fast": true,
-      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp2ceb8kj_/qmc_plot.png",
-      "generated_at": "2025-11-21T04:51:16.678841+00:00",
+      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpqp6xw_ff/qmc_plot.png",
+      "generated_at": "2025-11-21T19:47:43.425633+00:00",
       "inputs": [],
       "paths": [
         256,
@@ -1003,140 +1011,140 @@
       },
       "summary_rows": [
         {
-          "paths_prng": 451.4428822822716,
-          "paths_qmc": 24.591767720195094,
+          "paths_prng": 340.57428572225786,
+          "paths_qmc": 16.35128524334453,
           "payoff": "call",
-          "rmse_prng": 0.6925718656507839,
-          "rmse_qmc": 0.08275562076459957,
-          "rmse_ratio": 8.36888007427099,
-          "time_seconds": 3.522916813381016e-05
+          "rmse_prng": 0.7973707916083351,
+          "rmse_qmc": 0.10148840506048648,
+          "rmse_ratio": 7.85676739262093,
+          "time_seconds": 2.1465166355483234e-05
         },
         {
-          "paths_prng": 934.7141957728758,
-          "paths_qmc": 50.91734810616197,
+          "paths_prng": 764.5710409255134,
+          "paths_qmc": 36.70776010720083,
           "payoff": "call",
-          "rmse_prng": 0.48131215674527045,
-          "rmse_qmc": 0.05751213453577866,
-          "rmse_ratio": 8.36888007427099,
-          "time_seconds": 7.294212590852699e-05
+          "rmse_prng": 0.5321785035542791,
+          "rmse_qmc": 0.06773504635686435,
+          "rmse_ratio": 7.856767392620932,
+          "time_seconds": 4.818814946421118e-05
         },
         {
-          "paths_prng": 1935.3292787835892,
-          "paths_qmc": 105.42456189658199,
+          "paths_prng": 1716.4210603340866,
+          "paths_qmc": 82.40695651959587,
           "payoff": "call",
-          "rmse_prng": 0.3344943733934388,
-          "rmse_qmc": 0.039968833395258856,
-          "rmse_ratio": 8.36888007427099,
-          "time_seconds": 0.00015102694766582232
+          "rmse_prng": 0.3551847680224352,
+          "rmse_qmc": 0.045207494415072595,
+          "rmse_ratio": 7.856767392620931,
+          "time_seconds": 0.00010817981609501837
         },
         {
-          "paths_prng": 4007.106593925229,
-          "paths_qmc": 218.28195427446468,
+          "paths_prng": 3853.27340255019,
+          "paths_qmc": 184.9992062438706,
           "payoff": "call",
-          "rmse_prng": 0.23246137514678242,
-          "rmse_qmc": 0.027776879711952623,
-          "rmse_ratio": 8.36888007427099,
-          "time_seconds": 0.0003127018665436049
+          "rmse_prng": 0.23705621063719623,
+          "rmse_qmc": 0.03017223226690397,
+          "rmse_ratio": 7.856767392620931,
+          "time_seconds": 0.00024285789640134667
         },
         {
-          "paths_prng": 8296.72936337288,
-          "paths_qmc": 451.9536121821372,
+          "paths_prng": 8650.392527758158,
+          "paths_qmc": 415.3133152384258,
           "payoff": "call",
-          "rmse_prng": 0.16155216719168006,
-          "rmse_qmc": 0.019303917102164093,
-          "rmse_ratio": 8.368880074270988,
-          "time_seconds": 0.0006474503977675432
+          "rmse_prng": 0.1582152503739044,
+          "rmse_qmc": 0.02013744870727623,
+          "rmse_ratio": 7.856767392620932,
+          "time_seconds": 0.0005452029775377224
         },
         {
-          "paths_prng": 17178.409537048155,
-          "paths_qmc": 935.7716639628634,
+          "paths_prng": 19419.668179987013,
+          "paths_qmc": 932.3561615013518,
           "payoff": "call",
-          "rmse_prng": 0.11227285697612724,
-          "rmse_qmc": 0.013415517486180166,
-          "rmse_ratio": 8.36888007427099,
-          "time_seconds": 0.0013405484981679667
+          "rmse_prng": 0.10559548464725817,
+          "rmse_qmc": 0.013440067571102252,
+          "rmse_ratio": 7.856767392620931,
+          "time_seconds": 0.0012239515005300443
         },
         {
-          "paths_prng": 342.5103665094795,
-          "paths_qmc": 58.29272571010515,
+          "paths_prng": 450.91824077543407,
+          "paths_qmc": 111.42638775507268,
           "payoff": "asian",
-          "rmse_prng": 0.35203926119766626,
-          "rmse_qmc": 0.14194982579164817,
-          "rmse_ratio": 2.4800260178859554,
-          "time_seconds": 5.836116906721145e-05
+          "rmse_prng": 0.3068167456662171,
+          "rmse_qmc": 0.10267105378489096,
+          "rmse_ratio": 2.988347098385077,
+          "time_seconds": 0.00010588883499925335
         },
         {
-          "paths_prng": 593.7385476880507,
-          "paths_qmc": 101.04990005590918,
+          "paths_prng": 700.734882788889,
+          "paths_qmc": 173.15856779017653,
           "payoff": "asian",
-          "rmse_prng": 0.2673808737992674,
-          "rmse_qmc": 0.10781373738457406,
-          "rmse_ratio": 2.4800260178859554,
-          "time_seconds": 0.00010116854598146561
+          "rmse_prng": 0.2461223723022712,
+          "rmse_qmc": 0.08236070449623382,
+          "rmse_ratio": 2.988347098385078,
+          "time_seconds": 0.00016455311334102098
         },
         {
-          "paths_prng": 1029.2402726472208,
-          "paths_qmc": 175.169065726826,
+          "paths_prng": 1088.9543415071116,
+          "paths_qmc": 269.0914621144591,
           "payoff": "asian",
-          "rmse_prng": 0.2030811320033915,
-          "rmse_qmc": 0.08188669414706529,
-          "rmse_ratio": 2.4800260178859554,
-          "time_seconds": 0.00017537473733976688
+          "rmse_prng": 0.19743453707575023,
+          "rmse_qmc": 0.06606814087374427,
+          "rmse_ratio": 2.9883470983850775,
+          "time_seconds": 0.00025571843443564034
         },
         {
-          "paths_prng": 1784.178478833578,
-          "paths_qmc": 303.65395285529235,
+          "paths_prng": 1692.2542134161774,
+          "paths_qmc": 418.17286841180123,
           "payoff": "asian",
-          "rmse_prng": 0.15424418953294614,
-          "rmse_qmc": 0.06219458522633898,
-          "rmse_ratio": 2.4800260178859554,
-          "time_seconds": 0.0003040104826911997
+          "rmse_prng": 0.15837811112287928,
+          "rmse_qmc": 0.052998566066327385,
+          "rmse_ratio": 2.9883470983850775,
+          "time_seconds": 0.00039739094801990353
         },
         {
-          "paths_prng": 3092.8568663033648,
-          "paths_qmc": 526.3813145435046,
+          "paths_prng": 2629.7928330598425,
+          "paths_qmc": 649.84799778364,
           "payoff": "asian",
-          "rmse_prng": 0.11715155302698468,
-          "rmse_qmc": 0.04723803386822852,
-          "rmse_ratio": 2.4800260178859554,
-          "time_seconds": 0.0005269993557115322
+          "rmse_prng": 0.12704781267943618,
+          "rmse_qmc": 0.04251440963738572,
+          "rmse_ratio": 2.9883470983850775,
+          "time_seconds": 0.0006175525277115013
         },
         {
-          "paths_prng": 5361.438728760788,
-          "paths_qmc": 912.4771329177787,
+          "paths_prng": 4086.7443496281035,
+          "paths_qmc": 1009.8752265475482,
           "payoff": "asian",
-          "rmse_prng": 0.0889789522587034,
-          "rmse_qmc": 0.03587823338020929,
-          "rmse_ratio": 2.4800260178859554,
-          "time_seconds": 0.0009135485015576705
+          "rmse_prng": 0.10191526210402793,
+          "rmse_qmc": 0.034104225094569375,
+          "rmse_ratio": 2.9883470983850775,
+          "time_seconds": 0.000959687497622023
         }
       ],
       "time_grid": {
         "asian": [
-          5.836116906721145e-05,
-          0.00010116854598146561,
-          0.00017537473733976688,
-          0.0003040104826911997,
-          0.0005269993557115322,
-          0.0009135485015576705
+          0.00010588883499925335,
+          0.00016455311334102098,
+          0.00025571843443564034,
+          0.00039739094801990353,
+          0.0006175525277115013,
+          0.000959687497622023
         ],
         "call": [
-          3.522916813381016e-05,
-          7.294212590852699e-05,
-          0.00015102694766582232,
-          0.0003127018665436049,
-          0.0006474503977675432,
-          0.0013405484981679667
+          2.1465166355483234e-05,
+          4.818814946421118e-05,
+          0.00010817981609501837,
+          0.00024285789640134667,
+          0.0005452029775377224,
+          0.0012239515005300443
         ]
       },
       "time_per_path": {
         "asian": {
-          "prng": 1.703924166207571e-07,
-          "qmc": 1.0011741320425926e-06
+          "prng": 2.348293447103818e-07,
+          "qmc": 9.503030398150258e-07
         },
         "call": {
-          "prng": 7.803682263348341e-08,
-          "qmc": 1.4325594050272152e-06
+          "prng": 6.30263858880653e-08,
+          "qmc": 1.3127510184081834e-06
         }
       }
     },
@@ -1504,6 +1512,21 @@
         "summary_fig": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmporwl0_4s/wrds_artifacts/wrds_multi_date_summary.png",
         "symbol": "SPX",
         "timestamp": "2025-11-21T16:19:58.435328+00:00"
+      },
+      {
+        "comparison_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_bs_heston_comparison.csv",
+        "dateset": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/wrds_pipeline_dates_panel.yaml",
+        "ivrmse_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_bs_heston_ivrmse.png",
+        "oos_bs_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_agg_oos_bs.csv",
+        "oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_agg_oos.csv",
+        "oos_heatmap_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_bs_heston_oos_heatmap.png",
+        "pnl_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_agg_pnl.csv",
+        "pnl_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_bs_heston_pnl_sigma.png",
+        "pricing_bs_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_agg_pricing_bs.csv",
+        "pricing_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_agg_pricing.csv",
+        "summary_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_multi_date_summary.png",
+        "symbol": "SPX",
+        "timestamp": "2025-11-21T19:42:03.970053+00:00"
       }
     ],
     "wrds_heston": [
@@ -3189,6 +3212,91 @@
         "price_rmse_ticks": 395.22057162969537,
         "summary": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmporwl0_4s/wrds_artifacts/per_date/2024-06-14/heston_fit.json",
         "surface_csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmporwl0_4s/wrds_artifacts/per_date/2024-06-14/heston_fit_table.csv"
+      },
+      {
+        "figure": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/heston_fit.png",
+        "iv_mae_bps": 136.23651967626566,
+        "iv_mae_volpts_vega_wt": 0.012770526638505838,
+        "iv_p90_bps": 227.00543163064856,
+        "iv_rmse_volpts_vega_wt": 0.01600708357642217,
+        "params": {
+          "kappa": 6.0,
+          "rho": 0.1,
+          "sigma": 0.05,
+          "theta": 0.027858452912156162,
+          "v0": 0.06563512754411348
+        },
+        "price_rmse_ticks": 186.54036553497377,
+        "summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/heston_fit.json",
+        "surface_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/heston_fit_table.csv"
+      },
+      {
+        "figure": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/heston_fit.png",
+        "iv_mae_bps": 130.93782012839134,
+        "iv_mae_volpts_vega_wt": 0.013593103991747629,
+        "iv_p90_bps": 271.84652396757133,
+        "iv_rmse_volpts_vega_wt": 0.01910971756988591,
+        "params": {
+          "kappa": 3.154217569530856,
+          "rho": 0.1,
+          "sigma": 0.05,
+          "theta": 0.0005,
+          "v0": 0.06717579185751016
+        },
+        "price_rmse_ticks": 199.0022110119428,
+        "summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/heston_fit.json",
+        "surface_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/heston_fit_table.csv"
+      },
+      {
+        "figure": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/heston_fit.png",
+        "iv_mae_bps": 136.23651967626566,
+        "iv_mae_volpts_vega_wt": 0.012770526638505838,
+        "iv_p90_bps": 227.00543163064856,
+        "iv_rmse_volpts_vega_wt": 0.01600708357642217,
+        "params": {
+          "kappa": 6.0,
+          "rho": 0.1,
+          "sigma": 0.05,
+          "theta": 0.027858452912156162,
+          "v0": 0.06563512754411348
+        },
+        "price_rmse_ticks": 186.54036553497377,
+        "summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/heston_fit.json",
+        "surface_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/heston_fit_table.csv"
+      },
+      {
+        "figure": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/heston_fit.png",
+        "iv_mae_bps": 130.93782012839134,
+        "iv_mae_volpts_vega_wt": 0.013593103991747629,
+        "iv_p90_bps": 271.84652396757133,
+        "iv_rmse_volpts_vega_wt": 0.01910971756988591,
+        "params": {
+          "kappa": 3.154217569530856,
+          "rho": 0.1,
+          "sigma": 0.05,
+          "theta": 0.0005,
+          "v0": 0.06717579185751016
+        },
+        "price_rmse_ticks": 199.0022110119428,
+        "summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/heston_fit.json",
+        "surface_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/heston_fit_table.csv"
+      },
+      {
+        "figure": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/heston_fit.png",
+        "iv_mae_bps": 136.23651967626566,
+        "iv_mae_volpts_vega_wt": 0.012770526638505838,
+        "iv_p90_bps": 227.00543163064856,
+        "iv_rmse_volpts_vega_wt": 0.01600708357642217,
+        "params": {
+          "kappa": 6.0,
+          "rho": 0.1,
+          "sigma": 0.05,
+          "theta": 0.027858452912156162,
+          "v0": 0.06563512754411348
+        },
+        "price_rmse_ticks": 186.54036553497377,
+        "summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/heston_fit.json",
+        "surface_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/heston_fit_table.csv"
       }
     ],
     "wrds_pipeline": [
@@ -5951,6 +6059,146 @@
         "wrds_heston_insample_fig": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmporwl0_4s/wrds_artifacts/per_date/2024-06-14/wrds_heston_insample.png",
         "wrds_heston_oos_csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmporwl0_4s/wrds_artifacts/per_date/2024-06-14/wrds_heston_oos.csv",
         "wrds_heston_oos_fig": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmporwl0_4s/wrds_artifacts/per_date/2024-06-14/wrds_heston_oos.png"
+      },
+      {
+        "fit_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/heston_fit.png",
+        "fit_json": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/heston_fit.json",
+        "fit_table": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/heston_fit_table.csv",
+        "label": "stress-covid-a",
+        "next_trade_date": "2020-03-17",
+        "oos_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/oos_pricing_detail.csv",
+        "oos_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/oos_pricing_summary.csv",
+        "pnl_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/delta_hedge_pnl.csv",
+        "pnl_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/delta_hedge_pnl_summary.csv",
+        "regime": "stress",
+        "source_next": "sample",
+        "source_today": "sample",
+        "summary_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/heston_wrds_summary.png",
+        "surface_next": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/spx_2020-03-17_surface.csv",
+        "surface_today": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/spx_2020-03-16_surface.csv",
+        "symbol": "SPX",
+        "timestamp": "2025-11-21T19:41:16.193391+00:00",
+        "trade_date": "2020-03-16",
+        "wrds_bs_fit_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/bs_fit_table.csv",
+        "wrds_bs_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/bs_oos_summary.csv",
+        "wrds_heston_hedge_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/wrds_heston_hedge.csv",
+        "wrds_heston_hedge_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/wrds_heston_hedge.png",
+        "wrds_heston_insample_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/wrds_heston_insample.csv",
+        "wrds_heston_insample_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/wrds_heston_insample.png",
+        "wrds_heston_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/wrds_heston_oos.csv",
+        "wrds_heston_oos_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-16/wrds_heston_oos.png"
+      },
+      {
+        "fit_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/heston_fit.png",
+        "fit_json": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/heston_fit.json",
+        "fit_table": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/heston_fit_table.csv",
+        "label": "stress-covid-b",
+        "next_trade_date": "2020-03-18",
+        "oos_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/oos_pricing_detail.csv",
+        "oos_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/oos_pricing_summary.csv",
+        "pnl_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/delta_hedge_pnl.csv",
+        "pnl_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/delta_hedge_pnl_summary.csv",
+        "regime": "stress",
+        "source_next": "sample",
+        "source_today": "sample",
+        "summary_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/heston_wrds_summary.png",
+        "surface_next": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/spx_2020-03-18_surface.csv",
+        "surface_today": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/spx_2020-03-17_surface.csv",
+        "symbol": "SPX",
+        "timestamp": "2025-11-21T19:41:27.638804+00:00",
+        "trade_date": "2020-03-17",
+        "wrds_bs_fit_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/bs_fit_table.csv",
+        "wrds_bs_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/bs_oos_summary.csv",
+        "wrds_heston_hedge_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/wrds_heston_hedge.csv",
+        "wrds_heston_hedge_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/wrds_heston_hedge.png",
+        "wrds_heston_insample_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/wrds_heston_insample.csv",
+        "wrds_heston_insample_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/wrds_heston_insample.png",
+        "wrds_heston_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/wrds_heston_oos.csv",
+        "wrds_heston_oos_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2020-03-17/wrds_heston_oos.png"
+      },
+      {
+        "fit_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/heston_fit.png",
+        "fit_json": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/heston_fit.json",
+        "fit_table": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/heston_fit_table.csv",
+        "label": "calm-inflation-a",
+        "next_trade_date": "2022-06-14",
+        "oos_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/oos_pricing_detail.csv",
+        "oos_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/oos_pricing_summary.csv",
+        "pnl_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/delta_hedge_pnl.csv",
+        "pnl_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/delta_hedge_pnl_summary.csv",
+        "regime": "calm",
+        "source_next": "sample",
+        "source_today": "sample",
+        "summary_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/heston_wrds_summary.png",
+        "surface_next": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/spx_2022-06-14_surface.csv",
+        "surface_today": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/spx_2022-06-13_surface.csv",
+        "symbol": "SPX",
+        "timestamp": "2025-11-21T19:41:39.928361+00:00",
+        "trade_date": "2022-06-13",
+        "wrds_bs_fit_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/bs_fit_table.csv",
+        "wrds_bs_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/bs_oos_summary.csv",
+        "wrds_heston_hedge_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/wrds_heston_hedge.csv",
+        "wrds_heston_hedge_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/wrds_heston_hedge.png",
+        "wrds_heston_insample_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/wrds_heston_insample.csv",
+        "wrds_heston_insample_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/wrds_heston_insample.png",
+        "wrds_heston_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/wrds_heston_oos.csv",
+        "wrds_heston_oos_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-13/wrds_heston_oos.png"
+      },
+      {
+        "fit_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/heston_fit.png",
+        "fit_json": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/heston_fit.json",
+        "fit_table": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/heston_fit_table.csv",
+        "label": "calm-inflation-b",
+        "next_trade_date": "2022-06-15",
+        "oos_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/oos_pricing_detail.csv",
+        "oos_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/oos_pricing_summary.csv",
+        "pnl_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/delta_hedge_pnl.csv",
+        "pnl_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/delta_hedge_pnl_summary.csv",
+        "regime": "calm",
+        "source_next": "sample",
+        "source_today": "sample",
+        "summary_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/heston_wrds_summary.png",
+        "surface_next": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/spx_2022-06-15_surface.csv",
+        "surface_today": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/spx_2022-06-14_surface.csv",
+        "symbol": "SPX",
+        "timestamp": "2025-11-21T19:41:51.173601+00:00",
+        "trade_date": "2022-06-14",
+        "wrds_bs_fit_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/bs_fit_table.csv",
+        "wrds_bs_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/bs_oos_summary.csv",
+        "wrds_heston_hedge_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/wrds_heston_hedge.csv",
+        "wrds_heston_hedge_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/wrds_heston_hedge.png",
+        "wrds_heston_insample_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/wrds_heston_insample.csv",
+        "wrds_heston_insample_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/wrds_heston_insample.png",
+        "wrds_heston_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/wrds_heston_oos.csv",
+        "wrds_heston_oos_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2022-06-14/wrds_heston_oos.png"
+      },
+      {
+        "fit_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/heston_fit.png",
+        "fit_json": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/heston_fit.json",
+        "fit_table": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/heston_fit_table.csv",
+        "label": "calm-june",
+        "next_trade_date": "2024-06-17",
+        "oos_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/oos_pricing_detail.csv",
+        "oos_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/oos_pricing_summary.csv",
+        "pnl_detail": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/delta_hedge_pnl.csv",
+        "pnl_summary": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/delta_hedge_pnl_summary.csv",
+        "regime": "calm",
+        "source_next": "sample",
+        "source_today": "sample",
+        "summary_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/heston_wrds_summary.png",
+        "surface_next": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/spx_2024-06-17_surface.csv",
+        "surface_today": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/spx_2024-06-14_surface.csv",
+        "symbol": "SPX",
+        "timestamp": "2025-11-21T19:42:03.388439+00:00",
+        "trade_date": "2024-06-14",
+        "wrds_bs_fit_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/bs_fit_table.csv",
+        "wrds_bs_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/bs_oos_summary.csv",
+        "wrds_heston_hedge_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_hedge.csv",
+        "wrds_heston_hedge_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_hedge.png",
+        "wrds_heston_insample_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_insample.csv",
+        "wrds_heston_insample_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_insample.png",
+        "wrds_heston_oos_csv": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_oos.csv",
+        "wrds_heston_oos_fig": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_oos.png"
       }
     ]
   },

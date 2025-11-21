@@ -223,6 +223,14 @@ def _positive_weights(values, default: float = 1.0) -> np.ndarray:
     return arr
 
 
+def _vega_quote_weights(surface: pd.DataFrame, default: float = 1.0) -> np.ndarray:
+    """Positive weights combining liquidity (quotes) and sensitivity (vega)."""
+    vega = surface.get("vega", default)
+    quotes = surface.get("quotes", 1.0)
+    weights = np.asarray(vega, dtype=np.float64) * np.asarray(quotes, dtype=np.float64)
+    return _positive_weights(weights, default=default)
+
+
 def _weighted_percentile(
     values: np.ndarray, weights: np.ndarray, percentile: float
 ) -> float:
@@ -240,28 +248,34 @@ def _weighted_percentile(
 
 
 def compute_insample_metrics(surface: pd.DataFrame) -> Dict[str, float]:
-    errors = (surface["model_iv"] - surface["mid_iv"]).to_numpy(np.float64)
-    weights_raw = surface.get("vega", np.ones(len(surface), dtype=np.float64))
-    weights = _positive_weights(weights_raw)
-    mask = np.isfinite(errors) & np.isfinite(weights)
-    if not mask.any():
+    weights_all = _vega_quote_weights(surface)
+    iv_errors = (surface["model_iv"] - surface["mid_iv"]).to_numpy(np.float64)
+    iv_mask = np.isfinite(iv_errors) & np.isfinite(weights_all)
+    if not iv_mask.any():
         return {
             "iv_rmse_volpts_vega_wt": float("nan"),
             "iv_mae_volpts_vega_wt": float("nan"),
             "iv_p90_bps": float("nan"),
             "price_rmse_ticks": float("nan"),
         }
-    errors = errors[mask]
-    weights = weights[mask]
-    abs_iv = np.abs(errors)
+    iv_errors = iv_errors[iv_mask]
+    iv_weights = weights_all[iv_mask]
+    abs_iv = np.abs(iv_errors)
     iv_rmse_volpts_vega_wt = float(
-        np.sqrt(np.average(np.square(errors), weights=weights))
+        np.sqrt(np.average(np.square(iv_errors), weights=iv_weights))
     )
-    iv_mae_volpts_vega_wt = float(np.average(abs_iv, weights=weights))
-    iv_p90_bps = _weighted_percentile(abs_iv * 1e4, weights, 0.9)
+    iv_mae_volpts_vega_wt = float(np.average(abs_iv, weights=iv_weights))
+    iv_p90_bps = _weighted_percentile(abs_iv * 1e4, iv_weights, 0.9)
+
     price_errors = surface["price_error_ticks"].to_numpy(np.float64)
-    price_errors = price_errors[np.isfinite(price_errors)]
-    price_rmse_ticks = float(np.sqrt(np.mean(np.square(price_errors)))) if price_errors.size else float("nan")
+    price_mask = np.isfinite(price_errors) & np.isfinite(weights_all)
+    price_errors = price_errors[price_mask]
+    price_weights = weights_all[price_mask]
+    price_rmse_ticks = (
+        float(np.sqrt(np.average(np.square(price_errors), weights=price_weights)))
+        if price_errors.size
+        else float("nan")
+    )
     return {
         "iv_rmse_volpts_vega_wt": iv_rmse_volpts_vega_wt,
         "iv_mae_volpts_vega_wt": iv_mae_volpts_vega_wt,
@@ -275,8 +289,7 @@ def compute_oos_iv_metrics(surface: pd.DataFrame) -> Dict[str, float]:
         return {
             "iv_mae_bps": 0.0,
         }
-    default_weights = np.ones(len(surface), dtype=np.float64)
-    weights = _positive_weights(surface.get("quotes", default_weights))
+    weights = _vega_quote_weights(surface, default=1.0)
     iv_error_bps = surface["iv_error_bps"].to_numpy(np.float64)
     mask = np.isfinite(iv_error_bps)
     if not mask.any():
@@ -302,7 +315,7 @@ def _objective(params_vec: np.ndarray, surface: pd.DataFrame) -> np.ndarray:
     penalty = 10.0  # vol points; large enough to steer solver away from bad regions
     for _, row in surface.iterrows():
         price, iv = _model_iv(row, params)
-        weight = float(row.get("vega", 1.0))
+        weight = float(row.get("vega", 1.0)) * float(max(row.get("quotes", 1.0), 1.0))
         target = float(row["mid_iv"])
         if not math.isfinite(iv) or iv <= 0.0 or iv > 5.0:
             residuals.append(math.sqrt(weight) * penalty)
@@ -361,6 +374,7 @@ def apply_model(surface: pd.DataFrame, params_dict: Dict[str, float]) -> pd.Data
     out["iv_error_vol"] = out["model_iv"] - out["mid_iv"]
     out["iv_error_bps"] = out["iv_error_vol"] * 1e4
     out["price_error_ticks"] = (out["model_price"] - out["mid_price"]) / TICK_SIZE
+    out["weight"] = _vega_quote_weights(out, default=1.0)
     return out
 
 
@@ -455,6 +469,7 @@ def write_tables(out_csv: Path, surface: pd.DataFrame) -> None:
         "tenor_bucket",
         "moneyness",
         "ttm_years",
+        "vega",
         "mid_price",
         "model_price",
         "mid_iv",
@@ -462,6 +477,7 @@ def write_tables(out_csv: Path, surface: pd.DataFrame) -> None:
         "iv_error_bps",
         "price_error_ticks",
         "quotes",
+        "weight",
     ]
     surface[cols].to_csv(out_csv, index=False)
 

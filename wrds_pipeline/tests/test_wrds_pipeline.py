@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import math
 from pathlib import Path
 from typing import List
 
@@ -58,23 +59,42 @@ def _write_dateset(path: Path) -> Path:
     return path
 
 
+def _baseline_sigma() -> pd.Series:
+    """Reference Δ-hedge σ from bundled sample comparison (regression harness)."""
+    repo_root = _root()
+    base_path = repo_root / "docs/artifacts/wrds/wrds_bs_heston_comparison.csv"
+    if not base_path.exists():
+        return pd.Series(dtype=float)
+    base = pd.read_csv(base_path)
+    return base.set_index("tenor_bucket")["heston_pnl_sigma"]
+
+
 def _assert_tolerances(wrds_root: Path, dates: List[str]) -> None:
     comp_path = wrds_root / "wrds_bs_heston_comparison.csv"
     comp = pd.read_csv(comp_path)
     assert not comp.empty, "comparison CSV is empty"
-    assert comp["heston_iv_rmse_volpts"].between(0.0, 5.0).all()
-    assert comp["bs_iv_rmse_volpts"].between(0.0, 5.0).all()
-    assert comp["heston_price_rmse_ticks"].between(0.0, 1e12).all()
-    assert comp["bs_price_rmse_ticks"].between(0.0, 1e7).all()
-    assert comp["heston_oos_iv_mae_bps"].between(0.0, 40000.0).all()
-    assert comp["heston_oos_price_mae_ticks"].between(0.0, 1e7).all()
-    assert comp["heston_pnl_sigma"].between(0.0, 5e3).all()
+    assert comp["heston_iv_rmse_volpts"].dropna().between(0.0, 1.0).all()
+    assert comp["bs_iv_rmse_volpts"].dropna().between(0.0, 1.0).all()
+    assert comp["heston_price_rmse_ticks"].dropna().between(0.0, 4000.0).all()
+    assert comp["bs_price_rmse_ticks"].dropna().between(0.0, 4000.0).all()
+    assert comp["heston_oos_iv_mae_bps"].dropna().between(0.0, 3000.0).all()
+    assert comp["heston_oos_price_mae_ticks"].dropna().between(0.0, 4000.0).all()
+
+    baseline_sigma = _baseline_sigma()
+    if not baseline_sigma.empty:
+        sigma = comp.set_index("tenor_bucket")["heston_pnl_sigma"].dropna()
+        for bucket, val in sigma.items():
+            base = baseline_sigma.get(bucket)
+            valid_base = base is not None and not math.isnan(base) and base > 0
+            lo = 0.2 * base if valid_base else 0.0
+            hi = 5.0 * base if valid_base else 2000.0
+            assert lo <= val <= hi, f"{bucket} hedge σ {val} outside [{lo}, {hi}]"
 
     pricing = pd.read_csv(wrds_root / "wrds_agg_pricing.csv")
     filtered = pricing[pricing["trade_date"].isin(dates)]
     assert not filtered.empty, "pricing aggregate missing expected dates"
-    assert filtered["iv_rmse_volpts_vega_wt"].between(0.0, 5.0).all()
-    assert filtered["price_rmse_ticks"].between(0.0, 1e12).all()
+    assert filtered["iv_rmse_volpts_vega_wt"].dropna().between(0.0, 1.0).all()
+    assert filtered["price_rmse_ticks"].dropna().between(0.0, 4000.0).all()
 
 
 def main() -> None:

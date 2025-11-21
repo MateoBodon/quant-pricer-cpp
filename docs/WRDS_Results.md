@@ -3,7 +3,7 @@
 This appendix tracks the deterministic WRDS OptionMetrics bundle that lives under `docs/artifacts/wrds/`. Each refresh runs the same ingest → aggregate → vega-weighted Heston calibration → next-day OOS diagnostics → Δ-hedged P&L pipeline that MARKET tests exercise. All scalar metrics are written to CSV/JSON artifacts so reviewers can diff successive runs.
 
 **Snapshot scope:** The numbers below come from the deterministic **sample** IvyDB snapshot (five SPX trade dates across calm/stress).
-Use live WRDS runs (`WRDS_ENABLED=1`, credentials set) for any headline claims; treat the sample bundle as a smoke test.
+Use live WRDS runs (`WRDS_ENABLED=1`, credentials set) for any headline claims; treat the sample bundle as a smoke test/regression harness rather than a performance statement.
 
 **Analytic fix (Nov 2025):** Heston characteristic-function bug fixed (complex shift + Laguerre nodes). Calibrations no longer blow up; QE remains **experimental** and is not used by the WRDS pipeline.
 
@@ -15,7 +15,7 @@ Use live WRDS runs (`WRDS_ENABLED=1`, credentials set) for any headline claims; 
 | `bps` | One basis point (1e-4). Quotes-weighted `iv_mae_bps` stays in bps so it is comparable to vendor surfaces. |
 | `ticks` | Price increments of 0.05 USD (SPX option tick size). Price RMSE stays in ticks for quick intuition. |
 | `vega-wtd` | Weighted by per-node Black–Scholes vega prior to averaging errors. |
-| `quotes-wtd` | Weighted by the bucketed quote counts; used for OOS MAE and hedge histograms. |
+| `quotes-wtd` | Weighted by the bucketed quote counts; OOS aggregates now use `vega × quotes` to mute deep-OTM noise. |
 
 ## Headline Metrics (sample panel)
 
@@ -26,9 +26,9 @@ Sample bundle spans five SPX trade dates (`2020-03-16`, `2020-03-17`, `2022-06-1
 | In-sample vega-wtd IV RMSE | 0.0160 | vol pts | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
 | In-sample vega-wtd IV MAE | 0.0128 | vol pts | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
 | In-sample 90th pct IV error | 227.0 | bps | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
-| In-sample price RMSE | 182.16 | ticks | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
-| Next-day IV MAE (quotes-wtd) | 137.27 | bps | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
-| Next-day price MAE (quotes-wtd) | 159.31 | ticks | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
+| In-sample price RMSE | 186.54 | ticks | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
+| Next-day IV MAE (quotes/vega-wtd) | 127.29 | bps | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
+| Next-day price MAE (quotes/vega-wtd) | 137.26 | ticks | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
 | Δ-hedged mean ticks (30/60/90d) | −79.6 / −72.3 / −67.2 | ticks | [`wrds_agg_pnl.csv`](artifacts/wrds_agg_pnl.csv) |
 | Δ-hedged σ ticks (30/60/90d) | 91.8 / 62.7 / 46.1 | ticks | [`wrds_agg_pnl.csv`](artifacts/wrds_agg_pnl.csv) |
 
@@ -40,8 +40,8 @@ For comparison, a vega-weighted least-squares BS fit per tenor bucket is now emi
 | --- | --- | --- | --- |
 | In-sample vega-wtd IV RMSE | 0.0160 | vol pts | 0.0160 |
 | In-sample vega-wtd IV MAE | 0.0126 | vol pts | 0.0128 |
-| In-sample price RMSE | 182.25 | ticks | 182.16 |
-| OOS IV error (quotes-wtd, overall) | 169.8 | bps | 170.0 |
+| In-sample price RMSE | 186.29 | ticks | 186.54 |
+| OOS IV error (quotes/vega-wtd, overall) | 169.8 | bps | 139.1 |
 
 Artifacts: [`wrds_agg_pricing_bs.csv`](artifacts/wrds_agg_pricing_bs.csv), [`wrds_agg_oos_bs.csv`](artifacts/wrds_agg_oos_bs.csv).
 
@@ -55,20 +55,20 @@ These numbers come from the bundled **sample IvyDB snapshot**; live WRDS runs (w
 
 | Tenor | BS IV RMSE (vol pts) | Heston IV RMSE (vol pts) | Δ (H−BS) | BS price RMSE (ticks) | Heston price RMSE (ticks) | Δ (ticks) |
 | --- | --- | --- | --- | --- | --- | --- |
-| 30d | 0.03605 | 0.03529 | −0.00076 | 182.25 | 182.16 | +0.08 |
-| 60d | 0.01681 | 0.01725 | +0.00044 | 210.70 | 209.53 | −1.17 |
-| 90d | 0.01510 | 0.01498 | −0.00013 | 182.25 | 183.43 | +1.18 |
+| 30d | 0.02370 | 0.02373 | +0.00003 | 147.78 | 154.32 | +6.54 |
+| 60d | 0.01567 | 0.01577 | +0.00011 | 172.19 | 166.84 | −5.35 |
+| 90d | 0.01458 | 0.01458 | −0.00001 | 218.91 | 221.98 | +3.07 |
 
 **OOS + Δ-hedged**
 
 | Tenor | BS OOS IV MAE (bps) | Heston OOS IV MAE (bps) | Δ (H−BS) (bps) | Δ‑hedged σ (Heston, ticks) |
 | --- | --- | --- | --- | --- |
-| 30d | 248.62 | 244.82 | −3.81 | 96.1 |
-| 60d | 129.51 | 132.26 | +2.75 | 64.2 |
-| 90d | 131.36 | 132.92 | +1.56 | 47.0 |
+| 30d | 166.91 | 167.42 | +0.51 | 96.1 |
+| 60d | 122.47 | 121.05 | −1.42 | 64.2 |
+| 90d | 126.27 | 128.84 | +2.57 | 47.0 |
 
 **Narrative (sample data only):**
-- After fixing the analytic characteristic function and tightening the calibration bounds, Heston now tracks BS closely on the deterministic bundle. IV RMSE deltas sit within ±0.001 vol pts, and OOS IV MAE deltas are single-digit bps.
+- After fixing the analytic characteristic function and tightening calibration bounds/weights, Heston now tracks BS closely on the deterministic bundle. IV RMSE deltas sit within ±2e−4 vol pts, and OOS IV MAE deltas are single-digit bps.
 - These near-parity results are **only** for the bundled sample snapshot; live IvyDB pulls remain the source of truth when `WRDS_ENABLED=1`.
 
 ## Live WRDS (fast, opt-in)
@@ -80,6 +80,8 @@ Fast live pull on two dates (`2024-06-14`, `2022-06-13`; calm + stress) with the
 | In-sample IV RMSE (vol pts, mean of dates) | 0.101 | 0.134 | Heston tighter overall, but front tenors still noisy |
 | OOS IV MAE (bps, quotes-wtd overall) | 1889 | 2434 | ≈22% lower for Heston |
 | Δ (H−BS) OOS IV MAE by tenor (bps) | +121 (30d), +30 (60d), −272 (90d), −683 (6m), +280 (1y) | — | Mid-tenor improvement; 30–60d still worse |
+
+These live numbers come from a prior fast pull; the current pipeline now drops DTE < 14 days, tightens wings to 0.75–1.25 moneyness, and weights OOS errors by vega×quotes, so rerunning with `WRDS_ENABLED=1` should markedly soften the 30–60d outliers while keeping the analytic pricer stable.
 
 Reproduce (keeps live artifacts under `docs/artifacts/wrds/live_panel/` and leaves samples untouched):
 

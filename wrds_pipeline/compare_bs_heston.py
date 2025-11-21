@@ -116,10 +116,10 @@ def _aggregate_buckets() -> Dict[str, pd.DataFrame]:
                 {
                     "tenor_bucket": bucket,
                     "iv_rmse_volpts": _bucket_rmse(
-                        g, "iv_error_vol", weight_col="quotes"
+                        g, "iv_error_vol", weight_col="weight" if "weight" in g.columns else "quotes"
                     )["value"],
                     "price_rmse_ticks": _bucket_rmse(
-                        g, "price_error_ticks", weight_col="quotes"
+                        g, "price_error_ticks", weight_col="weight" if "weight" in g.columns else "quotes"
                     )["value"],
                 }
             )
@@ -145,10 +145,10 @@ def _aggregate_buckets() -> Dict[str, pd.DataFrame]:
                     "trade_date": trade_date,
                     "tenor_bucket": bucket,
                     "iv_mae_bps": _bucket_mae(
-                        g, "iv_error_bps", weight_col="quotes"
+                        g, "iv_error_bps", weight_col="weight" if "weight" in g.columns else "quotes"
                     )["value"],
                     "price_mae_ticks": _bucket_mae(
-                        g, "price_error_ticks", weight_col="quotes"
+                        g, "price_error_ticks", weight_col="weight" if "weight" in g.columns else "quotes"
                     )["value"],
                     "quotes": g["quotes"].sum(),
                 }

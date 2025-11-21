@@ -68,17 +68,17 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
   Reproduce: `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv --fast`
   Data: [qmc_vs_prng_equal_time.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/qmc_vs_prng_equal_time.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_multi_date_summary.png" alt="WRDS panel summary" width="230"></a><br>
-  **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated over ≥5 calm/stress dates with vega-weighted IV RMSE, quotes-weighted OOS MAE, and Δ-hedged 1d buckets (sample medians after analytic fix: IV RMSE 0.016 vol pts, OOS IV MAE 137 bps, Δ-hedged mean ≈ −12 ticks with σ 46–92). BS baseline (one σ per tenor) lives in `wrds_agg_pricing_bs.csv` / `wrds_agg_oos_bs.csv` for comparison.<br>
+  **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated over ≥5 calm/stress dates with vega-weighted IV RMSE, vega/quote-weighted OOS MAE, and Δ-hedged 1d buckets (sample medians after analytic fix: IV RMSE 0.0160 vol pts, OOS IV MAE 127 bps, Δ-hedged mean ≈ −12 ticks with σ 46–92). BS baseline (one σ per tenor) lives in `wrds_agg_pricing_bs.csv` / `wrds_agg_oos_bs.csv` for comparison.<br>
   Reproduce (sample): `python wrds_pipeline/pipeline.py --dateset wrds_pipeline_dates_panel.yaml --use-sample`
   Data: [wrds_agg_pricing.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pricing.csv), [wrds_agg_oos.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_oos.csv), [wrds_agg_pnl.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pnl.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_bs_heston_ivrmse.png" alt="BS vs Heston IV RMSE by tenor" width="230"></a><br>
-  **WRDS BS vs Heston (sample comparison)** – On the bundled sample dates Heston and BS are now near parity (per-tenor IV RMSE deltas within ±0.001 vol pts; OOS deltas single-digit bps). Live IvyDB pulls remain the source of truth; sample bundle is a smoke test.<br>
+  **WRDS BS vs Heston (sample comparison)** – On the bundled sample dates Heston and BS are now near parity (per-tenor IV RMSE deltas within ±0.0002 vol pts; OOS deltas single-digit bps). Live IvyDB pulls remain the source of truth; sample bundle is a smoke test/regression harness.<br>
   
   | Tenor | BS IV RMSE | Heston IV RMSE | OOS IV MAE BS (bps) | OOS IV MAE Heston (bps) | Δ‑hedged σ (Heston, ticks) |
   | --- | --- | --- | --- | --- | --- |
-  | 30d | 0.036 | 0.214 | 249 | 3558 | 96 |
-  | 60d | 0.017 | 0.200 | 130 | 2059 | 64 |
-  | 90d | 0.015 | 0.155 | 131 | 1505 | 47 |
+  | 30d | 0.0237 | 0.0237 | 166.9 | 167.4 | 96.1 |
+  | 60d | 0.0157 | 0.0158 | 122.5 | 121.1 | 64.2 |
+  | 90d | 0.0146 | 0.0146 | 126.3 | 128.8 | 47.0 |
   
   See `docs/WRDS_Results.md` for narrative, heatmaps, and the full `wrds_bs_heston_comparison.csv`.
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#quantlib-parity"><img src="docs/artifacts/ql_parity/ql_parity.png" alt="QuantLib parity" width="230"></a><br>

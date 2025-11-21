@@ -373,6 +373,7 @@ def run(
         "tenor_bucket",
         "moneyness",
         "ttm_years",
+        "vega",
         "mid_iv",
         "model_iv",
         "iv_error_bps",
@@ -380,6 +381,7 @@ def run(
         "model_price",
         "price_error_ticks",
         "quotes",
+        "weight",
     ]
     insample_csv = out_dir / "wrds_heston_insample.csv"
     calib["surface"][insample_cols].to_csv(insample_csv, index=False)
@@ -535,7 +537,9 @@ def run_dateset(
         bs_summary = result["bs_summary"]
         oos_df = result["oos_summary"].copy()
         if not oos_df.empty:
-            weights = np.asarray(oos_df["quotes"].clip(lower=1), dtype=np.float64)
+            weights = np.asarray(
+                oos_df.get("weight", oos_df["quotes"]).clip(lower=1), dtype=np.float64
+            )
             price_mae_ticks = float(
                 np.average(oos_df["price_mae_ticks"], weights=weights)
             )

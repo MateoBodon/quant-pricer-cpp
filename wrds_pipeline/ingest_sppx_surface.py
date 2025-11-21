@@ -14,6 +14,7 @@ from .bs_utils import bs_vega, implied_vol_from_price
 
 SAMPLE_PATH = Path(__file__).resolve().parent / "sample_data" / "spx_options_sample.csv"
 SPOT_FALLBACK = 4500.0
+MIN_DTE_DAYS = 14  # ignore ultra-short tenor noise for calibration/OOS
 
 
 def _has_wrds_credentials() -> bool:
@@ -169,7 +170,7 @@ def _prepare_quotes(df: pd.DataFrame) -> pd.DataFrame:
     df["trade_date"] = pd.to_datetime(df["trade_date"])
     df["exdate"] = pd.to_datetime(df["exdate"])
     df["days_to_expiration"] = (df["exdate"] - df["trade_date"]).dt.days
-    df = df[df["days_to_expiration"] > 0]
+    df = df[df["days_to_expiration"] >= MIN_DTE_DAYS]
     df["ttm_years"] = df["days_to_expiration"] / 365.0
     df["option_mid"] = 0.5 * (df["best_bid"] + df["best_offer"])
     df = df[(df["option_mid"] > 0.01)]
@@ -188,7 +189,8 @@ def _prepare_quotes(df: pd.DataFrame) -> pd.DataFrame:
     df["strike"] = df["strike"].fillna(df.get("strike_price", df["spot"]))
     df = df[df["strike"] > 0]
     df["moneyness"] = df["strike"] / df["spot"]
-    df = df[df["moneyness"].between(0.6, 1.4)]
+    # Trim wings; extreme OTM quotes dominate error tails but carry little vega.
+    df = df[df["moneyness"].between(0.75, 1.25)]
 
     def _compute_iv(row: pd.Series) -> float:
         return implied_vol_from_price(
