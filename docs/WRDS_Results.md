@@ -12,6 +12,36 @@ This appendix tracks the deterministic WRDS OptionMetrics bundle that lives unde
 | `vega-wtd` | Weighted by per-node Black–Scholes vega prior to averaging errors. |
 | `quotes-wtd` | Weighted by the bucketed quote counts; used for OOS MAE and hedge histograms. |
 
+## Headline Metrics (sample panel)
+
+Sample bundle spans five SPX trade dates (`2020-03-16`, `2020-03-17`, `2022-06-13`, `2022-06-14`, `2024-06-14`) mixed calm/stress. Median values across those dates/tenor buckets:
+
+| Metric (median) | Value | Units | Source |
+| --- | --- | --- | --- |
+| In-sample vega-wtd IV RMSE | 0.167 | vol pts | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
+| In-sample vega-wtd IV MAE | 0.145 | vol pts | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
+| In-sample 90th pct IV error | 2384.74 | bps | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
+| In-sample price RMSE | 2643.44 | ticks | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
+| Next-day IV MAE (quotes-wtd) | 1942.83 | bps | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
+| Next-day price MAE (quotes-wtd) | 2072.23 | ticks | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
+| Δ-hedged mean ticks (30/60/90d) | −12.3 / −12.6 / −12.0 | ticks | [`wrds_agg_pnl.csv`](artifacts/wrds_agg_pnl.csv) |
+| Δ-hedged σ ticks (30/60/90d) | 96.1 / 64.2 / 47.0 | ticks | [`wrds_agg_pnl.csv`](artifacts/wrds_agg_pnl.csv) |
+
+## BS baseline (single σ per tenor bucket)
+
+For comparison, a vega-weighted least-squares BS fit per tenor bucket is now emitted as `wrds_agg_pricing_bs.csv` and `wrds_agg_oos_bs.csv`.
+
+| Metric (median) | BS | Units | Heston ref |
+| --- | --- | --- | --- |
+| In-sample vega-wtd IV RMSE | 0.016 | vol pts | 0.167 |
+| In-sample vega-wtd IV MAE | 0.0126 | vol pts | 0.145 |
+| In-sample price RMSE | 182.25 | ticks | 2643.44 |
+| OOS IV error (quotes-wtd) | 117 | bps | 1943 |
+
+Artifacts: [`wrds_agg_pricing_bs.csv`](artifacts/wrds_agg_pricing_bs.csv), [`wrds_agg_oos_bs.csv`](artifacts/wrds_agg_oos_bs.csv).
+
+These numbers come from the bundled **sample IvyDB snapshot**; live WRDS runs (with `WRDS_ENABLED=1`) will shift depending on the trade-date panel and calibration seed.
+
 ## Vega-weighted Calibration Snapshot
 
 | Metric | Definition | Units | Artifact |

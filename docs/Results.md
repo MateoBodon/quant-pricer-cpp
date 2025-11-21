@@ -56,11 +56,11 @@ Counter-based RNG plus antithetic sampling keeps the LR Theta/Vega and mixed-pat
 
 ## Heston QE vs Analytic
 
-Current QE runs still exhibit a large bias versus the analytic reference (CLI emits warnings in the log), so the plot captures that divergence alongside the Euler baseline. Keeping the CSV/manifest entries in-tree lets us spot the eventual QE regression fix—once the bias shrinks, the same plot will show the intended log–log convergence.
+QE now uses the integrated-variance drift term from Andersen (σ∫√v dW₁ identity) so asset/variance covariance respects the CIR expectation. The refreshed sweep still shows a stubborn bias versus the analytic CF in the at-the-money base regime (~4.4 price units at 64 steps, 80k paths), but the stress/near-Feller scenario drops below ~1 price unit with 8–16 steps. The new figure tracks both price and implied-vol RMSE across three parameter grids for QE and Euler.
 
 ![Heston QE vs analytic](artifacts/heston_qe_vs_analytic.png)
 
-- Reproduce: `./scripts/reproduce_all.sh` or `python scripts/heston_qe_vs_analytic.py --quant-cli build/quant_cli --output docs/artifacts/heston_qe_vs_analytic.png --csv docs/artifacts/heston_qe_vs_analytic.csv`
+- Reproduce: `./scripts/reproduce_all.sh` or `python scripts/heston_qe_vs_analytic.py --quant-cli build/quant_cli --output docs/artifacts/heston_qe_vs_analytic.png --csv docs/artifacts/heston_qe_vs_analytic.csv --fast`
 - Data: [artifacts/heston_qe_vs_analytic.csv](artifacts/heston_qe_vs_analytic.csv)
 - Manifest entry: `runs.heston_qe_vs_analytic`
 
@@ -111,6 +111,7 @@ The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `seci
   - `iv_rmse_volpts_vega_wt`, `iv_mae_volpts_vega_wt` (vol pts, vega-weighted)
   - `iv_p90_bps` (90th percentile IV error, basis points)
   - `price_rmse_ticks` (RMSE vs market prices, ticks)
+- BS baseline (one σ per tenor bucket) lives in [artifacts/wrds/wrds_agg_pricing_bs.csv](artifacts/wrds/wrds_agg_pricing_bs.csv) and OOS in [artifacts/wrds/wrds_agg_oos_bs.csv](artifacts/wrds/wrds_agg_oos_bs.csv) for quick Heston vs BS comparisons.
 - Next-day diagnostics per tenor bucket live in [artifacts/wrds/wrds_agg_oos.csv](artifacts/wrds/wrds_agg_oos.csv):
   - `iv_mae_bps` (quotes-weighted IV MAE), `price_mae_ticks` (quotes-weighted price MAE)
 - Δ-hedged distributions per bucket are stored in [artifacts/wrds/wrds_agg_pnl.csv](artifacts/wrds/wrds_agg_pnl.csv) with `mean_ticks` and `pnl_sigma` (tick σ).

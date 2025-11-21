@@ -277,12 +277,25 @@ McResult call_qe_mc(const McParams& p) {
                 }
             }
             v_next = std::max(v_next, 0.0);
-            const double v_avg = std::max(0.0, 0.5 * (v + v_next));
-            const double sqrt_v_avg_dt = std::sqrt(v_avg * dt);
-            const double cross = v_next - v - kappa * (theta - v_avg) * dt;
+
+            // Approximate ∫_t^{t+Δ} v_s ds using the CIR expectation so the asset drift uses a
+            // consistent average variance even when κΔ is not tiny.
+            double int_v;
+            if (kappa_small) {
+                int_v = v * dt; // κ → 0 reduces to Euler
+            } else {
+                int_v = theta * dt + (v - theta) * one_minus_exp / kappa;
+            }
+            const double v_bar = std::max(int_v / dt, 0.0);
+            const double sqrt_v_bar_dt = std::sqrt(std::max(v_bar * dt, 0.0));
+
+            // Andersen QE: σ ∫ sqrt(v) dW1 ≈ dv - κ(θ - \bar v)Δt couples asset and variance.
+            const double dv = v_next - v;
+            const double cross = dv - kappa * (theta - v_bar) * dt;
             const double correlated = (sigma > 1e-12) ? (rho / sigma) * cross : 0.0;
-            const double diffusion = sqrt_one_minus_rho2 * sqrt_v_avg_dt * z_perp;
-            logS += (p.mkt.rate - p.mkt.dividend) * dt - 0.5 * v_avg * dt + correlated + diffusion;
+            const double diffusion = sqrt_one_minus_rho2 * sqrt_v_bar_dt * z_perp;
+
+            logS += (p.mkt.rate - p.mkt.dividend) * dt - 0.5 * v_bar * dt + correlated + diffusion;
             v = v_next;
         }
 

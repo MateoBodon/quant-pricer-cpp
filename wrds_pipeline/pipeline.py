@@ -25,7 +25,7 @@ for path in (REPO_ROOT, SCRIPTS_DIR):
 
 from manifest_utils import ARTIFACTS_ROOT, update_run
 
-from . import calibrate_heston, delta_hedge_pnl, ingest_sppx_surface, oos_pricing
+from . import calibrate_heston, calibrate_bs, delta_hedge_pnl, ingest_sppx_surface, oos_pricing
 
 
 def _next_business_day(trade_date: str) -> str:
@@ -336,6 +336,18 @@ def run(
         oos_metrics = calibrate_heston.compute_oos_iv_metrics(oos_detail)
     oos_pricing.write_outputs(oos_detail_csv, oos_summary_csv, oos_detail, oos_summary)
 
+    # BS baseline (per tenor bucket constant vol)
+    bs_fit = calibrate_bs.fit_bs(agg_today)
+    bs_oos_detail = calibrate_bs.evaluate_oos(
+        agg_next, bs_fit.surface.groupby("tenor_bucket", observed=True)["fit_vol"].first()
+    )
+    bs_metrics_oos = calibrate_bs.summarize_oos(bs_oos_detail)
+    bs_insample_metrics = bs_fit.metrics
+    bs_fit_csv = out_dir / "bs_fit_table.csv"
+    bs_oos_csv = out_dir / "bs_oos_summary.csv"
+    bs_fit.surface.to_csv(bs_fit_csv, index=False)
+    bs_oos_detail.to_csv(bs_oos_csv, index=False)
+
     pnl_detail_csv = out_dir / "delta_hedge_pnl.csv"
     pnl_summary_csv = out_dir / "delta_hedge_pnl_summary.csv"
     pnl_detail, pnl_summary = delta_hedge_pnl.simulate(agg_today, agg_next)
@@ -380,6 +392,18 @@ def run(
     calibrate_heston.plot_fit(calib["surface"], calib["params"], fit_metrics, fit_fig)
     calibrate_heston.record_manifest(fit_json, summary_payload, fit_csv, fit_fig)
 
+    # Record BS baseline (no manifest entry for now)
+    bs_payload = {
+        "trade_date": trade_date,
+        "next_trade_date": next_trade_date,
+        "label": label,
+        "regime": regime,
+        **bs_insample_metrics,
+        **bs_metrics_oos,
+        "fit_csv": str(bs_fit_csv),
+        "oos_csv": str(bs_oos_csv),
+    }
+
     update_run(
         "wrds_pipeline",
         {
@@ -406,6 +430,8 @@ def run(
             "wrds_heston_oos_fig": str(oos_fig),
             "wrds_heston_hedge_csv": str(hedge_csv),
             "wrds_heston_hedge_fig": str(hedge_fig),
+            "wrds_bs_fit_csv": str(bs_fit_csv),
+            "wrds_bs_oos_csv": str(bs_oos_csv),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         },
         append=True,
@@ -417,6 +443,7 @@ def run(
         "label": label,
         "regime": regime,
         "summary": summary_payload,
+        "bs_summary": bs_payload,
         "oos_summary": oos_summary.copy(),
         "pnl_summary": pnl_summary.copy(),
         "artifacts": {
@@ -425,6 +452,8 @@ def run(
             "fit_json": fit_json,
             "summary_fig": summary_fig,
         },
+        "bs_fit": bs_fit.surface.copy(),
+        "bs_oos": bs_oos_detail.copy(),
     }
 
 
@@ -443,6 +472,8 @@ def run_dateset(
     pricing_rows = []
     oos_rows = []
     pnl_rows = []
+    bs_pricing_rows = []
+    bs_oos_rows = []
 
     for entry in entries:
         trade_date = entry["trade_date"]
@@ -485,6 +516,7 @@ def run_dateset(
             )
             continue
         summary = result["summary"]
+        bs_summary = result["bs_summary"]
         oos_df = result["oos_summary"].copy()
         if not oos_df.empty:
             weights = np.asarray(oos_df["quotes"].clip(lower=1), dtype=np.float64)
@@ -512,11 +544,34 @@ def run_dateset(
             }
         )
 
+        bs_pricing_rows.append(
+            {
+                "trade_date": bs_summary["trade_date"],
+                "next_trade_date": bs_summary.get("next_trade_date"),
+                "label": summary.get("label"),
+                "regime": summary.get("regime"),
+                "status": "ok",
+                "iv_rmse_volpts_vega_wt": bs_summary["iv_rmse_volpts_vega_wt"],
+                "iv_mae_volpts_vega_wt": bs_summary["iv_mae_volpts_vega_wt"],
+                "iv_p90_bps": bs_summary["iv_p90_bps"],
+                "price_rmse_ticks": bs_summary["price_rmse_ticks"],
+                "iv_mae_bps": bs_summary.get("iv_mae_bps"),
+                "price_mae_ticks": bs_summary.get("price_mae_ticks"),
+            }
+        )
+
         if not oos_df.empty:
             oos_df["trade_date"] = summary["trade_date"]
             oos_df["label"] = summary.get("label")
             oos_df["regime"] = summary.get("regime")
             oos_rows.append(oos_df)
+
+        bs_oos_df = result["bs_oos"].copy()
+        if not bs_oos_df.empty:
+            bs_oos_df["trade_date"] = summary["trade_date"]
+            bs_oos_df["label"] = summary.get("label")
+            bs_oos_df["regime"] = summary.get("regime")
+            bs_oos_rows.append(bs_oos_df)
 
         pnl_df = result["pnl_summary"].copy()
         if not pnl_df.empty:
@@ -528,6 +583,10 @@ def run_dateset(
     pricing_df = pd.DataFrame(pricing_rows)
     pricing_csv = agg_dir / "wrds_agg_pricing.csv"
     pricing_df.to_csv(pricing_csv, index=False)
+
+    bs_pricing_df = pd.DataFrame(bs_pricing_rows)
+    bs_pricing_csv = agg_dir / "wrds_agg_pricing_bs.csv"
+    bs_pricing_df.to_csv(bs_pricing_csv, index=False)
 
     if oos_rows:
         oos_df = pd.concat(oos_rows, ignore_index=True)
@@ -545,6 +604,23 @@ def run_dateset(
         )
     oos_csv = agg_dir / "wrds_agg_oos.csv"
     oos_df.to_csv(oos_csv, index=False)
+
+    if bs_oos_rows:
+        bs_oos_df = pd.concat(bs_oos_rows, ignore_index=True)
+    else:
+        bs_oos_df = pd.DataFrame(
+            columns=[
+                "trade_date",
+                "label",
+                "regime",
+                "tenor_bucket",
+                "iv_error_bps",
+                "price_error_ticks",
+                "quotes",
+            ]
+        )
+    bs_oos_csv = agg_dir / "wrds_agg_oos_bs.csv"
+    bs_oos_df.to_csv(bs_oos_csv, index=False)
 
     if pnl_rows:
         pnl_df = pd.concat(pnl_rows, ignore_index=True)
@@ -573,7 +649,9 @@ def run_dateset(
             "symbol": symbol,
             "dateset": str(dateset_path),
             "pricing_csv": str(pricing_csv),
+            "pricing_bs_csv": str(bs_pricing_csv),
             "oos_csv": str(oos_csv),
+            "oos_bs_csv": str(bs_oos_csv),
             "pnl_csv": str(pnl_csv),
             "summary_fig": str(multi_fig),
             "timestamp": datetime.now(timezone.utc).isoformat(),

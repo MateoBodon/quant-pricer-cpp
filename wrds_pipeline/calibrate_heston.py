@@ -71,8 +71,8 @@ def heston_call_price(
     denom = 1j * phis
     integrand1 = np.real(exp_term * cf1 / denom)
     integrand2 = np.real(exp_term * cf2 / denom)
-    p1 = 0.5 + (1.0 / math.pi) * np.trapezoid(integrand1, phis)
-    p2 = 0.5 + (1.0 / math.pi) * np.trapezoid(integrand2, phis)
+    p1 = 0.5 + (1.0 / math.pi) * np.trapz(integrand1, phis)
+    p2 = 0.5 + (1.0 / math.pi) * np.trapz(integrand2, phis)
     return spot * math.exp(-div * T) * p1 - strike * math.exp(-rate * T) * p2
 
 
