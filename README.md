@@ -71,6 +71,16 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
   **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated over ≥5 calm/stress dates with vega-weighted IV RMSE, quotes-weighted OOS MAE, and Δ-hedged 1d buckets (sample medians: IV RMSE 0.167 vol pts, OOS IV MAE 1943 bps, Δ-hedged mean ≈ −12 ticks with σ 47–96). BS baseline (one σ per tenor) lives in `wrds_agg_pricing_bs.csv` / `wrds_agg_oos_bs.csv` for comparison.<br>
   Reproduce (sample): `python wrds_pipeline/pipeline.py --dateset wrds_pipeline_dates_panel.yaml --use-sample`
   Data: [wrds_agg_pricing.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pricing.csv), [wrds_agg_oos.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_oos.csv), [wrds_agg_pnl.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pnl.csv)
+- <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_bs_heston_ivrmse.png" alt="BS vs Heston IV RMSE by tenor" width="230"></a><br>
+  **WRDS BS vs Heston (sample comparison)** – On the bundled sample dates the single-σ BS fit beats Heston on IV and price errors; treat this as a regression guard until Heston is retuned on live IvyDB.<br>
+  
+  | Tenor | BS IV RMSE | Heston IV RMSE | OOS IV MAE BS (bps) | OOS IV MAE Heston (bps) | Δ‑hedged σ (Heston, ticks) |
+  | --- | --- | --- | --- | --- | --- |
+  | 30d | 0.036 | 0.214 | 249 | 3558 | 96 |
+  | 60d | 0.017 | 0.200 | 130 | 2059 | 64 |
+  | 90d | 0.015 | 0.155 | 131 | 1505 | 47 |
+  
+  See `docs/WRDS_Results.md` for narrative, heatmaps, and the full `wrds_bs_heston_comparison.csv`.
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#quantlib-parity"><img src="docs/artifacts/ql_parity/ql_parity.png" alt="QuantLib parity" width="230"></a><br>
   **QuantLib Parity (vanilla/barrier/American)** – quant-pricer-cpp prices match QuantLib within ≈1¢ while exposing runtime deltas for each product.<br>
   Reproduce: `python scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`

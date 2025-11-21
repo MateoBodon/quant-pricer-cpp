@@ -1,26 +1,52 @@
 {
   "params": {
-    "kappa": 0.4799978140460021,
-    "theta": 0.12649646678628212,
-    "sigma": 0.4412643010894408,
-    "rho": -0.9499999999999998,
-    "v0": 0.04293554224272711
+    "kappa": -0.6984315236748186,
+    "theta": 0.24356641599717127,
+    "sigma": -0.8952904865832658,
+    "rho": -0.7150697090760835,
+    "v0": -0.07671086989091819
   },
-  "rmse_price": 845.9856331528141,
-  "rmse_vol": 0.600376749945438,
-  "rmspe_price": 2.3538322164861007,
-  "rmspe_price_pct": 235.38322164861006,
-  "rmspe_vol": 2.348917171917966,
-  "rmspe_vol_pct": 234.89171719179657,
-  "feller": -0.07327812833203641,
+  "rmse_price": 263.1234246201418,
+  "rmse_vol": 0.21601989341560784,
+  "rmspe_price": 1.4324651578470284,
+  "rmspe_price_pct": 143.24651578470284,
+  "rmspe_vol": 0.939901284599222,
+  "rmspe_vol_pct": 93.99012845992219,
+  "feller": -1.141773981448339,
   "n_obs": 12,
   "n_strikes": 6,
   "n_maturities": 2,
   "converged": true,
-  "cost": 33.51664082479954,
-  "nit": 54,
+  "cost": 600000000.0,
+  "nit": 6,
   "fast_mode": true,
   "metric": "price",
+  "weight_mode": "iv",
+  "param_transform": "none",
+  "diagnostics": {
+    "weight_mode": "iv",
+    "param_transform": "none",
+    "attempts": [
+      {
+        "success": true,
+        "rmse_price": 263.1234246201418,
+        "rmse_vol": 0.21601989341560784,
+        "feller": -1.141773981448339,
+        "nit": 6
+      },
+      {
+        "success": true,
+        "rmse_price": 4720.9536133923375,
+        "rmse_vol": 1.1021650848121163,
+        "feller": -0.08366903132877099,
+        "nit": 2
+      }
+    ],
+    "residual_norm": 34641.016151377546,
+    "feller_violation": true,
+    "retry_failures": 0,
+    "warnings": []
+  },
   "input": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/data/samples/spx_20240614_sample.csv",
   "figure": "artifacts/heston/series_runs/fit_20240614.png",
   "table": "artifacts/heston/series_runs/fit_20240614.csv"

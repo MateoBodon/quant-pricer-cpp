@@ -25,7 +25,14 @@ for path in (REPO_ROOT, SCRIPTS_DIR):
 
 from manifest_utils import ARTIFACTS_ROOT, update_run
 
-from . import calibrate_heston, calibrate_bs, delta_hedge_pnl, ingest_sppx_surface, oos_pricing
+from . import (
+    calibrate_heston,
+    calibrate_bs,
+    compare_bs_heston,
+    delta_hedge_pnl,
+    ingest_sppx_surface,
+    oos_pricing,
+)
 
 
 def _next_business_day(trade_date: str) -> str:
@@ -251,8 +258,10 @@ def run(
     output_dir: Path | None = None,
     label: str | None = None,
     regime: str | None = None,
+    wrds_root: Path | None = None,
 ) -> Dict[str, object]:
-    out_dir = output_dir or (ARTIFACTS_ROOT / "wrds")
+    wrds_root = wrds_root or (ARTIFACTS_ROOT / "wrds")
+    out_dir = output_dir or wrds_root
     out_dir.mkdir(parents=True, exist_ok=True)
 
     raw_today, source_today = ingest_sppx_surface.load_surface(
@@ -458,15 +467,21 @@ def run(
 
 
 def run_dateset(
-    symbol: str, dateset_path: Path, use_sample: bool, fast: bool
+    symbol: str,
+    dateset_path: Path,
+    use_sample: bool,
+    fast: bool,
+    *,
+    output_root: Path | None = None,
 ) -> Dict[str, Path]:
     payload = _load_dateset_payload(dateset_path)
     entries = payload.get("dates", [])
     if not entries:
         raise RuntimeError(f"{dateset_path} does not contain any dates")
-    per_date_root = ARTIFACTS_ROOT / "wrds" / "per_date"
+    wrds_root = output_root or (ARTIFACTS_ROOT / "wrds")
+    per_date_root = wrds_root / "per_date"
     per_date_root.mkdir(parents=True, exist_ok=True)
-    agg_dir = ARTIFACTS_ROOT / "wrds"
+    agg_dir = wrds_root
     agg_dir.mkdir(parents=True, exist_ok=True)
 
     pricing_rows = []
@@ -494,6 +509,7 @@ def run_dateset(
                 output_dir=per_date_dir,
                 label=label,
                 regime=regime,
+                wrds_root=wrds_root,
             )
         except Exception as exc:  # pragma: no cover
             print(f"[wrds_pipeline] {trade_date} failed: {exc}")
@@ -643,6 +659,10 @@ def run_dateset(
     multi_fig = agg_dir / "wrds_multi_date_summary.png"
     _plot_multi_date_summary(pricing_df, oos_df, pnl_df, multi_fig)
 
+    comparison = compare_bs_heston.generate_comparison_artifacts(
+        artifacts_root=agg_dir, per_date_root=per_date_root
+    )
+
     update_run(
         "wrds_dateset",
         {
@@ -654,6 +674,10 @@ def run_dateset(
             "oos_bs_csv": str(bs_oos_csv),
             "pnl_csv": str(pnl_csv),
             "summary_fig": str(multi_fig),
+            "comparison_csv": str(comparison["comparison_csv"]),
+            "ivrmse_fig": str(comparison["ivrmse_fig"]),
+            "oos_heatmap_fig": str(comparison["oos_heatmap_fig"]),
+            "pnl_fig": str(comparison["pnl_fig"]),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         },
         append=True,
@@ -679,16 +703,39 @@ def main() -> None:
         default=None,
         help="Path to a YAML/JSON file listing trade dates to batch-process",
     )
+    ap.add_argument(
+        "--output-root",
+        default=None,
+        help="Optional output root for artifacts (defaults to docs/artifacts/wrds)",
+    )
     args = ap.parse_args()
     next_trade = args.next_trade_date or _next_business_day(args.trade_date)
     use_sample = args.use_sample or not ingest_sppx_surface.has_wrds_credentials()
+    output_root = None
+    if args.output_root:
+        output_root = Path(args.output_root)
+        if not output_root.is_absolute():
+            output_root = REPO_ROOT / output_root
     if args.dateset:
         dateset_path = Path(args.dateset)
         if not dateset_path.is_absolute():
             dateset_path = REPO_ROOT / dateset_path
-        run_dateset(args.symbol.upper(), dateset_path, use_sample, args.fast)
+        run_dateset(
+            args.symbol.upper(),
+            dateset_path,
+            use_sample,
+            args.fast,
+            output_root=output_root,
+        )
     else:
-        run(args.symbol.upper(), args.trade_date, next_trade, use_sample, args.fast)
+        run(
+            args.symbol.upper(),
+            args.trade_date,
+            next_trade,
+            use_sample,
+            args.fast,
+            wrds_root=output_root,
+        )
 
 
 if __name__ == "__main__":  # pragma: no cover

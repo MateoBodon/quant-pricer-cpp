@@ -22,10 +22,10 @@ Sample bundle spans five SPX trade dates (`2020-03-16`, `2020-03-17`, `2022-06-1
 | In-sample vega-wtd IV MAE | 0.145 | vol pts | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
 | In-sample 90th pct IV error | 2384.74 | bps | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
 | In-sample price RMSE | 2643.44 | ticks | [`wrds_agg_pricing.csv`](artifacts/wrds_agg_pricing.csv) |
-| Next-day IV MAE (quotes-wtd) | 1942.83 | bps | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
-| Next-day price MAE (quotes-wtd) | 2072.23 | ticks | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
-| Δ-hedged mean ticks (30/60/90d) | −12.3 / −12.6 / −12.0 | ticks | [`wrds_agg_pnl.csv`](artifacts/wrds_agg_pnl.csv) |
-| Δ-hedged σ ticks (30/60/90d) | 96.1 / 64.2 / 47.0 | ticks | [`wrds_agg_pnl.csv`](artifacts/wrds_agg_pnl.csv) |
+| Next-day IV MAE (quotes-wtd) | 2143.33 | bps | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
+| Next-day price MAE (quotes-wtd) | 2592.79 | ticks | [`wrds_agg_oos.csv`](artifacts/wrds_agg_oos.csv) |
+| Δ-hedged mean ticks (30/60/90d) | −79.6 / −72.3 / −67.2 | ticks | [`wrds_agg_pnl.csv`](artifacts/wrds_agg_pnl.csv) |
+| Δ-hedged σ ticks (30/60/90d) | 91.8 / 62.7 / 46.1 | ticks | [`wrds_agg_pnl.csv`](artifacts/wrds_agg_pnl.csv) |
 
 ## BS baseline (single σ per tenor bucket)
 
@@ -41,6 +41,32 @@ For comparison, a vega-weighted least-squares BS fit per tenor bucket is now emi
 Artifacts: [`wrds_agg_pricing_bs.csv`](artifacts/wrds_agg_pricing_bs.csv), [`wrds_agg_oos_bs.csv`](artifacts/wrds_agg_oos_bs.csv).
 
 These numbers come from the bundled **sample IvyDB snapshot**; live WRDS runs (with `WRDS_ENABLED=1`) will shift depending on the trade-date panel and calibration seed.
+
+## BS vs Heston comparison (sample panel)
+
+`wrds_bs_heston_comparison.csv` summarizes per-tenor deltas between the single-σ BS baseline and the vega-weighted Heston calibration using only the committed sample data.
+
+**In-sample fit (vega-weighted)**
+
+| Tenor | BS IV RMSE (vol pts) | Heston IV RMSE (vol pts) | Δ (H−BS) | BS price RMSE (ticks) | Heston price RMSE (ticks) | Δ (ticks) |
+| --- | --- | --- | --- | --- | --- | --- |
+| 30d | 0.036 | 0.214 | +0.178 | 181.1 | 3351.5 | +3170.4 |
+| 60d | 0.017 | 0.200 | +0.183 | 177.1 | 4035.2 | +3858.1 |
+| 90d | 0.015 | 0.155 | +0.139 | 221.2 | 3610.4 | +3389.3 |
+
+**OOS + Δ-hedged**
+
+| Tenor | BS OOS IV MAE (bps) | Heston OOS IV MAE (bps) | Δ (H−BS) (bps) | BS OOS price MAE (ticks) | Heston OOS price MAE (ticks) | Δ (ticks) | Δ‑hedged σ (Heston, ticks) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 30d | 248.6 | 3557.5 | +3308.9 | 145.5 | 2619.1 | +2474.6 | 96.1 |
+| 60d | 129.5 | 2058.9 | +1929.3 | 142.8 | 3114.5 | +2971.7 | 64.2 |
+| 90d | 131.4 | 1505.2 | +1373.9 | 194.6 | 2896.7 | +2702.2 | 47.0 |
+
+**Narrative (sample data only):**
+- On the bundled sample panel, the single-σ BS fit dominates Heston on both in-sample IV RMSE (+0.14–0.18 vol pts worse for Heston) and next-day IV MAE (+1.3–3.3k bps). Price errors show the same pattern.
+- Δ‑hedged 1d σ remains in the 47–96 tick band, but the lack of IV fit improvement suggests the Heston calibration needs retuning before it can outperform BS on live IvyDB pulls. Use this as a regression guard; do not extrapolate these sample deltas to live data.
+
+Artifacts: [`wrds_bs_heston_comparison.csv`](artifacts/wrds_bs_heston_comparison.csv), [`wrds_bs_heston_ivrmse.png`](artifacts/wrds_bs_heston_ivrmse.png), [`wrds_bs_heston_oos_heatmap.png`](artifacts/wrds_bs_heston_oos_heatmap.png), [`wrds_bs_heston_pnl_sigma.png`](artifacts/wrds_bs_heston_pnl_sigma.png).
 
 ## Vega-weighted Calibration Snapshot
 

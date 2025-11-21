@@ -29,6 +29,11 @@ def _table_for_trade_date(trade_date: str) -> str:
     return f"opprcd{year}"
 
 
+def _secprd_table(trade_date: str) -> str:
+    year = pd.to_datetime(trade_date).year
+    return f"secprd{year}"
+
+
 def _resolve_secid(conn, ticker: str, trade_date: str) -> int:
     cur = conn.cursor()
     cur.execute(
@@ -66,7 +71,7 @@ def _fetch_from_wrds(symbol: str, trade_date: str) -> pd.DataFrame:
     )
     table = _table_for_trade_date(trade_date)
     secid = _resolve_secid(conn, symbol, trade_date)
-    query = f"""
+    base_query = f"""
         SELECT
             date,
             exdate,
@@ -74,10 +79,7 @@ def _fetch_from_wrds(symbol: str, trade_date: str) -> pd.DataFrame:
             strike_price / 1000.0 AS strike,
             best_bid,
             best_offer,
-            forward_price,
-            spot,
-            rate,
-            divyield
+            forward_price
         FROM optionm.{table}
         WHERE secid = %s
           AND date = %s
@@ -88,13 +90,30 @@ def _fetch_from_wrds(symbol: str, trade_date: str) -> pd.DataFrame:
           AND best_offer > best_bid
         LIMIT 6000
     """
+    fallback_query = base_query
     try:
-        df = pd.read_sql(query, conn, params=[secid, trade_date])
+        df = pd.read_sql(base_query, conn, params=[secid, trade_date])
+        spot_query = f"""
+            SELECT close
+            FROM optionm.{_secprd_table(trade_date)}
+            WHERE secid = %s AND date = %s
+            LIMIT 1
+        """
+        spot_df = pd.read_sql(spot_query, conn, params=[secid, trade_date])
+        spot_val = float(spot_df["close"].iloc[0]) if not spot_df.empty else SPOT_FALLBACK
+        df["spot"] = spot_val
     except errors.UndefinedTable as exc:  # pragma: no cover
         conn.close()
         raise RuntimeError(f"WRDS table optionm.{table} unavailable") from exc
+    except Exception as exc:
+        conn.close()
+        raise
     finally:
         conn.close()
+    if "rate" not in df.columns:
+        df["rate"] = 0.015
+    if "divyield" not in df.columns:
+        df["divyield"] = 0.01
     return df
 
 
@@ -108,6 +127,8 @@ def _load_sample(symbol: str, trade_date: str) -> pd.DataFrame:
     df["strike"] = df["strike_price"] / 1.0
     df["rate"] = df.get("rate", 0.015)
     df["divyield"] = df.get("dividend", 0.01)
+    df["underlying_bid"] = df.get("spot", SPOT_FALLBACK)
+    df["underlying_ask"] = df.get("spot", SPOT_FALLBACK)
     return df[
         [
             "trade_date",
@@ -117,7 +138,8 @@ def _load_sample(symbol: str, trade_date: str) -> pd.DataFrame:
             "best_bid",
             "best_offer",
             "forward_price",
-            "spot",
+            "underlying_bid",
+            "underlying_ask",
             "rate",
             "divyield",
         ]
@@ -151,7 +173,15 @@ def _prepare_quotes(df: pd.DataFrame) -> pd.DataFrame:
     df["ttm_years"] = df["days_to_expiration"] / 365.0
     df["option_mid"] = 0.5 * (df["best_bid"] + df["best_offer"])
     df = df[(df["option_mid"] > 0.01)]
-    df["spot"] = df.get("spot").fillna(df.get("forward_price")).fillna(SPOT_FALLBACK)
+    if "underlying_bid" in df.columns and "underlying_ask" in df.columns:
+        underlying_mid = 0.5 * (df["underlying_bid"] + df["underlying_ask"])
+    else:
+        underlying_mid = pd.Series(np.nan, index=df.index)
+    base_spot = df["spot"] if "spot" in df.columns else pd.Series(np.nan, index=df.index)
+    forward = df["forward_price"] if "forward_price" in df.columns else pd.Series(np.nan, index=df.index)
+    df["spot"] = (
+        base_spot.fillna(underlying_mid).fillna(forward).fillna(SPOT_FALLBACK)
+    )
     df["spot"] = np.clip(df["spot"], 1000.0, 20000.0)
     df["rate"] = df.get("rate", 0.015).fillna(0.015)
     df["dividend"] = df.get("dividend", df.get("divyield", 0.01)).fillna(0.01)
