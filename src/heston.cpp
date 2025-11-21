@@ -23,50 +23,29 @@ struct GL32 {
 };
 
 // 32-point Gauss–Laguerre nodes (x) and weights (w) for ∫_0^∞ w(x) f(x) dx
-static const double kGL32_x[32] = {0.044489365833267, 0.234526109519619, 0.576884629301886, 1.07244875381782,
-                                   1.72240877644465,  2.52833670642579,  3.49221327302199,  4.61645676974977,
-                                   5.90395850417424,  7.35812673318624,  8.98294092421260,  10.7830186325399,
-                                   12.7636979867427,  14.9311397555226,  17.2924543367153,  19.8558609403361,
-                                   22.6308890131960,  25.6286360224592,  28.8621018163235,  32.3466291539647,
-                                   36.1004948057519,  40.1457197715394,  44.5092079957549,  49.2243949873086,
-                                   54.3337213333969,  59.8925091621340,  65.9738932315048,  72.6764856363483,
-                                   80.1456711922165,  88.7250222336802,  99.3663896266145,  116.498428833741};
-static const double kGL32_w[32] = {0.109218341952385,
-                                   0.210443107938813,
-                                   0.235213229669847,
-                                   0.195903335972881,
-                                   0.129983786286072,
-                                   0.068212565104719,
-                                   0.028248880785091,
-                                   0.009025579689953,
-                                   0.002169537515914,
-                                   0.000359246582804,
-                                   0.000040069955161,
-                                   2.67678014474e-06,
-                                   9.73806705861e-08,
-                                   1.56920701086e-09,
-                                   8.00611520883e-12,
-                                   4.40455033387e-15,
-                                   2.06776392922e-19,
-                                   4.99469948627e-25,
-                                   1.03614617085e-32,
-                                   1.42362101688e-43,
-                                   1.30902850238e-59,
-                                   7.91001810658e-86,
-                                   2.69453204242e-130,
-                                   3.32235353348e-206,
-                                   9.37858201788e-342,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0};
+static const double kGL32_x[32] = {
+    0.044489365833267285, 0.23452610951961964, 0.5768846293018867, 1.072448753817818,
+    1.7224087764446454,  2.5283367064257942,  3.492213273021994,  4.616456769749767,
+    5.903958504174244,   7.358126733186241,   8.982940924212595,  10.783018632539973,
+    12.763697986742725,  14.931139755522558,  17.292454336715313, 19.855860940336054,
+    22.630889013196775,  25.628636022459247,  28.862101816323474, 32.346629153964734,
+    36.10049480575197,   40.14571977153944,   44.50920799575494,  49.22439498730864,
+    54.33372133339691,   59.89250916213402,   65.97537728793505,  72.68762809066271,
+    80.18744697791352,   88.7353404178924,    98.82954286828397,  111.7513980979377};
+static const double kGL32_w[32] = {
+    0.10921834195241631,   0.21044310793883672,  0.23521322966983194,  0.1959033359728629,
+    0.12998378628606097,   0.07057862386571173,   0.03176091250917226,   0.011918214834837557,
+    0.003738816294611212,  0.0009808033066148732, 0.00021486491880134604, 3.9203419679876094e-05,
+    5.934541612868126e-06,  7.416404578666935e-07,  7.604567879120183e-08,  6.350602226625271e-09,
+    4.2813829710405056e-10, 2.305899491891127e-11,  9.79937928872617e-13,  3.237801657729003e-14,
+    8.171823443420105e-16,  1.5421338333936845e-17, 2.119792290163458e-19,  2.054429673787832e-21,
+    1.3469825866373068e-23, 5.661294130396917e-26,  1.4185605454629279e-28, 1.91337549445389e-31,
+    1.1922487600980343e-34, 2.6715112192398583e-38, 1.3386169421063085e-42, 4.5105361938984096e-48};
 
 inline std::complex<double> iunit() { return std::complex<double>(0.0, 1.0); }
 
-inline std::complex<double> heston_phi(double u, double S0, double r, double q, double T, const Params& h) {
+inline std::complex<double> heston_phi(std::complex<double> u, double S0, double r, double q, double T,
+                                       const Params& h) {
     using cd = std::complex<double>;
     const cd i = iunit();
     const cd iu = i * u;
@@ -76,12 +55,11 @@ inline std::complex<double> heston_phi(double u, double S0, double r, double q, 
     const double rho = h.rho;
     const double v0 = h.v0;
 
-    const cd d = std::sqrt(std::pow(rho * sigma * iu - kappa, 2.0) + sigma * sigma * (iu + iu * iu));
+    const cd d = std::sqrt(std::pow(rho * sigma * iu - kappa, 2.0) + sigma * sigma * (iu + u * u));
     const cd g = (kappa - rho * sigma * iu - d) / (kappa - rho * sigma * iu + d);
-    const cd C =
-        iu * (std::log(S0) + (r - q) * T) +
-        (kappa * theta) / (sigma * sigma) *
-            ((kappa - rho * sigma * iu - d) * T - 2.0 * std::log((1.0 - g * std::exp(-d * T)) / (1.0 - g)));
+    const cd C = iu * (std::log(S0) + (r - q) * T) + (kappa * theta) / (sigma * sigma) *
+                                               ((kappa - rho * sigma * iu - d) * T -
+                                                2.0 * std::log((1.0 - g * std::exp(-d * T)) / (1.0 - g)));
     const cd D = ((kappa - rho * sigma * iu - d) / (sigma * sigma)) *
                  ((1.0 - std::exp(-d * T)) / (1.0 - g * std::exp(-d * T)));
     return std::exp(C + D * v0);
@@ -97,7 +75,7 @@ inline double P_j(int j, double lnK, const MarketParams& mkt, const Params& h) {
     const std::complex<double> denom_base = i; // for 1/(i u)
 
     // φ1 uses shift u - i with normalization φ(-i)
-    std::complex<double> phi_minus_i = heston_phi(-1.0, S0, r, q, T, h);
+    std::complex<double> phi_minus_i = heston_phi(std::complex<double>(0.0, -1.0), S0, r, q, T, h);
     double sum = 0.0;
     for (int k = 0; k < 32; ++k) {
         const double x = kGL32_x[k];
@@ -107,9 +85,9 @@ inline double P_j(int j, double lnK, const MarketParams& mkt, const Params& h) {
         const double u = x; // Laguerre transforms ∫_0^∞ f(u) e^{-u} du ≈ Σ w_k f(x_k)
         std::complex<double> phi;
         if (j == 1) {
-            phi = heston_phi(u - 1.0, S0, r, q, T, h) / phi_minus_i;
+            phi = heston_phi(std::complex<double>(u, -1.0), S0, r, q, T, h) / phi_minus_i;
         } else {
-            phi = heston_phi(u, S0, r, q, T, h);
+            phi = heston_phi(std::complex<double>(u, 0.0), S0, r, q, T, h);
         }
         const std::complex<double> integrand = std::exp(-i * u * lnK) * phi / (denom_base * u);
         // Transform ∫ f(u) du into Laguerre form ∫ e^{-x} [e^{x} f(x)] dx
@@ -135,7 +113,7 @@ double call_analytic(const MarketParams& mkt, const Params& h) {
 }
 
 std::complex<double> characteristic_function(double u, const MarketParams& mkt, const Params& h) {
-    return heston_phi(u, mkt.spot, mkt.rate, mkt.dividend, mkt.time, h);
+    return heston_phi(std::complex<double>(u, 0.0), mkt.spot, mkt.rate, mkt.dividend, mkt.time, h);
 }
 
 double implied_vol_call(const MarketParams& mkt, const Params& h) {

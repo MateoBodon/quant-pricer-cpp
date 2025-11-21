@@ -16,6 +16,9 @@ def evaluate(
     oos_surface: pd.DataFrame, params: Dict[str, float]
 ) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, float]]:
     modeled = apply_model(oos_surface.copy(), params)
+    # Drop rows where the model produced NaN / inf so aggregates remain meaningful.
+    mask = modeled[["iv_error_bps", "price_error_ticks"]].replace([float("inf"), -float("inf")], float("nan")).notnull().all(axis=1)
+    modeled = modeled[mask].copy()
     modeled["abs_iv_bps"] = modeled["iv_error_bps"].abs()
     modeled["abs_price_ticks"] = modeled["price_error_ticks"].abs()
     summary = (

@@ -285,7 +285,7 @@ def run(
     config = calibrate_heston.CalibrationConfig(
         fast=fast,
         max_evals=120 if fast else 220,
-        bootstrap_samples=60 if fast else 150,
+        bootstrap_samples=32 if fast else 150,
         rng_seed=19,
     )
     calib = calibrate_heston.calibrate(agg_today, config)

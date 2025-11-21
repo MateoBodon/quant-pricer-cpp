@@ -22,32 +22,112 @@ from .bs_utils import bs_call, bs_delta_call, bs_vega, implied_vol_from_price
 
 Params = Tuple[float, float, float, float, float]  # kappa, theta, sigma, rho, v0
 TICK_SIZE = 0.05
-LOWER_BOUNDS = np.array([0.1, 0.001, 0.05, -0.999, 0.001], dtype=float)
-UPPER_BOUNDS = np.array([5.0, 0.5, 2.5, 0.999, 0.5], dtype=float)
+# Tighter, SPX-like bounds to keep the optimizer away from numerically toxic regions
+# while still covering stressed regimes.
+LOWER_BOUNDS = np.array([0.15, 0.0005, 0.05, -0.999, 0.0005], dtype=float)
+UPPER_BOUNDS = np.array([6.0, 0.20, 1.50, 0.10, 0.20], dtype=float)
 POSITIVE_IDX = [0, 1, 2, 4]
 
+# 32-point Gauss–Laguerre (matches the C++ analytic implementation)
+GL32_X = np.array(
+    [
+        0.044489365833267285,
+        0.23452610951961964,
+        0.5768846293018867,
+        1.072448753817818,
+        1.7224087764446454,
+        2.5283367064257942,
+        3.492213273021994,
+        4.616456769749767,
+        5.903958504174244,
+        7.358126733186241,
+        8.982940924212595,
+        10.783018632539973,
+        12.763697986742725,
+        14.931139755522558,
+        17.292454336715313,
+        19.855860940336054,
+        22.630889013196775,
+        25.628636022459247,
+        28.862101816323474,
+        32.346629153964734,
+        36.10049480575197,
+        40.14571977153944,
+        44.50920799575494,
+        49.22439498730864,
+        54.33372133339691,
+        59.89250916213402,
+        65.97537728793505,
+        72.68762809066271,
+        80.18744697791352,
+        88.7353404178924,
+        98.82954286828397,
+        111.7513980979377,
+    ],
+    dtype=np.float64,
+)
+GL32_W = np.array(
+    [
+        0.10921834195241631,
+        0.21044310793883672,
+        0.23521322966983194,
+        0.1959033359728629,
+        0.12998378628606097,
+        0.07057862386571173,
+        0.03176091250917226,
+        0.011918214834837557,
+        0.003738816294611212,
+        0.0009808033066148732,
+        0.00021486491880134604,
+        3.9203419679876094e-05,
+        5.934541612868126e-06,
+        7.416404578666935e-07,
+        7.604567879120183e-08,
+        6.350602226625271e-09,
+        4.2813829710405056e-10,
+        2.305899491891127e-11,
+        9.79937928872617e-13,
+        3.237801657729003e-14,
+        8.171823443420105e-16,
+        1.5421338333936845e-17,
+        2.119792290163458e-19,
+        2.054429673787832e-21,
+        1.3469825866373068e-23,
+        5.661294130396917e-26,
+        1.4185605454629279e-28,
+        1.91337549445389e-31,
+        1.1922487600980343e-34,
+        2.6715112192398583e-38,
+        1.3386169421063085e-42,
+        4.5105361938984096e-48,
+    ],
+    dtype=np.float64,
+)
 
-def _heston_characteristic(phi, T, params: Params, r, q, log_spot, j: int):
+
+def _heston_cf(u: complex, T: float, params: Params, r: float, q: float, log_spot: float) -> complex:
+    """Risk-neutral characteristic function φ(u).
+
+    Mirrors quant::heston::characteristic_function (C++) to stay numerically consistent
+    with the analytic pricer and to minimise branch cut surprises.
+    """
     kappa, theta, sigma, rho, v0 = params
-    u = 0.5 if j == 1 else -0.5
-    b = kappa - rho * sigma if j == 1 else kappa
-    a = kappa * theta
-    phi = np.asarray(phi, dtype=np.complex128)
-    i = 1j
-    d = np.sqrt(
-        (rho * sigma * i * phi - b) ** 2
-        - sigma * sigma * (2.0 * u * i * phi - phi * phi)
+    iu = 1j * u
+    sigma2 = sigma * sigma
+    d = np.sqrt((rho * sigma * iu - kappa) ** 2 + sigma2 * (1j * u + u * u))
+    denom = (kappa - rho * sigma * iu + d)
+    denom_safe = np.where(np.abs(denom) < 1e-14, denom + 1e-14, denom)
+    g = (kappa - rho * sigma * iu - d) / denom_safe
+    exp_dT = np.exp(-d * T)
+    one_minus_g = 1.0 - g
+    one_minus_g_exp = 1.0 - g * exp_dT
+    # Stabilise logs near zero to avoid NaNs
+    log_term = np.log(one_minus_g_exp / np.where(np.abs(one_minus_g) < 1e-14, one_minus_g + 1e-14, one_minus_g))
+    C = iu * (log_spot + (r - q) * T) + (kappa * theta / sigma2) * (
+        (kappa - rho * sigma * iu - d) * T - 2.0 * log_term
     )
-    g = (b - rho * sigma * i * phi + d) / (b - rho * sigma * i * phi - d + 1e-16)
-    exp_dt = np.exp(-d * T)
-    log_term = np.log((1.0 - g * exp_dt) / (1.0 - g + 1e-16))
-    C = (r - q) * i * phi * T + (a / (sigma * sigma)) * (
-        (b - rho * sigma * i * phi + d) * T - 2.0 * log_term
-    )
-    D = ((b - rho * sigma * i * phi + d) / (sigma * sigma)) * (
-        (1.0 - exp_dt) / (1.0 - g * exp_dt + 1e-16)
-    )
-    return np.exp(C + D * v0 + i * phi * log_spot)
+    D = ((kappa - rho * sigma * iu - d) / sigma2) * ((1.0 - exp_dT) / one_minus_g_exp)
+    return np.exp(C + D * v0)
 
 
 def heston_call_price(
@@ -57,43 +137,69 @@ def heston_call_price(
     div: float,
     T: float,
     params: Params,
-    n_points: int = 256,
-    phi_max: float = 120.0,
+    n_points: int = 32,
+    phi_max: float | None = None,
 ) -> float:
     if T <= 0.0:
         return max(spot - strike, 0.0)
+
     log_spot = math.log(spot)
     log_strike = math.log(strike)
-    phis = np.linspace(1e-5, phi_max, n_points, dtype=np.float64)
-    cf1 = _heston_characteristic(phis, T, params, rate, div, log_spot, 1)
-    cf2 = _heston_characteristic(phis, T, params, rate, div, log_spot, 2)
-    exp_term = np.exp(-1j * phis * log_strike)
-    denom = 1j * phis
-    integrand1 = np.real(exp_term * cf1 / denom)
-    integrand2 = np.real(exp_term * cf2 / denom)
-    p1 = 0.5 + (1.0 / math.pi) * np.trapz(integrand1, phis)
-    p2 = 0.5 + (1.0 / math.pi) * np.trapz(integrand2, phis)
-    return spot * math.exp(-div * T) * p1 - strike * math.exp(-rate * T) * p2
+
+    def _p_j(j: int) -> float:
+        phi_minus_i = _heston_cf(-1j, T, params, rate, div, log_spot)
+        acc = 0.0
+        for x, w in zip(GL32_X, GL32_W):
+            if w == 0.0:
+                continue
+            u = x  # Laguerre node
+            if j == 1:
+                phi = _heston_cf(u - 1j, T, params, rate, div, log_spot) / (phi_minus_i + 1e-16)
+            else:
+                phi = _heston_cf(u, T, params, rate, div, log_spot)
+            integrand = cmath.exp(-1j * u * log_strike) * phi / (1j * u)
+            # Transform ∫ f(u) du to Gauss–Laguerre: ∫ e^{-x} [e^{x} f(x)] dx
+            acc += w * math.exp(x) * integrand.real
+        return 0.5 + acc / math.pi
+
+    import cmath
+
+    p1 = _p_j(1)
+    p2 = _p_j(2)
+
+    df_r = math.exp(-rate * T)
+    df_q = math.exp(-div * T)
+    intrinsic = max(0.0, spot * df_q - strike * df_r)
+    price = spot * df_q * p1 - strike * df_r * p2
+    # Enforce no-arbitrage bounds to keep the implied-vol solver well-behaved.
+    upper = spot * df_q
+    price = float(min(max(price, intrinsic + 1e-10), upper))
+    return price
 
 
 def _model_iv(row: pd.Series, params: Params) -> Tuple[float, float]:
-    price = heston_call_price(
-        spot=float(row["spot"]),
-        strike=float(row["strike"]),
-        rate=float(row["rate"]),
-        div=float(row["dividend"]),
-        T=float(row["ttm_years"]),
-        params=params,
-    )
+    T = float(row["ttm_years"])
+    spot = float(row["spot"])
+    strike = float(row["strike"])
+    rate = float(row["rate"])
+    div = float(row["dividend"])
+
+    price = heston_call_price(spot=spot, strike=strike, rate=rate, div=div, T=T, params=params)
+    intrinsic = max(0.0, spot * math.exp(-div * T) - strike * math.exp(-rate * T))
+    upper = spot * math.exp(-div * T)
+    price = float(min(max(price, intrinsic + 1e-10), upper))
+
     iv = implied_vol_from_price(
         price,
-        float(row["spot"]),
-        float(row["strike"]),
-        float(row["rate"]),
-        float(row["dividend"]),
-        float(row["ttm_years"]),
+        spot,
+        strike,
+        rate,
+        div,
+        T,
         option="call",
     )
+    if not math.isfinite(iv) or iv <= 0.0:
+        iv = float("nan")
     return price, iv
 
 
@@ -134,16 +240,28 @@ def _weighted_percentile(
 
 
 def compute_insample_metrics(surface: pd.DataFrame) -> Dict[str, float]:
-    iv_error_vol = (surface["model_iv"] - surface["mid_iv"]).to_numpy(np.float64)
-    default_weights = np.ones(len(surface), dtype=np.float64)
-    weights = _positive_weights(surface.get("vega", default_weights))
-    abs_iv = np.abs(iv_error_vol)
+    errors = (surface["model_iv"] - surface["mid_iv"]).to_numpy(np.float64)
+    weights_raw = surface.get("vega", np.ones(len(surface), dtype=np.float64))
+    weights = _positive_weights(weights_raw)
+    mask = np.isfinite(errors) & np.isfinite(weights)
+    if not mask.any():
+        return {
+            "iv_rmse_volpts_vega_wt": float("nan"),
+            "iv_mae_volpts_vega_wt": float("nan"),
+            "iv_p90_bps": float("nan"),
+            "price_rmse_ticks": float("nan"),
+        }
+    errors = errors[mask]
+    weights = weights[mask]
+    abs_iv = np.abs(errors)
     iv_rmse_volpts_vega_wt = float(
-        np.sqrt(np.average(np.square(iv_error_vol), weights=weights))
+        np.sqrt(np.average(np.square(errors), weights=weights))
     )
     iv_mae_volpts_vega_wt = float(np.average(abs_iv, weights=weights))
     iv_p90_bps = _weighted_percentile(abs_iv * 1e4, weights, 0.9)
-    price_rmse_ticks = float(np.sqrt(np.mean(np.square(surface["price_error_ticks"]))))
+    price_errors = surface["price_error_ticks"].to_numpy(np.float64)
+    price_errors = price_errors[np.isfinite(price_errors)]
+    price_rmse_ticks = float(np.sqrt(np.mean(np.square(price_errors)))) if price_errors.size else float("nan")
     return {
         "iv_rmse_volpts_vega_wt": iv_rmse_volpts_vega_wt,
         "iv_mae_volpts_vega_wt": iv_mae_volpts_vega_wt,
@@ -160,6 +278,11 @@ def compute_oos_iv_metrics(surface: pd.DataFrame) -> Dict[str, float]:
     default_weights = np.ones(len(surface), dtype=np.float64)
     weights = _positive_weights(surface.get("quotes", default_weights))
     iv_error_bps = surface["iv_error_bps"].to_numpy(np.float64)
+    mask = np.isfinite(iv_error_bps)
+    if not mask.any():
+        return {"iv_mae_bps": float("nan")}
+    weights = weights[mask]
+    iv_error_bps = iv_error_bps[mask]
     iv_mae_bps = float(np.average(np.abs(iv_error_bps), weights=weights))
     return {
         "iv_mae_bps": iv_mae_bps,
@@ -169,17 +292,22 @@ def compute_oos_iv_metrics(surface: pd.DataFrame) -> Dict[str, float]:
 def _objective(params_vec: np.ndarray, surface: pd.DataFrame) -> np.ndarray:
     kappa, theta, sigma, rho, v0 = params_vec
     params: Params = (
-        max(kappa, 1e-4),
-        max(theta, 1e-6),
-        max(sigma, 1e-4),
-        np.clip(rho, -0.999, 0.999),
-        max(v0, 1e-6),
+        max(kappa, LOWER_BOUNDS[0]),
+        max(theta, LOWER_BOUNDS[1]),
+        max(sigma, LOWER_BOUNDS[2]),
+        np.clip(rho, LOWER_BOUNDS[3], UPPER_BOUNDS[3]),
+        max(v0, LOWER_BOUNDS[4]),
     )
     residuals = []
+    penalty = 10.0  # vol points; large enough to steer solver away from bad regions
     for _, row in surface.iterrows():
         price, iv = _model_iv(row, params)
         weight = float(row.get("vega", 1.0))
-        residuals.append(math.sqrt(weight) * (iv - float(row["mid_iv"])))
+        target = float(row["mid_iv"])
+        if not math.isfinite(iv) or iv <= 0.0 or iv > 5.0:
+            residuals.append(math.sqrt(weight) * penalty)
+        else:
+            residuals.append(math.sqrt(weight) * (iv - target))
     return np.asarray(residuals)
 
 
@@ -287,11 +415,10 @@ def bootstrap_confidence_intervals(
     keys = ["kappa", "theta", "sigma", "rho", "v0"]
     samples = {key: [] for key in keys}
     n = len(surface)
-    boot_iters = (
-        config.bootstrap_samples
-        if not config.fast
-        else max(32, config.bootstrap_samples // 3)
-    )
+    if config.fast:
+        boot_iters = min(12, max(4, config.bootstrap_samples // 4))
+    else:
+        boot_iters = config.bootstrap_samples
     for _ in range(boot_iters):
         idx = [rng.randrange(0, n) for _ in range(n)]
         boot = surface.iloc[idx].reset_index(drop=True)

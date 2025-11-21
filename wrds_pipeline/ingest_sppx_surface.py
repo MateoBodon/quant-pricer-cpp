@@ -202,6 +202,9 @@ def _prepare_quotes(df: pd.DataFrame) -> pd.DataFrame:
         )
 
     df["mid_iv"] = df.apply(_compute_iv, axis=1).clip(0.05, 3.0)
+    # Discard nodes that hit the clip boundaries; they originate from noisy quotes
+    # and destabilise the Heston calibration objective.
+    df = df[(df["mid_iv"] > 0.051) & (df["mid_iv"] < 2.99)]
     df["vega"] = df.apply(
         lambda row: bs_vega(
             float(row["spot"]),
