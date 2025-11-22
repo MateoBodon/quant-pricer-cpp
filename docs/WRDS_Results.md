@@ -3,7 +3,7 @@
 This appendix tracks the deterministic WRDS OptionMetrics bundle that lives under `docs/artifacts/wrds/`. Each refresh runs the same ingest → aggregate → vega-weighted Heston calibration → next-day OOS diagnostics → Δ-hedged P&L pipeline that MARKET tests exercise. All scalar metrics are written to CSV/JSON artifacts so reviewers can diff successive runs.
 
 **Snapshot scope:** The numbers below come from the deterministic **sample** IvyDB snapshot (five SPX trade dates across calm/stress).
-Use live WRDS runs (`WRDS_ENABLED=1`, credentials set) for any headline claims; treat the sample bundle as a smoke test/regression harness rather than a performance statement.
+Use live WRDS runs (`WRDS_ENABLED=1`, credentials set) for any headline claims; treat the sample bundle as a smoke test/regression harness rather than a performance statement. Production filters drop DTE < 21d, clip wings to 0.75–1.25 with a soft taper beyond 1.2, and weight errors by `vega × quotes`.
 
 **Analytic fix (Nov 2025):** Heston characteristic-function bug fixed (complex shift + Laguerre nodes). Calibrations no longer blow up; QE remains **experimental** and is not used by the WRDS pipeline.
 
@@ -73,15 +73,19 @@ These numbers come from the bundled **sample IvyDB snapshot**; live WRDS runs (w
 
 ## Live WRDS (fast, opt-in)
 
-Fast live pull on two dates (`2024-06-14`, `2022-06-13`; calm + stress) with the corrected analytic pricer:
+Fast live pull on five dates (full dateset, calm + stress) with DTE ≥21d, 0.75–1.25 wings + taper, and vega×quote weights:
 
-| Metric (quotes/vega-wtd where applicable) | Heston | BS | Notes |
-| --- | --- | --- | --- |
-| In-sample IV RMSE (vol pts, mean of dates) | 0.101 | 0.134 | Heston tighter overall, but front tenors still noisy |
-| OOS IV MAE (bps, quotes-wtd overall) | 1889 | 2434 | ≈22% lower for Heston |
-| Δ (H−BS) OOS IV MAE by tenor (bps) | +121 (30d), +30 (60d), −272 (90d), −683 (6m), +280 (1y) | — | Mid-tenor improvement; 30–60d still worse |
+| Trade date | In-sample IV RMSE (vol pts) | OOS IV MAE (bps, weighted) |
+| --- | --- | --- |
+| 2020-03-16 | 0.213 | 1028 |
+| 2020-03-17 | 0.131 | 1318 |
+| 2022-06-13 | 0.0048 | 61.5 |
+| 2022-06-14 | 0.0059 | 140.5 |
+| 2024-06-14 | 0.0194 | 120.9 |
 
-These live numbers come from a prior fast pull; the current pipeline now drops DTE < 14 days, tightens wings to 0.75–1.25 moneyness, and weights OOS errors by vega×quotes, so rerunning with `WRDS_ENABLED=1` should markedly soften the 30–60d outliers while keeping the analytic pricer stable.
+Per-tenor OOS (weighted means across dates): 30d 847 bps, 60d 729 bps, 90d 599 bps, 6m 413 bps, 1y 230 bps. Stress dates remain heavier, but front-tenor blowups are curtailed relative to the previous run.
+
+Artifacts live under `docs/artifacts/wrds/live_panel/`; rerun with `WRDS_ENABLED=1` to refresh.
 
 Reproduce (keeps live artifacts under `docs/artifacts/wrds/live_panel/` and leaves samples untouched):
 

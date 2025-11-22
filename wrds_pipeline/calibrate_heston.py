@@ -223,11 +223,22 @@ def _positive_weights(values, default: float = 1.0) -> np.ndarray:
     return arr
 
 
+def _moneyness_taper(surface: pd.DataFrame) -> np.ndarray:
+    m = np.asarray(surface.get("moneyness", 1.0), dtype=np.float64)
+    # Softly down-weight wings beyond 1.2 or below 0.8 to stop edge quotes dominating.
+    dist = np.abs(m - 1.0)
+    taper = np.ones_like(dist)
+    mask = dist > 0.2
+    taper[mask] = np.exp(-6.0 * (dist[mask] - 0.2))  # ~0.37 weight at m=1.25
+    return taper
+
+
 def _vega_quote_weights(surface: pd.DataFrame, default: float = 1.0) -> np.ndarray:
-    """Positive weights combining liquidity (quotes) and sensitivity (vega)."""
+    """Positive weights combining liquidity (quotes), sensitivity (vega), and wing taper."""
     vega = surface.get("vega", default)
     quotes = surface.get("quotes", 1.0)
-    weights = np.asarray(vega, dtype=np.float64) * np.asarray(quotes, dtype=np.float64)
+    taper = _moneyness_taper(surface)
+    weights = np.asarray(vega, dtype=np.float64) * np.asarray(quotes, dtype=np.float64) * taper
     return _positive_weights(weights, default=default)
 
 

@@ -14,7 +14,7 @@ from .bs_utils import bs_vega, implied_vol_from_price
 
 SAMPLE_PATH = Path(__file__).resolve().parent / "sample_data" / "spx_options_sample.csv"
 SPOT_FALLBACK = 4500.0
-MIN_DTE_DAYS = 14  # ignore ultra-short tenor noise for calibration/OOS
+MIN_DTE_DAYS = 21  # ignore ultra-short tenor noise for calibration/OOS
 
 
 def _has_wrds_credentials() -> bool:

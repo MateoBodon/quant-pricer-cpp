@@ -52,7 +52,7 @@ python -m wrds_pipeline.compare_bs_heston --wrds-root docs/artifacts/wrds
 MARKET tests:
 
 - Command: `ctest --test-dir build -L MARKET --output-on-failure`
-- Behaviour: skips cleanly with exit code 77 unless `WRDS_ENABLED=1` with credentials. When enabled, runs a two-date `--fast` WRDS pipeline subset (calm + stress) using the production filters (DTE ≥14d, moneyness 0.75–1.25, vega×quote weights) and asserts moderate bands on IV RMSE/OOS MAE and Δ‑hedged σ, then checks the comparison CSV/plots exist.
+- Behaviour: skips cleanly with exit code 77 unless `WRDS_ENABLED=1` with credentials. When enabled, runs a two-date `--fast` WRDS pipeline subset (calm + stress) using the production filters (DTE ≥21d, moneyness 0.75–1.25 with soft wing taper, vega×quote weights) and asserts moderate bands on IV RMSE/OOS MAE and Δ‑hedged σ, then checks the comparison CSV/plots exist.
 - The MARKET test writes to a temporary artifact root; it does not touch `docs/artifacts/wrds/`.
 
 Rules for agents:
@@ -62,7 +62,7 @@ Rules for agents:
 - ❌ Never commit raw IvyDB tables or credentials; never print secrets in logs.
 
 WRDS pipeline filters (sample + live):
-- Drops ultra-short expiries (DTE < 14d) and tightens wings to moneyness 0.75–1.25 to keep front-tenor noise out of the fit/OOS aggregates.
+- Drops ultra-short expiries (DTE < 21d) and tightens wings to moneyness 0.75–1.25 with a soft taper beyond 1.2 to keep front-tenor/wings noise out of the fit/OOS aggregates.
 - OOS and comparison aggregates are weighted by `vega × quotes` to stop deep-OTM clutter dominating error stats.
 - The bundled sample snapshot is a deterministic regression harness, not a performance claim; re-run live pulls for headline numbers.
 
