@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-11-22T00:49:20.386430+00:00",
+  "generated_at": "2025-12-18T06:16:47.526569+00:00",
   "git": {
     "branch": "master",
     "dirty": true,
-    "sha": "926002288a06c95c448f4c545ae33e59e9de41e7"
+    "sha": "45bbd3c7fbd40b878cc85dfae88a4738eab8ca33"
   },
   "omp_threads": 11,
   "runs": {
@@ -789,6 +789,67 @@
       "seed": 2025,
       "std_error": 0.0107174,
       "steps": 1
+    },
+    "metrics_snapshot": {
+      "artifacts_root": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts",
+      "generated_at": "2025-12-18T06:16:47.523501+00:00",
+      "inputs": [
+        {
+          "path": "docs/artifacts/tri_engine_agreement.csv",
+          "sha256": "4d48372bdb24b7755f4437a6643f0d052e793beb05cca6ee83d99f316b4a3fa5",
+          "size_bytes": 571
+        },
+        {
+          "path": "docs/artifacts/qmc_vs_prng_equal_time.csv",
+          "sha256": "df75f04805ddfa7635ffcf863d5e7f5aa064ba5626f755e313a028becc9c6721",
+          "size_bytes": 1146
+        },
+        {
+          "path": "docs/artifacts/pde_order_slope.csv",
+          "sha256": "78c373a917838059030dce81f52b368d045fc13f2df24738377d6702caac015d",
+          "size_bytes": 220
+        },
+        {
+          "path": "docs/artifacts/ql_parity/ql_parity.csv",
+          "sha256": "3c9229057cbe7eb0ca4780e3a39133d63319c032c9aab6246e16612927ec71e0",
+          "size_bytes": 600
+        },
+        {
+          "path": "docs/artifacts/bench/bench_mc_paths.csv",
+          "sha256": "d1554f3762e5536e9808b308df5609d1c46cf29e0ca6fc2fb9bd35b11431697d",
+          "size_bytes": 249
+        },
+        {
+          "path": "docs/artifacts/bench/bench_mc_equal_time.csv",
+          "sha256": "7aa9697eefef6f6df241d94bca7fa9cc8e53671a8f1da2606da0a1a62ef55d6a",
+          "size_bytes": 341
+        },
+        {
+          "path": "docs/artifacts/wrds/wrds_agg_pricing.csv",
+          "sha256": "d4576a9db4d4bd15791b708e80c95865914006ca68ba2f03deb661fd195f6029",
+          "size_bytes": 1222
+        },
+        {
+          "path": "docs/artifacts/wrds/wrds_agg_oos.csv",
+          "sha256": "a7b90735af6d5aa47bacc519e962fd0c06d35bd3c815780295c3ec2b0a00a292",
+          "size_bytes": 1481
+        },
+        {
+          "path": "docs/artifacts/wrds/wrds_agg_pnl.csv",
+          "sha256": "279081af1edc9bacd830912c7d31b5d42574b1bb09054f7b4e825102c9cfeb14",
+          "size_bytes": 1463
+        }
+      ],
+      "output_json": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/metrics_summary.json",
+      "output_md": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/metrics_summary.md",
+      "statuses": {
+        "benchmarks": "ok",
+        "pde_order": "ok",
+        "ql_parity": "ok",
+        "qmc_vs_prng_equal_time": "ok",
+        "tri_engine_agreement": "ok",
+        "wrds": "ok"
+      }
     },
     "parity_checks": [
       {

@@ -101,6 +101,7 @@ generate_figures() {
   run_py_fast "${ROOT}/scripts/mc_greeks_ci.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/mc_greeks_ci.png" --csv "${ARTIFACT_DIR}/mc_greeks_ci.csv"
   run_py_fast "${ROOT}/scripts/heston_qe_vs_analytic.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/heston_qe_vs_analytic.png" --csv "${ARTIFACT_DIR}/heston_qe_vs_analytic.csv"
   run_py_fast "${ROOT}/scripts/tri_engine_agreement.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/tri_engine_agreement.png" --csv "${ARTIFACT_DIR}/tri_engine_agreement.csv"
+  run_py_fast "${ROOT}/scripts/generate_metrics_summary.py" --artifacts "${ARTIFACT_DIR}" --manifest "${ARTIFACT_DIR}/manifest.json"
 }
 
 run_benchmarks() {
