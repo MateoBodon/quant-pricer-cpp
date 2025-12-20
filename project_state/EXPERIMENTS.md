@@ -1,17 +1,44 @@
+---
+generated_at: 2025-12-20T21:11:15Z
+git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
+branch: master
+commands:
+  - date -u +%Y-%m-%dT%H:%M:%SZ
+  - git rev-parse HEAD
+  - git rev-parse --abbrev-ref HEAD
+  - python3 -V
+  - rg --files
+  - rg --files -g '*.py'
+  - python3 tools/project_state_generate.py
+  - uname -a
+  - cmake --version
+---
+
 # Experiments
 
-| Name | Entry Point | Purpose | Key Inputs / Flags | Metrics & Outputs | Default Output Paths |
-| --- | --- | --- | --- | --- | --- |
-| Tri-Engine Agreement | `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output ... --csv ...` | Cross-check analytic BS vs MC vs PDE across strikes; ensure ≤5 bps gap | Market params (hard-coded), optional cli path | Price curves; CSV of BS/MC/PDE values | `docs/artifacts/tri_engine_agreement.{csv,png}` |
-| QMC vs PRNG (equal wall-clock) | `python scripts/qmc_vs_prng_equal_time.py --output ... --csv ... [--fast]` | Compare Sobol+BB vs PRNG RMSE at matched wall-clock for Euro/Asian | MC steps, seeds, runtime grid (script fixed), `--fast` trims reps | RMSE vs seconds; RMSE ratio | `docs/artifacts/qmc_vs_prng_equal_time.{csv,png}` |
-| MC Greeks CI | `python scripts/mc_greeks_ci.py --quant-cli build/quant_cli --output ... --csv ...` | Validate MC Δ/ν/Γ/Θ estimators vs analytic with 95% CI | Paths, steps, seeds (script defaults) | Estimator mean/SE/CI per Greek | `docs/artifacts/mc_greeks_ci.{csv,png}` |
-| Heston QE vs Analytic | `python scripts/heston_qe_vs_analytic.py --quant-cli build/quant_cli --output ... --csv ... [--fast]` | Bias/RMSE study of Andersen QE & Euler vs analytic CF across parameter grids (base/stress/Feller) | Path/step grids, scenario definitions, optional `--fast` | Price & IV RMSE, bias per grid | `docs/artifacts/heston_qe_vs_analytic.{csv,png}` |
-| PDE Order / Walltime | `python scripts/pde_order_slope.py --skip-build --output ... --csv ...` | Convergence slope of CN (Δ/Γ/price) vs grid size | Grid refinements preset; optional skip-build | Fitted slope, RMSE columns | `docs/artifacts/pde_order_slope.{csv,png}` |
-| QuantLib Parity | `python scripts/ql_parity.py --output ... --csv ...` | Compare quant_cli prices vs QuantLib (vanilla/barrier/American) | Uses QuantLib Python; reads no data | Price gaps (cents) & runtime deltas | `docs/artifacts/ql_parity/ql_parity.{csv,png}` |
-| WRDS Pipeline (sample or live) | `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml [--use-sample] [--fast] [--output-root …]` | Ingest OptionMetrics, calibrate Heston & BS baseline, compute OOS IV/price MAE and Δ‑hedged PnL | WRDS env or bundled sample; dateset YAML | `wrds_agg_pricing*.csv`, `wrds_agg_oos*.csv`, `wrds_agg_pnl.csv`, insample/OOS/hedge plots, comparison heatmaps | `docs/artifacts/wrds/` (aggregates) & `docs/artifacts/wrds/per_date/<date>/` |
-| Heston Calibration (normalized CSV) | `python scripts/calibrate_heston.py --input data/normalized/... [--fast] [--metric price|vol]` | Calibrate Heston to provided normalized surface | CSV schema in `scripts/data/schema.md`; optional retries/seed | params JSON, fit CSV, IV/price error plot | `artifacts/heston/params_<date>.json`, `fit_<date>.{csv,png}` |
-| MC/Barrier/Greeks diagnostics | `python scripts/greeks_variance.py`, `greeks_reliability.py`, `american_consistency.py`, `parity_checks.py`, `heston_series_plot.py`, `risk_backtest.py` | Smaller focused checks (variance reduction impact, American cross-method consistency, parity, Heston term structure, risk backtest) | Embedded params; some read sample data | Printed stats + optional PNG/CSV (where applicable) | Under `docs/artifacts/` when plotting |
-| Benchmarks | `./build/bench_mc`, `./build/bench_pde`, then `python scripts/generate_bench_artifacts.py ...` | Google Benchmark runs for MC throughput, equal-time RMSE, PDE walltime/order, PSOR iterations | Google Benchmark JSON from executables | CSV/PNG summarizing speed & scaling | `docs/artifacts/bench/bench_*.{json,csv,png}` |
-| Package Validation | `python scripts/package_validation.py --artifacts docs/artifacts --output docs/validation_pack.zip` | Bundle committed artifacts for release reproducibility | Existing artifacts | Zip bundle | `docs/validation_pack.zip` |
+## Core validation scripts (artifacts)
+- `scripts/tri_engine_agreement.py` → `docs/artifacts/tri_engine_agreement.csv/png`.
+- `scripts/qmc_vs_prng_equal_time.py` → `docs/artifacts/qmc_vs_prng_equal_time.csv/png`.
+- `scripts/pde_order_slope.py` → `docs/artifacts/pde_order_slope.csv/png`.
+- `scripts/mc_greeks_ci.py` → `docs/artifacts/mc_greeks_ci.csv/png`.
+- `scripts/heston_qe_vs_analytic.py` → `docs/artifacts/heston_qe_vs_analytic.csv/png`.
+- `scripts/ql_parity.py` → `docs/artifacts/ql_parity/ql_parity.csv/png`.
 
-Most scripts append entries to `docs/artifacts/manifest.json` via `manifest_utils.update_run`, capturing git SHA, compiler flags, seeds, and hardware.
+## Benchmarks
+- C++ benchmarks: `benchmarks/bench_mc.cpp`, `benchmarks/bench_pde.cpp`, `benchmarks/bench_sanity.cpp`.
+- Artifact post-processing: `scripts/generate_bench_artifacts.py` → `docs/artifacts/bench/`.
+
+## WRDS experiments
+- `wrds_pipeline/pipeline.py` (single date or multi-date panel) → `docs/artifacts/wrds/`.
+- `wrds_pipeline/compare_bs_heston.py` → `docs/artifacts/wrds/wrds_bs_heston_comparison.csv` and plots.
+
+## Other analytical scripts
+- `scripts/greeks_reliability.py`, `scripts/greeks_variance.py` — Monte Carlo Greeks diagnostics.
+- `scripts/american_consistency.py` — American pricing checks.
+- `scripts/parity_checks.py` — parity validation.
+- `scripts/risk_backtest.py` — risk module backtests.
+- `scripts/multiasset_figures.py`, `scripts/sabr_slice_calibration.py` — multi-asset / SABR experiments.
+
+## Experiment outputs outside docs/artifacts
+- `artifacts/heston/` contains Heston calibration series outputs (CSV/PNG/JSON).
+- Use `scripts/calibrate_heston_series.py` and `scripts/heston_series_plot.py` to regenerate.

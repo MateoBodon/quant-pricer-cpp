@@ -1,0 +1,4639 @@
+{
+  "files": [
+    {
+      "ext": "md",
+      "path": "AGENTS.md",
+      "role": "misc",
+      "size_bytes": 4859
+    },
+    {
+      "ext": "md",
+      "path": "CHANGELOG.md",
+      "role": "repo_meta",
+      "size_bytes": 2964
+    },
+    {
+      "ext": "cff",
+      "path": "CITATION.cff",
+      "role": "repo_meta",
+      "size_bytes": 513
+    },
+    {
+      "ext": "txt",
+      "path": "CMakeLists.txt",
+      "role": "repo_meta",
+      "size_bytes": 10272
+    },
+    {
+      "ext": "md",
+      "path": "CONTRIBUTING.md",
+      "role": "repo_meta",
+      "size_bytes": 962
+    },
+    {
+      "ext": "",
+      "path": "Doxyfile",
+      "role": "repo_meta",
+      "size_bytes": 671
+    },
+    {
+      "ext": "",
+      "path": "LICENSE",
+      "role": "repo_meta",
+      "size_bytes": 1068
+    },
+    {
+      "ext": "",
+      "path": "Makefile",
+      "role": "repo_meta",
+      "size_bytes": 138
+    },
+    {
+      "ext": "md",
+      "path": "README.md",
+      "role": "repo_meta",
+      "size_bytes": 48365
+    },
+    {
+      "ext": "md",
+      "path": "ROADMAP (1).md",
+      "role": "misc",
+      "size_bytes": 12677
+    },
+    {
+      "ext": "csv",
+      "path": "artifacts/american_consistency.csv",
+      "role": "artifacts",
+      "size_bytes": 1149
+    },
+    {
+      "ext": "csv",
+      "path": "artifacts/greeks_reliability.csv",
+      "role": "artifacts",
+      "size_bytes": 1408
+    },
+    {
+      "ext": "png",
+      "path": "artifacts/greeks_reliability.png",
+      "role": "artifacts",
+      "size_bytes": 119593
+    },
+    {
+      "ext": "csv",
+      "path": "artifacts/heston/fit_20230601.csv",
+      "role": "artifacts",
+      "size_bytes": 1920
+    },
+    {
+      "ext": "png",
+      "path": "artifacts/heston/fit_20230601.png",
+      "role": "artifacts",
+      "size_bytes": 83941
+    },
+    {
+      "ext": "csv",
+      "path": "artifacts/heston/fit_20240614.csv",
+      "role": "artifacts",
+      "size_bytes": 736
+    },
+    {
+      "ext": "png",
+      "path": "artifacts/heston/fit_20240614.png",
+      "role": "artifacts",
+      "size_bytes": 80356
+    },
+    {
+      "ext": "json",
+      "path": "artifacts/heston/params_20230601.json",
+      "role": "artifacts",
+      "size_bytes": 754
+    },
+    {
+      "ext": "json",
+      "path": "artifacts/heston/params_20240614.json",
+      "role": "artifacts",
+      "size_bytes": 810
+    },
+    {
+      "ext": "csv",
+      "path": "artifacts/heston/params_series.csv",
+      "role": "artifacts",
+      "size_bytes": 1902
+    },
+    {
+      "ext": "png",
+      "path": "artifacts/heston/params_series.png",
+      "role": "artifacts",
+      "size_bytes": 181956
+    },
+    {
+      "ext": "csv",
+      "path": "artifacts/heston/series_runs/fit_20230601.csv",
+      "role": "artifacts",
+      "size_bytes": 604
+    },
+    {
+      "ext": "png",
+      "path": "artifacts/heston/series_runs/fit_20230601.png",
+      "role": "artifacts",
+      "size_bytes": 84105
+    },
+    {
+      "ext": "csv",
+      "path": "artifacts/heston/series_runs/fit_20240614.csv",
+      "role": "artifacts",
+      "size_bytes": 616
+    },
+    {
+      "ext": "png",
+      "path": "artifacts/heston/series_runs/fit_20240614.png",
+      "role": "artifacts",
+      "size_bytes": 80179
+    },
+    {
+      "ext": "json",
+      "path": "artifacts/heston/series_runs/params_20230601.json",
+      "role": "artifacts",
+      "size_bytes": 1463
+    },
+    {
+      "ext": "json",
+      "path": "artifacts/heston/series_runs/params_20240614.json",
+      "role": "artifacts",
+      "size_bytes": 1461
+    },
+    {
+      "ext": "json",
+      "path": "artifacts/manifest.json",
+      "role": "artifacts",
+      "size_bytes": 8377
+    },
+    {
+      "ext": "cpp",
+      "path": "benchmarks/bench_mc.cpp",
+      "role": "benchmarks",
+      "size_bytes": 7513
+    },
+    {
+      "ext": "cpp",
+      "path": "benchmarks/bench_pde.cpp",
+      "role": "benchmarks",
+      "size_bytes": 4175
+    },
+    {
+      "ext": "cpp",
+      "path": "benchmarks/bench_sanity.cpp",
+      "role": "benchmarks",
+      "size_bytes": 210
+    },
+    {
+      "ext": "in",
+      "path": "cmake/quant-pricer-config.cmake.in",
+      "role": "cmake",
+      "size_bytes": 475
+    },
+    {
+      "ext": "py",
+      "path": "conanfile.py",
+      "role": "repo_meta",
+      "size_bytes": 1104
+    },
+    {
+      "ext": "md",
+      "path": "data/README.md",
+      "role": "data",
+      "size_bytes": 2066
+    },
+    {
+      "ext": "csv",
+      "path": "data/normalized/spy_20230601.csv",
+      "role": "data",
+      "size_bytes": 3750
+    },
+    {
+      "ext": "csv",
+      "path": "data/options_2023-06-01.csv",
+      "role": "data",
+      "size_bytes": 452032
+    },
+    {
+      "ext": "csv",
+      "path": "data/options_synth.csv",
+      "role": "data",
+      "size_bytes": 119904
+    },
+    {
+      "ext": "csv",
+      "path": "data/samples/spx_20240614_sample.csv",
+      "role": "data",
+      "size_bytes": 1133
+    },
+    {
+      "ext": "csv",
+      "path": "data/spy_returns.csv",
+      "role": "data",
+      "size_bytes": 15
+    },
+    {
+      "ext": "md",
+      "path": "docs/Design.md",
+      "role": "docs",
+      "size_bytes": 3657
+    },
+    {
+      "ext": "md",
+      "path": "docs/Greeks.md",
+      "role": "docs",
+      "size_bytes": 1553
+    },
+    {
+      "ext": "md",
+      "path": "docs/Results.md",
+      "role": "docs",
+      "size_bytes": 9844
+    },
+    {
+      "ext": "md",
+      "path": "docs/Validation.md",
+      "role": "docs",
+      "size_bytes": 2696
+    },
+    {
+      "ext": "md",
+      "path": "docs/ValidationHighlights.md",
+      "role": "docs",
+      "size_bytes": 4148
+    },
+    {
+      "ext": "md",
+      "path": "docs/WORKLOG.md",
+      "role": "docs",
+      "size_bytes": 26237
+    },
+    {
+      "ext": "md",
+      "path": "docs/WRDS_Results.md",
+      "role": "docs",
+      "size_bytes": 9507
+    },
+    {
+      "ext": "md",
+      "path": "docs/api/index.md",
+      "role": "docs",
+      "size_bytes": 1876
+    },
+    {
+      "ext": "json",
+      "path": "docs/artifacts/bench/bench_mc.json",
+      "role": "docs",
+      "size_bytes": 5216
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/bench/bench_mc_equal_time.csv",
+      "role": "docs",
+      "size_bytes": 338
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/bench/bench_mc_equal_time.png",
+      "role": "docs",
+      "size_bytes": 104363
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/bench/bench_mc_paths.csv",
+      "role": "docs",
+      "size_bytes": 247
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/bench/bench_mc_paths.png",
+      "role": "docs",
+      "size_bytes": 65875
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/bench/bench_mc_rmse.csv",
+      "role": "docs",
+      "size_bytes": 68
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/bench/bench_mc_rmse.png",
+      "role": "docs",
+      "size_bytes": 43207
+    },
+    {
+      "ext": "json",
+      "path": "docs/artifacts/bench/bench_pde.json",
+      "role": "docs",
+      "size_bytes": 6343
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/bench/bench_pde_order.csv",
+      "role": "docs",
+      "size_bytes": 216
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/bench/bench_pde_order.png",
+      "role": "docs",
+      "size_bytes": 62681
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/bench/bench_pde_walltime.csv",
+      "role": "docs",
+      "size_bytes": 155
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/bench/bench_pde_walltime.png",
+      "role": "docs",
+      "size_bytes": 51296
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/bench/bench_psor_iterations.csv",
+      "role": "docs",
+      "size_bytes": 194
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/bench/bench_psor_iterations.png",
+      "role": "docs",
+      "size_bytes": 64307
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/heston_qe_vs_analytic.csv",
+      "role": "docs",
+      "size_bytes": 8803
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/heston_qe_vs_analytic.png",
+      "role": "docs",
+      "size_bytes": 167504
+    },
+    {
+      "ext": "log",
+      "path": "docs/artifacts/logs/slow_20251218T185425Z.log",
+      "role": "docs",
+      "size_bytes": 8416
+    },
+    {
+      "ext": "xml",
+      "path": "docs/artifacts/logs/slow_20251218T185425Z.xml",
+      "role": "docs",
+      "size_bytes": 6368
+    },
+    {
+      "ext": "json",
+      "path": "docs/artifacts/manifest.json",
+      "role": "docs",
+      "size_bytes": 95195
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/mc_greeks_ci.csv",
+      "role": "docs",
+      "size_bytes": 312
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/mc_greeks_ci.png",
+      "role": "docs",
+      "size_bytes": 40393
+    },
+    {
+      "ext": "json",
+      "path": "docs/artifacts/metrics_summary.json",
+      "role": "docs",
+      "size_bytes": 3592
+    },
+    {
+      "ext": "md",
+      "path": "docs/artifacts/metrics_summary.md",
+      "role": "docs",
+      "size_bytes": 1564
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/pde_order_slope.csv",
+      "role": "docs",
+      "size_bytes": 220
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/pde_order_slope.png",
+      "role": "docs",
+      "size_bytes": 66216
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/qmc_vs_prng_equal_time.csv",
+      "role": "docs",
+      "size_bytes": 1147
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/qmc_vs_prng_equal_time.png",
+      "role": "docs",
+      "size_bytes": 161184
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/tri_engine_agreement.csv",
+      "role": "docs",
+      "size_bytes": 571
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/tri_engine_agreement.png",
+      "role": "docs",
+      "size_bytes": 208886
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.american.cpp.0d282902e6f19aae61097313a51cb11a.html",
+      "role": "docs",
+      "size_bytes": 385727
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.american.hpp.a0ed7122bc4d8c3ef0fae3d9112beaec.html",
+      "role": "docs",
+      "size_bytes": 29077
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.asian.cpp.0d75f0879327e1b315dfb62915699991.html",
+      "role": "docs",
+      "size_bytes": 83354
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.black_scholes.cpp.5699800c160bb1776dce5eb08975dfee.html",
+      "role": "docs",
+      "size_bytes": 169847
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.black_scholes.hpp.902ae49bfc2e716dba49b44081104389.html",
+      "role": "docs",
+      "size_bytes": 49183
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.brownian_bridge.cpp.db43db83cd80392051aaae673789658d.html",
+      "role": "docs",
+      "size_bytes": 64458
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.brownian_bridge.hpp.dcdb4c1d0c0ed3146015a2e7193468d0.html",
+      "role": "docs",
+      "size_bytes": 13992
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.bs_barrier_rr.cpp.53777bd26dd8951566cc7228118ebd36.html",
+      "role": "docs",
+      "size_bytes": 133209
+    },
+    {
+      "ext": "css",
+      "path": "docs/coverage/coverage.css",
+      "role": "docs",
+      "size_bytes": 13840
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.digital.cpp.86a30725c38a5338398b055afb9c9add.html",
+      "role": "docs",
+      "size_bytes": 24068
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.functions.html",
+      "role": "docs",
+      "size_bytes": 49761
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.grid_utils.cpp.84791bc4a0aa7dcd24498ba2a5f3a7b4.html",
+      "role": "docs",
+      "size_bytes": 101505
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.grid_utils.hpp.d5bed6b0ee6c34477a161473cfd5a9e9.html",
+      "role": "docs",
+      "size_bytes": 24566
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.heston.cpp.ff945e4139a5804dbfe4d75c4ceee9d5.html",
+      "role": "docs",
+      "size_bytes": 187057
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.html",
+      "role": "docs",
+      "size_bytes": 25154
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.lookback.cpp.e95811fb92ac19a1fc67d4224b2f2a71.html",
+      "role": "docs",
+      "size_bytes": 54214
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.main.cpp.7ec3c68a81efff79b6ca22ac1f1eabba.html",
+      "role": "docs",
+      "size_bytes": 772240
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.math.hpp.606ba9da201eccda6c9ea6085ae207dc.html",
+      "role": "docs",
+      "size_bytes": 42837
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.mc.cpp.0314bb892b1ab65e235e696eeab23b7b.html",
+      "role": "docs",
+      "size_bytes": 350047
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.mc.hpp.3b29997f60a1e5ef2d73993397de729f.html",
+      "role": "docs",
+      "size_bytes": 29486
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.mc_barrier.cpp.a6ea38573e52b1e8043a5fd341bcdc7b.html",
+      "role": "docs",
+      "size_bytes": 263863
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.multi.cpp.7be5c33e38f9ff3b7ba2c91146736ded.html",
+      "role": "docs",
+      "size_bytes": 100124
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.multi.hpp.9fe73f369ae2bdfda36e532fb43217a4.html",
+      "role": "docs",
+      "size_bytes": 18646
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.pde.cpp.c9e1c964bf47d9086a8bfb5f6112d141.html",
+      "role": "docs",
+      "size_bytes": 160313
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.pde.hpp.f44505751ba8b7b7431cb485485a611c.html",
+      "role": "docs",
+      "size_bytes": 25912
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.pde_barrier.cpp.35d705d70dc976667a0ef7fc09cd24cb.html",
+      "role": "docs",
+      "size_bytes": 142337
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.risk.cpp.8065ea28503ade0125bcbaa9c0f6398e.html",
+      "role": "docs",
+      "size_bytes": 119800
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.rng.hpp.3625aefa74bf287be77c1fd50c9dff1f.html",
+      "role": "docs",
+      "size_bytes": 35102
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.sobol.cpp.47630ec011715ceec86f4e328dd51ded.html",
+      "role": "docs",
+      "size_bytes": 127769
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.sobol.hpp.72980145c4f8ffd50f734b17924817dd.html",
+      "role": "docs",
+      "size_bytes": 15819
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.stats.hpp.4d583054a4649b09c4003b19e4053cde.html",
+      "role": "docs",
+      "size_bytes": 20505
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.term_structures.hpp.e8430b7309e89e0f0422475df90ba087.html",
+      "role": "docs",
+      "size_bytes": 16546
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/coverage.version.hpp.9fda5abe4e1ad392caf3904829366d68.html",
+      "role": "docs",
+      "size_bytes": 10034
+    },
+    {
+      "ext": "xml",
+      "path": "docs/coverage/coverage.xml",
+      "role": "docs",
+      "size_bytes": 667521
+    },
+    {
+      "ext": "html",
+      "path": "docs/coverage/index.html",
+      "role": "docs",
+      "size_bytes": 25154
+    },
+    {
+      "ext": "txt",
+      "path": "examples/consumer-cmake/CMakeLists.txt",
+      "role": "repo_meta",
+      "size_bytes": 186
+    },
+    {
+      "ext": "cpp",
+      "path": "examples/consumer-cmake/main.cpp",
+      "role": "misc",
+      "size_bytes": 162
+    },
+    {
+      "ext": "",
+      "path": "external/benchmark/AUTHORS",
+      "role": "external",
+      "size_bytes": 2796
+    },
+    {
+      "ext": "bazel",
+      "path": "external/benchmark/BUILD.bazel",
+      "role": "external",
+      "size_bytes": 2459
+    },
+    {
+      "ext": "txt",
+      "path": "external/benchmark/CMakeLists.txt",
+      "role": "external",
+      "size_bytes": 14405
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/CONTRIBUTING.md",
+      "role": "external",
+      "size_bytes": 2485
+    },
+    {
+      "ext": "",
+      "path": "external/benchmark/CONTRIBUTORS",
+      "role": "external",
+      "size_bytes": 4060
+    },
+    {
+      "ext": "",
+      "path": "external/benchmark/LICENSE",
+      "role": "external",
+      "size_bytes": 11358
+    },
+    {
+      "ext": "bazel",
+      "path": "external/benchmark/MODULE.bazel",
+      "role": "external",
+      "size_bytes": 1454
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/README.md",
+      "role": "external",
+      "size_bytes": 7943
+    },
+    {
+      "ext": "",
+      "path": "external/benchmark/WORKSPACE",
+      "role": "external",
+      "size_bytes": 430
+    },
+    {
+      "ext": "bzlmod",
+      "path": "external/benchmark/WORKSPACE.bzlmod",
+      "role": "external",
+      "size_bytes": 98
+    },
+    {
+      "ext": "yml",
+      "path": "external/benchmark/_config.yml",
+      "role": "external",
+      "size_bytes": 43
+    },
+    {
+      "ext": "yml",
+      "path": "external/benchmark/appveyor.yml",
+      "role": "external",
+      "size_bytes": 1266
+    },
+    {
+      "ext": "bzl",
+      "path": "external/benchmark/bazel/benchmark_deps.bzl",
+      "role": "external",
+      "size_bytes": 2330
+    },
+    {
+      "ext": "",
+      "path": "external/benchmark/bindings/python/google_benchmark/BUILD",
+      "role": "external",
+      "size_bytes": 762
+    },
+    {
+      "ext": "py",
+      "path": "external/benchmark/bindings/python/google_benchmark/__init__.py",
+      "role": "external",
+      "size_bytes": 4460
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/bindings/python/google_benchmark/benchmark.cc",
+      "role": "external",
+      "size_bytes": 8083
+    },
+    {
+      "ext": "py",
+      "path": "external/benchmark/bindings/python/google_benchmark/example.py",
+      "role": "external",
+      "size_bytes": 3958
+    },
+    {
+      "ext": "cmake",
+      "path": "external/benchmark/cmake/AddCXXCompilerFlag.cmake",
+      "role": "external",
+      "size_bytes": 2969
+    },
+    {
+      "ext": "cmake",
+      "path": "external/benchmark/cmake/CXXFeatureCheck.cmake",
+      "role": "external",
+      "size_bytes": 2685
+    },
+    {
+      "ext": "in",
+      "path": "external/benchmark/cmake/Config.cmake.in",
+      "role": "external",
+      "size_bytes": 273
+    },
+    {
+      "ext": "cmake",
+      "path": "external/benchmark/cmake/GetGitVersion.cmake",
+      "role": "external",
+      "size_bytes": 859
+    },
+    {
+      "ext": "cmake",
+      "path": "external/benchmark/cmake/GoogleTest.cmake",
+      "role": "external",
+      "size_bytes": 2656
+    },
+    {
+      "ext": "in",
+      "path": "external/benchmark/cmake/GoogleTest.cmake.in",
+      "role": "external",
+      "size_bytes": 2688
+    },
+    {
+      "ext": "in",
+      "path": "external/benchmark/cmake/benchmark.pc.in",
+      "role": "external",
+      "size_bytes": 341
+    },
+    {
+      "ext": "in",
+      "path": "external/benchmark/cmake/benchmark_main.pc.in",
+      "role": "external",
+      "size_bytes": 210
+    },
+    {
+      "ext": "cpp",
+      "path": "external/benchmark/cmake/gnu_posix_regex.cpp",
+      "role": "external",
+      "size_bytes": 267
+    },
+    {
+      "ext": "cmake",
+      "path": "external/benchmark/cmake/llvm-toolchain.cmake",
+      "role": "external",
+      "size_bytes": 287
+    },
+    {
+      "ext": "cpp",
+      "path": "external/benchmark/cmake/posix_regex.cpp",
+      "role": "external",
+      "size_bytes": 297
+    },
+    {
+      "ext": "cpp",
+      "path": "external/benchmark/cmake/pthread_affinity.cpp",
+      "role": "external",
+      "size_bytes": 389
+    },
+    {
+      "ext": "cmake",
+      "path": "external/benchmark/cmake/split_list.cmake",
+      "role": "external",
+      "size_bytes": 93
+    },
+    {
+      "ext": "cpp",
+      "path": "external/benchmark/cmake/std_regex.cpp",
+      "role": "external",
+      "size_bytes": 259
+    },
+    {
+      "ext": "cpp",
+      "path": "external/benchmark/cmake/steady_clock.cpp",
+      "role": "external",
+      "size_bytes": 136
+    },
+    {
+      "ext": "cpp",
+      "path": "external/benchmark/cmake/thread_safety_attributes.cpp",
+      "role": "external",
+      "size_bytes": 79
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/AssemblyTests.md",
+      "role": "external",
+      "size_bytes": 5324
+    },
+    {
+      "ext": "yml",
+      "path": "external/benchmark/docs/_config.yml",
+      "role": "external",
+      "size_bytes": 85
+    },
+    {
+      "ext": "png",
+      "path": "external/benchmark/docs/assets/images/icon.png",
+      "role": "external",
+      "size_bytes": 11106
+    },
+    {
+      "ext": "xcf",
+      "path": "external/benchmark/docs/assets/images/icon.xcf",
+      "role": "external",
+      "size_bytes": 25934
+    },
+    {
+      "ext": "png",
+      "path": "external/benchmark/docs/assets/images/icon_black.png",
+      "role": "external",
+      "size_bytes": 11559
+    },
+    {
+      "ext": "xcf",
+      "path": "external/benchmark/docs/assets/images/icon_black.xcf",
+      "role": "external",
+      "size_bytes": 36322
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/dependencies.md",
+      "role": "external",
+      "size_bytes": 933
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/index.md",
+      "role": "external",
+      "size_bytes": 412
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/perf_counters.md",
+      "role": "external",
+      "size_bytes": 1567
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/platform_specific_build_instructions.md",
+      "role": "external",
+      "size_bytes": 2368
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/python_bindings.md",
+      "role": "external",
+      "size_bytes": 1405
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/random_interleaving.md",
+      "role": "external",
+      "size_bytes": 647
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/reducing_variance.md",
+      "role": "external",
+      "size_bytes": 4779
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/releasing.md",
+      "role": "external",
+      "size_bytes": 1260
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/tools.md",
+      "role": "external",
+      "size_bytes": 19213
+    },
+    {
+      "ext": "md",
+      "path": "external/benchmark/docs/user_guide.md",
+      "role": "external",
+      "size_bytes": 48767
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/include/benchmark/benchmark.h",
+      "role": "external",
+      "size_bytes": 77427
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/include/benchmark/export.h",
+      "role": "external",
+      "size_bytes": 1481
+    },
+    {
+      "ext": "toml",
+      "path": "external/benchmark/pyproject.toml",
+      "role": "external",
+      "size_bytes": 2175
+    },
+    {
+      "ext": "py",
+      "path": "external/benchmark/setup.py",
+      "role": "external",
+      "size_bytes": 5922
+    },
+    {
+      "ext": "txt",
+      "path": "external/benchmark/src/CMakeLists.txt",
+      "role": "external",
+      "size_bytes": 6350
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/arraysize.h",
+      "role": "external",
+      "size_bytes": 1108
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/benchmark.cc",
+      "role": "external",
+      "size_bytes": 32097
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/benchmark_api_internal.cc",
+      "role": "external",
+      "size_bytes": 3651
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/benchmark_api_internal.h",
+      "role": "external",
+      "size_bytes": 2981
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/benchmark_main.cc",
+      "role": "external",
+      "size_bytes": 720
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/benchmark_name.cc",
+      "role": "external",
+      "size_bytes": 1746
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/benchmark_register.cc",
+      "role": "external",
+      "size_bytes": 15776
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/benchmark_register.h",
+      "role": "external",
+      "size_bytes": 3028
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/benchmark_runner.cc",
+      "role": "external",
+      "size_bytes": 20859
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/benchmark_runner.h",
+      "role": "external",
+      "size_bytes": 3450
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/check.cc",
+      "role": "external",
+      "size_bytes": 324
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/check.h",
+      "role": "external",
+      "size_bytes": 3255
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/colorprint.cc",
+      "role": "external",
+      "size_bytes": 5733
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/colorprint.h",
+      "role": "external",
+      "size_bytes": 760
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/commandlineflags.cc",
+      "role": "external",
+      "size_bytes": 9932
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/commandlineflags.h",
+      "role": "external",
+      "size_bytes": 5308
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/complexity.cc",
+      "role": "external",
+      "size_bytes": 8941
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/complexity.h",
+      "role": "external",
+      "size_bytes": 1980
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/console_reporter.cc",
+      "role": "external",
+      "size_bytes": 7311
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/counter.cc",
+      "role": "external",
+      "size_bytes": 2216
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/counter.h",
+      "role": "external",
+      "size_bytes": 1129
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/csv_reporter.cc",
+      "role": "external",
+      "size_bytes": 4929
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/cycleclock.h",
+      "role": "external",
+      "size_bytes": 10951
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/internal_macros.h",
+      "role": "external",
+      "size_bytes": 2878
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/json_reporter.cc",
+      "role": "external",
+      "size_bytes": 10822
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/log.h",
+      "role": "external",
+      "size_bytes": 1810
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/mutex.h",
+      "role": "external",
+      "size_bytes": 4578
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/perf_counters.cc",
+      "role": "external",
+      "size_bytes": 9695
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/perf_counters.h",
+      "role": "external",
+      "size_bytes": 6887
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/re.h",
+      "role": "external",
+      "size_bytes": 3884
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/reporter.cc",
+      "role": "external",
+      "size_bytes": 4070
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/statistics.cc",
+      "role": "external",
+      "size_bytes": 7764
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/statistics.h",
+      "role": "external",
+      "size_bytes": 1499
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/string_util.cc",
+      "role": "external",
+      "size_bytes": 8118
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/string_util.h",
+      "role": "external",
+      "size_bytes": 1971
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/sysinfo.cc",
+      "role": "external",
+      "size_bytes": 27045
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/thread_manager.h",
+      "role": "external",
+      "size_bytes": 1089
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/thread_timer.h",
+      "role": "external",
+      "size_bytes": 2297
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/src/timers.cc",
+      "role": "external",
+      "size_bytes": 10202
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/src/timers.h",
+      "role": "external",
+      "size_bytes": 1970
+    },
+    {
+      "ext": "cmake",
+      "path": "external/benchmark/test/AssemblyTests.cmake",
+      "role": "external",
+      "size_bytes": 2308
+    },
+    {
+      "ext": "",
+      "path": "external/benchmark/test/BUILD",
+      "role": "external",
+      "size_bytes": 3451
+    },
+    {
+      "ext": "txt",
+      "path": "external/benchmark/test/CMakeLists.txt",
+      "role": "external",
+      "size_bytes": 13574
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/args_product_test.cc",
+      "role": "external",
+      "size_bytes": 2229
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/basic_test.cc",
+      "role": "external",
+      "size_bytes": 5367
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/benchmark_gtest.cc",
+      "role": "external",
+      "size_bytes": 4993
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/benchmark_min_time_flag_iters_test.cc",
+      "role": "external",
+      "size_bytes": 1789
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/benchmark_min_time_flag_time_test.cc",
+      "role": "external",
+      "size_bytes": 2469
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/benchmark_name_gtest.cc",
+      "role": "external",
+      "size_bytes": 2362
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/benchmark_random_interleaving_gtest.cc",
+      "role": "external",
+      "size_bytes": 3526
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/benchmark_setup_teardown_cb_types_gtest.cc",
+      "role": "external",
+      "size_bytes": 3748
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/benchmark_setup_teardown_test.cc",
+      "role": "external",
+      "size_bytes": 4236
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/benchmark_test.cc",
+      "role": "external",
+      "size_bytes": 9222
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/clobber_memory_assembly_test.cc",
+      "role": "external",
+      "size_bytes": 1397
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/commandlineflags_gtest.cc",
+      "role": "external",
+      "size_bytes": 6306
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/complexity_test.cc",
+      "role": "external",
+      "size_bytes": 10752
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/cxx11_test.cc",
+      "role": "external",
+      "size_bytes": 369
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/diagnostics_test.cc",
+      "role": "external",
+      "size_bytes": 2484
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/display_aggregates_only_test.cc",
+      "role": "external",
+      "size_bytes": 1818
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/donotoptimize_assembly_test.cc",
+      "role": "external",
+      "size_bytes": 5294
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/donotoptimize_test.cc",
+      "role": "external",
+      "size_bytes": 1578
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/filter_test.cc",
+      "role": "external",
+      "size_bytes": 2984
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/fixture_test.cc",
+      "role": "external",
+      "size_bytes": 1214
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/internal_threading_test.cc",
+      "role": "external",
+      "size_bytes": 5693
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/link_main_test.cc",
+      "role": "external",
+      "size_bytes": 296
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/locale_impermeability_test.cc",
+      "role": "external",
+      "size_bytes": 1676
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/manual_threading_test.cc",
+      "role": "external",
+      "size_bytes": 4917
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/map_test.cc",
+      "role": "external",
+      "size_bytes": 1501
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/memory_manager_test.cc",
+      "role": "external",
+      "size_bytes": 1869
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/memory_results_gtest.cc",
+      "role": "external",
+      "size_bytes": 2618
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/min_time_parse_gtest.cc",
+      "role": "external",
+      "size_bytes": 951
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/multiple_ranges_test.cc",
+      "role": "external",
+      "size_bytes": 2741
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/options_test.cc",
+      "role": "external",
+      "size_bytes": 2336
+    },
+    {
+      "ext": "h",
+      "path": "external/benchmark/test/output_test.h",
+      "role": "external",
+      "size_bytes": 8021
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/output_test_helper.cc",
+      "role": "external",
+      "size_bytes": 18296
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/overload_gtest.cc",
+      "role": "external",
+      "size_bytes": 998
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/perf_counters_gtest.cc",
+      "role": "external",
+      "size_bytes": 11096
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/perf_counters_test.cc",
+      "role": "external",
+      "size_bytes": 2452
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/profiler_manager_gtest.cc",
+      "role": "external",
+      "size_bytes": 1007
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/profiler_manager_iterations_test.cc",
+      "role": "external",
+      "size_bytes": 1810
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/profiler_manager_test.cc",
+      "role": "external",
+      "size_bytes": 1765
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/register_benchmark_test.cc",
+      "role": "external",
+      "size_bytes": 5929
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/repetitions_test.cc",
+      "role": "external",
+      "size_bytes": 11646
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/report_aggregates_only_test.cc",
+      "role": "external",
+      "size_bytes": 1556
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/reporter_output_test.cc",
+      "role": "external",
+      "size_bytes": 57467
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/skip_with_error_test.cc",
+      "role": "external",
+      "size_bytes": 7166
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/spec_arg_test.cc",
+      "role": "external",
+      "size_bytes": 2935
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/spec_arg_verbosity_test.cc",
+      "role": "external",
+      "size_bytes": 1110
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/state_assembly_test.cc",
+      "role": "external",
+      "size_bytes": 1793
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/statistics_gtest.cc",
+      "role": "external",
+      "size_bytes": 1361
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/string_util_gtest.cc",
+      "role": "external",
+      "size_bytes": 5801
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/templated_fixture_method_test.cc",
+      "role": "external",
+      "size_bytes": 484
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/templated_fixture_test.cc",
+      "role": "external",
+      "size_bytes": 482
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/time_unit_gtest.cc",
+      "role": "external",
+      "size_bytes": 882
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/user_counters_tabular_test.cc",
+      "role": "external",
+      "size_bytes": 28826
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/user_counters_test.cc",
+      "role": "external",
+      "size_bytes": 27271
+    },
+    {
+      "ext": "cc",
+      "path": "external/benchmark/test/user_counters_thousands_test.cc",
+      "role": "external",
+      "size_bytes": 9680
+    },
+    {
+      "ext": "bazel",
+      "path": "external/benchmark/tools/BUILD.bazel",
+      "role": "external",
+      "size_bytes": 425
+    },
+    {
+      "ext": "py",
+      "path": "external/benchmark/tools/compare.py",
+      "role": "external",
+      "size_bytes": 19670
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test1_run1.json",
+      "role": "external",
+      "size_bytes": 2689
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test1_run2.json",
+      "role": "external",
+      "size_bytes": 2740
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test2_run.json",
+      "role": "external",
+      "size_bytes": 1551
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test3_run0.json",
+      "role": "external",
+      "size_bytes": 1266
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test3_run1.json",
+      "role": "external",
+      "size_bytes": 1270
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test4_run.json",
+      "role": "external",
+      "size_bytes": 2317
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test4_run0.json",
+      "role": "external",
+      "size_bytes": 431
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test4_run1.json",
+      "role": "external",
+      "size_bytes": 432
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test5_run0.json",
+      "role": "external",
+      "size_bytes": 404
+    },
+    {
+      "ext": "json",
+      "path": "external/benchmark/tools/gbench/Inputs/test5_run1.json",
+      "role": "external",
+      "size_bytes": 404
+    },
+    {
+      "ext": "py",
+      "path": "external/benchmark/tools/gbench/__init__.py",
+      "role": "external",
+      "size_bytes": 210
+    },
+    {
+      "ext": "py",
+      "path": "external/benchmark/tools/gbench/report.py",
+      "role": "external",
+      "size_bytes": 56033
+    },
+    {
+      "ext": "py",
+      "path": "external/benchmark/tools/gbench/util.py",
+      "role": "external",
+      "size_bytes": 7153
+    },
+    {
+      "ext": "bazel",
+      "path": "external/benchmark/tools/libpfm.BUILD.bazel",
+      "role": "external",
+      "size_bytes": 6972
+    },
+    {
+      "ext": "txt",
+      "path": "external/benchmark/tools/requirements.txt",
+      "role": "external",
+      "size_bytes": 31
+    },
+    {
+      "ext": "py",
+      "path": "external/benchmark/tools/strip_asm.py",
+      "role": "external",
+      "size_bytes": 4574
+    },
+    {
+      "ext": "bazel",
+      "path": "external/googletest/BUILD.bazel",
+      "role": "external",
+      "size_bytes": 7422
+    },
+    {
+      "ext": "txt",
+      "path": "external/googletest/CMakeLists.txt",
+      "role": "external",
+      "size_bytes": 986
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/CONTRIBUTING.md",
+      "role": "external",
+      "size_bytes": 5690
+    },
+    {
+      "ext": "",
+      "path": "external/googletest/CONTRIBUTORS",
+      "role": "external",
+      "size_bytes": 2293
+    },
+    {
+      "ext": "",
+      "path": "external/googletest/LICENSE",
+      "role": "external",
+      "size_bytes": 1475
+    },
+    {
+      "ext": "bazel",
+      "path": "external/googletest/MODULE.bazel",
+      "role": "external",
+      "size_bytes": 2699
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/README.md",
+      "role": "external",
+      "size_bytes": 5261
+    },
+    {
+      "ext": "",
+      "path": "external/googletest/WORKSPACE",
+      "role": "external",
+      "size_bytes": 2655
+    },
+    {
+      "ext": "bzlmod",
+      "path": "external/googletest/WORKSPACE.bzlmod",
+      "role": "external",
+      "size_bytes": 1794
+    },
+    {
+      "ext": "sh",
+      "path": "external/googletest/ci/linux-presubmit.sh",
+      "role": "external",
+      "size_bytes": 5973
+    },
+    {
+      "ext": "sh",
+      "path": "external/googletest/ci/macos-presubmit.sh",
+      "role": "external",
+      "size_bytes": 3192
+    },
+    {
+      "ext": "bat",
+      "path": "external/googletest/ci/windows-presubmit.bat",
+      "role": "external",
+      "size_bytes": 2403
+    },
+    {
+      "ext": "yml",
+      "path": "external/googletest/docs/_config.yml",
+      "role": "external",
+      "size_bytes": 18
+    },
+    {
+      "ext": "yml",
+      "path": "external/googletest/docs/_data/navigation.yml",
+      "role": "external",
+      "size_bytes": 1200
+    },
+    {
+      "ext": "html",
+      "path": "external/googletest/docs/_layouts/default.html",
+      "role": "external",
+      "size_bytes": 2187
+    },
+    {
+      "ext": "scss",
+      "path": "external/googletest/docs/_sass/main.scss",
+      "role": "external",
+      "size_bytes": 2915
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/advanced.md",
+      "role": "external",
+      "size_bytes": 90878
+    },
+    {
+      "ext": "scss",
+      "path": "external/googletest/docs/assets/css/style.scss",
+      "role": "external",
+      "size_bytes": 56
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/community_created_documentation.md",
+      "role": "external",
+      "size_bytes": 342
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/faq.md",
+      "role": "external",
+      "size_bytes": 28216
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/gmock_cheat_sheet.md",
+      "role": "external",
+      "size_bytes": 7382
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/gmock_cook_book.md",
+      "role": "external",
+      "size_bytes": 150410
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/gmock_faq.md",
+      "role": "external",
+      "size_bytes": 14980
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/gmock_for_dummies.md",
+      "role": "external",
+      "size_bytes": 29227
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/index.md",
+      "role": "external",
+      "size_bytes": 1034
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/pkgconfig.md",
+      "role": "external",
+      "size_bytes": 4981
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/platforms.md",
+      "role": "external",
+      "size_bytes": 343
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/primer.md",
+      "role": "external",
+      "size_bytes": 19101
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/quickstart-bazel.md",
+      "role": "external",
+      "size_bytes": 5042
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/quickstart-cmake.md",
+      "role": "external",
+      "size_bytes": 5097
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/reference/actions.md",
+      "role": "external",
+      "size_bytes": 7020
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/reference/assertions.md",
+      "role": "external",
+      "size_bytes": 21975
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/reference/matchers.md",
+      "role": "external",
+      "size_bytes": 22539
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/reference/mocking.md",
+      "role": "external",
+      "size_bytes": 21135
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/reference/testing.md",
+      "role": "external",
+      "size_bytes": 49054
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/docs/samples.md",
+      "role": "external",
+      "size_bytes": 1116
+    },
+    {
+      "ext": "bzl",
+      "path": "external/googletest/fake_fuchsia_sdk.bzl",
+      "role": "external",
+      "size_bytes": 1974
+    },
+    {
+      "ext": "txt",
+      "path": "external/googletest/googlemock/CMakeLists.txt",
+      "role": "external",
+      "size_bytes": 7964
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/googlemock/README.md",
+      "role": "external",
+      "size_bytes": 1537
+    },
+    {
+      "ext": "in",
+      "path": "external/googletest/googlemock/cmake/gmock.pc.in",
+      "role": "external",
+      "size_bytes": 347
+    },
+    {
+      "ext": "in",
+      "path": "external/googletest/googlemock/cmake/gmock_main.pc.in",
+      "role": "external",
+      "size_bytes": 354
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/googlemock/docs/README.md",
+      "role": "external",
+      "size_bytes": 139
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/gmock-actions.h",
+      "role": "external",
+      "size_bytes": 92200
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/gmock-cardinalities.h",
+      "role": "external",
+      "size_bytes": 6118
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/gmock-function-mocker.h",
+      "role": "external",
+      "size_bytes": 25796
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/gmock-matchers.h",
+      "role": "external",
+      "size_bytes": 222841
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/gmock-more-actions.h",
+      "role": "external",
+      "size_bytes": 38344
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/gmock-more-matchers.h",
+      "role": "external",
+      "size_bytes": 4499
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/gmock-nice-strict.h",
+      "role": "external",
+      "size_bytes": 10858
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/gmock-spec-builders.h",
+      "role": "external",
+      "size_bytes": 82086
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/gmock.h",
+      "role": "external",
+      "size_bytes": 3954
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/googlemock/include/gmock/internal/custom/README.md",
+      "role": "external",
+      "size_bytes": 510
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/internal/custom/gmock-generated-actions.h",
+      "role": "external",
+      "size_bytes": 314
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/internal/custom/gmock-matchers.h",
+      "role": "external",
+      "size_bytes": 1918
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/internal/custom/gmock-port.h",
+      "role": "external",
+      "size_bytes": 1953
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/internal/gmock-internal-utils.h",
+      "role": "external",
+      "size_bytes": 19281
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/internal/gmock-port.h",
+      "role": "external",
+      "size_bytes": 6233
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/include/gmock/internal/gmock-pp.h",
+      "role": "external",
+      "size_bytes": 13491
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/src/gmock-all.cc",
+      "role": "external",
+      "size_bytes": 2107
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/src/gmock-cardinalities.cc",
+      "role": "external",
+      "size_bytes": 5330
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/src/gmock-internal-utils.cc",
+      "role": "external",
+      "size_bytes": 9460
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/src/gmock-matchers.cc",
+      "role": "external",
+      "size_bytes": 18644
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/src/gmock-spec-builders.cc",
+      "role": "external",
+      "size_bytes": 29379
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/src/gmock.cc",
+      "role": "external",
+      "size_bytes": 8547
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/src/gmock_main.cc",
+      "role": "external",
+      "size_bytes": 3092
+    },
+    {
+      "ext": "bazel",
+      "path": "external/googletest/googlemock/test/BUILD.bazel",
+      "role": "external",
+      "size_bytes": 3349
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-actions_test.cc",
+      "role": "external",
+      "size_bytes": 74336
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-cardinalities_test.cc",
+      "role": "external",
+      "size_bytes": 12138
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-function-mocker_test.cc",
+      "role": "external",
+      "size_bytes": 35016
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-internal-utils_test.cc",
+      "role": "external",
+      "size_bytes": 28429
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-matchers-arithmetic_test.cc",
+      "role": "external",
+      "size_bytes": 60225
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-matchers-comparisons_test.cc",
+      "role": "external",
+      "size_bytes": 83518
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-matchers-containers_test.cc",
+      "role": "external",
+      "size_bytes": 112016
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-matchers-misc_test.cc",
+      "role": "external",
+      "size_bytes": 63841
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/test/gmock-matchers_test.h",
+      "role": "external",
+      "size_bytes": 6273
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-more-actions_test.cc",
+      "role": "external",
+      "size_bytes": 55436
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-nice-strict_test.cc",
+      "role": "external",
+      "size_bytes": 15676
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-port_test.cc",
+      "role": "external",
+      "size_bytes": 1977
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-pp-string_test.cc",
+      "role": "external",
+      "size_bytes": 8788
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-pp_test.cc",
+      "role": "external",
+      "size_bytes": 3519
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock-spec-builders_test.cc",
+      "role": "external",
+      "size_bytes": 74694
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock_all_test.cc",
+      "role": "external",
+      "size_bytes": 2491
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock_ex_test.cc",
+      "role": "external",
+      "size_bytes": 3300
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googlemock/test/gmock_leak_test.py",
+      "role": "external",
+      "size_bytes": 4070
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock_leak_test_.cc",
+      "role": "external",
+      "size_bytes": 3284
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock_link2_test.cc",
+      "role": "external",
+      "size_bytes": 1875
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock_link_test.cc",
+      "role": "external",
+      "size_bytes": 1875
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googlemock/test/gmock_link_test.h",
+      "role": "external",
+      "size_bytes": 19828
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googlemock/test/gmock_output_test.py",
+      "role": "external",
+      "size_bytes": 6334
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock_output_test_.cc",
+      "role": "external",
+      "size_bytes": 8440
+    },
+    {
+      "ext": "txt",
+      "path": "external/googletest/googlemock/test/gmock_output_test_golden.txt",
+      "role": "external",
+      "size_bytes": 13629
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock_stress_test.cc",
+      "role": "external",
+      "size_bytes": 7249
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googlemock/test/gmock_test.cc",
+      "role": "external",
+      "size_bytes": 6414
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googlemock/test/gmock_test_utils.py",
+      "role": "external",
+      "size_bytes": 3108
+    },
+    {
+      "ext": "txt",
+      "path": "external/googletest/googletest/CMakeLists.txt",
+      "role": "external",
+      "size_bytes": 11956
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/googletest/README.md",
+      "role": "external",
+      "size_bytes": 8958
+    },
+    {
+      "ext": "in",
+      "path": "external/googletest/googletest/cmake/Config.cmake.in",
+      "role": "external",
+      "size_bytes": 361
+    },
+    {
+      "ext": "in",
+      "path": "external/googletest/googletest/cmake/gtest.pc.in",
+      "role": "external",
+      "size_bytes": 311
+    },
+    {
+      "ext": "in",
+      "path": "external/googletest/googletest/cmake/gtest_main.pc.in",
+      "role": "external",
+      "size_bytes": 354
+    },
+    {
+      "ext": "cmake",
+      "path": "external/googletest/googletest/cmake/internal_utils.cmake",
+      "role": "external",
+      "size_bytes": 13911
+    },
+    {
+      "ext": "in",
+      "path": "external/googletest/googletest/cmake/libgtest.la.in",
+      "role": "external",
+      "size_bytes": 499
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/googletest/docs/README.md",
+      "role": "external",
+      "size_bytes": 139
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest-assertion-result.h",
+      "role": "external",
+      "size_bytes": 8703
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest-death-test.h",
+      "role": "external",
+      "size_bytes": 14917
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest-matchers.h",
+      "role": "external",
+      "size_bytes": 33848
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest-message.h",
+      "role": "external",
+      "size_bytes": 9147
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest-param-test.h",
+      "role": "external",
+      "size_bytes": 26376
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest-printers.h",
+      "role": "external",
+      "size_bytes": 43992
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest-spi.h",
+      "role": "external",
+      "size_bytes": 12843
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest-test-part.h",
+      "role": "external",
+      "size_bytes": 7164
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest-typed-test.h",
+      "role": "external",
+      "size_bytes": 15809
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest.h",
+      "role": "external",
+      "size_bytes": 92636
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest_pred_impl.h",
+      "role": "external",
+      "size_bytes": 12783
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/gtest_prod.h",
+      "role": "external",
+      "size_bytes": 2502
+    },
+    {
+      "ext": "md",
+      "path": "external/googletest/googletest/include/gtest/internal/custom/README.md",
+      "role": "external",
+      "size_bytes": 1269
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/custom/gtest-port.h",
+      "role": "external",
+      "size_bytes": 1873
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/custom/gtest-printers.h",
+      "role": "external",
+      "size_bytes": 2094
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/custom/gtest.h",
+      "role": "external",
+      "size_bytes": 1858
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/gtest-death-test-internal.h",
+      "role": "external",
+      "size_bytes": 13854
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/gtest-filepath.h",
+      "role": "external",
+      "size_bytes": 10552
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/gtest-internal.h",
+      "role": "external",
+      "size_bytes": 61548
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/gtest-param-util.h",
+      "role": "external",
+      "size_bytes": 39712
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/gtest-port-arch.h",
+      "role": "external",
+      "size_bytes": 4392
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/gtest-port.h",
+      "role": "external",
+      "size_bytes": 86623
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/gtest-string.h",
+      "role": "external",
+      "size_bytes": 7323
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/include/gtest/internal/gtest-type-util.h",
+      "role": "external",
+      "size_bytes": 7324
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/samples/prime_tables.h",
+      "role": "external",
+      "size_bytes": 4327
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample1.cc",
+      "role": "external",
+      "size_bytes": 2471
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/samples/sample1.h",
+      "role": "external",
+      "size_bytes": 1919
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample10_unittest.cc",
+      "role": "external",
+      "size_bytes": 4961
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample1_unittest.cc",
+      "role": "external",
+      "size_bytes": 5108
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample2.cc",
+      "role": "external",
+      "size_bytes": 2258
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/samples/sample2.h",
+      "role": "external",
+      "size_bytes": 2981
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample2_unittest.cc",
+      "role": "external",
+      "size_bytes": 3908
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/samples/sample3-inl.h",
+      "role": "external",
+      "size_bytes": 5376
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample3_unittest.cc",
+      "role": "external",
+      "size_bytes": 5352
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample4.cc",
+      "role": "external",
+      "size_bytes": 2105
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/samples/sample4.h",
+      "role": "external",
+      "size_bytes": 2132
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample4_unittest.cc",
+      "role": "external",
+      "size_bytes": 1995
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample5_unittest.cc",
+      "role": "external",
+      "size_bytes": 6578
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample6_unittest.cc",
+      "role": "external",
+      "size_bytes": 8858
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample7_unittest.cc",
+      "role": "external",
+      "size_bytes": 4616
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample8_unittest.cc",
+      "role": "external",
+      "size_bytes": 6210
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/samples/sample9_unittest.cc",
+      "role": "external",
+      "size_bytes": 5834
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest-all.cc",
+      "role": "external",
+      "size_bytes": 2201
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest-assertion-result.cc",
+      "role": "external",
+      "size_bytes": 3009
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest-death-test.cc",
+      "role": "external",
+      "size_bytes": 62728
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest-filepath.cc",
+      "role": "external",
+      "size_bytes": 15726
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/src/gtest-internal-inl.h",
+      "role": "external",
+      "size_bytes": 48421
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest-matchers.cc",
+      "role": "external",
+      "size_bytes": 3724
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest-port.cc",
+      "role": "external",
+      "size_bytes": 49585
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest-printers.cc",
+      "role": "external",
+      "size_bytes": 18617
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest-test-part.cc",
+      "role": "external",
+      "size_bytes": 4028
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest-typed-test.cc",
+      "role": "external",
+      "size_bytes": 3823
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest.cc",
+      "role": "external",
+      "size_bytes": 267916
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/src/gtest_main.cc",
+      "role": "external",
+      "size_bytes": 2430
+    },
+    {
+      "ext": "bazel",
+      "path": "external/googletest/googletest/test/BUILD.bazel",
+      "role": "external",
+      "size_bytes": 16612
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-break-on-failure-unittest.py",
+      "role": "external",
+      "size_bytes": 6926
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-break-on-failure-unittest_.cc",
+      "role": "external",
+      "size_bytes": 3252
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-catch-exceptions-test.py",
+      "role": "external",
+      "size_bytes": 10424
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-catch-exceptions-test_.cc",
+      "role": "external",
+      "size_bytes": 8380
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-color-test.py",
+      "role": "external",
+      "size_bytes": 5170
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-color-test_.cc",
+      "role": "external",
+      "size_bytes": 2503
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-death-test-test.cc",
+      "role": "external",
+      "size_bytes": 47907
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-death-test_ex_test.cc",
+      "role": "external",
+      "size_bytes": 3559
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-env-var-test.py",
+      "role": "external",
+      "size_bytes": 4173
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-env-var-test_.cc",
+      "role": "external",
+      "size_bytes": 3702
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-fail-if-no-test-linked-test-with-disabled-test_.cc",
+      "role": "external",
+      "size_bytes": 1801
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-fail-if-no-test-linked-test-with-enabled-test_.cc",
+      "role": "external",
+      "size_bytes": 1791
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-fail-if-no-test-linked-test.py",
+      "role": "external",
+      "size_bytes": 6178
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-fail-if-no-test-selected-test.py",
+      "role": "external",
+      "size_bytes": 3713
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-failfast-unittest.py",
+      "role": "external",
+      "size_bytes": 14376
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-failfast-unittest_.cc",
+      "role": "external",
+      "size_bytes": 5594
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-filepath-test.cc",
+      "role": "external",
+      "size_bytes": 23708
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-filter-unittest.py",
+      "role": "external",
+      "size_bytes": 24018
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-filter-unittest_.cc",
+      "role": "external",
+      "size_bytes": 3435
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-global-environment-unittest.py",
+      "role": "external",
+      "size_bytes": 4889
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-global-environment-unittest_.cc",
+      "role": "external",
+      "size_bytes": 2286
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-json-outfiles-test.py",
+      "role": "external",
+      "size_bytes": 5829
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-json-output-unittest.py",
+      "role": "external",
+      "size_bytes": 30681
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-list-tests-unittest.py",
+      "role": "external",
+      "size_bytes": 6555
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-list-tests-unittest_.cc",
+      "role": "external",
+      "size_bytes": 4743
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-listener-test.cc",
+      "role": "external",
+      "size_bytes": 24343
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-message-test.cc",
+      "role": "external",
+      "size_bytes": 5830
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-options-test.cc",
+      "role": "external",
+      "size_bytes": 8079
+    },
+    {
+      "ext": "txt",
+      "path": "external/googletest/googletest/test/googletest-output-test-golden-lin.txt",
+      "role": "external",
+      "size_bytes": 42974
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-output-test.py",
+      "role": "external",
+      "size_bytes": 12645
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-output-test_.cc",
+      "role": "external",
+      "size_bytes": 36397
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-param-test-invalid-name1-test.py",
+      "role": "external",
+      "size_bytes": 2398
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-param-test-invalid-name1-test_.cc",
+      "role": "external",
+      "size_bytes": 1995
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-param-test-invalid-name2-test.py",
+      "role": "external",
+      "size_bytes": 2352
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-param-test-invalid-name2-test_.cc",
+      "role": "external",
+      "size_bytes": 2129
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-param-test-test.cc",
+      "role": "external",
+      "size_bytes": 45504
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/test/googletest-param-test-test.h",
+      "role": "external",
+      "size_bytes": 2280
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-param-test2-test.cc",
+      "role": "external",
+      "size_bytes": 2768
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-port-test.cc",
+      "role": "external",
+      "size_bytes": 41142
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-printers-test.cc",
+      "role": "external",
+      "size_bytes": 69478
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-setuptestsuite-test.py",
+      "role": "external",
+      "size_bytes": 2294
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-setuptestsuite-test_.cc",
+      "role": "external",
+      "size_bytes": 1942
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-shuffle-test.py",
+      "role": "external",
+      "size_bytes": 12701
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-shuffle-test_.cc",
+      "role": "external",
+      "size_bytes": 3192
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-test-part-test.cc",
+      "role": "external",
+      "size_bytes": 7834
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-throw-on-failure-test.py",
+      "role": "external",
+      "size_bytes": 5495
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-throw-on-failure-test_.cc",
+      "role": "external",
+      "size_bytes": 3013
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/googletest-uninitialized-test.py",
+      "role": "external",
+      "size_bytes": 2501
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/googletest-uninitialized-test_.cc",
+      "role": "external",
+      "size_bytes": 1875
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest-typed-test2_test.cc",
+      "role": "external",
+      "size_bytes": 1954
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest-typed-test_test.cc",
+      "role": "external",
+      "size_bytes": 14090
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/test/gtest-typed-test_test.h",
+      "role": "external",
+      "size_bytes": 2393
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest-unittest-api_test.cc",
+      "role": "external",
+      "size_bytes": 13047
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_all_test.cc",
+      "role": "external",
+      "size_bytes": 2239
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_assert_by_exception_test.cc",
+      "role": "external",
+      "size_bytes": 3842
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_dirs_test.cc",
+      "role": "external",
+      "size_bytes": 2939
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_environment_test.cc",
+      "role": "external",
+      "size_bytes": 6501
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_help_test.py",
+      "role": "external",
+      "size_bytes": 5779
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_help_test_.cc",
+      "role": "external",
+      "size_bytes": 2090
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_json_test_utils.py",
+      "role": "external",
+      "size_bytes": 2648
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_list_output_unittest.py",
+      "role": "external",
+      "size_bytes": 9497
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_list_output_unittest_.cc",
+      "role": "external",
+      "size_bytes": 3197
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_main_unittest.cc",
+      "role": "external",
+      "size_bytes": 1839
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_no_test_unittest.cc",
+      "role": "external",
+      "size_bytes": 2403
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_pred_impl_unittest.cc",
+      "role": "external",
+      "size_bytes": 69752
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_premature_exit_test.cc",
+      "role": "external",
+      "size_bytes": 4312
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_prod_test.cc",
+      "role": "external",
+      "size_bytes": 2147
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_repeat_test.cc",
+      "role": "external",
+      "size_bytes": 7668
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_skip_check_output_test.py",
+      "role": "external",
+      "size_bytes": 2417
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_skip_environment_check_output_test.py",
+      "role": "external",
+      "size_bytes": 2231
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_skip_in_environment_setup_test.cc",
+      "role": "external",
+      "size_bytes": 2070
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_skip_test.cc",
+      "role": "external",
+      "size_bytes": 2001
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_sole_header_test.cc",
+      "role": "external",
+      "size_bytes": 2173
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_stress_test.cc",
+      "role": "external",
+      "size_bytes": 9369
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_test_macro_stack_footprint_test.cc",
+      "role": "external",
+      "size_bytes": 3871
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_test_utils.py",
+      "role": "external",
+      "size_bytes": 8146
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_testbridge_test.py",
+      "role": "external",
+      "size_bytes": 2495
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_testbridge_test_.cc",
+      "role": "external",
+      "size_bytes": 1922
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_throw_on_failure_ex_test.cc",
+      "role": "external",
+      "size_bytes": 3395
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_unittest.cc",
+      "role": "external",
+      "size_bytes": 266858
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_xml_outfile1_test_.cc",
+      "role": "external",
+      "size_bytes": 1955
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_xml_outfile2_test_.cc",
+      "role": "external",
+      "size_bytes": 2835
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_xml_outfiles_test.py",
+      "role": "external",
+      "size_bytes": 5961
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_xml_output_unittest.py",
+      "role": "external",
+      "size_bytes": 25170
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/gtest_xml_output_unittest_.cc",
+      "role": "external",
+      "size_bytes": 7007
+    },
+    {
+      "ext": "py",
+      "path": "external/googletest/googletest/test/gtest_xml_test_utils.py",
+      "role": "external",
+      "size_bytes": 10192
+    },
+    {
+      "ext": "cc",
+      "path": "external/googletest/googletest/test/production.cc",
+      "role": "external",
+      "size_bytes": 1675
+    },
+    {
+      "ext": "h",
+      "path": "external/googletest/googletest/test/production.h",
+      "role": "external",
+      "size_bytes": 2131
+    },
+    {
+      "ext": "bzl",
+      "path": "external/googletest/googletest_deps.bzl",
+      "role": "external",
+      "size_bytes": 1872
+    },
+    {
+      "ext": "md",
+      "path": "external/pcg/CONTRIBUTING.md",
+      "role": "external",
+      "size_bytes": 686
+    },
+    {
+      "ext": "txt",
+      "path": "external/pcg/LICENSE-APACHE.txt",
+      "role": "external",
+      "size_bytes": 11357
+    },
+    {
+      "ext": "txt",
+      "path": "external/pcg/LICENSE-MIT.txt",
+      "role": "external",
+      "size_bytes": 1093
+    },
+    {
+      "ext": "spdx",
+      "path": "external/pcg/LICENSE.spdx",
+      "role": "external",
+      "size_bytes": 210
+    },
+    {
+      "ext": "",
+      "path": "external/pcg/Makefile",
+      "role": "external",
+      "size_bytes": 1097
+    },
+    {
+      "ext": "md",
+      "path": "external/pcg/README.md",
+      "role": "external",
+      "size_bytes": 2072
+    },
+    {
+      "ext": "hpp",
+      "path": "external/pcg/include/pcg_extras.hpp",
+      "role": "external",
+      "size_bytes": 20333
+    },
+    {
+      "ext": "hpp",
+      "path": "external/pcg/include/pcg_random.hpp",
+      "role": "external",
+      "size_bytes": 73456
+    },
+    {
+      "ext": "hpp",
+      "path": "external/pcg/include/pcg_uint128.hpp",
+      "role": "external",
+      "size_bytes": 28354
+    },
+    {
+      "ext": "",
+      "path": "external/pcg/sample/Makefile",
+      "role": "external",
+      "size_bytes": 1826
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/sample/codebook.cpp",
+      "role": "external",
+      "size_bytes": 1243
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/sample/cppref-sample.cpp",
+      "role": "external",
+      "size_bytes": 2518
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/sample/make-partytrick.cpp",
+      "role": "external",
+      "size_bytes": 3213
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/sample/pcg-demo.cpp",
+      "role": "external",
+      "size_bytes": 6488
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/sample/spew.cpp",
+      "role": "external",
+      "size_bytes": 1790
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/sample/use-partytrick.cpp",
+      "role": "external",
+      "size_bytes": 2612
+    },
+    {
+      "ext": "",
+      "path": "external/pcg/test-high/Makefile",
+      "role": "external",
+      "size_bytes": 9122
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg128_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 82
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg128_oneseq_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 89
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg16_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 81
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg16_oneseq_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 88
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32.cpp",
+      "role": "external",
+      "size_bytes": 67
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_c1024.cpp",
+      "role": "external",
+      "size_bytes": 83
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_c1024_fast.cpp",
+      "role": "external",
+      "size_bytes": 88
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_c64.cpp",
+      "role": "external",
+      "size_bytes": 81
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_c64_fast.cpp",
+      "role": "external",
+      "size_bytes": 86
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_c64_oneseq.cpp",
+      "role": "external",
+      "size_bytes": 88
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_fast.cpp",
+      "role": "external",
+      "size_bytes": 72
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_k1024.cpp",
+      "role": "external",
+      "size_bytes": 73
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_k1024_fast.cpp",
+      "role": "external",
+      "size_bytes": 78
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_k16384.cpp",
+      "role": "external",
+      "size_bytes": 74
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_k16384_fast.cpp",
+      "role": "external",
+      "size_bytes": 79
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_k2.cpp",
+      "role": "external",
+      "size_bytes": 70
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_k2_fast.cpp",
+      "role": "external",
+      "size_bytes": 75
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_k64.cpp",
+      "role": "external",
+      "size_bytes": 71
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_k64_fast.cpp",
+      "role": "external",
+      "size_bytes": 76
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_k64_oneseq.cpp",
+      "role": "external",
+      "size_bytes": 78
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 81
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_oneseq.cpp",
+      "role": "external",
+      "size_bytes": 74
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_oneseq_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 88
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg32_unique.cpp",
+      "role": "external",
+      "size_bytes": 84
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64.cpp",
+      "role": "external",
+      "size_bytes": 67
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_c1024.cpp",
+      "role": "external",
+      "size_bytes": 113
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_c1024_fast.cpp",
+      "role": "external",
+      "size_bytes": 118
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_c32.cpp",
+      "role": "external",
+      "size_bytes": 111
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_c32_fast.cpp",
+      "role": "external",
+      "size_bytes": 116
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_c32_oneseq.cpp",
+      "role": "external",
+      "size_bytes": 118
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_fast.cpp",
+      "role": "external",
+      "size_bytes": 72
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_k1024.cpp",
+      "role": "external",
+      "size_bytes": 103
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_k1024_fast.cpp",
+      "role": "external",
+      "size_bytes": 108
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_k32.cpp",
+      "role": "external",
+      "size_bytes": 101
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_k32_fast.cpp",
+      "role": "external",
+      "size_bytes": 106
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_k32_oneseq.cpp",
+      "role": "external",
+      "size_bytes": 108
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 81
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_oneseq.cpp",
+      "role": "external",
+      "size_bytes": 74
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_oneseq_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 88
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg64_unique.cpp",
+      "role": "external",
+      "size_bytes": 84
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg8_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 80
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/check-pcg8_oneseq_once_insecure.cpp",
+      "role": "external",
+      "size_bytes": 87
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg128_once_insecure.out",
+      "role": "external",
+      "size_bytes": 4245
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg128_oneseq_once_insecure.out",
+      "role": "external",
+      "size_bytes": 4232
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg16_once_insecure.out",
+      "role": "external",
+      "size_bytes": 2800
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg16_oneseq_once_insecure.out",
+      "role": "external",
+      "size_bytes": 2788
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32.out",
+      "role": "external",
+      "size_bytes": 2747
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_c1024.out",
+      "role": "external",
+      "size_bytes": 2158
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_c1024_fast.out",
+      "role": "external",
+      "size_bytes": 2144
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_c64.out",
+      "role": "external",
+      "size_bytes": 2154
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_c64_fast.out",
+      "role": "external",
+      "size_bytes": 2140
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_c64_oneseq.out",
+      "role": "external",
+      "size_bytes": 2142
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_fast.out",
+      "role": "external",
+      "size_bytes": 2732
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_k1024.out",
+      "role": "external",
+      "size_bytes": 2758
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_k1024_fast.out",
+      "role": "external",
+      "size_bytes": 2744
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_k16384.out",
+      "role": "external",
+      "size_bytes": 2761
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_k16384_fast.out",
+      "role": "external",
+      "size_bytes": 2747
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_k2.out",
+      "role": "external",
+      "size_bytes": 2751
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_k2_fast.out",
+      "role": "external",
+      "size_bytes": 2737
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_k64.out",
+      "role": "external",
+      "size_bytes": 2754
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_k64_fast.out",
+      "role": "external",
+      "size_bytes": 2740
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_k64_oneseq.out",
+      "role": "external",
+      "size_bytes": 2742
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_once_insecure.out",
+      "role": "external",
+      "size_bytes": 2760
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_oneseq.out",
+      "role": "external",
+      "size_bytes": 2734
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg32_oneseq_once_insecure.out",
+      "role": "external",
+      "size_bytes": 2748
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64.out",
+      "role": "external",
+      "size_bytes": 3249
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_c1024.out",
+      "role": "external",
+      "size_bytes": 2409
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_c1024_fast.out",
+      "role": "external",
+      "size_bytes": 2394
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_c32.out",
+      "role": "external",
+      "size_bytes": 2405
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_c32_fast.out",
+      "role": "external",
+      "size_bytes": 2390
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_c32_oneseq.out",
+      "role": "external",
+      "size_bytes": 2392
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_fast.out",
+      "role": "external",
+      "size_bytes": 3234
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_k1024.out",
+      "role": "external",
+      "size_bytes": 3259
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_k1024_fast.out",
+      "role": "external",
+      "size_bytes": 3244
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_k32.out",
+      "role": "external",
+      "size_bytes": 3255
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_k32_fast.out",
+      "role": "external",
+      "size_bytes": 3240
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_k32_oneseq.out",
+      "role": "external",
+      "size_bytes": 3242
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_once_insecure.out",
+      "role": "external",
+      "size_bytes": 3261
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_oneseq.out",
+      "role": "external",
+      "size_bytes": 3236
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg64_oneseq_once_insecure.out",
+      "role": "external",
+      "size_bytes": 3248
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg8_once_insecure.out",
+      "role": "external",
+      "size_bytes": 2796
+    },
+    {
+      "ext": "out",
+      "path": "external/pcg/test-high/expected/check-pcg8_oneseq_once_insecure.out",
+      "role": "external",
+      "size_bytes": 2785
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/pcg-test-noadvance.cpp",
+      "role": "external",
+      "size_bytes": 5309
+    },
+    {
+      "ext": "cpp",
+      "path": "external/pcg/test-high/pcg-test.cpp",
+      "role": "external",
+      "size_bytes": 5755
+    },
+    {
+      "ext": "sh",
+      "path": "external/pcg/test-high/run-tests.sh",
+      "role": "external",
+      "size_bytes": 3692
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/american.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 1852
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/asian.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 841
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/barrier.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 283
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/black_scholes.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 3823
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/bs_barrier.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 299
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/digital.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 500
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/grid_utils.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 1887
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/heston.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 1425
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/lookback.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 775
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/math.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 2636
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/mc.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 2772
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/mc_barrier.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 464
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/multi.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 1239
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/pde.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 2217
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/pde_barrier.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 842
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/qmc/brownian_bridge.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 779
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/qmc/sobol.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 883
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/risk.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 2032
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/rng.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 2264
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/stats.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 1062
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/term_structures.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 1058
+    },
+    {
+      "ext": "hpp",
+      "path": "include/quant/version.hpp",
+      "role": "cpp_headers",
+      "size_bytes": 514
+    },
+    {
+      "ext": "md",
+      "path": "project_state/ARCHITECTURE.md",
+      "role": "project_state",
+      "size_bytes": 4061
+    },
+    {
+      "ext": "md",
+      "path": "project_state/CHANGELOG.md",
+      "role": "project_state",
+      "size_bytes": 1451
+    },
+    {
+      "ext": "md",
+      "path": "project_state/CONFIG_REFERENCE.md",
+      "role": "project_state",
+      "size_bytes": 3104
+    },
+    {
+      "ext": "md",
+      "path": "project_state/CURRENT_RESULTS.md",
+      "role": "project_state",
+      "size_bytes": 1810
+    },
+    {
+      "ext": "md",
+      "path": "project_state/DATAFLOW.md",
+      "role": "project_state",
+      "size_bytes": 3410
+    },
+    {
+      "ext": "md",
+      "path": "project_state/DEPENDENCY_GRAPH.md",
+      "role": "project_state",
+      "size_bytes": 2886
+    },
+    {
+      "ext": "md",
+      "path": "project_state/EXPERIMENTS.md",
+      "role": "project_state",
+      "size_bytes": 4047
+    },
+    {
+      "ext": "md",
+      "path": "project_state/FUNCTION_INDEX.md",
+      "role": "project_state",
+      "size_bytes": 7990
+    },
+    {
+      "ext": "md",
+      "path": "project_state/KNOWN_ISSUES.md",
+      "role": "project_state",
+      "size_bytes": 1237
+    },
+    {
+      "ext": "md",
+      "path": "project_state/MODULE_SUMMARIES.md",
+      "role": "project_state",
+      "size_bytes": 7768
+    },
+    {
+      "ext": "md",
+      "path": "project_state/OPEN_QUESTIONS.md",
+      "role": "project_state",
+      "size_bytes": 1629
+    },
+    {
+      "ext": "md",
+      "path": "project_state/PIPELINE_FLOW.md",
+      "role": "project_state",
+      "size_bytes": 4260
+    },
+    {
+      "ext": "md",
+      "path": "project_state/RESEARCH_NOTES.md",
+      "role": "project_state",
+      "size_bytes": 3320
+    },
+    {
+      "ext": "md",
+      "path": "project_state/ROADMAP.md",
+      "role": "project_state",
+      "size_bytes": 2250
+    },
+    {
+      "ext": "md",
+      "path": "project_state/SERVER_ENVIRONMENT.md",
+      "role": "project_state",
+      "size_bytes": 1657
+    },
+    {
+      "ext": "md",
+      "path": "project_state/STYLE_GUIDE.md",
+      "role": "project_state",
+      "size_bytes": 2324
+    },
+    {
+      "ext": "md",
+      "path": "project_state/TEST_COVERAGE.md",
+      "role": "project_state",
+      "size_bytes": 2815
+    },
+    {
+      "ext": "json",
+      "path": "project_state/_generated/import_graph.json",
+      "role": "project_state",
+      "size_bytes": 4992
+    },
+    {
+      "ext": "txt",
+      "path": "project_state/_generated/make_targets.txt",
+      "role": "project_state",
+      "size_bytes": 6
+    },
+    {
+      "ext": "json",
+      "path": "project_state/_generated/repo_inventory.json",
+      "role": "project_state",
+      "size_bytes": 112651
+    },
+    {
+      "ext": "json",
+      "path": "project_state/_generated/symbol_index.json",
+      "role": "project_state",
+      "size_bytes": 61616
+    },
+    {
+      "ext": "toml",
+      "path": "pyproject.toml",
+      "role": "repo_meta",
+      "size_bytes": 965
+    },
+    {
+      "ext": "txt",
+      "path": "python/CMakeLists.txt",
+      "role": "python_bindings",
+      "size_bytes": 786
+    },
+    {
+      "ext": "py",
+      "path": "python/examples/quickstart.py",
+      "role": "python_bindings",
+      "size_bytes": 2554
+    },
+    {
+      "ext": "cpp",
+      "path": "python/pybind_module.cpp",
+      "role": "python_bindings",
+      "size_bytes": 16249
+    },
+    {
+      "ext": "py",
+      "path": "python/scripts/cibw_smoke.py",
+      "role": "python_bindings",
+      "size_bytes": 982
+    },
+    {
+      "ext": "txt",
+      "path": "requirements-artifacts.txt",
+      "role": "misc",
+      "size_bytes": 79
+    },
+    {
+      "ext": "py",
+      "path": "scripts/american_consistency.py",
+      "role": "scripts",
+      "size_bytes": 8702
+    },
+    {
+      "ext": "py",
+      "path": "scripts/calibrate_heston.py",
+      "role": "scripts",
+      "size_bytes": 23808
+    },
+    {
+      "ext": "py",
+      "path": "scripts/calibrate_heston_series.py",
+      "role": "scripts",
+      "size_bytes": 6485
+    },
+    {
+      "ext": "sh",
+      "path": "scripts/cleanup_repo.sh",
+      "role": "scripts",
+      "size_bytes": 742
+    },
+    {
+      "ext": "py",
+      "path": "scripts/data/cboe_csv.py",
+      "role": "scripts",
+      "size_bytes": 8374
+    },
+    {
+      "ext": "md",
+      "path": "scripts/data/schema.md",
+      "role": "scripts",
+      "size_bytes": 1662
+    },
+    {
+      "ext": "py",
+      "path": "scripts/data/wrds_fetch_options.py",
+      "role": "scripts",
+      "size_bytes": 6631
+    },
+    {
+      "ext": "py",
+      "path": "scripts/data/wrds_fetch_returns.py",
+      "role": "scripts",
+      "size_bytes": 2266
+    },
+    {
+      "ext": "sh",
+      "path": "scripts/demo.sh",
+      "role": "scripts",
+      "size_bytes": 42126
+    },
+    {
+      "ext": "py",
+      "path": "scripts/generate_bench_artifacts.py",
+      "role": "scripts",
+      "size_bytes": 11958
+    },
+    {
+      "ext": "py",
+      "path": "scripts/generate_metrics_summary.py",
+      "role": "scripts",
+      "size_bytes": 19825
+    },
+    {
+      "ext": "py",
+      "path": "scripts/generate_synthetic_data.py",
+      "role": "scripts",
+      "size_bytes": 2378
+    },
+    {
+      "ext": "py",
+      "path": "scripts/greeks_reliability.py",
+      "role": "scripts",
+      "size_bytes": 6994
+    },
+    {
+      "ext": "py",
+      "path": "scripts/greeks_variance.py",
+      "role": "scripts",
+      "size_bytes": 2490
+    },
+    {
+      "ext": "py",
+      "path": "scripts/heston_qe_vs_analytic.py",
+      "role": "scripts",
+      "size_bytes": 10445
+    },
+    {
+      "ext": "py",
+      "path": "scripts/heston_series_plot.py",
+      "role": "scripts",
+      "size_bytes": 8121
+    },
+    {
+      "ext": "py",
+      "path": "scripts/manifest_utils.py",
+      "role": "scripts",
+      "size_bytes": 6089
+    },
+    {
+      "ext": "py",
+      "path": "scripts/mc_greeks_ci.py",
+      "role": "scripts",
+      "size_bytes": 5265
+    },
+    {
+      "ext": "py",
+      "path": "scripts/multiasset_figures.py",
+      "role": "scripts",
+      "size_bytes": 2599
+    },
+    {
+      "ext": "py",
+      "path": "scripts/package_validation.py",
+      "role": "scripts",
+      "size_bytes": 2485
+    },
+    {
+      "ext": "py",
+      "path": "scripts/parity_checks.py",
+      "role": "scripts",
+      "size_bytes": 5623
+    },
+    {
+      "ext": "py",
+      "path": "scripts/pde_order_slope.py",
+      "role": "scripts",
+      "size_bytes": 4357
+    },
+    {
+      "ext": "py",
+      "path": "scripts/ql_parity.py",
+      "role": "scripts",
+      "size_bytes": 12140
+    },
+    {
+      "ext": "py",
+      "path": "scripts/qmc_vs_prng_equal_time.py",
+      "role": "scripts",
+      "size_bytes": 12580
+    },
+    {
+      "ext": "py",
+      "path": "scripts/report.py",
+      "role": "scripts",
+      "size_bytes": 10344
+    },
+    {
+      "ext": "sh",
+      "path": "scripts/reproduce_all.sh",
+      "role": "scripts",
+      "size_bytes": 7238
+    },
+    {
+      "ext": "py",
+      "path": "scripts/risk_backtest.py",
+      "role": "scripts",
+      "size_bytes": 2536
+    },
+    {
+      "ext": "py",
+      "path": "scripts/sabr_slice_calibration.py",
+      "role": "scripts",
+      "size_bytes": 4344
+    },
+    {
+      "ext": "py",
+      "path": "scripts/tri_engine_agreement.py",
+      "role": "scripts",
+      "size_bytes": 7180
+    },
+    {
+      "ext": "cfg",
+      "path": "setup.cfg",
+      "role": "repo_meta",
+      "size_bytes": 470
+    },
+    {
+      "ext": "cpp",
+      "path": "src/american.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 21989
+    },
+    {
+      "ext": "cpp",
+      "path": "src/asian.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 5286
+    },
+    {
+      "ext": "cpp",
+      "path": "src/black_scholes.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 9422
+    },
+    {
+      "ext": "cpp",
+      "path": "src/bs_barrier_rr.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 7640
+    },
+    {
+      "ext": "cpp",
+      "path": "src/digital.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 1258
+    },
+    {
+      "ext": "cpp",
+      "path": "src/grid_utils.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 5730
+    },
+    {
+      "ext": "cpp",
+      "path": "src/heston.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 13039
+    },
+    {
+      "ext": "cpp",
+      "path": "src/lookback.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 3299
+    },
+    {
+      "ext": "cpp",
+      "path": "src/main.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 46462
+    },
+    {
+      "ext": "cpp",
+      "path": "src/mc.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 21480
+    },
+    {
+      "ext": "cpp",
+      "path": "src/mc_barrier.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 16730
+    },
+    {
+      "ext": "cpp",
+      "path": "src/multi.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 5025
+    },
+    {
+      "ext": "cpp",
+      "path": "src/pde.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 8447
+    },
+    {
+      "ext": "cpp",
+      "path": "src/pde_barrier.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 9029
+    },
+    {
+      "ext": "cpp",
+      "path": "src/qmc/brownian_bridge.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 3098
+    },
+    {
+      "ext": "cpp",
+      "path": "src/qmc/sobol.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 5939
+    },
+    {
+      "ext": "cpp",
+      "path": "src/risk.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 7062
+    },
+    {
+      "ext": "cpp",
+      "path": "src/version.cpp",
+      "role": "cpp_sources",
+      "size_bytes": 96
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_american.cpp",
+      "role": "tests",
+      "size_bytes": 4806
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_asian.cpp",
+      "role": "tests",
+      "size_bytes": 1214
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_barrier.cpp",
+      "role": "tests",
+      "size_bytes": 3111
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_barrier_mc_regression.cpp",
+      "role": "tests",
+      "size_bytes": 1537
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_black_scholes.cpp",
+      "role": "tests",
+      "size_bytes": 3345
+    },
+    {
+      "ext": "py",
+      "path": "tests/test_cli_fast.py",
+      "role": "tests",
+      "size_bytes": 10721
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_digital.cpp",
+      "role": "tests",
+      "size_bytes": 619
+    },
+    {
+      "ext": "py",
+      "path": "tests/test_greeks_reliability_fast.py",
+      "role": "tests",
+      "size_bytes": 1183
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_grid_utils.cpp",
+      "role": "tests",
+      "size_bytes": 1298
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_heston.cpp",
+      "role": "tests",
+      "size_bytes": 2972
+    },
+    {
+      "ext": "py",
+      "path": "tests/test_heston_fast.py",
+      "role": "tests",
+      "size_bytes": 3937
+    },
+    {
+      "ext": "py",
+      "path": "tests/test_heston_safety_fast.py",
+      "role": "tests",
+      "size_bytes": 1808
+    },
+    {
+      "ext": "py",
+      "path": "tests/test_heston_series_fast.py",
+      "role": "tests",
+      "size_bytes": 1620
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_lookback.cpp",
+      "role": "tests",
+      "size_bytes": 997
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_mc.cpp",
+      "role": "tests",
+      "size_bytes": 8435
+    },
+    {
+      "ext": "py",
+      "path": "tests/test_metrics_snapshot_fast.py",
+      "role": "tests",
+      "size_bytes": 2119
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_multi.cpp",
+      "role": "tests",
+      "size_bytes": 2439
+    },
+    {
+      "ext": "py",
+      "path": "tests/test_parity_fast.py",
+      "role": "tests",
+      "size_bytes": 859
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_pde.cpp",
+      "role": "tests",
+      "size_bytes": 6570
+    },
+    {
+      "ext": "py",
+      "path": "tests/test_qmc_fast.py",
+      "role": "tests",
+      "size_bytes": 2172
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_risk.cpp",
+      "role": "tests",
+      "size_bytes": 3273
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_rng_repro.cpp",
+      "role": "tests",
+      "size_bytes": 1480
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_sanity.cpp",
+      "role": "tests",
+      "size_bytes": 730
+    },
+    {
+      "ext": "cpp",
+      "path": "tests/test_term_structures.cpp",
+      "role": "tests",
+      "size_bytes": 4049
+    },
+    {
+      "ext": "py",
+      "path": "tools/project_state_generate.py",
+      "role": "misc",
+      "size_bytes": 13309
+    },
+    {
+      "ext": "json",
+      "path": "vcpkg.json",
+      "role": "repo_meta",
+      "size_bytes": 284
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/__init__.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 50
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/bs_utils.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 2781
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/calibrate_bs.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 3871
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/calibrate_heston.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 18015
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/compare_bs_heston.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 13109
+    },
+    {
+      "ext": "yaml",
+      "path": "wrds_pipeline/dateset.yaml",
+      "role": "wrds_pipeline",
+      "size_bytes": 997
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/delta_hedge_pnl.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 2482
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/ingest_sppx_surface.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 9686
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/oos_pricing.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 2216
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/pipeline.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 25727
+    },
+    {
+      "ext": "csv",
+      "path": "wrds_pipeline/sample_data/spx_options_sample.csv",
+      "role": "wrds_pipeline",
+      "size_bytes": 8132
+    },
+    {
+      "ext": "py",
+      "path": "wrds_pipeline/tests/test_wrds_pipeline.py",
+      "role": "wrds_pipeline",
+      "size_bytes": 4495
+    },
+    {
+      "ext": "yaml",
+      "path": "wrds_pipeline_dates_panel.yaml",
+      "role": "misc",
+      "size_bytes": 799
+    }
+  ],
+  "generated_at": "2025-12-20T21:16:57.986501+00:00",
+  "git_sha": "36c52c1d72dbcaacd674729ea9ab4719b3fd6408",
+  "root": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp",
+  "summary": {
+    "role_counts": {
+      "artifacts": 18,
+      "benchmarks": 3,
+      "cmake": 1,
+      "cpp_headers": 22,
+      "cpp_sources": 18,
+      "data": 6,
+      "docs": 72,
+      "external": 517,
+      "misc": 6,
+      "project_state": 21,
+      "python_bindings": 4,
+      "repo_meta": 13,
+      "scripts": 29,
+      "tests": 24,
+      "wrds_pipeline": 12
+    },
+    "role_sizes_bytes": {
+      "artifacts": 651330,
+      "benchmarks": 11898,
+      "cmake": 475,
+      "cpp_headers": 30447,
+      "cpp_sources": 191031,
+      "data": 578900,
+      "docs": 5587462,
+      "external": 5439082,
+      "misc": 31885,
+      "project_state": 235284,
+      "python_bindings": 20571,
+      "repo_meta": 67962,
+      "scripts": 245787,
+      "tests": 71294,
+      "wrds_pipeline": 91561
+    }
+  }
+}

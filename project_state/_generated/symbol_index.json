@@ -1,0 +1,6140 @@
+{
+  "files": {
+    "python/examples/quickstart.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 17,
+          "name": "price_vanilla",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 29,
+          "name": "price_barrier",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 46,
+          "name": "heston_helpers",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 68,
+          "name": "maybe_run_heston",
+          "signature": "(repo_root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 95,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "pathlib",
+        "pyquant_pricer",
+        "subprocess",
+        "sys"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pyquant_pricer"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "python.examples.quickstart"
+    },
+    "python/scripts/cibw_smoke.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 15,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "math",
+        "pyquant_pricer"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pyquant_pricer"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "python.scripts.cibw_smoke"
+    },
+    "scripts/american_consistency.py": {
+      "classes": [
+        {
+          "docstring": null,
+          "lineno": 30,
+          "name": "AmericanSpec"
+        }
+      ],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 39,
+          "name": "american_put_psor",
+          "signature": "(spec, m_nodes, n_steps, smax_mult=4.0, omega=1.5, tol=1e-08, max_iter=10000)"
+        },
+        {
+          "docstring": null,
+          "lineno": 105,
+          "name": "american_put_binomial",
+          "signature": "(spec, steps)"
+        },
+        {
+          "docstring": null,
+          "lineno": 122,
+          "name": "american_put_lsmc",
+          "signature": "(spec, paths, steps, seed)"
+        },
+        {
+          "docstring": null,
+          "lineno": 160,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "dataclasses",
+        "datetime",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "shlex",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "dataclasses",
+          "names": [
+            "dataclass"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "datetime",
+            "timezone"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.american_consistency"
+    },
+    "scripts/calibrate_heston.py": {
+      "classes": [
+        {
+          "docstring": null,
+          "lineno": 150,
+          "name": "CalibrationConfig"
+        },
+        {
+          "docstring": null,
+          "lineno": 174,
+          "name": "ParameterTransform"
+        }
+      ],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 37,
+          "name": "black_scholes_call",
+          "signature": "(spot, strike, r, q, sigma, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 51,
+          "name": "black_scholes_put",
+          "signature": "(spot, strike, r, q, sigma, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 58,
+          "name": "implied_vol_from_price",
+          "signature": "(price, spot, strike, r, q, T, is_call)"
+        },
+        {
+          "docstring": null,
+          "lineno": 91,
+          "name": "_heston_characteristic",
+          "signature": "(phi, T, params, r, q, log_spot, j)"
+        },
+        {
+          "docstring": null,
+          "lineno": 123,
+          "name": "heston_call_price",
+          "signature": "(spot, strike, r, q, T, params, n_points=256, phi_max=120.0)"
+        },
+        {
+          "docstring": null,
+          "lineno": 161,
+          "name": "_sigmoid_forward",
+          "signature": "(value, lb, ub)"
+        },
+        {
+          "docstring": null,
+          "lineno": 167,
+          "name": "_sigmoid_inverse",
+          "signature": "(value, lb, ub)"
+        },
+        {
+          "docstring": null,
+          "lineno": 220,
+          "name": "_compute_weight_vector",
+          "signature": "(df, market_prices, vegas, mode)"
+        },
+        {
+          "docstring": null,
+          "lineno": 234,
+          "name": "_prepare_surface",
+          "signature": "(df, fast)"
+        },
+        {
+          "docstring": null,
+          "lineno": 250,
+          "name": "_surface_market_prices",
+          "signature": "(df)"
+        },
+        {
+          "docstring": null,
+          "lineno": 277,
+          "name": "_model_prices",
+          "signature": "(df, params, fast)"
+        },
+        {
+          "docstring": null,
+          "lineno": 298,
+          "name": "calibrate_surface",
+          "signature": "(df, config)"
+        },
+        {
+          "docstring": null,
+          "lineno": 459,
+          "name": "_plot_smiles",
+          "signature": "(df, model_vols, output_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 479,
+          "name": "save_calibration_outputs",
+          "signature": "(df, metrics, output_dir, fast)"
+        },
+        {
+          "docstring": null,
+          "lineno": 539,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "dataclasses",
+        "json",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "scipy.optimize",
+        "shlex",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "dataclasses",
+          "names": [
+            "dataclass"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Iterable",
+            "Tuple"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "describe_inputs",
+            "update_run"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "scipy.optimize",
+          "names": [
+            "brentq",
+            "least_squares"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.calibrate_heston"
+    },
+    "scripts/calibrate_heston_series.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 32,
+          "name": "resolve_inputs",
+          "signature": "(inputs, pattern, input_dir)"
+        },
+        {
+          "docstring": null,
+          "lineno": 47,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "calibrate_heston",
+        "glob",
+        "json",
+        "manifest_utils",
+        "pandas",
+        "pathlib",
+        "shlex",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "glob"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Iterable",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "calibrate_heston",
+          "names": [
+            "CalibrationConfig",
+            "calibrate_surface",
+            "save_calibration_outputs"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "describe_inputs",
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.calibrate_heston_series"
+    },
+    "scripts/data/cboe_csv.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 65,
+          "name": "_find_column",
+          "signature": "(columns, candidates)"
+        },
+        {
+          "docstring": null,
+          "lineno": 73,
+          "name": "_normalized_put_call",
+          "signature": "(raw)"
+        },
+        {
+          "docstring": null,
+          "lineno": 84,
+          "name": "_parse_date",
+          "signature": "(value, fallback=None)"
+        },
+        {
+          "docstring": null,
+          "lineno": 100,
+          "name": "_parse_rate",
+          "signature": "(series, default=0.0)"
+        },
+        {
+          "docstring": null,
+          "lineno": 110,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "argparse",
+        "datetime",
+        "json",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "datetime"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Iterable",
+            "Optional"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "scripts.data.cboe_csv"
+    },
+    "scripts/data/wrds_fetch_options.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 20,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "argparse",
+        "datetime",
+        "math",
+        "numpy",
+        "os",
+        "pandas",
+        "psycopg2",
+        "sys",
+        "wrds"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "datetime"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "psycopg2"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "wrds"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "scripts.data.wrds_fetch_options"
+    },
+    "scripts/data/wrds_fetch_returns.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 15,
+          "name": "fetch_wrds",
+          "signature": "(ticker, start, end)"
+        },
+        {
+          "docstring": null,
+          "lineno": 44,
+          "name": "fetch_yf",
+          "signature": "(ticker, start, end)"
+        },
+        {
+          "docstring": null,
+          "lineno": 59,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "argparse",
+        "os",
+        "pandas",
+        "sys",
+        "wrds",
+        "yfinance"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "wrds"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "yfinance"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "scripts.data.wrds_fetch_returns"
+    },
+    "scripts/generate_bench_artifacts.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 22,
+          "name": "load_benchmarks",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 27,
+          "name": "parse_mc",
+          "signature": "(benches)"
+        },
+        {
+          "docstring": null,
+          "lineno": 79,
+          "name": "parse_pde",
+          "signature": "(benches)"
+        },
+        {
+          "docstring": null,
+          "lineno": 121,
+          "name": "plot_throughput",
+          "signature": "(df, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 157,
+          "name": "plot_rmse",
+          "signature": "(df, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 168,
+          "name": "plot_equal_time",
+          "signature": "(df, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 220,
+          "name": "plot_walltime",
+          "signature": "(df, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 232,
+          "name": "plot_psor",
+          "signature": "(df, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 244,
+          "name": "plot_order",
+          "signature": "(df, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 273,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "datetime",
+        "json",
+        "manifest_utils",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "datetime",
+            "timezone"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Any",
+            "Dict",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.generate_bench_artifacts"
+    },
+    "scripts/generate_metrics_summary.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 31,
+          "name": "_safe_load_csv",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 40,
+          "name": "_status_block",
+          "signature": "(status, source, metrics=None, reason=None, notes=None)"
+        },
+        {
+          "docstring": null,
+          "lineno": 60,
+          "name": "_weighted_average",
+          "signature": "(values, weights)"
+        },
+        {
+          "docstring": "Return (slope, r2) for y ~ a*x + b using least squares.",
+          "lineno": 69,
+          "name": "_regression_slope",
+          "signature": "(x, y)"
+        },
+        {
+          "docstring": null,
+          "lineno": 84,
+          "name": "tri_engine_metrics",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 115,
+          "name": "qmc_vs_prng_metrics",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 141,
+          "name": "pde_order_metrics",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 174,
+          "name": "ql_parity_metrics",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 204,
+          "name": "_collapse_status",
+          "signature": "(statuses)"
+        },
+        {
+          "docstring": null,
+          "lineno": 213,
+          "name": "benchmark_metrics",
+          "signature": "(root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 276,
+          "name": "wrds_metrics",
+          "signature": "(root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 337,
+          "name": "_fmt",
+          "signature": "(value)"
+        },
+        {
+          "docstring": null,
+          "lineno": 345,
+          "name": "_highlights",
+          "signature": "(name, block)"
+        },
+        {
+          "docstring": null,
+          "lineno": 385,
+          "name": "render_markdown",
+          "signature": "(summary)"
+        },
+        {
+          "docstring": null,
+          "lineno": 424,
+          "name": "parse_args",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 434,
+          "name": "build_summary",
+          "signature": "(artifacts_root, manifest_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 465,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "dataclasses",
+        "datetime",
+        "json",
+        "manifest_utils",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "dataclasses",
+          "names": [
+            "dataclass"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "datetime",
+            "timezone"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Any",
+            "Dict",
+            "Iterable",
+            "List",
+            "Tuple"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "ARTIFACTS_ROOT",
+            "MANIFEST_PATH",
+            "describe_inputs",
+            "load_manifest",
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.generate_metrics_summary"
+    },
+    "scripts/generate_synthetic_data.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 14,
+          "name": "bs_call",
+          "signature": "(S, K, r, q, sigma, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 27,
+          "name": "make_options_csv",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 50,
+          "name": "make_returns_csv",
+          "signature": "(path, days=1500)"
+        },
+        {
+          "docstring": null,
+          "lineno": 71,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "math",
+        "os",
+        "random"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "random"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "scripts.generate_synthetic_data"
+    },
+    "scripts/greeks_reliability.py": {
+      "classes": [
+        {
+          "docstring": null,
+          "lineno": 31,
+          "name": "McSpec"
+        }
+      ],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 41,
+          "name": "_delta_pathwise",
+          "signature": "(st, payoff_mask, spec, discount)"
+        },
+        {
+          "docstring": null,
+          "lineno": 47,
+          "name": "_delta_lr",
+          "signature": "(payoff, z, spec, discount)"
+        },
+        {
+          "docstring": null,
+          "lineno": 53,
+          "name": "_delta_fd",
+          "signature": "(payoff_up, payoff_dn, spec, discount)"
+        },
+        {
+          "docstring": null,
+          "lineno": 59,
+          "name": "_gamma_lr",
+          "signature": "(payoff, z, spec, discount)"
+        },
+        {
+          "docstring": null,
+          "lineno": 66,
+          "name": "_gamma_fd",
+          "signature": "(payoff_up, payoff, payoff_dn, spec, discount)"
+        },
+        {
+          "docstring": null,
+          "lineno": 77,
+          "name": "_simulate",
+          "signature": "(n_paths, rng, spec)"
+        },
+        {
+          "docstring": null,
+          "lineno": 108,
+          "name": "_summaries",
+          "signature": "(n_paths, samples)"
+        },
+        {
+          "docstring": null,
+          "lineno": 128,
+          "name": "_plot",
+          "signature": "(df, output_png)"
+        },
+        {
+          "docstring": null,
+          "lineno": 154,
+          "name": "_parse_args",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 177,
+          "name": "_path_grid",
+          "signature": "(args)"
+        },
+        {
+          "docstring": null,
+          "lineno": 185,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "dataclasses",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "shlex",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "dataclasses",
+          "names": [
+            "dataclass"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict",
+            "Iterable",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "describe_inputs",
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.greeks_reliability"
+    },
+    "scripts/greeks_variance.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 10,
+          "name": "run_cli",
+          "signature": "(cli, args)"
+        },
+        {
+          "docstring": null,
+          "lineno": 14,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "argparse",
+        "csv",
+        "json",
+        "math",
+        "matplotlib.pyplot",
+        "os",
+        "pyquant_pricer",
+        "subprocess"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "csv"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pyquant_pricer"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "scripts.greeks_variance"
+    },
+    "scripts/heston_qe_vs_analytic.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 23,
+          "name": "_norm_cdf",
+          "signature": "(x)"
+        },
+        {
+          "docstring": null,
+          "lineno": 27,
+          "name": "_bs_call_price",
+          "signature": "(spot, strike, rate, div, vol, tenor)"
+        },
+        {
+          "docstring": null,
+          "lineno": 38,
+          "name": "_bs_vega",
+          "signature": "(spot, strike, rate, div, vol, tenor)"
+        },
+        {
+          "docstring": null,
+          "lineno": 47,
+          "name": "_implied_vol_call",
+          "signature": "(price, spot, strike, rate, div, tenor)"
+        },
+        {
+          "docstring": null,
+          "lineno": 62,
+          "name": "_find_quant_cli",
+          "signature": "(override)"
+        },
+        {
+          "docstring": null,
+          "lineno": 85,
+          "name": "_run_cli_json",
+          "signature": "(cli, args)"
+        },
+        {
+          "docstring": null,
+          "lineno": 91,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "pandas",
+        "pathlib",
+        "shlex",
+        "subprocess",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Any",
+            "Dict",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "ARTIFACTS_ROOT",
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.heston_qe_vs_analytic"
+    },
+    "scripts/heston_series_plot.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 38,
+          "name": "_parse_args",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 114,
+          "name": "_plot_params",
+          "signature": "(df, output_png)"
+        },
+        {
+          "docstring": null,
+          "lineno": 146,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "calibrate_heston",
+        "calibrate_heston_series",
+        "manifest_utils",
+        "matplotlib",
+        "matplotlib.dates",
+        "matplotlib.pyplot",
+        "pandas",
+        "pathlib",
+        "shlex",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Iterable",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.dates"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "calibrate_heston",
+          "names": [
+            "CalibrationConfig",
+            "calibrate_surface",
+            "save_calibration_outputs"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "calibrate_heston_series",
+          "names": [
+            "resolve_inputs"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "describe_inputs",
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.heston_series_plot"
+    },
+    "scripts/manifest_utils.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 17,
+          "name": "_rel_path",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 24,
+          "name": "_git_info",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 34,
+          "name": "_cpu_brand",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 55,
+          "name": "_system_info",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 67,
+          "name": "_omp_threads",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 74,
+          "name": "_cmake_value",
+          "signature": "(lines, key)"
+        },
+        {
+          "docstring": null,
+          "lineno": 82,
+          "name": "_cmake_cache_path",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 89,
+          "name": "_compile_info",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 114,
+          "name": "load_manifest",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 120,
+          "name": "ensure_metadata",
+          "signature": "(manifest)"
+        },
+        {
+          "docstring": null,
+          "lineno": 147,
+          "name": "save_manifest",
+          "signature": "(manifest)"
+        },
+        {
+          "docstring": null,
+          "lineno": 153,
+          "name": "describe_inputs",
+          "signature": "(paths)"
+        },
+        {
+          "docstring": null,
+          "lineno": 170,
+          "name": "update_run",
+          "signature": "(key, data, append=False, id_field=None)"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "datetime",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "platform",
+        "subprocess",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "hashlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "platform"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "datetime",
+            "timezone"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Any",
+            "Dict",
+            "Iterable",
+            "List"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.manifest_utils"
+    },
+    "scripts/mc_greeks_ci.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 23,
+          "name": "_find_quant_cli",
+          "signature": "(override)"
+        },
+        {
+          "docstring": null,
+          "lineno": 46,
+          "name": "_run_cli_json",
+          "signature": "(cli, args)"
+        },
+        {
+          "docstring": null,
+          "lineno": 52,
+          "name": "_confidence_band",
+          "signature": "(std_error)"
+        },
+        {
+          "docstring": null,
+          "lineno": 56,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "pandas",
+        "pathlib",
+        "shlex",
+        "subprocess",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Any",
+            "Dict",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "ARTIFACTS_ROOT",
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.mc_greeks_ci"
+    },
+    "scripts/multiasset_figures.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 9,
+          "name": "ensure_matplotlib",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 18,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "argparse",
+        "json",
+        "math",
+        "matplotlib.pyplot",
+        "os",
+        "pyquant_pricer",
+        "subprocess"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pyquant_pricer"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "scripts.multiasset_figures"
+    },
+    "scripts/package_validation.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 11,
+          "name": "gather_files",
+          "signature": "(artifacts, allowed_exts)"
+        },
+        {
+          "docstring": null,
+          "lineno": 24,
+          "name": "main",
+          "signature": "(argv=None)"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "pathlib",
+        "sys",
+        "zipfile"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "zipfile"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.package_validation"
+    },
+    "scripts/parity_checks.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 25,
+          "name": "black_scholes_call",
+          "signature": "(S, K, r, q, sigma, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 39,
+          "name": "black_scholes_put",
+          "signature": "(S, K, r, q, sigma, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 46,
+          "name": "black_scholes_digital_call",
+          "signature": "(S, K, r, q, sigma, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 58,
+          "name": "build_grid",
+          "signature": "(fast)"
+        },
+        {
+          "docstring": null,
+          "lineno": 103,
+          "name": "plot_results",
+          "signature": "(df, output_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 132,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "shlex",
+        "sys"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "describe_inputs",
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.parity_checks"
+    },
+    "scripts/pde_order_slope.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 28,
+          "name": "run",
+          "signature": "(cmd, cwd=None)"
+        },
+        {
+          "docstring": null,
+          "lineno": 32,
+          "name": "black_scholes_call",
+          "signature": "(S, K, r, q, sigma, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 45,
+          "name": "ensure_build",
+          "signature": "(root, build_dir, skip)"
+        },
+        {
+          "docstring": null,
+          "lineno": 55,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "shlex",
+        "subprocess",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.pde_order_slope"
+    },
+    "scripts/ql_parity.py": {
+      "classes": [
+        {
+          "docstring": null,
+          "lineno": 73,
+          "name": "Scenario"
+        }
+      ],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 31,
+          "name": "_find_quant_cli",
+          "signature": "(override)"
+        },
+        {
+          "docstring": null,
+          "lineno": 52,
+          "name": "_maturity_date",
+          "signature": "(eval_date, tenor)"
+        },
+        {
+          "docstring": null,
+          "lineno": 57,
+          "name": "_build_process",
+          "signature": "(spot, rate, dividend, vol, eval_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 80,
+          "name": "_scenarios",
+          "signature": "(fast)"
+        },
+        {
+          "docstring": null,
+          "lineno": 150,
+          "name": "_run_cli",
+          "signature": "(quant_cli, scenario)"
+        },
+        {
+          "docstring": null,
+          "lineno": 222,
+          "name": "_price_quantlib",
+          "signature": "(scenario, eval_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 266,
+          "name": "_plot",
+          "signature": "(df, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 329,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "QuantLib",
+        "__future__",
+        "argparse",
+        "dataclasses",
+        "json",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "pandas",
+        "pathlib",
+        "shlex",
+        "subprocess",
+        "sys",
+        "time",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "dataclasses",
+          "names": [
+            "dataclass"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "time",
+          "names": [
+            "perf_counter"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Callable",
+            "Dict",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "QuantLib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "ARTIFACTS_ROOT",
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.ql_parity"
+    },
+    "scripts/qmc_vs_prng_equal_time.py": {
+      "classes": [
+        {
+          "docstring": null,
+          "lineno": 32,
+          "name": "MarketSpec"
+        }
+      ],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 41,
+          "name": "black_scholes_call",
+          "signature": "(mkt)"
+        },
+        {
+          "docstring": null,
+          "lineno": 60,
+          "name": "simulate_call_price",
+          "signature": "(mkt, normals)"
+        },
+        {
+          "docstring": null,
+          "lineno": 69,
+          "name": "simulate_asian_price",
+          "signature": "(mkt, normals, steps)"
+        },
+        {
+          "docstring": null,
+          "lineno": 81,
+          "name": "generate_normals",
+          "signature": "(paths, dims, method, seed)"
+        },
+        {
+          "docstring": null,
+          "lineno": 91,
+          "name": "estimator",
+          "signature": "(mkt, paths, method, seed, kind, steps)"
+        },
+        {
+          "docstring": null,
+          "lineno": 106,
+          "name": "rmse_over_replicates",
+          "signature": "(mkt, paths, method, kind, steps, reps, base_seed)"
+        },
+        {
+          "docstring": null,
+          "lineno": 136,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "dataclasses",
+        "datetime",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "scipy.stats",
+        "shlex",
+        "sys",
+        "time",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shlex"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "dataclasses",
+          "names": [
+            "dataclass"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "datetime",
+            "timezone"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "time",
+          "names": [
+            "perf_counter"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict",
+            "List",
+            "Tuple"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "update_run"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "scipy.stats",
+          "names": [
+            "norm",
+            "qmc"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.qmc_vs_prng_equal_time"
+    },
+    "scripts/report.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 28,
+          "name": "ensure_matplotlib",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 49,
+          "name": "run_cli",
+          "signature": "(args)"
+        },
+        {
+          "docstring": null,
+          "lineno": 54,
+          "name": "price_heston_cli",
+          "signature": "(cli_path, row, calib)"
+        },
+        {
+          "docstring": null,
+          "lineno": 79,
+          "name": "build_error_heatmap",
+          "signature": "(cli_path, options_csv, calib_json, out_png)"
+        },
+        {
+          "docstring": null,
+          "lineno": 141,
+          "name": "build_iv_surface",
+          "signature": "(options_csv, out_png)"
+        },
+        {
+          "docstring": null,
+          "lineno": 196,
+          "name": "build_param_series",
+          "signature": "(series_csv, out_png)"
+        },
+        {
+          "docstring": null,
+          "lineno": 216,
+          "name": "build_var_plot",
+          "signature": "(returns_csv, out_png, alpha=0.99)"
+        },
+        {
+          "docstring": null,
+          "lineno": 276,
+          "name": "stitch_pdf",
+          "signature": "(artifacts_dir, images, pdf_name)"
+        },
+        {
+          "docstring": null,
+          "lineno": 297,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "argparse",
+        "json",
+        "math",
+        "matplotlib.backends.backend_pdf",
+        "matplotlib.pyplot",
+        "numpy",
+        "os",
+        "pandas",
+        "pyquant_pricer",
+        "subprocess",
+        "sys"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "matplotlib.backends.backend_pdf",
+          "names": [
+            "PdfPages"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "matplotlib.backends.backend_pdf",
+          "names": [
+            "PdfPages"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "math",
+          "names": [
+            "erf",
+            "sqrt"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pyquant_pricer"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "scripts.report"
+    },
+    "scripts/risk_backtest.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 20,
+          "name": "kupiec_pvalue",
+          "signature": "(num_obs, num_exceed, alpha)"
+        },
+        {
+          "docstring": null,
+          "lineno": 40,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "argparse",
+        "json",
+        "math",
+        "numpy",
+        "os",
+        "pandas",
+        "sys"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "math",
+          "names": [
+            "erf",
+            "sqrt"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "math",
+          "names": [
+            "sqrt"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.risk_backtest"
+    },
+    "scripts/sabr_slice_calibration.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 19,
+          "name": "bs_price_call",
+          "signature": "(S, K, r, q, sigma, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 31,
+          "name": "implied_vol_from_price",
+          "signature": "(S, K, r, q, T, price)"
+        },
+        {
+          "docstring": null,
+          "lineno": 44,
+          "name": "hagan_black_vol",
+          "signature": "(F, K, T, alpha, beta, rho, nu)"
+        },
+        {
+          "docstring": null,
+          "lineno": 66,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "argparse",
+        "json",
+        "math",
+        "numpy",
+        "os",
+        "pandas"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "math",
+          "names": [
+            "erf",
+            "exp",
+            "sqrt"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.sabr_slice_calibration"
+    },
+    "scripts/tri_engine_agreement.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 24,
+          "name": "_bs_call",
+          "signature": "(S, K, r, q, sigma, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 39,
+          "name": "_run",
+          "signature": "(cmd)"
+        },
+        {
+          "docstring": null,
+          "lineno": 44,
+          "name": "_mc_price",
+          "signature": "(quant_cli, spot, strike, r, q, sigma, T, paths, seed, steps)"
+        },
+        {
+          "docstring": null,
+          "lineno": 79,
+          "name": "_pde_price",
+          "signature": "(quant_cli, spot, strike, r, q, sigma, T, nodes, timesteps)"
+        },
+        {
+          "docstring": null,
+          "lineno": 114,
+          "name": "build_dataset",
+          "signature": "(quant_cli, strikes, spot, r, q, sigma, T, paths, seed, steps, nodes)"
+        },
+        {
+          "docstring": null,
+          "lineno": 150,
+          "name": "plot",
+          "signature": "(df, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 198,
+          "name": "parse_args",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 219,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "pandas",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Iterable",
+            "List",
+            "Tuple"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "ARTIFACTS_ROOT",
+            "describe_inputs",
+            "update_run"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.tri_engine_agreement"
+    },
+    "tests/test_cli_fast.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 21,
+          "name": "_norm_cdf",
+          "signature": "(x)"
+        },
+        {
+          "docstring": null,
+          "lineno": 25,
+          "name": "_bs_common",
+          "signature": "(spot, strike, rate, dividend, sigma, time)"
+        },
+        {
+          "docstring": null,
+          "lineno": 51,
+          "name": "bs_call_price",
+          "signature": "(spot, strike, rate, dividend, sigma, time)"
+        },
+        {
+          "docstring": null,
+          "lineno": 58,
+          "name": "bs_put_price",
+          "signature": "(spot, strike, rate, dividend, sigma, time)"
+        },
+        {
+          "docstring": null,
+          "lineno": 65,
+          "name": "cash_or_nothing_call",
+          "signature": "(spot, strike, rate, dividend, sigma, time)"
+        },
+        {
+          "docstring": null,
+          "lineno": 75,
+          "name": "run_cli_plain",
+          "signature": "(cli, *args)"
+        },
+        {
+          "docstring": null,
+          "lineno": 84,
+          "name": "run_cli_json",
+          "signature": "(cli, *args)"
+        },
+        {
+          "docstring": null,
+          "lineno": 96,
+          "name": "assert_close",
+          "signature": "(actual, expected, tol, msg)"
+        },
+        {
+          "docstring": null,
+          "lineno": 101,
+          "name": "assert_between",
+          "signature": "(value, low, high, msg)"
+        },
+        {
+          "docstring": null,
+          "lineno": 106,
+          "name": "smoke_cli",
+          "signature": "(cli)"
+        },
+        {
+          "docstring": null,
+          "lineno": 440,
+          "name": "main",
+          "signature": "(argv=None)"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "math",
+        "pathlib",
+        "re",
+        "shutil",
+        "subprocess",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "re"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shutil"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Any",
+            "Iterable",
+            "List"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tests.test_cli_fast"
+    },
+    "tests/test_greeks_reliability_fast.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 10,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "csv",
+        "pathlib",
+        "subprocess",
+        "sys"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "csv"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tests.test_greeks_reliability_fast"
+    },
+    "tests/test_heston_fast.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 12,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "csv",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "tempfile"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "csv"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "tempfile"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tests.test_heston_fast"
+    },
+    "tests/test_heston_safety_fast.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 11,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "tempfile"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "tempfile"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tests.test_heston_safety_fast"
+    },
+    "tests/test_heston_series_fast.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 10,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "csv",
+        "pathlib",
+        "subprocess",
+        "sys"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "csv"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tests.test_heston_series_fast"
+    },
+    "tests/test_metrics_snapshot_fast.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 31,
+          "name": "run_snapshot",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 43,
+          "name": "load_json",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 48,
+          "name": "assert_status_blocks",
+          "signature": "(summary)"
+        },
+        {
+          "docstring": null,
+          "lineno": 62,
+          "name": "test_snapshot_outputs_exist_and_parse",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "json",
+        "pathlib",
+        "subprocess",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tests.test_metrics_snapshot_fast"
+    },
+    "tests/test_parity_fast.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 10,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "csv",
+        "pathlib",
+        "subprocess",
+        "sys"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "csv"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tests.test_parity_fast"
+    },
+    "tests/test_qmc_fast.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 12,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "csv",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "tempfile"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "csv"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "tempfile"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tests.test_qmc_fast"
+    },
+    "tools/project_state_generate.py": {
+      "classes": [
+        {
+          "docstring": null,
+          "lineno": 48,
+          "name": "SymbolInfo"
+        }
+      ],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 56,
+          "name": "_utc_now",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 60,
+          "name": "_git",
+          "signature": "(cmd)"
+        },
+        {
+          "docstring": null,
+          "lineno": 64,
+          "name": "_rg_files",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 75,
+          "name": "_role_for_path",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 123,
+          "name": "_inventory",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 157,
+          "name": "_should_skip",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 168,
+          "name": "_iter_python_files",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 181,
+          "name": "_format_signature",
+          "signature": "(node)"
+        },
+        {
+          "docstring": null,
+          "lineno": 224,
+          "name": "_collect_symbols",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 283,
+          "name": "_module_name",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 293,
+          "name": "_symbol_index",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 335,
+          "name": "_resolve_internal",
+          "signature": "(module, modules)"
+        },
+        {
+          "docstring": null,
+          "lineno": 345,
+          "name": "_resolve_relative",
+          "signature": "(current, level, module, name)"
+        },
+        {
+          "docstring": null,
+          "lineno": 357,
+          "name": "_import_graph",
+          "signature": "(symbol_index)"
+        },
+        {
+          "docstring": null,
+          "lineno": 410,
+          "name": "_make_targets",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 425,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "ast",
+        "collections",
+        "dataclasses",
+        "datetime",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "subprocess",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "ast"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "re"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "collections",
+          "names": [
+            "defaultdict"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "dataclasses",
+          "names": [
+            "dataclass"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "datetime",
+            "timezone"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict",
+            "Iterable",
+            "List",
+            "Optional",
+            "Tuple"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tools.project_state_generate"
+    },
+    "wrds_pipeline/__init__.py": {
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "imports_detail": [],
+      "module": "wrds_pipeline"
+    },
+    "wrds_pipeline/bs_utils.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 9,
+          "name": "_norm_cdf",
+          "signature": "(x)"
+        },
+        {
+          "docstring": null,
+          "lineno": 13,
+          "name": "bs_call",
+          "signature": "(spot, strike, rate, div, vol, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 29,
+          "name": "bs_put",
+          "signature": "(spot, strike, rate, div, vol, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 36,
+          "name": "bs_delta_call",
+          "signature": "(spot, strike, rate, div, vol, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 48,
+          "name": "bs_vega",
+          "signature": "(spot, strike, rate, div, vol, T)"
+        },
+        {
+          "docstring": null,
+          "lineno": 64,
+          "name": "implied_vol_from_price",
+          "signature": "(price, spot, strike, rate, div, T, option='call', tol=1e-06, max_iter=120)"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Literal"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "wrds_pipeline.bs_utils"
+    },
+    "wrds_pipeline/calibrate_bs.py": {
+      "classes": [
+        {
+          "docstring": null,
+          "lineno": 24,
+          "name": "BsFit"
+        }
+      ],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 29,
+          "name": "_weighted_mean_iv",
+          "signature": "(group)"
+        },
+        {
+          "docstring": null,
+          "lineno": 35,
+          "name": "_apply_bs_surface",
+          "signature": "(surface)"
+        },
+        {
+          "docstring": null,
+          "lineno": 75,
+          "name": "fit_bs",
+          "signature": "(surface)"
+        },
+        {
+          "docstring": null,
+          "lineno": 81,
+          "name": "evaluate_oos",
+          "signature": "(oos_surface, fit_vols)"
+        },
+        {
+          "docstring": null,
+          "lineno": 110,
+          "name": "summarize_oos",
+          "signature": "(oos_surface)"
+        }
+      ],
+      "imports": [
+        ".bs_utils",
+        ".calibrate_heston",
+        "__future__",
+        "dataclasses",
+        "numpy",
+        "pandas",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "dataclasses"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 1,
+          "module": null,
+          "names": [
+            "calibrate_heston"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 1,
+          "module": "bs_utils",
+          "names": [
+            "bs_call",
+            "bs_delta_call",
+            "bs_vega"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "wrds_pipeline.calibrate_bs"
+    },
+    "wrds_pipeline/calibrate_heston.py": {
+      "classes": [
+        {
+          "docstring": null,
+          "lineno": 207,
+          "name": "CalibrationConfig"
+        }
+      ],
+      "functions": [
+        {
+          "docstring": "Risk-neutral characteristic function \u03c6(u).",
+          "lineno": 108,
+          "name": "_heston_cf",
+          "signature": "(u, T, params, r, q, log_spot)"
+        },
+        {
+          "docstring": null,
+          "lineno": 133,
+          "name": "heston_call_price",
+          "signature": "(spot, strike, rate, div, T, params, n_points=32, phi_max=None)"
+        },
+        {
+          "docstring": null,
+          "lineno": 180,
+          "name": "_model_iv",
+          "signature": "(row, params)"
+        },
+        {
+          "docstring": null,
+          "lineno": 214,
+          "name": "_positive_weights",
+          "signature": "(values, default=1.0)"
+        },
+        {
+          "docstring": null,
+          "lineno": 226,
+          "name": "_moneyness_taper",
+          "signature": "(surface)"
+        },
+        {
+          "docstring": "Positive weights combining liquidity (quotes), sensitivity (vega), and wing taper.",
+          "lineno": 236,
+          "name": "_vega_quote_weights",
+          "signature": "(surface, default=1.0)"
+        },
+        {
+          "docstring": null,
+          "lineno": 245,
+          "name": "_weighted_percentile",
+          "signature": "(values, weights, percentile)"
+        },
+        {
+          "docstring": null,
+          "lineno": 261,
+          "name": "compute_insample_metrics",
+          "signature": "(surface)"
+        },
+        {
+          "docstring": null,
+          "lineno": 298,
+          "name": "compute_oos_iv_metrics",
+          "signature": "(surface)"
+        },
+        {
+          "docstring": null,
+          "lineno": 316,
+          "name": "_objective",
+          "signature": "(params_vec, surface)"
+        },
+        {
+          "docstring": null,
+          "lineno": 338,
+          "name": "_to_internal",
+          "signature": "(params)"
+        },
+        {
+          "docstring": null,
+          "lineno": 348,
+          "name": "_from_internal",
+          "signature": "(internal)"
+        },
+        {
+          "docstring": null,
+          "lineno": 359,
+          "name": "_objective_internal",
+          "signature": "(internal_vec, surface)"
+        },
+        {
+          "docstring": null,
+          "lineno": 364,
+          "name": "_params_tuple",
+          "signature": "(params_dict)"
+        },
+        {
+          "docstring": null,
+          "lineno": 374,
+          "name": "apply_model",
+          "signature": "(surface, params_dict)"
+        },
+        {
+          "docstring": null,
+          "lineno": 392,
+          "name": "calibrate",
+          "signature": "(surface, config)"
+        },
+        {
+          "docstring": null,
+          "lineno": 436,
+          "name": "bootstrap_confidence_intervals",
+          "signature": "(surface, params, config)"
+        },
+        {
+          "docstring": null,
+          "lineno": 475,
+          "name": "write_tables",
+          "signature": "(out_csv, surface)"
+        },
+        {
+          "docstring": null,
+          "lineno": 496,
+          "name": "write_summary",
+          "signature": "(out_json, payload)"
+        },
+        {
+          "docstring": null,
+          "lineno": 501,
+          "name": "plot_fit",
+          "signature": "(surface, params, metrics, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 540,
+          "name": "record_manifest",
+          "signature": "(out_json, summary, surface_csv, figure)"
+        }
+      ],
+      "imports": [
+        ".bs_utils",
+        "__future__",
+        "cmath",
+        "dataclasses",
+        "json",
+        "manifest_utils",
+        "math",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "random",
+        "scipy.optimize",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "dataclasses"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "random"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict",
+            "Tuple"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "update_run"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "scipy.optimize",
+          "names": [
+            "least_squares"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 1,
+          "module": "bs_utils",
+          "names": [
+            "bs_call",
+            "bs_delta_call",
+            "bs_vega",
+            "implied_vol_from_price"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "cmath"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "wrds_pipeline.calibrate_heston"
+    },
+    "wrds_pipeline/compare_bs_heston.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 30,
+          "name": "_concat_csv",
+          "signature": "(files)"
+        },
+        {
+          "docstring": null,
+          "lineno": 40,
+          "name": "_bucket_rmse",
+          "signature": "(df, error_col, weight_col=None)"
+        },
+        {
+          "docstring": null,
+          "lineno": 56,
+          "name": "_bucket_mae",
+          "signature": "(df, error_col, weight_col=None)"
+        },
+        {
+          "docstring": "Load per-row insample surfaces across all dates for a model.",
+          "lineno": 70,
+          "name": "_load_insample",
+          "signature": "(model)"
+        },
+        {
+          "docstring": "Load per-row OOS surfaces across all dates for a model.",
+          "lineno": 82,
+          "name": "_load_oos",
+          "signature": "(model)"
+        },
+        {
+          "docstring": null,
+          "lineno": 92,
+          "name": "_load_pnl",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 99,
+          "name": "_aggregate_buckets",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 184,
+          "name": "_merge_comparison",
+          "signature": "(buckets)"
+        },
+        {
+          "docstring": null,
+          "lineno": 287,
+          "name": "_plot_iv_rmse",
+          "signature": "(comp, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 308,
+          "name": "_plot_oos_heatmap",
+          "signature": "(oos_h, oos_b, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 344,
+          "name": "_plot_pnl_sigma",
+          "signature": "(comp, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 359,
+          "name": "generate_comparison_artifacts",
+          "signature": "(artifacts_root=WRDS_ROOT, per_date_root=PER_DATE_ROOT)"
+        },
+        {
+          "docstring": null,
+          "lineno": 385,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "manifest_utils",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict",
+            "Iterable",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "ARTIFACTS_ROOT"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "wrds_pipeline.compare_bs_heston"
+    },
+    "wrds_pipeline/delta_hedge_pnl.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 14,
+          "name": "simulate",
+          "signature": "(today, tomorrow)"
+        },
+        {
+          "docstring": null,
+          "lineno": 72,
+          "name": "write_outputs",
+          "signature": "(detail_csv, summary_csv, detail, summary)"
+        }
+      ],
+      "imports": [
+        ".bs_utils",
+        "__future__",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Tuple"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 1,
+          "module": "bs_utils",
+          "names": [
+            "bs_delta_call"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "wrds_pipeline.delta_hedge_pnl"
+    },
+    "wrds_pipeline/ingest_sppx_surface.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 20,
+          "name": "_has_wrds_credentials",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 28,
+          "name": "_table_for_trade_date",
+          "signature": "(trade_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 33,
+          "name": "_secprd_table",
+          "signature": "(trade_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 38,
+          "name": "_resolve_secid",
+          "signature": "(conn, ticker, trade_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 57,
+          "name": "_fetch_from_wrds",
+          "signature": "(symbol, trade_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 121,
+          "name": "_load_sample",
+          "signature": "(symbol, trade_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 150,
+          "name": "load_surface",
+          "signature": "(symbol, trade_date, force_sample=False)"
+        },
+        {
+          "docstring": null,
+          "lineno": 168,
+          "name": "_prepare_quotes",
+          "signature": "(df)"
+        },
+        {
+          "docstring": null,
+          "lineno": 225,
+          "name": "aggregate_surface",
+          "signature": "(df)"
+        },
+        {
+          "docstring": null,
+          "lineno": 286,
+          "name": "write_surface",
+          "signature": "(out_path, df)"
+        },
+        {
+          "docstring": null,
+          "lineno": 291,
+          "name": "has_wrds_credentials",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        ".bs_utils",
+        "__future__",
+        "datetime",
+        "numpy",
+        "os",
+        "pandas",
+        "pathlib",
+        "psycopg2",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "datetime"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Tuple"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 1,
+          "module": "bs_utils",
+          "names": [
+            "bs_vega",
+            "implied_vol_from_price"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "psycopg2"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "psycopg2",
+          "names": [
+            "errors"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "wrds_pipeline.ingest_sppx_surface"
+    },
+    "wrds_pipeline/oos_pricing.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 16,
+          "name": "evaluate",
+          "signature": "(oos_surface, params)"
+        },
+        {
+          "docstring": null,
+          "lineno": 45,
+          "name": "write_outputs",
+          "signature": "(detail_csv, summary_csv, detail, summary)"
+        }
+      ],
+      "imports": [
+        ".calibrate_heston",
+        "__future__",
+        "numpy",
+        "pandas",
+        "pathlib",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict",
+            "Tuple"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 1,
+          "module": "calibrate_heston",
+          "names": [
+            "apply_model",
+            "compute_oos_iv_metrics",
+            "_vega_quote_weights"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "wrds_pipeline.oos_pricing"
+    },
+    "wrds_pipeline/pipeline.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 38,
+          "name": "_next_business_day",
+          "signature": "(trade_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 46,
+          "name": "_plot_wrds_summary",
+          "signature": "(surface, oos, pnl, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 98,
+          "name": "_plot_insample_surface",
+          "signature": "(surface, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 114,
+          "name": "_plot_oos_summary",
+          "signature": "(oos, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 144,
+          "name": "_plot_hedge_distribution",
+          "signature": "(pnl_detail, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 164,
+          "name": "_plot_multi_date_summary",
+          "signature": "(pricing, oos, pnl, out_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 234,
+          "name": "_load_dateset_payload",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 251,
+          "name": "run",
+          "signature": "(symbol, trade_date, next_trade_date, use_sample, fast, *, output_dir=None, label=None, regime=None, wrds_root=None)"
+        },
+        {
+          "docstring": null,
+          "lineno": 471,
+          "name": "run_dateset",
+          "signature": "(symbol, dateset_path, use_sample, fast, *, output_root=None)"
+        },
+        {
+          "docstring": null,
+          "lineno": 698,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        ".calibrate_heston,calibrate_bs,compare_bs_heston,delta_hedge_pnl,ingest_sppx_surface,oos_pricing",
+        "__future__",
+        "argparse",
+        "datetime",
+        "json",
+        "manifest_utils",
+        "matplotlib",
+        "matplotlib.pyplot",
+        "numpy",
+        "os",
+        "pandas",
+        "pathlib",
+        "sys",
+        "typing",
+        "yaml"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "datetime",
+            "timedelta",
+            "timezone"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Dict"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "matplotlib.pyplot"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "numpy"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "manifest_utils",
+          "names": [
+            "ARTIFACTS_ROOT",
+            "update_run"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 1,
+          "module": null,
+          "names": [
+            "calibrate_heston",
+            "calibrate_bs",
+            "compare_bs_heston",
+            "delta_hedge_pnl",
+            "ingest_sppx_surface",
+            "oos_pricing"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "yaml"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "wrds_pipeline.pipeline"
+    },
+    "wrds_pipeline/tests/test_wrds_pipeline.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 19,
+          "name": "_root",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 23,
+          "name": "_has_wrds_env",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 31,
+          "name": "_expected_artifacts",
+          "signature": "(base)"
+        },
+        {
+          "docstring": null,
+          "lineno": 41,
+          "name": "_write_dateset",
+          "signature": "(path)"
+        },
+        {
+          "docstring": "Reference \u0394-hedge \u03c3 from bundled sample comparison (regression harness).",
+          "lineno": 62,
+          "name": "_baseline_sigma",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 72,
+          "name": "_assert_tolerances",
+          "signature": "(wrds_root, dates)"
+        },
+        {
+          "docstring": null,
+          "lineno": 100,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "json",
+        "math",
+        "os",
+        "pandas",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "tempfile",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "tempfile"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "math"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "wrds_pipeline.tests.test_wrds_pipeline"
+    }
+  },
+  "generated_at": "2025-12-20T21:16:58.000993+00:00",
+  "git_sha": "36c52c1d72dbcaacd674729ea9ab4719b3fd6408",
+  "modules": {
+    "python.examples.quickstart": "python/examples/quickstart.py",
+    "python.scripts.cibw_smoke": "python/scripts/cibw_smoke.py",
+    "scripts.american_consistency": "scripts/american_consistency.py",
+    "scripts.calibrate_heston": "scripts/calibrate_heston.py",
+    "scripts.calibrate_heston_series": "scripts/calibrate_heston_series.py",
+    "scripts.data.cboe_csv": "scripts/data/cboe_csv.py",
+    "scripts.data.wrds_fetch_options": "scripts/data/wrds_fetch_options.py",
+    "scripts.data.wrds_fetch_returns": "scripts/data/wrds_fetch_returns.py",
+    "scripts.generate_bench_artifacts": "scripts/generate_bench_artifacts.py",
+    "scripts.generate_metrics_summary": "scripts/generate_metrics_summary.py",
+    "scripts.generate_synthetic_data": "scripts/generate_synthetic_data.py",
+    "scripts.greeks_reliability": "scripts/greeks_reliability.py",
+    "scripts.greeks_variance": "scripts/greeks_variance.py",
+    "scripts.heston_qe_vs_analytic": "scripts/heston_qe_vs_analytic.py",
+    "scripts.heston_series_plot": "scripts/heston_series_plot.py",
+    "scripts.manifest_utils": "scripts/manifest_utils.py",
+    "scripts.mc_greeks_ci": "scripts/mc_greeks_ci.py",
+    "scripts.multiasset_figures": "scripts/multiasset_figures.py",
+    "scripts.package_validation": "scripts/package_validation.py",
+    "scripts.parity_checks": "scripts/parity_checks.py",
+    "scripts.pde_order_slope": "scripts/pde_order_slope.py",
+    "scripts.ql_parity": "scripts/ql_parity.py",
+    "scripts.qmc_vs_prng_equal_time": "scripts/qmc_vs_prng_equal_time.py",
+    "scripts.report": "scripts/report.py",
+    "scripts.risk_backtest": "scripts/risk_backtest.py",
+    "scripts.sabr_slice_calibration": "scripts/sabr_slice_calibration.py",
+    "scripts.tri_engine_agreement": "scripts/tri_engine_agreement.py",
+    "tests.test_cli_fast": "tests/test_cli_fast.py",
+    "tests.test_greeks_reliability_fast": "tests/test_greeks_reliability_fast.py",
+    "tests.test_heston_fast": "tests/test_heston_fast.py",
+    "tests.test_heston_safety_fast": "tests/test_heston_safety_fast.py",
+    "tests.test_heston_series_fast": "tests/test_heston_series_fast.py",
+    "tests.test_metrics_snapshot_fast": "tests/test_metrics_snapshot_fast.py",
+    "tests.test_parity_fast": "tests/test_parity_fast.py",
+    "tests.test_qmc_fast": "tests/test_qmc_fast.py",
+    "tools.project_state_generate": "tools/project_state_generate.py",
+    "wrds_pipeline": "wrds_pipeline/__init__.py",
+    "wrds_pipeline.bs_utils": "wrds_pipeline/bs_utils.py",
+    "wrds_pipeline.calibrate_bs": "wrds_pipeline/calibrate_bs.py",
+    "wrds_pipeline.calibrate_heston": "wrds_pipeline/calibrate_heston.py",
+    "wrds_pipeline.compare_bs_heston": "wrds_pipeline/compare_bs_heston.py",
+    "wrds_pipeline.delta_hedge_pnl": "wrds_pipeline/delta_hedge_pnl.py",
+    "wrds_pipeline.ingest_sppx_surface": "wrds_pipeline/ingest_sppx_surface.py",
+    "wrds_pipeline.oos_pricing": "wrds_pipeline/oos_pricing.py",
+    "wrds_pipeline.pipeline": "wrds_pipeline/pipeline.py",
+    "wrds_pipeline.tests.test_wrds_pipeline": "wrds_pipeline/tests/test_wrds_pipeline.py"
+  },
+  "python_roots": [
+    "src",
+    "experiments",
+    "tools",
+    "scripts",
+    "wrds_pipeline",
+    "python",
+    "tests"
+  ]
+}

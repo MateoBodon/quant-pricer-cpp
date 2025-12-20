@@ -1,27 +1,42 @@
+---
+generated_at: 2025-12-20T21:11:15Z
+git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
+branch: master
+commands:
+  - date -u +%Y-%m-%dT%H:%M:%SZ
+  - git rev-parse HEAD
+  - git rev-parse --abbrev-ref HEAD
+  - python3 -V
+  - rg --files
+  - rg --files -g '*.py'
+  - python3 tools/project_state_generate.py
+  - uname -a
+  - cmake --version
+---
+
 # Changelog (summary)
 
-_Source of truth: root `CHANGELOG.md`._
+Source: `CHANGELOG.md`.
 
-- **Unreleased** – Further Heston/QE work (Andersen QE variance paths, counter RNG, MC Greek CIs via CLI/pybind) in progress.
+## Unreleased
+- Andersen QE variance paths and deterministic RNG for MC/Heston; CLI/pybind CI for MC Greeks.
 
-- **v0.3.2**
-  - WRDS panel pipeline (multi-date OptionMetrics with vega-weighted RMSE/MAE, OOS bps, Δ‑hedged PnL) and deterministic sample bundle.
-  - Google Benchmark refresh + plots (OpenMP throughput, equal-time RMSE, PDE −2 slope) wired into docs/manifest.
-  - QuantLib parity script + published CSV/PNG.
-  - Docs/Pages pipeline now publishes artifacts + coverage; project/python versions bumped to 0.3.2.
+## v0.3.2
+- WRDS multi-date panel artifacts (vega-weighted RMSE/MAE, OOS, Δ-hedged PnL) and deterministic sample bundle.
+- Benchmarks refreshed; documentation + manifest updates.
+- QuantLib parity script + published CSV/PNG.
+- Docs + release wiring updates; version bumps.
 
-- **v0.3.1**
-  - Added `cli_smoke_fast` test; committed gcovr HTML bundle to gh-pages.
-  - `scripts/package_validation.py` + release workflow to ship validation pack alongside artifacts.
-  - Version bumps to 0.3.1 across CMake/pyproject/setup.
+## v0.3.1
+- CLI smoke test added; coverage HTML committed for GH Pages.
+- Validation pack packaging script and release workflow.
+- Version bumps for project + Python package.
 
-- **v0.3.0**
-  - Pybind bindings expose Heston CF/implied vol + PDE/MC stats; quickstart example.
-  - Public Heston CF/IV C++ APIs with unit tests.
-  - cibuildwheel builds (Linux/macOS/Windows) with smoke tests; consumer CMake example in CI.
-  - Version bumps to 0.3.0; README documents pip install.
+## v0.3.0
+- Pybind bindings expanded to Heston/PDE/MC stats.
+- Heston characteristic function + implied vol APIs.
+- cibuildwheel builds and consumer CMake example.
 
-- **v0.2.0**
-  - Added Sobol QMC + Brownian bridge; control/antithetic variates; mixed Γ estimator.
-  - Barrier analytics/MC/PDE; American PSOR/LSMC; CN PDE with Rannacher and boundaries; parity/validation figures.
-  - CLI modern flags; API docs/gh-pages; deterministic artifacts and manifest.
+## v0.2.0
+- QMC (Sobol + Brownian bridge), barrier analytics/MC/PDE, American PSOR/LSMC, PDE improvements.
+- Artifact pipeline and CLI enhancements.

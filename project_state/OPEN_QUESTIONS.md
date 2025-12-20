@@ -1,10 +1,22 @@
+---
+generated_at: 2025-12-20T21:11:15Z
+git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
+branch: master
+commands:
+  - date -u +%Y-%m-%dT%H:%M:%SZ
+  - git rev-parse HEAD
+  - git rev-parse --abbrev-ref HEAD
+  - python3 -V
+  - rg --files
+  - rg --files -g '*.py'
+  - python3 tools/project_state_generate.py
+  - uname -a
+  - cmake --version
+---
+
 # Open Questions
 
-- **Heston QE bias** – Base/ATM scenarios still show several price units of bias vs analytic despite integrated-drift fix. Should we add martingale correction, adaptive stepping, or switch to Alfonsi/Quadratic Exponential with conditional moments for high vol-of-vol?
-- **WRDS weighting choices** – Current calibration weights = vega × quotes with soft wing taper (moneyness >1.2). Would alternative liquidity/vega schemes or tenor-dependent tapers improve stability on live IvyDB pulls?
-- **Barrier MC near-touch regime** – Crossing probability formula assumes log-Brownian bridge; how tight is bias when spot ≈ barrier and σ→0? Should extra analytical parity checks be added?
-- **Sobol dimension cap** – Barrier MC with QMC uses 2 dims/step; num_steps>32 exceeds Sobol table. Is a higher-dim generator or Owen scrambling table needed for finer barrier discretization?
-- **American LSMC regression robustness** – Current condition-number guard rejects ill-conditioned bases. Are alternative bases (Laguerre/orthogonal polynomials) or state scaling warranted for deep ITM/OTM regions?
-- **Risk backtests** – Kupiec/Christoffersen implemented, but no systematic pass/fail thresholds documented. Should VaR coverage tests be integrated into CI with synthetic series?
-- **Config surfacing** – PiecewiseConstant schedules exist for MC/PDE but CLI exposes only simple scalars. Should CLI/python add convenient schedule constructors and tests?
-- **Pybind surface coverage** – Barrier PDE Greeks and risk portfolio functions are not exposed to Python; is exposure needed for notebooks/backtests?
+- There is no `PROGRESS.md` in the repo root; should one be created and maintained? (Checked: `rg --files -g 'PROGRESS.md'` returned none.)
+- `ROADMAP (1).md` exists, but there is no `docs/ROADMAP.md`; should it be moved/renamed to align with the roadmap doc references?
+- `docs/artifacts/metrics_summary.md` reports missing QL parity, benchmark, and WRDS artifacts; are these expected to be regenerated on the next run? (`docs/artifacts/metrics_summary.md`).
+- `docs/agent_runs/` had no historical runs before this rebuild; if prior runs exist elsewhere, where should they be indexed?

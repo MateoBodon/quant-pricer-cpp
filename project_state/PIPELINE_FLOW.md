@@ -1,38 +1,56 @@
+---
+generated_at: 2025-12-20T21:11:15Z
+git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
+branch: master
+commands:
+  - date -u +%Y-%m-%dT%H:%M:%SZ
+  - git rev-parse HEAD
+  - git rev-parse --abbrev-ref HEAD
+  - python3 -V
+  - rg --files
+  - rg --files -g '*.py'
+  - python3 tools/project_state_generate.py
+  - uname -a
+  - cmake --version
+---
+
 # Pipeline Flow
 
-## Core CLI (`quant_cli`)
-- **Command:** `build/quant_cli <engine> ...` (bs, iv, mc, barrier bs|mc|pde, pde, american binomial|psor|lsmc, digital, asian, lookback, heston, risk).
-- **Flow:** Parse args → build parameter struct → call corresponding C++ engine → print scalar or JSON (optionally with CIs/Greeks) → exit.
-- **Inputs:** Scalar market params; MC engines accept paths/seed/QMC/bridge/steps; PDE accepts grid spec.
-- **Outputs:** Price/Greeks/metrics on stdout (CI bounds for MC & Heston MC).
+## Build & test flow
+- Configure + build (Release):
+  - `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`
+  - `cmake --build build -j`
+- Tests:
+  - Fast loop: `ctest --test-dir build -L FAST --output-on-failure`
+  - Full suite: `ctest --test-dir build --output-on-failure`
+  - Market/WRDS: `ctest --test-dir build -L MARKET --output-on-failure` (skips unless `WRDS_ENABLED=1`).
 
-## Deterministic Artifact Sweep (`scripts/reproduce_all.sh`)
-- **Command:** `WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` (build Release, run FAST/SLOW tests + experiments).
-- **Steps:** Build → run selected CTest labels → invoke experiment scripts below → write CSV/PNG under `docs/artifacts/` → update `docs/artifacts/manifest.json` via `manifest_utils`.
-- **Outputs:** tri_engine_agreement.csv/png, qmc_vs_prng_equal_time.csv/png, mc_greeks_ci.csv/png, heston_qe_vs_analytic.csv/png, pde_order_slope.csv/png, ql_parity.csv/png, bench outputs, WRDS sample bundle, validation pack.
+## CLI flow
+- Build `quant_cli` (`src/main.cpp`), then run:
+  - `build/quant_cli bs ...`
+  - `build/quant_cli mc ...`
+  - `build/quant_cli pde ...`
+  - `build/quant_cli american ...`
+  - `build/quant_cli heston ...`
 
-## WRDS OptionMetrics Pipeline (`python -m wrds_pipeline.pipeline`)
-- **Single date (`run`)**
-  - **Inputs:** symbol (default SPX), `trade_date`, `next_trade_date` (auto next business day), flags `--use-sample`, `--fast`, optional `--output-root`, label/regime tags. Requires WRDS env (`WRDS_ENABLED=1`, `WRDS_USERNAME`, `WRDS_PASSWORD`) unless `--use-sample`.
-  - **Steps:** load_surface (WRDS or sample) → aggregate_surface (DTE≥21d, moneyness 0.75–1.25, IV/vega, tenor buckets) → calibrate_heston (least-squares IV, bootstrap CI, plots/tables) → calibrate_bs baseline → oos_pricing on next date → delta_hedge_pnl → summary/insample/OOS/hedge plots → manifest entry.
-  - **Outputs:** per-date CSV/PNG under `docs/artifacts/wrds/per_date/<date>/` (fit table/json/fig, oos detail/summary, pnl detail/summary, surfaces). Summary fig `heston_wrds_summary.png`.
-- **Panel (`run_dateset`)**
-  - **Inputs:** `--dateset wrds_pipeline_dates_panel.yaml` (trade_date + next_trade_date + regime labels), optional `--use-sample/--fast/--output-root`.
-  - **Steps:** loop `run` per date → aggregate to `wrds_agg_pricing.csv`, `wrds_agg_pricing_bs.csv`, `wrds_agg_oos.csv`, `wrds_agg_oos_bs.csv`, `wrds_agg_pnl.csv` → multi-date summary plot `wrds_multi_date_summary.png` → BS vs Heston comparison artifacts (`wrds_bs_heston_comparison.csv`, IVRMSE/OOS heatmap/PNL plots) via compare_bs_heston → manifest entry `runs.wrds_dateset`.
-  - **Outputs:** Aggregated CSV/PNG under `docs/artifacts/wrds/`.
+## Python bindings flow
+- Build with scikit-build (`pyproject.toml`): `pip install -e .`
+- Module name: `pyquant_pricer` (see `python/pybind_module.cpp`).
 
-## Experiment Drivers (deterministic scenarios)
-- **tri_engine_agreement.py** – Run analytic/MC/PDE on matched market params; writes agreement CSV/PNG.
-- **qmc_vs_prng_equal_time.py** – Match wall-clock budgets between PRNG and Sobol+BB for European/Asian; outputs RMSE vs time CSV/PNG.
-- **mc_greeks_ci.py** – Compare MC Greeks vs analytic bands; outputs estimator mean/SE/CI.
-- **heston_qe_vs_analytic.py** – QE vs analytic CF sweep over parameter grids (base/stress/Feller); outputs price/IV RMSE CSV/PNG.
-- **pde_order_slope.py** – Grid refinement study for CN; outputs convergence slope CSV/PNG.
-- **ql_parity.py** – Compare quant_cli (BS, barrier PDE, American PSOR) vs QuantLib; outputs parity CSV/PNG.
-- **american_consistency.py / parity_checks.py / greeks_reliability.py / greeks_variance.py / heston_series_plot.py / risk_backtest.py** – Smaller validation/diagnostic scripts; each reads deterministic inputs (often from `data/` or generated), runs quant_cli or internal formulas, emits CSV/plots noted in manifest.
-- **generate_bench_artifacts.py** – Consumes Google Benchmark JSON to CSV/PNG (MC throughput, equal-time RMSE, PDE walltime/order, PSOR iterations).
-- **package_validation.py** – Bundle docs/artifacts into `docs/validation_pack.zip` for releases.
+## Artifact reproduction flow
+- All-in-one: `./scripts/reproduce_all.sh` (builds, runs FAST/SLOW tests, produces figures, updates manifest).
+- Individual artifacts:
+  - `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv`
+  - `python scripts/pde_order_slope.py --output docs/artifacts/pde_order_slope.png --csv docs/artifacts/pde_order_slope.csv`
+  - `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output docs/artifacts/tri_engine_agreement.png --csv docs/artifacts/tri_engine_agreement.csv`
+  - `python scripts/heston_qe_vs_analytic.py --quant-cli build/quant_cli --output docs/artifacts/heston_qe_vs_analytic.png --csv docs/artifacts/heston_qe_vs_analytic.csv`
+  - `python scripts/generate_metrics_summary.py --artifacts docs/artifacts --manifest docs/artifacts/manifest.json`
 
-## Python bindings walkthrough
-- **Command:** `python -m python.examples.quickstart`  
-- **Flow:** Calls pyquant_pricer BS functions, barrier RR, Heston helpers; optionally runs fast Heston calibration script if sample surfaces exist.
-- **Outputs:** Console demo; optional Heston calibration PNG/CSV via scripts/calibrate_heston.py.
+## WRDS pipeline flow
+- Single-date or panel runs: `python -m wrds_pipeline.pipeline [--symbol SPX] [--trade-date YYYY-MM-DD] [--use-sample] [--fast]`.
+- Multi-date panel uses `wrds_pipeline_dates_panel.yaml` (invoked automatically in `scripts/reproduce_all.sh`).
+- BS vs Heston comparison: `python -m wrds_pipeline.compare_bs_heston --wrds-root docs/artifacts/wrds`.
+
+## Packaging/release flow
+- Validation pack: `python scripts/package_validation.py --artifacts docs/artifacts --output docs/validation_pack.zip`.
+- Makefile targets: `make bench` (see `project_state/_generated/make_targets.txt`).

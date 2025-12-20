@@ -1,40 +1,32 @@
+---
+generated_at: 2025-12-20T21:11:15Z
+git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
+branch: master
+commands:
+  - date -u +%Y-%m-%dT%H:%M:%SZ
+  - git rev-parse HEAD
+  - git rev-parse --abbrev-ref HEAD
+  - python3 -V
+  - rg --files
+  - rg --files -g '*.py'
+  - python3 tools/project_state_generate.py
+  - uname -a
+  - cmake --version
+---
+
 # Test Coverage
 
-## How to Run
-- C++/Python FAST label: `ctest --test-dir build -L FAST --output-on-failure`.
-- Full suite (includes SLOW/benchmarks if enabled): `ctest --test-dir build --output-on-failure`.
-- MARKET (WRDS opt-in): `ctest --test-dir build -L MARKET --output-on-failure` (skips with exit 77 unless WRDS env set).
-- Benchmarks (lightweight): `ctest --test-dir build -L BENCH --output-on-failure`.
+## Test suites
+- C++ unit tests: `tests/*.cpp` built into `unit_tests` via CMake (`CMakeLists.txt`).
+- Python FAST tests: `tests/test_*_fast.py` (invoked via `ctest -L FAST`).
+- WRDS MARKET tests: `wrds_pipeline/tests/test_wrds_pipeline.py` (label `MARKET`, skips without WRDS env).
+- Benchmarks: `benchmarks/*.cpp` executed via `ctest -L BENCH` or `make bench`.
 
-## Test Files & Focus
-- **C++ GTest (unit_tests target)**
-  - `tests/test_sanity.cpp` – basic construction/runs.
-  - `tests/test_black_scholes.cpp` – BS prices/Greeks, parity checks.
-  - `tests/test_mc.cpp` – MC price vs analytic with variance reduction, RNG determinism.
-  - `tests/test_pde.cpp` – CN pricing, boundary modes, theta extraction.
-  - `tests/test_barrier.cpp`, `tests/test_barrier_mc_regression.cpp` – RR analytics and MC regression harness.
-  - `tests/test_american.cpp` – PSOR/LSMC/binomial consistency.
-  - `tests/test_grid_utils.cpp` – grid assembly/stretch mapping.
-  - `tests/test_digital.cpp`, `tests/test_asian.cpp`, `tests/test_lookback.cpp`, `tests/test_multi.cpp`, `tests/test_risk.cpp`.
-  - `tests/test_term_structures.cpp` – piecewise schedule lookup.
-  - `tests/test_heston.cpp` – analytic Heston properties; MC parity; characteristic function sanity.
-  - `tests/test_rng_repro.cpp` – counter RNG determinism.
-  - `tests/test_sanity.cpp` – version/basic compile TU guard.
-- **Python FAST**
-  - `tests/test_parity_fast.py` – multi-product parity against QuantLib/analytic.
-  - `tests/test_qmc_fast.py` – QMC vs PRNG equal-time smoke.
-  - `tests/test_greeks_reliability_fast.py` – MC Greek CI sanity.
-  - `tests/test_heston_fast.py`, `tests/test_heston_series_fast.py`, `tests/test_heston_safety_fast.py` – Heston calibration/solver safety.
-  - `tests/test_cli_fast.py` – quant_cli subcommands JSON parsing.
-- **MARKET**
-  - `wrds_pipeline/tests/test_wrds_pipeline.py` – runs two-date panel (stress + calm) when WRDS env present; asserts artifact existence and metric ranges.
+## Test entrypoints
+- Fast loop: `ctest --test-dir build -L FAST --output-on-failure`.
+- Full suite: `ctest --test-dir build --output-on-failure`.
+- MARKET tests: `ctest --test-dir build -L MARKET --output-on-failure` (requires WRDS credentials).
 
-## Coverage Status
-- HTML report at `docs/coverage/index.html` (line/function coverage high; branch coverage notably lower in barrier, risk, CLI).
-- Benchmarks are labelled `BENCH` and counted in CTest but not coverage.
-- WRDS pipeline test is skipped in CI without credentials; pipeline logic otherwise exercised via scripts and artifacts.
-
-## Gaps / Suggestions
-- Add targeted branch tests for barrier degenerate cases (spot≈barrier, zero vol/time), risk Kupiec/Christoffersen edge cases, and CLI flag error paths.
-- Extend Python tests to cover WRDS aggregation on sample data without network to improve coverage of calibrate_bs/heston and compare_bs_heston.
-- Add unit coverage for PiecewiseConstant schedules in MC/PDE through small deterministic scenarios.
+## Coverage artifacts
+- Coverage HTML appears under `docs/coverage/` (generated in CI / release workflows).
+- Current coverage percentages are not extracted in this rebuild; refer to the published HTML for metrics.

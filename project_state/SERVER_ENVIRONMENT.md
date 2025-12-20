@@ -1,25 +1,26 @@
+---
+generated_at: 2025-12-20T21:11:15Z
+git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
+branch: master
+commands:
+  - date -u +%Y-%m-%dT%H:%M:%SZ
+  - git rev-parse HEAD
+  - git rev-parse --abbrev-ref HEAD
+  - python3 -V
+  - rg --files
+  - rg --files -g '*.py'
+  - python3 tools/project_state_generate.py
+  - uname -a
+  - cmake --version
+---
+
 # Server Environment
 
-- **Languages / Toolchain**
-  - C++20, CMake ≥ 3.16 (scikit-build-core also enforces this).
-  - Optional OpenMP for MC/PDE threading (`QUANT_ENABLE_OPENMP` default ON).
-  - Vendored deps: pcg_random, GoogleTest, Google Benchmark (submodules with fallback FetchContent).
-  - Sanitizers optional (`QUANT_ENABLE_SANITIZERS`).
-- **Python**
-  - Python ≥ 3.8.
-  - Core dependencies (bindings/tests/plots): `numpy>=1.24`, `pandas>=2.1`, `matplotlib>=3.8`, `scipy>=1.10`, `pyyaml>=6.0`, `QuantLib>=1.40` (for parity script), `pybind11>=2.11.1` (build), `scikit-build-core>=0.9.0`.
-  - WRDS live fetch requires `psycopg2` and network access to `wrds-pgdata.wharton.upenn.edu:9737`.
-- **Build commands**
-  - Release build: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j`.
-  - Python editable: `pip install -e .` (sets `QUANT_ENABLE_PYBIND=ON` via pyproject).
-- **Hardware assumptions**
-  - CPU-only; OpenMP parallelism benefits from 4–8 cores (bench plots up to 8 threads). No GPU support.
-  - Memory footprint modest (MC uses streaming accumulators; PDE grid sizes O(400×400) in examples).
-- **Environment variables**
-  - `OMP_NUM_THREADS` – overrides OpenMP threads.
-  - `WRDS_ENABLED`, `WRDS_USERNAME`, `WRDS_PASSWORD` – enable IvyDB pulls; absence triggers sample mode.
-  - `WRDS_CACHE_ROOT` – alternate artifact root for MARKET tests.
-  - `WRDS_USE_SAMPLE` – force sample panel in `reproduce_all.sh`.
-- **Paths**
-  - Artifacts expected under `docs/artifacts/` (manifest, plots, CSVs) and `docs/artifacts/wrds/` for WRDS runs.
-  - Coverage HTML at `docs/coverage/`; CLI binary at `build/quant_cli`.
+## Runtime snapshot
+- OS: Darwin Mateos-MacBook-Pro-7.local 25.0.0 (arm64) (`uname -a`).
+- Python: 3.12.2 (`python3 -V`).
+- CMake: 4.1.2 (`cmake --version`).
+
+## Notes
+- Package lists were not captured to avoid heavy environment scanning.
+- WRDS credentials are not present in repo; live runs require env vars (`WRDS_ENABLED`, `WRDS_USERNAME`, `WRDS_PASSWORD`).
