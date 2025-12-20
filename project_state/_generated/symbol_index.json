@@ -4537,104 +4537,104 @@
       "classes": [
         {
           "docstring": null,
-          "lineno": 48,
+          "lineno": 52,
           "name": "SymbolInfo"
         }
       ],
       "functions": [
         {
           "docstring": null,
-          "lineno": 56,
+          "lineno": 60,
           "name": "_utc_now",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 60,
+          "lineno": 64,
           "name": "_git",
           "signature": "(cmd)"
         },
         {
           "docstring": null,
-          "lineno": 64,
+          "lineno": 68,
           "name": "_rg_files",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 75,
+          "lineno": 79,
           "name": "_role_for_path",
           "signature": "(path)"
         },
         {
           "docstring": null,
-          "lineno": 123,
+          "lineno": 127,
           "name": "_inventory",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 157,
+          "lineno": 163,
           "name": "_should_skip",
           "signature": "(path)"
         },
         {
           "docstring": null,
-          "lineno": 168,
+          "lineno": 174,
           "name": "_iter_python_files",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 181,
+          "lineno": 187,
           "name": "_format_signature",
           "signature": "(node)"
         },
         {
           "docstring": null,
-          "lineno": 224,
+          "lineno": 230,
           "name": "_collect_symbols",
           "signature": "(path)"
         },
         {
           "docstring": null,
-          "lineno": 283,
+          "lineno": 289,
           "name": "_module_name",
           "signature": "(path)"
         },
         {
           "docstring": null,
-          "lineno": 293,
+          "lineno": 299,
           "name": "_symbol_index",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 335,
+          "lineno": 341,
           "name": "_resolve_internal",
           "signature": "(module, modules)"
         },
         {
           "docstring": null,
-          "lineno": 345,
+          "lineno": 351,
           "name": "_resolve_relative",
           "signature": "(current, level, module, name)"
         },
         {
           "docstring": null,
-          "lineno": 357,
+          "lineno": 363,
           "name": "_import_graph",
           "signature": "(symbol_index)"
         },
         {
           "docstring": null,
-          "lineno": 410,
+          "lineno": 416,
           "name": "_make_targets",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 425,
+          "lineno": 431,
           "name": "main",
           "signature": "()"
         }
@@ -6078,8 +6078,8 @@
       "module": "wrds_pipeline.tests.test_wrds_pipeline"
     }
   },
-  "generated_at": "2025-12-20T21:16:58.000993+00:00",
-  "git_sha": "36c52c1d72dbcaacd674729ea9ab4719b3fd6408",
+  "generated_at": "2025-12-20T21:30:07.845737+00:00",
+  "git_sha": "3297510aedecac18e790474b1319636ac560d3b2",
   "modules": {
     "python.examples.quickstart": "python/examples/quickstart.py",
     "python.scripts.cibw_smoke": "python/scripts/cibw_smoke.py",

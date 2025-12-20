@@ -43,6 +43,10 @@ EXCLUDE_PATTERNS = [
     re.compile(r"experiments/.*/outputs_.*"),
 ]
 
+EXCLUDE_INVENTORY_PREFIXES = {
+    "docs/gpt_bundles",
+}
+
 
 @dataclass
 class SymbolInfo:
@@ -125,6 +129,8 @@ def _inventory() -> Dict[str, object]:
     role_counts: Dict[str, int] = defaultdict(int)
     role_sizes: Dict[str, int] = defaultdict(int)
     for rel in _rg_files():
+        if any(rel == prefix or rel.startswith(prefix + "/") for prefix in EXCLUDE_INVENTORY_PREFIXES):
+            continue
         path = REPO_ROOT / rel
         if not path.exists():
             continue

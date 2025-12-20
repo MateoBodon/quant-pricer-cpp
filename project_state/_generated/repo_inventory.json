@@ -50,6 +50,12 @@
     },
     {
       "ext": "md",
+      "path": "PROGRESS.md",
+      "role": "misc",
+      "size_bytes": 356
+    },
+    {
+      "ext": "md",
       "path": "README.md",
       "role": "repo_meta",
       "size_bytes": 48365
@@ -275,6 +281,36 @@
       "path": "docs/WRDS_Results.md",
       "role": "docs",
       "size_bytes": 9507
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251220T211115Z_project_state_rebuild/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 332
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251220T211115Z_project_state_rebuild/META.json",
+      "role": "docs",
+      "size_bytes": 523
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251220T211115Z_project_state_rebuild/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 737
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251220T211115Z_project_state_rebuild/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 222
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251220T211115Z_project_state_rebuild/TESTS.md",
+      "role": "docs",
+      "size_bytes": 48
     },
     {
       "ext": "md",
@@ -3916,109 +3952,115 @@
       "ext": "md",
       "path": "project_state/ARCHITECTURE.md",
       "role": "project_state",
-      "size_bytes": 4061
+      "size_bytes": 3265
     },
     {
       "ext": "md",
       "path": "project_state/CHANGELOG.md",
       "role": "project_state",
-      "size_bytes": 1451
+      "size_bytes": 1265
     },
     {
       "ext": "md",
       "path": "project_state/CONFIG_REFERENCE.md",
       "role": "project_state",
-      "size_bytes": 3104
+      "size_bytes": 1706
     },
     {
       "ext": "md",
       "path": "project_state/CURRENT_RESULTS.md",
       "role": "project_state",
-      "size_bytes": 1810
+      "size_bytes": 1347
     },
     {
       "ext": "md",
       "path": "project_state/DATAFLOW.md",
       "role": "project_state",
-      "size_bytes": 3410
+      "size_bytes": 2065
     },
     {
       "ext": "md",
       "path": "project_state/DEPENDENCY_GRAPH.md",
       "role": "project_state",
-      "size_bytes": 2886
+      "size_bytes": 1530
     },
     {
       "ext": "md",
       "path": "project_state/EXPERIMENTS.md",
       "role": "project_state",
-      "size_bytes": 4047
+      "size_bytes": 1949
     },
     {
       "ext": "md",
       "path": "project_state/FUNCTION_INDEX.md",
       "role": "project_state",
-      "size_bytes": 7990
+      "size_bytes": 15367
+    },
+    {
+      "ext": "md",
+      "path": "project_state/INDEX.md",
+      "role": "project_state",
+      "size_bytes": 2641
     },
     {
       "ext": "md",
       "path": "project_state/KNOWN_ISSUES.md",
       "role": "project_state",
-      "size_bytes": 1237
+      "size_bytes": 790
     },
     {
       "ext": "md",
       "path": "project_state/MODULE_SUMMARIES.md",
       "role": "project_state",
-      "size_bytes": 7768
+      "size_bytes": 6374
     },
     {
       "ext": "md",
       "path": "project_state/OPEN_QUESTIONS.md",
       "role": "project_state",
-      "size_bytes": 1629
+      "size_bytes": 946
     },
     {
       "ext": "md",
       "path": "project_state/PIPELINE_FLOW.md",
       "role": "project_state",
-      "size_bytes": 4260
+      "size_bytes": 2601
     },
     {
       "ext": "md",
       "path": "project_state/RESEARCH_NOTES.md",
       "role": "project_state",
-      "size_bytes": 3320
+      "size_bytes": 1237
     },
     {
       "ext": "md",
       "path": "project_state/ROADMAP.md",
       "role": "project_state",
-      "size_bytes": 2250
+      "size_bytes": 1232
     },
     {
       "ext": "md",
       "path": "project_state/SERVER_ENVIRONMENT.md",
       "role": "project_state",
-      "size_bytes": 1657
+      "size_bytes": 726
     },
     {
       "ext": "md",
       "path": "project_state/STYLE_GUIDE.md",
       "role": "project_state",
-      "size_bytes": 2324
+      "size_bytes": 1200
     },
     {
       "ext": "md",
       "path": "project_state/TEST_COVERAGE.md",
       "role": "project_state",
-      "size_bytes": 2815
+      "size_bytes": 1186
     },
     {
       "ext": "json",
       "path": "project_state/_generated/import_graph.json",
       "role": "project_state",
-      "size_bytes": 4992
+      "size_bytes": 5458
     },
     {
       "ext": "txt",
@@ -4030,13 +4072,13 @@
       "ext": "json",
       "path": "project_state/_generated/repo_inventory.json",
       "role": "project_state",
-      "size_bytes": 112651
+      "size_bytes": 113252
     },
     {
       "ext": "json",
       "path": "project_state/_generated/symbol_index.json",
       "role": "project_state",
-      "size_bytes": 61616
+      "size_bytes": 131796
     },
     {
       "ext": "toml",
@@ -4510,7 +4552,7 @@
       "ext": "py",
       "path": "tools/project_state_generate.py",
       "role": "misc",
-      "size_bytes": 13309
+      "size_bytes": 13492
     },
     {
       "ext": "json",
@@ -4597,8 +4639,8 @@
       "size_bytes": 799
     }
   ],
-  "generated_at": "2025-12-20T21:16:57.986501+00:00",
-  "git_sha": "36c52c1d72dbcaacd674729ea9ab4719b3fd6408",
+  "generated_at": "2025-12-20T21:30:07.823252+00:00",
+  "git_sha": "3297510aedecac18e790474b1319636ac560d3b2",
   "root": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp",
   "summary": {
     "role_counts": {
@@ -4608,10 +4650,10 @@
       "cpp_headers": 22,
       "cpp_sources": 18,
       "data": 6,
-      "docs": 72,
+      "docs": 77,
       "external": 517,
-      "misc": 6,
-      "project_state": 21,
+      "misc": 7,
+      "project_state": 22,
       "python_bindings": 4,
       "repo_meta": 13,
       "scripts": 29,
@@ -4625,10 +4667,10 @@
       "cpp_headers": 30447,
       "cpp_sources": 191031,
       "data": 578900,
-      "docs": 5587462,
+      "docs": 5589324,
       "external": 5439082,
-      "misc": 31885,
-      "project_state": 235284,
+      "misc": 32424,
+      "project_state": 297939,
       "python_bindings": 20571,
       "repo_meta": 67962,
       "scripts": 245787,
