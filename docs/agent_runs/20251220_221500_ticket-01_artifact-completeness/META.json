@@ -1,0 +1,22 @@
+{
+  "run_name": "20251220_221500_ticket-01_artifact-completeness",
+  "ticket_id": "ticket-01",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "cf1d770d18d26b8db15c0638c692ac50f5f2747e",
+  "git_sha_after": "cf1d770d18d26b8db15c0638c692ac50f5f2747e",
+  "branch": "feature/ticket-01-artifact-completeness",
+  "timestamp_local": "2025-12-20T17:56:43-0500",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "3.12.2"
+  },
+  "dataset": {
+    "mode": "wrds_sample",
+    "dataset_id": "wrds_pipeline_dates_panel.yaml",
+    "config_path": "wrds_pipeline_dates_panel.yaml",
+    "config_hash": "af79ff1ee0770a0ac491797058d4820c6e64f0c317a06146d9f90588506cd694"
+  },
+  "notes": "REPRO_FAST=1 WRDS_USE_SAMPLE=1; WRDS sample smoke run executed via python3; OpenMP not found so one RNG determinism test skipped."
+}

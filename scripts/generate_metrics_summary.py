@@ -3,7 +3,7 @@
 Build a single source of truth for headline metrics directly from committed
 artifacts. The script is intentionally defensive: if an artifact is missing or
 its schema shifts, the corresponding block is marked `missing` or
-`parse_error` instead of crashing the entire run.
+`parse_error`, and the script exits non-zero after emitting actionable errors.
 
 Outputs (default paths under docs/artifacts/):
   - metrics_summary.json (structured, machine-readable)
@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -23,6 +24,75 @@ import numpy as np
 import pandas as pd
 
 from manifest_utils import ARTIFACTS_ROOT, MANIFEST_PATH, describe_inputs, load_manifest, update_run
+
+
+# ---------- Required artifacts ----------
+
+
+@dataclass(frozen=True)
+class RequiredArtifact:
+    name: str
+    relative_path: Path
+    kind: str = "csv"  # csv, json, or file
+    required_columns: Tuple[str, ...] = ()
+    required_keys: Tuple[str, ...] = ()
+
+
+REQUIRED_ARTIFACTS: Tuple[RequiredArtifact, ...] = (
+    RequiredArtifact(
+        name="tri_engine_agreement",
+        relative_path=Path("tri_engine_agreement.csv"),
+        required_columns=("bs_price", "mc_price", "pde_price"),
+    ),
+    RequiredArtifact(
+        name="qmc_vs_prng_equal_time",
+        relative_path=Path("qmc_vs_prng_equal_time.csv"),
+        required_columns=("payoff", "rmse_ratio"),
+    ),
+    RequiredArtifact(
+        name="pde_order_slope",
+        relative_path=Path("pde_order_slope.csv"),
+        required_columns=("nodes", "abs_error"),
+    ),
+    RequiredArtifact(
+        name="ql_parity",
+        relative_path=Path("ql_parity") / "ql_parity.csv",
+        required_columns=("category", "abs_diff_cents"),
+    ),
+    RequiredArtifact(
+        name="bench_mc_paths",
+        relative_path=Path("bench") / "bench_mc_paths.csv",
+        required_columns=("threads", "paths_per_sec"),
+    ),
+    RequiredArtifact(
+        name="bench_mc_equal_time",
+        relative_path=Path("bench") / "bench_mc_equal_time.csv",
+        required_columns=("payoff", "method", "time_scaled_error"),
+    ),
+    RequiredArtifact(
+        name="wrds_agg_pricing",
+        relative_path=Path("wrds") / "wrds_agg_pricing.csv",
+        required_columns=(
+            "iv_rmse_volpts_vega_wt",
+            "iv_mae_volpts_vega_wt",
+            "price_rmse_ticks",
+            "iv_mae_bps",
+            "price_mae_ticks",
+        ),
+    ),
+    RequiredArtifact(
+        name="wrds_agg_oos",
+        relative_path=Path("wrds") / "wrds_agg_oos.csv",
+        required_columns=("iv_mae_bps", "price_mae_ticks"),
+    ),
+    RequiredArtifact(
+        name="wrds_agg_pnl",
+        relative_path=Path("wrds") / "wrds_agg_pnl.csv",
+        required_columns=("mean_ticks", "mean_pnl", "pnl_sigma"),
+    ),
+)
+
+REQUIRED_ARTIFACTS_BY_NAME: Dict[str, RequiredArtifact] = {item.name: item for item in REQUIRED_ARTIFACTS}
 
 
 # ---------- Helpers ----------
@@ -78,6 +148,61 @@ def _regression_slope(x: np.ndarray, y: np.ndarray) -> Tuple[float, float]:
     return float(slope), float(r2)
 
 
+def _required_artifact(name: str) -> RequiredArtifact:
+    try:
+        return REQUIRED_ARTIFACTS_BY_NAME[name]
+    except KeyError as exc:
+        raise KeyError(f"Required artifact not registered: {name}") from exc
+
+
+def _required_path(name: str, artifacts_root: Path) -> Path:
+    return artifacts_root / _required_artifact(name).relative_path
+
+
+def _validate_required_artifacts(artifacts_root: Path) -> List[str]:
+    errors: List[str] = []
+    for req in REQUIRED_ARTIFACTS:
+        path = artifacts_root / req.relative_path
+        if not path.exists():
+            hint = f"expected {req.kind}"
+            if req.required_columns:
+                hint += f" with columns {', '.join(req.required_columns)}"
+            if req.required_keys:
+                hint += f" with keys {', '.join(req.required_keys)}"
+            errors.append(f"missing required artifact: {path} ({hint})")
+            continue
+        if req.kind == "csv":
+            try:
+                df = pd.read_csv(path)
+            except Exception as exc:
+                errors.append(f"failed to read required artifact: {path} ({exc})")
+                continue
+            if req.required_columns:
+                missing = [col for col in req.required_columns if col not in df.columns]
+                if missing:
+                    errors.append(
+                        f"required artifact missing columns: {path} (missing {', '.join(missing)})"
+                    )
+        elif req.kind == "json":
+            try:
+                payload = json.loads(path.read_text())
+            except Exception as exc:
+                errors.append(f"failed to read required artifact: {path} ({exc})")
+                continue
+            if req.required_keys:
+                missing = [key for key in req.required_keys if key not in payload]
+                if missing:
+                    errors.append(
+                        f"required artifact missing keys: {path} (missing {', '.join(missing)})"
+                    )
+        else:
+            try:
+                path.read_bytes()
+            except Exception as exc:
+                errors.append(f"failed to read required artifact: {path} ({exc})")
+    return errors
+
+
 # ---------- Metric extractors ----------
 
 
@@ -86,7 +211,7 @@ def tri_engine_metrics(path: Path) -> Dict[str, Any]:
     if df is None:
         return _status_block("missing" if err == "file not found" else "parse_error", path, reason=err)
 
-    required = {"bs_price", "mc_price", "pde_price"}
+    required = set(_required_artifact("tri_engine_agreement").required_columns)
     if not required.issubset(df.columns):
         missing = ",".join(sorted(required - set(df.columns)))
         return _status_block("parse_error", path, reason=f"missing columns: {missing}")
@@ -117,7 +242,7 @@ def qmc_vs_prng_metrics(path: Path) -> Dict[str, Any]:
     if df is None:
         return _status_block("missing" if err == "file not found" else "parse_error", path, reason=err)
 
-    required = {"payoff", "rmse_ratio"}
+    required = set(_required_artifact("qmc_vs_prng_equal_time").required_columns)
     if not required.issubset(df.columns):
         missing = ",".join(sorted(required - set(df.columns)))
         return _status_block("parse_error", path, reason=f"missing columns: {missing}")
@@ -143,7 +268,7 @@ def pde_order_metrics(path: Path) -> Dict[str, Any]:
     if df is None:
         return _status_block("missing" if err == "file not found" else "parse_error", path, reason=err)
 
-    required = {"nodes", "abs_error"}
+    required = set(_required_artifact("pde_order_slope").required_columns)
     if not required.issubset(df.columns):
         missing = ",".join(sorted(required - set(df.columns)))
         return _status_block("parse_error", path, reason=f"missing columns: {missing}")
@@ -176,7 +301,7 @@ def ql_parity_metrics(path: Path) -> Dict[str, Any]:
     if df is None:
         return _status_block("missing" if err == "file not found" else "parse_error", path, reason=err)
 
-    required = {"category", "abs_diff_cents"}
+    required = set(_required_artifact("ql_parity").required_columns)
     if not required.issubset(df.columns):
         missing = ",".join(sorted(required - set(df.columns)))
         return _status_block("parse_error", path, reason=f"missing columns: {missing}")
@@ -211,8 +336,8 @@ def _collapse_status(statuses: Iterable[str]) -> str:
 
 
 def benchmark_metrics(root: Path) -> Dict[str, Any]:
-    mc_paths_path = root / "bench" / "bench_mc_paths.csv"
-    mc_equal_time_path = root / "bench" / "bench_mc_equal_time.csv"
+    mc_paths_path = _required_path("bench_mc_paths", root)
+    mc_equal_time_path = _required_path("bench_mc_equal_time", root)
 
     mc_block: Dict[str, Any] | None = None
     df_mc, err_mc = _safe_load_csv(mc_paths_path)
@@ -274,10 +399,9 @@ def benchmark_metrics(root: Path) -> Dict[str, Any]:
 
 
 def wrds_metrics(root: Path) -> Dict[str, Any]:
-    wrds_root = root / "wrds"
-    pricing_path = wrds_root / "wrds_agg_pricing.csv"
-    oos_path = wrds_root / "wrds_agg_oos.csv"
-    pnl_path = wrds_root / "wrds_agg_pnl.csv"
+    pricing_path = _required_path("wrds_agg_pricing", root)
+    oos_path = _required_path("wrds_agg_oos", root)
+    pnl_path = _required_path("wrds_agg_pnl", root)
 
     blocks: Dict[str, Any] = {"bundle": "sample bundle regression harness"}
     statuses: List[str] = []
@@ -439,10 +563,10 @@ def build_summary(artifacts_root: Path, manifest_path: Path) -> Dict[str, Any]:
     except Exception:
         git_sha = None
 
-    tri_engine_path = artifacts_root / "tri_engine_agreement.csv"
-    qmc_path = artifacts_root / "qmc_vs_prng_equal_time.csv"
-    pde_path = artifacts_root / "pde_order_slope.csv"
-    ql_parity_path = artifacts_root / "ql_parity" / "ql_parity.csv"
+    tri_engine_path = _required_path("tri_engine_agreement", artifacts_root)
+    qmc_path = _required_path("qmc_vs_prng_equal_time", artifacts_root)
+    pde_path = _required_path("pde_order_slope", artifacts_root)
+    ql_parity_path = _required_path("ql_parity", artifacts_root)
 
     metrics = {
         "tri_engine_agreement": tri_engine_metrics(tri_engine_path),
@@ -478,21 +602,7 @@ def main() -> None:
     md_out.write_text(render_markdown(summary))
 
     if not args.skip_manifest:
-        inputs: List[str | Path] = [
-            artifacts_root / "tri_engine_agreement.csv",
-            artifacts_root / "qmc_vs_prng_equal_time.csv",
-            artifacts_root / "pde_order_slope.csv",
-            artifacts_root / "ql_parity" / "ql_parity.csv",
-        ]
-        inputs.extend((artifacts_root / "bench" / name) for name in [
-            "bench_mc_paths.csv",
-            "bench_mc_equal_time.csv",
-        ])
-        inputs.extend((artifacts_root / "wrds" / name) for name in [
-            "wrds_agg_pricing.csv",
-            "wrds_agg_oos.csv",
-            "wrds_agg_pnl.csv",
-        ])
+        inputs: List[str | Path] = [artifacts_root / item.relative_path for item in REQUIRED_ARTIFACTS]
         update_run(
             "metrics_snapshot",
             {
@@ -504,6 +614,12 @@ def main() -> None:
                 "inputs": describe_inputs(inputs),
             },
         )
+
+    errors = _validate_required_artifacts(artifacts_root)
+    if errors:
+        for err in errors:
+            print(f"[metrics_summary] ERROR: {err}", file=sys.stderr)
+        raise SystemExit(2)
 
     print(f"Wrote {json_out}")
     print(f"Wrote {md_out}")

@@ -19,13 +19,13 @@ test 11
 11: [----------] Global test environment set-up.
 11: [----------] 1 test from MonteCarloSlow
 11: [ RUN      ] MonteCarloSlow.PriceCloseToBS
-11: [       OK ] MonteCarloSlow.PriceCloseToBS (19 ms)
-11: [----------] 1 test from MonteCarloSlow (19 ms total)
+11: [       OK ] MonteCarloSlow.PriceCloseToBS (21 ms)
+11: [----------] 1 test from MonteCarloSlow (21 ms total)
 11: 
 11: [----------] Global test environment tear-down
-11: [==========] 1 test from 1 test suite ran. (19 ms total)
+11: [==========] 1 test from 1 test suite ran. (21 ms total)
 11: [  PASSED  ] 1 test.
-1/7 Test #11: MonteCarloSlow.PriceCloseToBS .......................   Passed    0.02 sec
+1/7 Test #11: MonteCarloSlow.PriceCloseToBS .......................   Passed    0.03 sec
 test 13
     Start 13: MonteCarloSlow.GreeksCloseToAnalytic
 
@@ -38,13 +38,13 @@ test 13
 13: [----------] Global test environment set-up.
 13: [----------] 1 test from MonteCarloSlow
 13: [ RUN      ] MonteCarloSlow.GreeksCloseToAnalytic
-13: [       OK ] MonteCarloSlow.GreeksCloseToAnalytic (28 ms)
-13: [----------] 1 test from MonteCarloSlow (28 ms total)
+13: [       OK ] MonteCarloSlow.GreeksCloseToAnalytic (31 ms)
+13: [----------] 1 test from MonteCarloSlow (31 ms total)
 13: 
 13: [----------] Global test environment tear-down
-13: [==========] 1 test from 1 test suite ran. (28 ms total)
+13: [==========] 1 test from 1 test suite ran. (31 ms total)
 13: [  PASSED  ] 1 test.
-2/7 Test #13: MonteCarloSlow.GreeksCloseToAnalytic ................   Passed    0.03 sec
+2/7 Test #13: MonteCarloSlow.GreeksCloseToAnalytic ................   Passed    0.04 sec
 test 14
     Start 14: MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
 
@@ -57,11 +57,11 @@ test 14
 14: [----------] Global test environment set-up.
 14: [----------] 1 test from MonteCarloSlow
 14: [ RUN      ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
-14: [       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (93 ms)
-14: [----------] 1 test from MonteCarloSlow (93 ms total)
+14: [       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (91 ms)
+14: [----------] 1 test from MonteCarloSlow (91 ms total)
 14: 
 14: [----------] Global test environment tear-down
-14: [==========] 1 test from 1 test suite ran. (93 ms total)
+14: [==========] 1 test from 1 test suite ran. (91 ms total)
 14: [  PASSED  ] 1 test.
 3/7 Test #14: MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic ...   Passed    0.10 sec
 test 15
@@ -76,11 +76,11 @@ test 15
 15: [----------] Global test environment set-up.
 15: [----------] 1 test from MonteCarloSlow
 15: [ RUN      ] MonteCarloSlow.ThetaCloseToPDE
-15: [       OK ] MonteCarloSlow.ThetaCloseToPDE (35 ms)
-15: [----------] 1 test from MonteCarloSlow (35 ms total)
+15: [       OK ] MonteCarloSlow.ThetaCloseToPDE (34 ms)
+15: [----------] 1 test from MonteCarloSlow (34 ms total)
 15: 
 15: [----------] Global test environment tear-down
-15: [==========] 1 test from 1 test suite ran. (35 ms total)
+15: [==========] 1 test from 1 test suite ran. (34 ms total)
 15: [  PASSED  ] 1 test.
 4/7 Test #15: MonteCarloSlow.ThetaCloseToPDE ......................   Passed    0.04 sec
 test 16
@@ -95,13 +95,13 @@ test 16
 16: [----------] Global test environment set-up.
 16: [----------] 1 test from MonteCarloSlow
 16: [ RUN      ] MonteCarloSlow.GammaMixedVarianceLowerThanLR
-16: [       OK ] MonteCarloSlow.GammaMixedVarianceLowerThanLR (29 ms)
-16: [----------] 1 test from MonteCarloSlow (29 ms total)
+16: [       OK ] MonteCarloSlow.GammaMixedVarianceLowerThanLR (32 ms)
+16: [----------] 1 test from MonteCarloSlow (32 ms total)
 16: 
 16: [----------] Global test environment tear-down
-16: [==========] 1 test from 1 test suite ran. (29 ms total)
+16: [==========] 1 test from 1 test suite ran. (32 ms total)
 16: [  PASSED  ] 1 test.
-5/7 Test #16: MonteCarloSlow.GammaMixedVarianceLowerThanLR ........   Passed    0.03 sec
+5/7 Test #16: MonteCarloSlow.GammaMixedVarianceLowerThanLR ........   Passed    0.04 sec
 test 17
     Start 17: MonteCarloSlow.QmcReducesErrorVsAnalytic
 
@@ -114,13 +114,13 @@ test 17
 17: [----------] Global test environment set-up.
 17: [----------] 1 test from MonteCarloSlow
 17: [ RUN      ] MonteCarloSlow.QmcReducesErrorVsAnalytic
-17: [       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1281 ms)
-17: [----------] 1 test from MonteCarloSlow (1281 ms total)
+17: [       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1493 ms)
+17: [----------] 1 test from MonteCarloSlow (1493 ms total)
 17: 
 17: [----------] Global test environment tear-down
-17: [==========] 1 test from 1 test suite ran. (1281 ms total)
+17: [==========] 1 test from 1 test suite ran. (1493 ms total)
 17: [  PASSED  ] 1 test.
-6/7 Test #17: MonteCarloSlow.QmcReducesErrorVsAnalytic ............   Passed    1.28 sec
+6/7 Test #17: MonteCarloSlow.QmcReducesErrorVsAnalytic ............   Passed    1.50 sec
 test 31
     Start 31: AmericanSlow.LsmcMatchesPsorWithinSe
 
@@ -133,17 +133,17 @@ test 31
 31: [----------] Global test environment set-up.
 31: [----------] 1 test from AmericanSlow
 31: [ RUN      ] AmericanSlow.LsmcMatchesPsorWithinSe
-31: [       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (627 ms)
-31: [----------] 1 test from AmericanSlow (627 ms total)
+31: [       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (1274 ms)
+31: [----------] 1 test from AmericanSlow (1274 ms total)
 31: 
 31: [----------] Global test environment tear-down
-31: [==========] 1 test from 1 test suite ran. (627 ms total)
+31: [==========] 1 test from 1 test suite ran. (1274 ms total)
 31: [  PASSED  ] 1 test.
-7/7 Test #31: AmericanSlow.LsmcMatchesPsorWithinSe ................   Passed    0.64 sec
+7/7 Test #31: AmericanSlow.LsmcMatchesPsorWithinSe ................   Passed    1.28 sec
 
 100% tests passed, 0 tests failed out of 7
 
 Label Time Summary:
-SLOW    =   2.14 sec*proc (7 tests)
+SLOW    =   3.01 sec*proc (7 tests)
 
-Total Test time (real) =   2.15 sec
+Total Test time (real) =   3.01 sec
