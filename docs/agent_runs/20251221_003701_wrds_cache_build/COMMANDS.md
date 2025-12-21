@@ -55,3 +55,5 @@
 53. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "wrds: add real-data cache support + builder"
 54. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git rev-parse HEAD
 55. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch (docs/agent_runs/20251221_003701_wrds_cache_build/META.json)
+56. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251221_003701_wrds_cache_build/META.json docs/agent_runs/20251221_003701_wrds_cache_build/COMMANDS.md
+57. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "docs: update wrds cache run metadata"
