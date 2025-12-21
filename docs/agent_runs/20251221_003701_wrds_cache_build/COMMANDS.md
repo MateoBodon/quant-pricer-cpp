@@ -64,3 +64,5 @@
 62. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add wrds_pipeline/ingest_sppx_surface.py docs/agent_runs/20251221_003701_wrds_cache_build/COMMANDS.md
 63. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "wrds: allow cache use without creds"
 64. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch (docs/agent_runs/20251221_003701_wrds_cache_build/META.json)
+65. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251221_003701_wrds_cache_build/META.json docs/agent_runs/20251221_003701_wrds_cache_build/COMMANDS.md
+66. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "docs: update wrds cache run metadata"
