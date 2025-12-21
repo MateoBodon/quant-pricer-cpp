@@ -25,7 +25,14 @@ for path in (REPO_ROOT, SCRIPTS_DIR):
 
 from manifest_utils import ARTIFACTS_ROOT, update_run
 
-from . import calibrate_heston, delta_hedge_pnl, ingest_sppx_surface, oos_pricing
+from . import (
+    calibrate_heston,
+    calibrate_bs,
+    compare_bs_heston,
+    delta_hedge_pnl,
+    ingest_sppx_surface,
+    oos_pricing,
+)
 
 
 def _next_business_day(trade_date: str) -> str:
@@ -241,6 +248,19 @@ def _load_dateset_payload(path: Path) -> Dict[str, object]:
         return data
 
 
+def _local_root_from_payload(payload: Dict[str, object]) -> Path | None:
+    raw = payload.get("wrds_local_root")
+    if raw is None:
+        return None
+    raw_str = str(raw).strip()
+    if not raw_str:
+        return None
+    root = Path(raw_str).expanduser()
+    if not root.is_absolute():
+        root = REPO_ROOT / root
+    return root
+
+
 def run(
     symbol: str,
     trade_date: str,
@@ -251,15 +271,26 @@ def run(
     output_dir: Path | None = None,
     label: str | None = None,
     regime: str | None = None,
+    wrds_root: Path | None = None,
+    local_root: Path | None = None,
 ) -> Dict[str, object]:
-    out_dir = output_dir or (ARTIFACTS_ROOT / "wrds")
+    if wrds_root is None:
+        if local_root is not None and not use_sample:
+            wrds_root = ARTIFACTS_ROOT / "wrds_local"
+        else:
+            wrds_root = ARTIFACTS_ROOT / "wrds"
+    out_dir = output_dir or wrds_root
     out_dir.mkdir(parents=True, exist_ok=True)
 
     raw_today, source_today = ingest_sppx_surface.load_surface(
-        symbol, trade_date, force_sample=use_sample
+        symbol, trade_date, force_sample=use_sample, local_root=local_root
     )
     raw_next, source_next = ingest_sppx_surface.load_surface(
-        symbol, next_trade_date, force_sample=use_sample
+        symbol, next_trade_date, force_sample=use_sample, local_root=local_root
+    )
+    print(
+        f"[wrds_pipeline] {symbol} {trade_date} "
+        f"source_today={source_today} source_next={source_next}"
     )
 
     agg_today = ingest_sppx_surface.aggregate_surface(raw_today)
@@ -276,7 +307,7 @@ def run(
     config = calibrate_heston.CalibrationConfig(
         fast=fast,
         max_evals=120 if fast else 220,
-        bootstrap_samples=60 if fast else 150,
+        bootstrap_samples=32 if fast else 150,
         rng_seed=19,
     )
     calib = calibrate_heston.calibrate(agg_today, config)
@@ -336,6 +367,18 @@ def run(
         oos_metrics = calibrate_heston.compute_oos_iv_metrics(oos_detail)
     oos_pricing.write_outputs(oos_detail_csv, oos_summary_csv, oos_detail, oos_summary)
 
+    # BS baseline (per tenor bucket constant vol)
+    bs_fit = calibrate_bs.fit_bs(agg_today)
+    bs_oos_detail = calibrate_bs.evaluate_oos(
+        agg_next, bs_fit.surface.groupby("tenor_bucket", observed=True)["fit_vol"].first()
+    )
+    bs_metrics_oos = calibrate_bs.summarize_oos(bs_oos_detail)
+    bs_insample_metrics = bs_fit.metrics
+    bs_fit_csv = out_dir / "bs_fit_table.csv"
+    bs_oos_csv = out_dir / "bs_oos_summary.csv"
+    bs_fit.surface.to_csv(bs_fit_csv, index=False)
+    bs_oos_detail.to_csv(bs_oos_csv, index=False)
+
     pnl_detail_csv = out_dir / "delta_hedge_pnl.csv"
     pnl_summary_csv = out_dir / "delta_hedge_pnl_summary.csv"
     pnl_detail, pnl_summary = delta_hedge_pnl.simulate(agg_today, agg_next)
@@ -352,6 +395,7 @@ def run(
         "tenor_bucket",
         "moneyness",
         "ttm_years",
+        "vega",
         "mid_iv",
         "model_iv",
         "iv_error_bps",
@@ -359,6 +403,7 @@ def run(
         "model_price",
         "price_error_ticks",
         "quotes",
+        "weight",
     ]
     insample_csv = out_dir / "wrds_heston_insample.csv"
     calib["surface"][insample_cols].to_csv(insample_csv, index=False)
@@ -379,6 +424,18 @@ def run(
     calibrate_heston.write_summary(fit_json, summary_payload)
     calibrate_heston.plot_fit(calib["surface"], calib["params"], fit_metrics, fit_fig)
     calibrate_heston.record_manifest(fit_json, summary_payload, fit_csv, fit_fig)
+
+    # Record BS baseline (no manifest entry for now)
+    bs_payload = {
+        "trade_date": trade_date,
+        "next_trade_date": next_trade_date,
+        "label": label,
+        "regime": regime,
+        **bs_insample_metrics,
+        **bs_metrics_oos,
+        "fit_csv": str(bs_fit_csv),
+        "oos_csv": str(bs_oos_csv),
+    }
 
     update_run(
         "wrds_pipeline",
@@ -406,6 +463,8 @@ def run(
             "wrds_heston_oos_fig": str(oos_fig),
             "wrds_heston_hedge_csv": str(hedge_csv),
             "wrds_heston_hedge_fig": str(hedge_fig),
+            "wrds_bs_fit_csv": str(bs_fit_csv),
+            "wrds_bs_oos_csv": str(bs_oos_csv),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         },
         append=True,
@@ -417,6 +476,7 @@ def run(
         "label": label,
         "regime": regime,
         "summary": summary_payload,
+        "bs_summary": bs_payload,
         "oos_summary": oos_summary.copy(),
         "pnl_summary": pnl_summary.copy(),
         "artifacts": {
@@ -425,24 +485,40 @@ def run(
             "fit_json": fit_json,
             "summary_fig": summary_fig,
         },
+        "bs_fit": bs_fit.surface.copy(),
+        "bs_oos": bs_oos_detail.copy(),
     }
 
 
 def run_dateset(
-    symbol: str, dateset_path: Path, use_sample: bool, fast: bool
+    symbol: str,
+    dateset_path: Path,
+    use_sample: bool,
+    fast: bool,
+    *,
+    output_root: Path | None = None,
+    local_root: Path | None = None,
 ) -> Dict[str, Path]:
     payload = _load_dateset_payload(dateset_path)
+    if local_root is None:
+        local_root = _local_root_from_payload(payload)
     entries = payload.get("dates", [])
     if not entries:
         raise RuntimeError(f"{dateset_path} does not contain any dates")
-    per_date_root = ARTIFACTS_ROOT / "wrds" / "per_date"
+    if output_root is None and local_root is not None and not use_sample:
+        wrds_root = ARTIFACTS_ROOT / "wrds_local"
+    else:
+        wrds_root = output_root or (ARTIFACTS_ROOT / "wrds")
+    per_date_root = wrds_root / "per_date"
     per_date_root.mkdir(parents=True, exist_ok=True)
-    agg_dir = ARTIFACTS_ROOT / "wrds"
+    agg_dir = wrds_root
     agg_dir.mkdir(parents=True, exist_ok=True)
 
     pricing_rows = []
     oos_rows = []
     pnl_rows = []
+    bs_pricing_rows = []
+    bs_oos_rows = []
 
     for entry in entries:
         trade_date = entry["trade_date"]
@@ -463,6 +539,8 @@ def run_dateset(
                 output_dir=per_date_dir,
                 label=label,
                 regime=regime,
+                wrds_root=wrds_root,
+                local_root=local_root,
             )
         except Exception as exc:  # pragma: no cover
             print(f"[wrds_pipeline] {trade_date} failed: {exc}")
@@ -485,9 +563,12 @@ def run_dateset(
             )
             continue
         summary = result["summary"]
+        bs_summary = result["bs_summary"]
         oos_df = result["oos_summary"].copy()
         if not oos_df.empty:
-            weights = np.asarray(oos_df["quotes"].clip(lower=1), dtype=np.float64)
+            weights = np.asarray(
+                oos_df.get("weight", oos_df["quotes"]).clip(lower=1), dtype=np.float64
+            )
             price_mae_ticks = float(
                 np.average(oos_df["price_mae_ticks"], weights=weights)
             )
@@ -512,11 +593,34 @@ def run_dateset(
             }
         )
 
+        bs_pricing_rows.append(
+            {
+                "trade_date": bs_summary["trade_date"],
+                "next_trade_date": bs_summary.get("next_trade_date"),
+                "label": summary.get("label"),
+                "regime": summary.get("regime"),
+                "status": "ok",
+                "iv_rmse_volpts_vega_wt": bs_summary["iv_rmse_volpts_vega_wt"],
+                "iv_mae_volpts_vega_wt": bs_summary["iv_mae_volpts_vega_wt"],
+                "iv_p90_bps": bs_summary["iv_p90_bps"],
+                "price_rmse_ticks": bs_summary["price_rmse_ticks"],
+                "iv_mae_bps": bs_summary.get("iv_mae_bps"),
+                "price_mae_ticks": bs_summary.get("price_mae_ticks"),
+            }
+        )
+
         if not oos_df.empty:
             oos_df["trade_date"] = summary["trade_date"]
             oos_df["label"] = summary.get("label")
             oos_df["regime"] = summary.get("regime")
             oos_rows.append(oos_df)
+
+        bs_oos_df = result["bs_oos"].copy()
+        if not bs_oos_df.empty:
+            bs_oos_df["trade_date"] = summary["trade_date"]
+            bs_oos_df["label"] = summary.get("label")
+            bs_oos_df["regime"] = summary.get("regime")
+            bs_oos_rows.append(bs_oos_df)
 
         pnl_df = result["pnl_summary"].copy()
         if not pnl_df.empty:
@@ -528,6 +632,10 @@ def run_dateset(
     pricing_df = pd.DataFrame(pricing_rows)
     pricing_csv = agg_dir / "wrds_agg_pricing.csv"
     pricing_df.to_csv(pricing_csv, index=False)
+
+    bs_pricing_df = pd.DataFrame(bs_pricing_rows)
+    bs_pricing_csv = agg_dir / "wrds_agg_pricing_bs.csv"
+    bs_pricing_df.to_csv(bs_pricing_csv, index=False)
 
     if oos_rows:
         oos_df = pd.concat(oos_rows, ignore_index=True)
@@ -545,6 +653,23 @@ def run_dateset(
         )
     oos_csv = agg_dir / "wrds_agg_oos.csv"
     oos_df.to_csv(oos_csv, index=False)
+
+    if bs_oos_rows:
+        bs_oos_df = pd.concat(bs_oos_rows, ignore_index=True)
+    else:
+        bs_oos_df = pd.DataFrame(
+            columns=[
+                "trade_date",
+                "label",
+                "regime",
+                "tenor_bucket",
+                "iv_error_bps",
+                "price_error_ticks",
+                "quotes",
+            ]
+        )
+    bs_oos_csv = agg_dir / "wrds_agg_oos_bs.csv"
+    bs_oos_df.to_csv(bs_oos_csv, index=False)
 
     if pnl_rows:
         pnl_df = pd.concat(pnl_rows, ignore_index=True)
@@ -567,15 +692,25 @@ def run_dateset(
     multi_fig = agg_dir / "wrds_multi_date_summary.png"
     _plot_multi_date_summary(pricing_df, oos_df, pnl_df, multi_fig)
 
+    comparison = compare_bs_heston.generate_comparison_artifacts(
+        artifacts_root=agg_dir, per_date_root=per_date_root
+    )
+
     update_run(
         "wrds_dateset",
         {
             "symbol": symbol,
             "dateset": str(dateset_path),
             "pricing_csv": str(pricing_csv),
+            "pricing_bs_csv": str(bs_pricing_csv),
             "oos_csv": str(oos_csv),
+            "oos_bs_csv": str(bs_oos_csv),
             "pnl_csv": str(pnl_csv),
             "summary_fig": str(multi_fig),
+            "comparison_csv": str(comparison["comparison_csv"]),
+            "ivrmse_fig": str(comparison["ivrmse_fig"]),
+            "oos_heatmap_fig": str(comparison["oos_heatmap_fig"]),
+            "pnl_fig": str(comparison["pnl_fig"]),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         },
         append=True,
@@ -601,16 +736,51 @@ def main() -> None:
         default=None,
         help="Path to a YAML/JSON file listing trade dates to batch-process",
     )
+    ap.add_argument(
+        "--output-root",
+        default=None,
+        help="Optional output root for artifacts (defaults to docs/artifacts/wrds)",
+    )
     args = ap.parse_args()
     next_trade = args.next_trade_date or _next_business_day(args.trade_date)
-    use_sample = args.use_sample or not ingest_sppx_surface.has_wrds_credentials()
+    dateset_path = None
+    local_root = None
     if args.dateset:
         dateset_path = Path(args.dateset)
         if not dateset_path.is_absolute():
             dateset_path = REPO_ROOT / dateset_path
-        run_dateset(args.symbol.upper(), dateset_path, use_sample, args.fast)
+        payload = _load_dateset_payload(dateset_path)
+        local_root = _local_root_from_payload(payload)
+    env_use_sample = os.environ.get("WRDS_USE_SAMPLE") == "1"
+    use_sample = (
+        args.use_sample
+        or env_use_sample
+        or not ingest_sppx_surface.has_wrds_credentials(local_root=local_root)
+    )
+    output_root = None
+    if args.output_root:
+        output_root = Path(args.output_root)
+        if not output_root.is_absolute():
+            output_root = REPO_ROOT / output_root
+    if dateset_path is not None:
+        run_dateset(
+            args.symbol.upper(),
+            dateset_path,
+            use_sample,
+            args.fast,
+            output_root=output_root,
+            local_root=local_root,
+        )
     else:
-        run(args.symbol.upper(), args.trade_date, next_trade, use_sample, args.fast)
+        run(
+            args.symbol.upper(),
+            args.trade_date,
+            next_trade,
+            use_sample,
+            args.fast,
+            wrds_root=output_root,
+            local_root=local_root,
+        )
 
 
 if __name__ == "__main__":  # pragma: no cover

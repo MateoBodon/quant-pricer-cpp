@@ -59,6 +59,10 @@ Upload the resulting `docs/validation_pack.zip` when drafting a GitHub release t
 
 Curated figures (plus precise reproduction commands) live on the [Results page](https://mateobodon.github.io/quant-pricer-cpp/Results.html).
 
+- **Metrics snapshot (single source of truth):**
+  - Generate: `WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh && python scripts/generate_metrics_summary.py --artifacts docs/artifacts --manifest docs/artifacts/manifest.json`
+  - Browse: `docs/artifacts/metrics_summary.md` (artifact-derived; no hand-edits)
+
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#tri-engine-agreement"><img src="docs/artifacts/tri_engine_agreement.png" alt="Tri-engine agreement" width="230"></a><br>
   **Tri-Engine Agreement (BS / MC / PDE)** – Analytic, deterministic MC, and Crank–Nicolson agree to <5 bps across strikes; MC CI is shown.<br>
   Reproduce: `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output docs/artifacts/tri_engine_agreement.png --csv docs/artifacts/tri_engine_agreement.csv`
@@ -68,9 +72,19 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
   Reproduce: `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv --fast`
   Data: [qmc_vs_prng_equal_time.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/qmc_vs_prng_equal_time.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_multi_date_summary.png" alt="WRDS panel summary" width="230"></a><br>
-  **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated over ≥5 calm/stress dates with vega-weighted IV RMSE, quotes-weighted OOS MAE, and Δ-hedged 1d buckets.<br>
+  **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated over ≥5 calm/stress dates with vega×quote-weighted IV/OOS errors (DTE ≥21d, 0.75–1.25 wings with soft taper) and Δ-hedged 1d buckets; snapshot values live in `docs/artifacts/metrics_summary.md` (bundle is deterministic sample; live WRDS remains source of truth). BS baseline (one σ per tenor) lives in `wrds_agg_pricing_bs.csv` / `wrds_agg_oos_bs.csv` for comparison.<br>
   Reproduce (sample): `python wrds_pipeline/pipeline.py --dateset wrds_pipeline_dates_panel.yaml --use-sample`
   Data: [wrds_agg_pricing.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pricing.csv), [wrds_agg_oos.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_oos.csv), [wrds_agg_pnl.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pnl.csv)
+- <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_bs_heston_ivrmse.png" alt="BS vs Heston IV RMSE by tenor" width="230"></a><br>
+  **WRDS BS vs Heston (sample comparison)** – On the bundled sample dates Heston and BS are now near parity (per-tenor IV RMSE deltas within ±0.0002 vol pts; OOS deltas single-digit bps). Live IvyDB pulls remain the source of truth; sample bundle is a smoke test/regression harness.<br>
+  
+  | Tenor | BS IV RMSE | Heston IV RMSE | OOS IV MAE BS (bps) | OOS IV MAE Heston (bps) | Δ‑hedged σ (Heston, ticks) |
+  | --- | --- | --- | --- | --- | --- |
+  | 30d | 0.0237 | 0.0237 | 166.9 | 167.4 | 96.1 |
+  | 60d | 0.0157 | 0.0158 | 122.5 | 121.1 | 64.2 |
+  | 90d | 0.0146 | 0.0146 | 126.3 | 128.8 | 47.0 |
+  
+  See `docs/WRDS_Results.md` for narrative, heatmaps, and the full `wrds_bs_heston_comparison.csv`.
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#quantlib-parity"><img src="docs/artifacts/ql_parity/ql_parity.png" alt="QuantLib parity" width="230"></a><br>
   **QuantLib Parity (vanilla/barrier/American)** – quant-pricer-cpp prices match QuantLib within ≈1¢ while exposing runtime deltas for each product.<br>
   Reproduce: `python scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`
@@ -935,6 +949,8 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 ### WRDS (OptionMetrics) Pipeline
 
 Opt-in MARKET tests under `wrds_pipeline/` pull (or fall back to deterministic samples), aggregate the SPX surface, run a vega-weighted Heston calibration, and emit anonymised CSV/PNG bundles under `docs/artifacts/wrds/`. Set `WRDS_ENABLED=1` together with `WRDS_USERNAME` / `WRDS_PASSWORD` to enable `ctest -L MARKET`; otherwise the tests are skipped. Key artifacts (all aggregated / anonymised):
+
+- Local WRDS parquet mode is **explicit-only**: set `WRDS_LOCAL_ROOT` (env) or `wrds_local_root` in the dateset config to read OptionMetrics parquet (`opprcd`, `secprd`, `secnmd`) before cache/live WRDS. Local runs default to `docs/artifacts/wrds_local/` so the sample bundle under `docs/artifacts/wrds/` remains reproducible. When generated, local-stash metadata is recorded in `docs/artifacts/wrds_local/wrds_local_manifest.json`; raw WRDS tables are never committed.
 
 - [`docs/artifacts/wrds/wrds_agg_pricing.csv`](docs/artifacts/wrds/wrds_agg_pricing.csv) – per-date vega-weighted RMSE/MAE, `iv_p90_bps`, provenance
 - [`docs/artifacts/wrds/wrds_agg_oos.csv`](docs/artifacts/wrds/wrds_agg_oos.csv) – tenor-by-date OOS IV/price MAE with quote counts

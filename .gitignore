@@ -32,6 +32,7 @@ CTestTestfile.cmake
 # IDE
 .vscode/
 .idea/
+.venv/
 .env
 
 # OS
@@ -43,4 +44,9 @@ docs/artifacts/wrds/*
 !docs/artifacts/wrds/wrds_agg_oos.csv
 !docs/artifacts/wrds/wrds_agg_pnl.csv
 !docs/artifacts/wrds/wrds_multi_date_summary.png
+!docs/artifacts/wrds/wrds_bs_heston_comparison.csv
+!docs/artifacts/wrds/wrds_bs_heston_ivrmse.png
+!docs/artifacts/wrds/wrds_bs_heston_oos_heatmap.png
+!docs/artifacts/wrds/wrds_bs_heston_pnl_sigma.png
 docs/validation_pack.zip
+docs/gpt_bundles/

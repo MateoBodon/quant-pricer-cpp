@@ -1,0 +1,22 @@
+{
+  "run_name": "20251221_202201_ticket-06_wrds-local-guardrails",
+  "ticket_id": "ticket-06",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "30002fe1a2fd69644b54a36237b8d820da8743f0",
+  "git_sha_after": "30002fe1a2fd69644b54a36237b8d820da8743f0",
+  "branch": "feature/ticket-06-wrds-local-guardrails",
+  "timestamp_local": "2025-12-21T15:42:31",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "3.12.2"
+  },
+  "dataset": {
+    "mode": "wrds_sample",
+    "dataset_id": "wrds_pipeline_dates_panel.yaml",
+    "config_path": "wrds_pipeline_dates_panel.yaml",
+    "config_hash": "b8e55c430a4623d5b3763c68fbdf22b6735c36a39b9f24a7a2297893832bc916"
+  },
+  "notes": "Sample mode forced via WRDS_USE_SAMPLE=1; local mode now explicit-only; python command missing so WRDS smoke ran with python3; artifacts sanitized to repo-relative paths."
+}

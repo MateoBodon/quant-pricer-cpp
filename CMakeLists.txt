@@ -234,6 +234,12 @@ add_test(
 set_tests_properties(cli_smoke_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME metrics_snapshot_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_metrics_snapshot_fast.py
+)
+set_tests_properties(metrics_snapshot_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME market_wrds_pipeline
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/wrds_pipeline/tests/test_wrds_pipeline.py
 )

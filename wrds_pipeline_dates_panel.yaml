@@ -1,3 +1,5 @@
+# Optional: set to a local OptionMetrics parquet root to enable explicit local mode.
+wrds_local_root: null
 dates:
   - trade_date: "2020-03-16"
     next_trade_date: "2020-03-17"

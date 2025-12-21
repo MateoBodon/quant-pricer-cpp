@@ -21,6 +21,32 @@ def _rel_path(path: Path) -> str:
         return str(path)
 
 
+def _relativize_string(value: str) -> str:
+    root_str = str(REPO_ROOT)
+    root_prefix = root_str + os.sep
+    if value == root_str:
+        return "."
+    if value.startswith(root_prefix):
+        return value[len(root_prefix) :]
+    if root_prefix in value:
+        return value.replace(root_prefix, "")
+    return value
+
+
+def _relativize_value(value: Any) -> Any:
+    if isinstance(value, Path):
+        return _rel_path(value.resolve())
+    if isinstance(value, dict):
+        return {key: _relativize_value(val) for key, val in value.items()}
+    if isinstance(value, list):
+        return [_relativize_value(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_relativize_value(item) for item in value)
+    if isinstance(value, str):
+        return _relativize_string(value)
+    return value
+
+
 def _git_info() -> Dict[str, Any]:
     def run(cmd: List[str]) -> str:
         return subprocess.check_output(cmd, cwd=REPO_ROOT, text=True).strip()
@@ -146,6 +172,7 @@ def ensure_metadata(manifest: Dict[str, Any]) -> Dict[str, Any]:
 
 def save_manifest(manifest: Dict[str, Any]) -> None:
     manifest = ensure_metadata(manifest)
+    manifest = _relativize_value(manifest)
     MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST_PATH.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 

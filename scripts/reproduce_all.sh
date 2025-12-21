@@ -103,6 +103,11 @@ generate_figures() {
   run_py_fast "${ROOT}/scripts/tri_engine_agreement.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/tri_engine_agreement.png" --csv "${ARTIFACT_DIR}/tri_engine_agreement.csv"
 }
 
+run_ql_parity() {
+  local quant_cli="$1"
+  run_py_fast "${ROOT}/scripts/ql_parity.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/ql_parity/ql_parity.png" --csv "${ARTIFACT_DIR}/ql_parity/ql_parity.csv"
+}
+
 run_benchmarks() {
   mkdir -p "${BENCH_DIR}"
   local bench_mc bench_pde
@@ -161,6 +166,14 @@ run_wrds_pipeline() {
   fi
 }
 
+generate_metrics_summary() {
+  run_py "${ROOT}/scripts/generate_metrics_summary.py" --artifacts "${ARTIFACT_DIR}" --manifest "${ARTIFACT_DIR}/manifest.json"
+}
+
+package_validation_pack() {
+  run_py "${ROOT}/scripts/package_validation.py" --artifacts "${ARTIFACT_DIR}" --output "${ROOT}/docs/validation_pack.zip"
+}
+
 finalize_manifest() {
   ROOT_DIR="${ROOT}" python3 - <<'PY'
 import os
@@ -191,6 +204,12 @@ maybe_clean_artifacts
 configure_build
 build_all
 
+quant_cli="$(find_binary quant_cli)"
+generate_figures "${quant_cli}"
+run_ql_parity "${quant_cli}"
+run_benchmarks
+run_wrds_pipeline
+
 run_ctest_label "FAST"
 
 if [[ "${SKIP_SLOW_FLAG}" != "1" ]]; then
@@ -201,11 +220,6 @@ else
   echo "[reproduce] skipping SLOW tests (SKIP_SLOW=1)"
 fi
 
-quant_cli="$(find_binary quant_cli)"
-generate_figures "${quant_cli}"
-run_benchmarks
-run_wrds_pipeline
-
 if [[ "${RUN_MARKET_TESTS:-0}" == "1" ]]; then
   market_log="${LOG_DIR}/market_${TIMESTAMP}.log"
   market_junit="${LOG_DIR}/market_${TIMESTAMP}.xml"
@@ -215,4 +229,6 @@ else
 fi
 
 finalize_manifest
+generate_metrics_summary
+package_validation_pack
 echo "[reproduce] artifacts available under ${ARTIFACT_DIR}"

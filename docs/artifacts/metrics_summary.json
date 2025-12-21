@@ -1,0 +1,148 @@
+{
+  "artifacts_root": "docs/artifacts",
+  "generated_at": "2025-12-21T21:34:11.595989+00:00",
+  "manifest_git_sha": "718e430b0e1ad6085274fcbfe9eb0231372512ad",
+  "manifest_path": "docs/artifacts/manifest.json",
+  "metrics": {
+    "benchmarks": {
+      "mc_equal_time": {
+        "metrics": {
+          "payoffs": {
+            "Asian": {
+              "rows": 2,
+              "time_scaled_error_ratio_prng_over_qmc": 0.9197927996383138
+            },
+            "Barrier": {
+              "rows": 2,
+              "time_scaled_error_ratio_prng_over_qmc": 1.2934833634199163
+            }
+          }
+        },
+        "source": "docs/artifacts/bench/bench_mc_equal_time.csv",
+        "status": "ok"
+      },
+      "mc_paths": {
+        "metrics": {
+          "efficiency_max_threads": 0.1254096874286405,
+          "paths_per_sec_1t": 13388493.928318013,
+          "paths_per_sec_max_threads": 13432374.709524907,
+          "speedup_max_threads": 1.0032774994291245,
+          "threads_max": 8
+        },
+        "source": "docs/artifacts/bench/bench_mc_paths.csv",
+        "status": "ok"
+      },
+      "sources": {
+        "mc_equal_time": "docs/artifacts/bench/bench_mc_equal_time.csv",
+        "mc_paths": "docs/artifacts/bench/bench_mc_paths.csv"
+      },
+      "status": "ok"
+    },
+    "pde_order": {
+      "metrics": {
+        "nodes_finest": 401,
+        "r2": 0.9999972497268851,
+        "rmse_finest": 0.0011572785725384,
+        "rows": 3,
+        "slope": -2.0124048488028428,
+        "timesteps_finest": 400
+      },
+      "source": "docs/artifacts/pde_order_slope.csv",
+      "status": "ok"
+    },
+    "ql_parity": {
+      "metrics": {
+        "by_category": {
+          "american": {
+            "max_abs_diff_cents": 0.79875157,
+            "rows": 1
+          },
+          "barrier": {
+            "max_abs_diff_cents": 0.0410715241,
+            "rows": 1
+          },
+          "vanilla": {
+            "max_abs_diff_cents": 0.8615834347,
+            "rows": 1
+          }
+        },
+        "max_abs_diff_cents_overall": 0.8615834347,
+        "runtime_ratio_by_category": {
+          "american": 13.0430846859,
+          "barrier": 5.9636408862,
+          "vanilla": 1.7459886516
+        },
+        "runtime_ratio_median": 5.9636408862
+      },
+      "source": "docs/artifacts/ql_parity/ql_parity.csv",
+      "status": "ok"
+    },
+    "qmc_vs_prng_equal_time": {
+      "metrics": {
+        "payoffs": {
+          "asian": {
+            "rmse_ratio_max": 3.0388772979,
+            "rmse_ratio_median": 3.0388772979,
+            "rmse_ratio_min": 3.0388772979,
+            "rows": 6
+          },
+          "call": {
+            "rmse_ratio_max": 9.3596716111,
+            "rmse_ratio_median": 9.3596716111,
+            "rmse_ratio_min": 9.3596716111,
+            "rows": 6
+          }
+        },
+        "rmse_ratio_overall_median": 6.199274454499999
+      },
+      "source": "docs/artifacts/qmc_vs_prng_equal_time.csv",
+      "status": "ok"
+    },
+    "tri_engine_agreement": {
+      "metrics": {
+        "max_abs_error_mc": 0.007545180000000151,
+        "max_abs_error_pde": 0.0005870100000002765,
+        "mc_ci_coverage_fraction": 1.0,
+        "mc_ci_covers_bs": true,
+        "rows": 4
+      },
+      "source": "docs/artifacts/tri_engine_agreement.csv",
+      "status": "ok"
+    },
+    "wrds": {
+      "bundle": "sample bundle regression harness",
+      "oos": {
+        "metrics": {
+          "rows": 15,
+          "weighted_iv_mae_bps": 134.0592281709936,
+          "weighted_price_mae_ticks": 162.40324677206775
+        },
+        "source": "docs/artifacts/wrds/wrds_agg_oos.csv",
+        "status": "ok"
+      },
+      "pnl": {
+        "metrics": {
+          "mean_pnl": -0.6156493960232174,
+          "mean_pnl_ticks": -12.312987920464357,
+          "median_pnl_sigma": 62.69949398003994,
+          "rows": 15
+        },
+        "source": "docs/artifacts/wrds/wrds_agg_pnl.csv",
+        "status": "ok"
+      },
+      "pricing": {
+        "metrics": {
+          "median_iv_mae_bps": 136.23345293556548,
+          "median_iv_mae_volpts_vega_wt": 0.0127702860949833,
+          "median_iv_rmse_volpts_vega_wt": 0.0160070836705396,
+          "median_price_mae_ticks": 161.11145009446895,
+          "median_price_rmse_ticks": 186.53798931427303,
+          "rows": 5
+        },
+        "source": "docs/artifacts/wrds/wrds_agg_pricing.csv",
+        "status": "ok"
+      },
+      "status": "ok"
+    }
+  }
+}

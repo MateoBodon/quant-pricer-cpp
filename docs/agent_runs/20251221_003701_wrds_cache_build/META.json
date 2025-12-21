@@ -1,0 +1,22 @@
+{
+  "run_name": "20251221_003701_wrds_cache_build",
+  "ticket_id": "wrds-cache",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "9f8319b51dab396c385b367f9ac2e4fbee3bf488",
+  "git_sha_after": "875bd9c2432c135084ff34405e684e5a7d8b2e5c",
+  "branch": "feature/ticket-01-artifact-completeness",
+  "timestamp_local": "2025-12-20T19:39:17-0500",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "3.12.2"
+  },
+  "dataset": {
+    "mode": "wrds_live_cache",
+    "dataset_id": "SPX optionm/opprcd 2010-01-01..2025-12-19",
+    "config_path": "/Volumes/Storage/Data/wrds_cache/cache_manifest.json",
+    "config_hash": "bcc7e7a7d48f587a84d815b868c1f744db2f4fb64801e63082f028d312e9edfb"
+  },
+  "notes": "WRDS cache built in chunks; missing dates are market holidays or post-2025-08-29 with no data yet. Cache root: /Volumes/Storage/Data/wrds_cache."
+}

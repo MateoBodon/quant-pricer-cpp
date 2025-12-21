@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-12-20T21:11:15Z",
+  "git_sha": "36c52c1d72dbcaacd674729ea9ab4719b3fd6408",
+  "branch": "master",
+  "summary": "Rebuilt project_state docs and generated indices.",
+  "bundle": "docs/gpt_bundles/project_state_20251220T211115Z_36c52c1.zip",
+  "outputs": [
+    "project_state/",
+    "project_state/_generated/repo_inventory.json",
+    "project_state/_generated/symbol_index.json",
+    "project_state/_generated/import_graph.json",
+    "project_state/_generated/make_targets.txt",
+    "PROGRESS.md"
+  ]
+}

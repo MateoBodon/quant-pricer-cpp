@@ -2,6 +2,12 @@
 
 # WORKLOG
 
+## 2025-12-18 (metrics snapshot single source of truth)
+- Added `scripts/generate_metrics_summary.py` to derive all headline metrics from committed artifacts and emit `docs/artifacts/metrics_summary.{json,md}` with defensive missing/parse handling plus manifest logging (`metrics_snapshot`).
+- Wired snapshot generation into `scripts/reproduce_all.sh`, created a FAST ctest (`metrics_snapshot_fast`) to guard against schema drift, and refreshed README/CURRENT_RESULTS to point at the snapshot instead of hard-coded numbers.
+- Commands run: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release` (success), `cmake --build build -j` (failed: missing Xcode Command Line Tools), `python3 scripts/generate_metrics_summary.py --artifacts docs/artifacts --manifest docs/artifacts/manifest.json`, `python3 tests/test_metrics_snapshot_fast.py`.
+- Artifacts: `docs/artifacts/metrics_summary.json`, `docs/artifacts/metrics_summary.md`, manifest `runs.metrics_snapshot` entry.
+
 ## 2025-11-12 (artifact + parity refresh)
 - Ran the full deterministic pipeline via `./scripts/reproduce_all.sh` (Release rebuild, `ctest -L FAST -VV`, artifact regeneration) so `docs/artifacts/{bench,wrds}` and `manifest.json` were repopulated after the earlier clean.
 - Installed the QuantLib Python wheel locally and re-rendered `scripts/ql_parity.py` so the CSV/PNG bundle (`docs/artifacts/ql_parity/`) and manifest entry match the refreshed benches/WRDS outputs.
