@@ -5,6 +5,8 @@ This appendix tracks the deterministic WRDS OptionMetrics bundle that lives unde
 **Snapshot scope:** The numbers below come from the deterministic **sample** IvyDB snapshot (five SPX trade dates across calm/stress).
 Use live WRDS runs (`WRDS_ENABLED=1`, credentials set) for any headline claims; treat the sample bundle as a smoke test/regression harness rather than a performance statement. Production filters drop DTE < 21d, clip wings to 0.75–1.25 with a soft taper beyond 1.2, and weight errors by `vega × quotes`.
 
+**WRDS cache (real data):** If `WRDS_CACHE_ROOT` is set (or `/Volumes/Storage/Data/wrds_cache` exists), the pipeline will read/write cached real-data slices (parquet) to avoid repeated WRDS pulls. Build the cache with `python3 scripts/build_wrds_cache.py` before running live pipelines offline.
+
 **Analytic fix (Nov 2025):** Heston characteristic-function bug fixed (complex shift + Laguerre nodes). Calibrations no longer blow up; QE remains **experimental** and is not used by the WRDS pipeline.
 
 ## Units & Metric Legend

@@ -4,6 +4,7 @@
 
 - feat(heston,mc): Andersen QE variance paths, deterministic counter RNG, CLI/pybind confidence intervals for MC Greeks
 - ops(artifacts): reproduce_all now builds full QL parity/bench/WRDS sample evidence before metrics snapshot, and metrics generation hard-fails when required artifacts are missing; validation pack is emitted at the end of the run
+- wrds(cache): add WRDS parquet cache support and a bulk cache builder script for real-data slices
 
 ## v0.3.2
 

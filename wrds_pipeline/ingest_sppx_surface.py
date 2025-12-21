@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-"""OptionMetrics SPX ingestion + aggregation helpers."""
+"""OptionMetrics SPX ingestion + aggregation helpers.
+
+If WRDS_CACHE_ROOT is set (or /Volumes/Storage/Data/wrds_cache exists), raw WRDS
+slices are cached as parquet and reused on subsequent runs.
+"""
 from __future__ import annotations
 
+import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Tuple
 
@@ -15,6 +20,58 @@ from .bs_utils import bs_vega, implied_vol_from_price
 SAMPLE_PATH = Path(__file__).resolve().parent / "sample_data" / "spx_options_sample.csv"
 SPOT_FALLBACK = 4500.0
 MIN_DTE_DAYS = 21  # ignore ultra-short tenor noise for calibration/OOS
+CACHE_ROOT_ENV = "WRDS_CACHE_ROOT"
+DEFAULT_CACHE_ROOT = Path("/Volumes/Storage/Data/wrds_cache")
+
+
+def _cache_root() -> Path | None:
+    root = os.environ.get(CACHE_ROOT_ENV)
+    if root:
+        return Path(root).expanduser()
+    if DEFAULT_CACHE_ROOT.exists():
+        return DEFAULT_CACHE_ROOT
+    return None
+
+
+def _cache_path(symbol: str, trade_date: str) -> Path | None:
+    root = _cache_root()
+    if root is None:
+        return None
+    date = pd.to_datetime(trade_date).date()
+    symbol = symbol.upper()
+    return root / "optionm" / symbol / str(date.year) / f"{symbol.lower()}_{date}.parquet"
+
+
+def _cache_meta_path(cache_path: Path) -> Path:
+    return cache_path.with_suffix(".json")
+
+
+def _load_cache(symbol: str, trade_date: str) -> pd.DataFrame | None:
+    cache_path = _cache_path(symbol, trade_date)
+    if cache_path is None or not cache_path.exists():
+        return None
+    try:
+        return pd.read_parquet(cache_path)
+    except Exception as exc:  # pragma: no cover
+        print(f"[wrds_pipeline] cache read failed ({cache_path}): {exc}")
+        return None
+
+
+def _write_cache(symbol: str, trade_date: str, df: pd.DataFrame, source: str) -> None:
+    cache_path = _cache_path(symbol, trade_date)
+    if cache_path is None:
+        return
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(cache_path, index=False, compression="zstd")
+    meta = {
+        "symbol": symbol.upper(),
+        "trade_date": str(pd.to_datetime(trade_date).date()),
+        "rows": int(len(df)),
+        "columns": list(df.columns),
+        "source": source,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    _cache_meta_path(cache_path).write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n")
 
 
 def _has_wrds_credentials() -> bool:
@@ -151,11 +208,16 @@ def load_surface(
     symbol: str, trade_date: str, force_sample: bool = False
 ) -> Tuple[pd.DataFrame, str]:
     trade_date = pd.to_datetime(trade_date).date()
+    if not force_sample:
+        cached = _load_cache(symbol, str(trade_date))
+        if cached is not None and not cached.empty:
+            return cached, "cache"
     if not force_sample and _has_wrds_credentials():
         try:
             raw = _fetch_from_wrds(symbol, str(trade_date))
             raw["trade_date"] = pd.to_datetime(raw["date"])
             raw.drop(columns=["date"], inplace=True)
+            _write_cache(symbol, str(trade_date), raw, "wrds")
             return raw, "wrds"
         except Exception as exc:  # pragma: no cover
             print(
