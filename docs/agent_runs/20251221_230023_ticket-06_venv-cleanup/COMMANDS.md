@@ -45,3 +45,28 @@
 43. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short --untracked-files=no | head -n 40
 44. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short --untracked-files=no | rg -n "PROGRESS.md|docs/agent_runs/20251221_230023|docs/agent_runs/20251221_205619"
 45. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] python3 - <<'PY' (rewrite COMMANDS.md)
+46. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status -sb
+47. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] ls -1 docs/agent_runs | tail -n 5
+48. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat docs/agent_runs/20251221_213044_ticket-06_checklist-merge/META.json
+49. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] sed -n '1,200p' docs/DOCS_AND_LOGGING_SYSTEM.md
+50. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/META.json
+51. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch <<'PATCH' (update META.json git_sha_after)
+52. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] tail -n 20 .gitignore
+53. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add .gitignore PROGRESS.md docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle docs/agent_runs/20251221_230023_ticket-06_venv-cleanup
+54. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git diff --cached --name-only | rg -v '^(\.venv/|docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/|docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle/|PROGRESS\.md|\.gitignore)$'
+55. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/RESULTS.md
+56. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/TESTS.md
+57. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "Remove tracked .venv and ignore local WRDS artifacts" -m "Tests: not run (repo hygiene + conflict resolution only)" -m "Artifacts: .gitignore, PROGRESS.md, docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle/, docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/" -m "Run log: docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/"
+58. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status -sb --untracked-files=no
+59. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git stash push -u -m "wip/unrelated-changes-before-merge"
+60. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status -sb
+61. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git switch main
+62. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git merge feature/ticket-06-venv-cleanup
+63. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git push origin main
+64. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git push origin feature/ticket-06-venv-cleanup
+65. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git stash list
+66. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git stash apply stash@{0}
+67. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git stash drop stash@{0}
+68. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] sed -n '1,200p' docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/COMMANDS.md
+69. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git stash push -u -m "wip/local-changes-before-logfix"
+70. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git switch feature/ticket-06-venv-cleanup
