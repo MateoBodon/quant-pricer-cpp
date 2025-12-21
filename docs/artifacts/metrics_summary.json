@@ -1,8 +1,8 @@
 {
-  "artifacts_root": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts",
-  "generated_at": "2025-12-20T22:51:28.540185+00:00",
-  "manifest_git_sha": "cf1d770d18d26b8db15c0638c692ac50f5f2747e",
-  "manifest_path": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/manifest.json",
+  "artifacts_root": "docs/artifacts",
+  "generated_at": "2025-12-21T20:29:56.983890+00:00",
+  "manifest_git_sha": "30002fe1a2fd69644b54a36237b8d820da8743f0",
+  "manifest_path": "docs/artifacts/manifest.json",
   "metrics": {
     "benchmarks": {
       "mc_equal_time": {
@@ -10,31 +10,31 @@
           "payoffs": {
             "Asian": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 0.9651630699235508
+              "time_scaled_error_ratio_prng_over_qmc": 0.9832660270887658
             },
             "Barrier": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 1.260088914271027
+              "time_scaled_error_ratio_prng_over_qmc": 1.254705399958854
             }
           }
         },
-        "source": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/bench/bench_mc_equal_time.csv",
+        "source": "docs/artifacts/bench/bench_mc_equal_time.csv",
         "status": "ok"
       },
       "mc_paths": {
         "metrics": {
-          "efficiency_max_threads": 0.1452012962732145,
-          "paths_per_sec_1t": 10730074.252113815,
-          "paths_per_sec_max_threads": 12464165.524118155,
-          "speedup_max_threads": 1.1616103701857166,
+          "efficiency_max_threads": 0.1189564997411394,
+          "paths_per_sec_1t": 12364148.91380953,
+          "paths_per_sec_max_threads": 11766367.01651994,
+          "speedup_max_threads": 0.9516519979291151,
           "threads_max": 8
         },
-        "source": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/bench/bench_mc_paths.csv",
+        "source": "docs/artifacts/bench/bench_mc_paths.csv",
         "status": "ok"
       },
       "sources": {
-        "mc_equal_time": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/bench/bench_mc_equal_time.csv",
-        "mc_paths": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/bench/bench_mc_paths.csv"
+        "mc_equal_time": "docs/artifacts/bench/bench_mc_equal_time.csv",
+        "mc_paths": "docs/artifacts/bench/bench_mc_paths.csv"
       },
       "status": "ok"
     },
@@ -47,7 +47,7 @@
         "slope": -2.0124048488028428,
         "timesteps_finest": 400
       },
-      "source": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/pde_order_slope.csv",
+      "source": "docs/artifacts/pde_order_slope.csv",
       "status": "ok"
     },
     "ql_parity": {
@@ -68,34 +68,34 @@
         },
         "max_abs_diff_cents_overall": 0.8615834347,
         "runtime_ratio_by_category": {
-          "american": 61.7546904502,
-          "barrier": 32.5065778887,
-          "vanilla": 8.3802048704
+          "american": 3.1379537858,
+          "barrier": 9.7777763944,
+          "vanilla": 0.6770399859
         },
-        "runtime_ratio_median": 32.5065778887
+        "runtime_ratio_median": 3.1379537858
       },
-      "source": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/ql_parity/ql_parity.csv",
+      "source": "docs/artifacts/ql_parity/ql_parity.csv",
       "status": "ok"
     },
     "qmc_vs_prng_equal_time": {
       "metrics": {
         "payoffs": {
           "asian": {
-            "rmse_ratio_max": 2.7571124724,
-            "rmse_ratio_median": 2.7571124724,
-            "rmse_ratio_min": 2.7571124724,
+            "rmse_ratio_max": 3.1371271426,
+            "rmse_ratio_median": 3.1371271426,
+            "rmse_ratio_min": 3.1371271426,
             "rows": 6
           },
           "call": {
-            "rmse_ratio_max": 9.1845487453,
-            "rmse_ratio_median": 9.1845487453,
-            "rmse_ratio_min": 9.1845487453,
+            "rmse_ratio_max": 9.5626348028,
+            "rmse_ratio_median": 9.5626348028,
+            "rmse_ratio_min": 9.5626348028,
             "rows": 6
           }
         },
-        "rmse_ratio_overall_median": 5.97083060885
+        "rmse_ratio_overall_median": 6.349880972699999
       },
-      "source": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/qmc_vs_prng_equal_time.csv",
+      "source": "docs/artifacts/qmc_vs_prng_equal_time.csv",
       "status": "ok"
     },
     "tri_engine_agreement": {
@@ -106,7 +106,7 @@
         "mc_ci_covers_bs": true,
         "rows": 4
       },
-      "source": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/tri_engine_agreement.csv",
+      "source": "docs/artifacts/tri_engine_agreement.csv",
       "status": "ok"
     },
     "wrds": {
@@ -117,7 +117,7 @@
           "weighted_iv_mae_bps": 134.0592281709936,
           "weighted_price_mae_ticks": 162.40324677206775
         },
-        "source": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_agg_oos.csv",
+        "source": "docs/artifacts/wrds/wrds_agg_oos.csv",
         "status": "ok"
       },
       "pnl": {
@@ -127,7 +127,7 @@
           "median_pnl_sigma": 62.69949398003994,
           "rows": 15
         },
-        "source": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_agg_pnl.csv",
+        "source": "docs/artifacts/wrds/wrds_agg_pnl.csv",
         "status": "ok"
       },
       "pricing": {
@@ -139,7 +139,7 @@
           "median_price_rmse_ticks": 186.53798931427303,
           "rows": 5
         },
-        "source": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/artifacts/wrds/wrds_agg_pricing.csv",
+        "source": "docs/artifacts/wrds/wrds_agg_pricing.csv",
         "status": "ok"
       },
       "status": "ok"

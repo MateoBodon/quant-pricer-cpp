@@ -950,6 +950,8 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 
 Opt-in MARKET tests under `wrds_pipeline/` pull (or fall back to deterministic samples), aggregate the SPX surface, run a vega-weighted Heston calibration, and emit anonymised CSV/PNG bundles under `docs/artifacts/wrds/`. Set `WRDS_ENABLED=1` together with `WRDS_USERNAME` / `WRDS_PASSWORD` to enable `ctest -L MARKET`; otherwise the tests are skipped. Key artifacts (all aggregated / anonymised):
 
+- Local WRDS parquet mode is **explicit-only**: set `WRDS_LOCAL_ROOT` (env) or `wrds_local_root` in the dateset config to read OptionMetrics parquet (`opprcd`, `secprd`, `secnmd`) before cache/live WRDS. Local runs default to `docs/artifacts/wrds_local/` so the sample bundle under `docs/artifacts/wrds/` remains reproducible. When generated, local-stash metadata is recorded in `docs/artifacts/wrds_local/wrds_local_manifest.json`; raw WRDS tables are never committed.
+
 - [`docs/artifacts/wrds/wrds_agg_pricing.csv`](docs/artifacts/wrds/wrds_agg_pricing.csv) – per-date vega-weighted RMSE/MAE, `iv_p90_bps`, provenance
 - [`docs/artifacts/wrds/wrds_agg_oos.csv`](docs/artifacts/wrds/wrds_agg_oos.csv) – tenor-by-date OOS IV/price MAE with quote counts
 - [`docs/artifacts/wrds/wrds_agg_pnl.csv`](docs/artifacts/wrds/wrds_agg_pnl.csv) – Δ-hedged mean ticks and `pnl_sigma` per bucket

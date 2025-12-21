@@ -1,7 +1,7 @@
 ---
-generated_at: 2025-12-20T21:11:15Z
-git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
-branch: master
+generated_at: 2025-12-21T20:30:38Z
+git_sha: 30002fe1a2fd69644b54a36237b8d820da8743f0
+branch: feature/ticket-06-wrds-local-guardrails
 commands:
   - date -u +%Y-%m-%dT%H:%M:%SZ
   - git rev-parse HEAD
@@ -37,6 +37,9 @@ commands:
   - `WRDS_USERNAME`, `WRDS_PASSWORD` for credentials.
   - `WRDS_USE_SAMPLE=1` for deterministic sample bundle.
   - `WRDS_CACHE_ROOT` to override output location (used by MARKET tests).
+  - `WRDS_LOCAL_ROOT` to explicitly enable local OptionMetrics parquet mode.
+- `wrds_pipeline_dates_panel.yaml` optional keys:
+  - `wrds_local_root` — explicit local OptionMetrics root (used only if set).
 
 ## Artifact reproduction configuration
 - `scripts/reproduce_all.sh` environment overrides:

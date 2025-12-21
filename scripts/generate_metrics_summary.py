@@ -25,6 +25,7 @@ import pandas as pd
 
 from manifest_utils import ARTIFACTS_ROOT, MANIFEST_PATH, describe_inputs, load_manifest, update_run
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # ---------- Required artifacts ----------
 
@@ -107,6 +108,13 @@ def _safe_load_csv(path: Path) -> Tuple[pd.DataFrame | None, str | None]:
         return None, str(exc)
 
 
+def _rel_path(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(REPO_ROOT))
+    except Exception:
+        return str(path)
+
+
 def _status_block(
     status: str,
     source: Path,
@@ -116,7 +124,7 @@ def _status_block(
 ) -> Dict[str, Any]:
     block: Dict[str, Any] = {
         "status": status,
-        "source": str(source),
+        "source": _rel_path(source),
     }
     if metrics is not None:
         block["metrics"] = metrics
@@ -391,11 +399,37 @@ def benchmark_metrics(root: Path) -> Dict[str, Any]:
     return {
         "status": overall_status,
         "sources": {
-            "mc_paths": str(mc_paths_path),
-            "mc_equal_time": str(mc_equal_time_path),
+            "mc_paths": _rel_path(mc_paths_path),
+            "mc_equal_time": _rel_path(mc_equal_time_path),
         },
         **blocks,
     }
+
+
+def _wrds_bundle_label(pricing_df: pd.DataFrame | None) -> str:
+    if pricing_df is None:
+        return "sample bundle regression harness"
+    if "source_today" not in pricing_df.columns or "source_next" not in pricing_df.columns:
+        return "sample bundle regression harness"
+    sources = set(
+        str(val)
+        for val in pd.concat([pricing_df["source_today"], pricing_df["source_next"]])
+        .dropna()
+        .unique()
+    )
+    if not sources:
+        return "sample bundle regression harness"
+    if sources == {"sample"}:
+        return "sample bundle regression harness"
+    if sources == {"local"}:
+        return "local WRDS stash"
+    if sources == {"wrds"}:
+        return "live WRDS"
+    if sources == {"cache"}:
+        return "WRDS cache"
+    if "sample" in sources:
+        return f"mixed (sample + {', '.join(sorted(sources - {'sample'}))})"
+    return f"mixed ({', '.join(sorted(sources))})"
 
 
 def wrds_metrics(root: Path) -> Dict[str, Any]:
@@ -403,14 +437,16 @@ def wrds_metrics(root: Path) -> Dict[str, Any]:
     oos_path = _required_path("wrds_agg_oos", root)
     pnl_path = _required_path("wrds_agg_pnl", root)
 
-    blocks: Dict[str, Any] = {"bundle": "sample bundle regression harness"}
+    blocks: Dict[str, Any] = {}
     statuses: List[str] = []
 
     pricing_df, pricing_err = _safe_load_csv(pricing_path)
     if pricing_df is None:
+        blocks["bundle"] = "sample bundle regression harness"
         blocks["pricing"] = _status_block("missing" if pricing_err == "file not found" else "parse_error", pricing_path, reason=pricing_err)
         statuses.append(blocks["pricing"]["status"])
     else:
+        blocks["bundle"] = _wrds_bundle_label(pricing_df)
         metrics = {
             "rows": int(len(pricing_df)),
             "median_iv_rmse_volpts_vega_wt": float(pricing_df["iv_rmse_volpts_vega_wt"].median()),
@@ -502,7 +538,8 @@ def _highlights(name: str, block: Dict[str, Any]) -> str:
         )
     if name == "wrds":
         pricing = block.get("pricing", {}).get("metrics", {}) if isinstance(block.get("pricing"), dict) else {}
-        return f"median iv_rmse={_fmt(pricing.get('median_iv_rmse_volpts_vega_wt'))} (sample bundle)"
+        bundle = block.get("bundle", "bundle")
+        return f"median iv_rmse={_fmt(pricing.get('median_iv_rmse_volpts_vega_wt'))} ({bundle})"
     return "ok"
 
 
@@ -579,8 +616,8 @@ def build_summary(artifacts_root: Path, manifest_path: Path) -> Dict[str, Any]:
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "artifacts_root": str(artifacts_root),
-        "manifest_path": str(manifest_path),
+        "artifacts_root": _rel_path(artifacts_root),
+        "manifest_path": _rel_path(manifest_path),
         "manifest_git_sha": git_sha,
         "metrics": metrics,
     }

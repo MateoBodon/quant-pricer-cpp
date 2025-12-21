@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="7"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="2"
+	timestamp="2025-12-21T15:26:30"
+	>
+	<testcase name="MonteCarloSlow.PriceCloseToBS" classname="MonteCarloSlow.PriceCloseToBS" time="0.0241195" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.PriceCloseToBS
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.PriceCloseToBS
+[       OK ] MonteCarloSlow.PriceCloseToBS (19 ms)
+[----------] 1 test from MonteCarloSlow (19 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.GreeksCloseToAnalytic" classname="MonteCarloSlow.GreeksCloseToAnalytic" time="0.0336485" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.GreeksCloseToAnalytic
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.GreeksCloseToAnalytic
+[       OK ] MonteCarloSlow.GreeksCloseToAnalytic (30 ms)
+[----------] 1 test from MonteCarloSlow (30 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (30 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic" classname="MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic" time="0.119787" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
+[       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (116 ms)
+[----------] 1 test from MonteCarloSlow (116 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (116 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.ThetaCloseToPDE" classname="MonteCarloSlow.ThetaCloseToPDE" time="0.0389721" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.ThetaCloseToPDE
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.ThetaCloseToPDE
+[       OK ] MonteCarloSlow.ThetaCloseToPDE (35 ms)
+[----------] 1 test from MonteCarloSlow (35 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (35 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.GammaMixedVarianceLowerThanLR" classname="MonteCarloSlow.GammaMixedVarianceLowerThanLR" time="0.0378459" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.GammaMixedVarianceLowerThanLR
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.GammaMixedVarianceLowerThanLR
+[       OK ] MonteCarloSlow.GammaMixedVarianceLowerThanLR (34 ms)
+[----------] 1 test from MonteCarloSlow (34 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (34 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.QmcReducesErrorVsAnalytic" classname="MonteCarloSlow.QmcReducesErrorVsAnalytic" time="1.43701" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.QmcReducesErrorVsAnalytic
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.QmcReducesErrorVsAnalytic
+[       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1432 ms)
+[----------] 1 test from MonteCarloSlow (1432 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (1432 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="AmericanSlow.LsmcMatchesPsorWithinSe" classname="AmericanSlow.LsmcMatchesPsorWithinSe" time="0.703092" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = AmericanSlow.LsmcMatchesPsorWithinSe
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AmericanSlow
+[ RUN      ] AmericanSlow.LsmcMatchesPsorWithinSe
+[       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (696 ms)
+[----------] 1 test from AmericanSlow (696 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (696 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+</testsuite>

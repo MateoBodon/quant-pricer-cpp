@@ -1,19 +1,20 @@
 ---
-generated_at: 2025-12-20T22:52:41Z
-git_sha: cf1d770d18d26b8db15c0638c692ac50f5f2747e
-branch: feature/ticket-01-artifact-completeness
+generated_at: 2025-12-21T20:30:38Z
+git_sha: 30002fe1a2fd69644b54a36237b8d820da8743f0
+branch: feature/ticket-06-wrds-local-guardrails
 commands:
   - date -u +%Y-%m-%dT%H:%M:%SZ
   - git rev-parse HEAD
   - git rev-parse --abbrev-ref HEAD
   - REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
+  - python3 scripts/generate_metrics_summary.py --artifacts docs/artifacts --manifest docs/artifacts/manifest.json
   - rg -n "ql parity|benchmarks|wrds" docs/artifacts/metrics_summary.md
 ---
 
 # Current Results
 
 ## Metrics snapshot (latest committed)
-Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-20T22:51:28Z**).
+Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-21T20:29:56.983890+00:00**).
 
 Status summary (from `docs/artifacts/metrics_summary.md`):
 - tri engine agreement: ok

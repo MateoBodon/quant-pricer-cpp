@@ -7,6 +7,8 @@ Use live WRDS runs (`WRDS_ENABLED=1`, credentials set) for any headline claims; 
 
 **WRDS cache (real data):** If `WRDS_CACHE_ROOT` is set (or `/Volumes/Storage/Data/wrds_cache` exists), the pipeline will read/write cached real-data slices (parquet) to avoid repeated WRDS pulls. Build the cache with `python3 scripts/build_wrds_cache.py` before running live pipelines offline.
 
+**Local WRDS raw data (real data):** Local mode is **explicit-only**. Set `WRDS_LOCAL_ROOT` (env) or `wrds_local_root` in the dateset config to read OptionMetrics parquet directly (`opprcd`, `secprd`, `secnmd`) before touching the cache or live WRDS. This keeps real-data runs credential-free once the local stash is built. Local runs default to `docs/artifacts/wrds_local/` so the sample bundle in `docs/artifacts/wrds/` stays reproducible. When generated, metadata and panel-date checks for the local stash are recorded in `docs/artifacts/wrds_local/wrds_local_manifest.json` (included in `docs/validation_pack.zip`).
+
 **Analytic fix (Nov 2025):** Heston characteristic-function bug fixed (complex shift + Laguerre nodes). Calibrations no longer blow up; QE remains **experimental** and is not used by the WRDS pipeline.
 
 ## Units & Metric Legend

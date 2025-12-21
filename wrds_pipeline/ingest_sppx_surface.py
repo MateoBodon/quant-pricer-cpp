@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """OptionMetrics SPX ingestion + aggregation helpers.
 
-If WRDS_CACHE_ROOT is set (or /Volumes/Storage/Data/wrds_cache exists), raw WRDS
+If WRDS_LOCAL_ROOT is explicitly set (or a dateset config provides a local
+root), local OptionMetrics parquet is read before cache/live WRDS. If
+WRDS_CACHE_ROOT is set (or /Volumes/Storage/Data/wrds_cache exists), raw WRDS
 slices are cached as parquet and reused on subsequent runs.
 """
 from __future__ import annotations
@@ -22,6 +24,7 @@ SPOT_FALLBACK = 4500.0
 MIN_DTE_DAYS = 21  # ignore ultra-short tenor noise for calibration/OOS
 CACHE_ROOT_ENV = "WRDS_CACHE_ROOT"
 DEFAULT_CACHE_ROOT = Path("/Volumes/Storage/Data/wrds_cache")
+LOCAL_ROOT_ENV = "WRDS_LOCAL_ROOT"
 
 
 def _cache_root() -> Path | None:
@@ -31,6 +34,156 @@ def _cache_root() -> Path | None:
     if DEFAULT_CACHE_ROOT.exists():
         return DEFAULT_CACHE_ROOT
     return None
+
+
+def _local_root(explicit_root: Path | str | None = None) -> Path | None:
+    root = explicit_root or os.environ.get(LOCAL_ROOT_ENV)
+    if not root:
+        return None
+    candidate = Path(root).expanduser()
+    optionm_root = candidate / "raw" / "optionm"
+    if (
+        (optionm_root / "opprcd").exists()
+        and (optionm_root / "secprd").exists()
+        and (optionm_root / "secnmd.parquet").exists()
+    ):
+        return candidate
+    return None
+
+
+def _local_optionm_root(local_root: Path | None) -> Path | None:
+    if local_root is None:
+        return None
+    return local_root / "raw" / "optionm"
+
+
+def _local_opprcd_path(trade_date: str, local_root: Path | None) -> Path | None:
+    optionm_root = _local_optionm_root(local_root)
+    if optionm_root is None:
+        return None
+    year = pd.to_datetime(trade_date).year
+    return optionm_root / "opprcd" / f"opprcd_{year}.parquet"
+
+
+def _local_secprd_path(trade_date: str, local_root: Path | None) -> Path | None:
+    optionm_root = _local_optionm_root(local_root)
+    if optionm_root is None:
+        return None
+    year = pd.to_datetime(trade_date).year
+    return optionm_root / "secprd" / f"secprd_{year}.parquet"
+
+
+def _local_secnmd_path(local_root: Path | None) -> Path | None:
+    optionm_root = _local_optionm_root(local_root)
+    if optionm_root is None:
+        return None
+    return optionm_root / "secnmd.parquet"
+
+
+def _resolve_secid_local(symbol: str, trade_date: str, local_root: Path | None) -> int:
+    secnmd_path = _local_secnmd_path(local_root)
+    if secnmd_path is None or not secnmd_path.exists():
+        raise RuntimeError("Local WRDS secnmd.parquet not found")
+    symbol = symbol.upper()
+    try:
+        import pyarrow.dataset as ds  # type: ignore
+        table = ds.dataset(secnmd_path).to_table(
+            filter=ds.field("ticker") == symbol,
+            columns=["secid", "effect_date", "ticker"],
+        )
+        df = table.to_pandas()
+    except Exception:
+        df = pd.read_parquet(secnmd_path, columns=["secid", "effect_date", "ticker"])
+        df = df[df["ticker"] == symbol]
+    if df.empty:
+        raise RuntimeError(f"Local WRDS missing secid for ticker {symbol}")
+    df["effect_date"] = pd.to_datetime(df["effect_date"])
+    trade_dt = pd.to_datetime(trade_date)
+    df = df[df["effect_date"] <= trade_dt]
+    if df.empty:
+        raise RuntimeError(f"Local WRDS missing secid for ticker {symbol} @ {trade_date}")
+    secid = df.sort_values("effect_date").iloc[-1]["secid"]
+    return int(secid)
+
+
+def _fetch_from_local(
+    symbol: str, trade_date: str, local_root: Path | None
+) -> pd.DataFrame:
+    opprcd_path = _local_opprcd_path(trade_date, local_root)
+    secprd_path = _local_secprd_path(trade_date, local_root)
+    if opprcd_path is None or secprd_path is None:
+        raise RuntimeError("Local WRDS OptionMetrics paths not found")
+    if not opprcd_path.exists() or not secprd_path.exists():
+        raise RuntimeError(f"Local WRDS missing parquet for {trade_date}")
+    secid = _resolve_secid_local(symbol, trade_date, local_root)
+    secid_val = float(secid)
+    try:
+        import pyarrow.dataset as ds  # type: ignore
+        op_dataset = ds.dataset(opprcd_path)
+        filt = (
+            (ds.field("secid") == secid_val)
+            & (ds.field("date") == str(trade_date))
+            & (ds.field("cp_flag") == "C")
+            & (ds.field("best_bid") > 0)
+            & (ds.field("best_offer") > ds.field("best_bid"))
+        )
+        columns = [
+            "date",
+            "exdate",
+            "cp_flag",
+            "strike_price",
+            "best_bid",
+            "best_offer",
+            "forward_price",
+        ]
+        table = op_dataset.to_table(filter=filt, columns=columns)
+        df = table.to_pandas()
+    except Exception:
+        df = pd.read_parquet(opprcd_path)
+        df = df[
+            (df["secid"] == secid_val)
+            & (df["date"] == str(trade_date))
+            & (df["cp_flag"] == "C")
+            & (df["best_bid"] > 0)
+            & (df["best_offer"] > df["best_bid"])
+        ]
+        df = df[
+            [
+                "date",
+                "exdate",
+                "cp_flag",
+                "strike_price",
+                "best_bid",
+                "best_offer",
+                "forward_price",
+            ]
+        ]
+
+    if df.empty:
+        return df
+    df["strike"] = df["strike_price"] / 1000.0
+    df.drop(columns=["strike_price"], inplace=True)
+
+    try:
+        import pyarrow.dataset as ds  # type: ignore
+        sec_dataset = ds.dataset(secprd_path)
+        spot_table = sec_dataset.to_table(
+            filter=(ds.field("secid") == secid_val) & (ds.field("date") == str(trade_date)),
+            columns=["close"],
+        )
+        spot_df = spot_table.to_pandas()
+    except Exception:
+        spot_df = pd.read_parquet(secprd_path, columns=["date", "secid", "close"])
+        spot_df = spot_df[
+            (spot_df["secid"] == secid_val) & (spot_df["date"] == str(trade_date))
+        ]
+    spot_val = float(spot_df["close"].iloc[0]) if not spot_df.empty else SPOT_FALLBACK
+    df["spot"] = spot_val
+    if "rate" not in df.columns:
+        df["rate"] = 0.015
+    if "divyield" not in df.columns:
+        df["divyield"] = 0.01
+    return df
 
 
 def _cache_path(symbol: str, trade_date: str) -> Path | None:
@@ -205,10 +358,24 @@ def _load_sample(symbol: str, trade_date: str) -> pd.DataFrame:
 
 
 def load_surface(
-    symbol: str, trade_date: str, force_sample: bool = False
+    symbol: str,
+    trade_date: str,
+    force_sample: bool = False,
+    *,
+    local_root: Path | None = None,
 ) -> Tuple[pd.DataFrame, str]:
     trade_date = pd.to_datetime(trade_date).date()
     if not force_sample:
+        resolved_local = _local_root(local_root)
+        if resolved_local is not None:
+            try:
+                local_df = _fetch_from_local(symbol, str(trade_date), resolved_local)
+                if not local_df.empty:
+                    local_df["trade_date"] = pd.to_datetime(local_df["date"])
+                    local_df.drop(columns=["date"], inplace=True)
+                    return local_df, "local"
+            except Exception as exc:
+                print(f"[wrds_pipeline] local WRDS fetch failed ({exc}); falling back")
         cached = _load_cache(symbol, str(trade_date))
         if cached is not None and not cached.empty:
             return cached, "cache"
@@ -350,8 +517,10 @@ def write_surface(out_path: Path, df: pd.DataFrame) -> None:
     df.to_csv(out_path, index=False)
 
 
-def has_wrds_credentials() -> bool:
+def has_wrds_credentials(local_root: Path | None = None) -> bool:
     if _has_wrds_credentials():
+        return True
+    if _local_root(local_root) is not None:
         return True
     cache_root = _cache_root()
     if cache_root is None:

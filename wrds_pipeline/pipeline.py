@@ -248,6 +248,19 @@ def _load_dateset_payload(path: Path) -> Dict[str, object]:
         return data
 
 
+def _local_root_from_payload(payload: Dict[str, object]) -> Path | None:
+    raw = payload.get("wrds_local_root")
+    if raw is None:
+        return None
+    raw_str = str(raw).strip()
+    if not raw_str:
+        return None
+    root = Path(raw_str).expanduser()
+    if not root.is_absolute():
+        root = REPO_ROOT / root
+    return root
+
+
 def run(
     symbol: str,
     trade_date: str,
@@ -259,16 +272,25 @@ def run(
     label: str | None = None,
     regime: str | None = None,
     wrds_root: Path | None = None,
+    local_root: Path | None = None,
 ) -> Dict[str, object]:
-    wrds_root = wrds_root or (ARTIFACTS_ROOT / "wrds")
+    if wrds_root is None:
+        if local_root is not None and not use_sample:
+            wrds_root = ARTIFACTS_ROOT / "wrds_local"
+        else:
+            wrds_root = ARTIFACTS_ROOT / "wrds"
     out_dir = output_dir or wrds_root
     out_dir.mkdir(parents=True, exist_ok=True)
 
     raw_today, source_today = ingest_sppx_surface.load_surface(
-        symbol, trade_date, force_sample=use_sample
+        symbol, trade_date, force_sample=use_sample, local_root=local_root
     )
     raw_next, source_next = ingest_sppx_surface.load_surface(
-        symbol, next_trade_date, force_sample=use_sample
+        symbol, next_trade_date, force_sample=use_sample, local_root=local_root
+    )
+    print(
+        f"[wrds_pipeline] {symbol} {trade_date} "
+        f"source_today={source_today} source_next={source_next}"
     )
 
     agg_today = ingest_sppx_surface.aggregate_surface(raw_today)
@@ -475,12 +497,18 @@ def run_dateset(
     fast: bool,
     *,
     output_root: Path | None = None,
+    local_root: Path | None = None,
 ) -> Dict[str, Path]:
     payload = _load_dateset_payload(dateset_path)
+    if local_root is None:
+        local_root = _local_root_from_payload(payload)
     entries = payload.get("dates", [])
     if not entries:
         raise RuntimeError(f"{dateset_path} does not contain any dates")
-    wrds_root = output_root or (ARTIFACTS_ROOT / "wrds")
+    if output_root is None and local_root is not None and not use_sample:
+        wrds_root = ARTIFACTS_ROOT / "wrds_local"
+    else:
+        wrds_root = output_root or (ARTIFACTS_ROOT / "wrds")
     per_date_root = wrds_root / "per_date"
     per_date_root.mkdir(parents=True, exist_ok=True)
     agg_dir = wrds_root
@@ -512,6 +540,7 @@ def run_dateset(
                 label=label,
                 regime=regime,
                 wrds_root=wrds_root,
+                local_root=local_root,
             )
         except Exception as exc:  # pragma: no cover
             print(f"[wrds_pipeline] {trade_date} failed: {exc}")
@@ -714,22 +743,33 @@ def main() -> None:
     )
     args = ap.parse_args()
     next_trade = args.next_trade_date or _next_business_day(args.trade_date)
-    use_sample = args.use_sample or not ingest_sppx_surface.has_wrds_credentials()
+    dateset_path = None
+    local_root = None
+    if args.dateset:
+        dateset_path = Path(args.dateset)
+        if not dateset_path.is_absolute():
+            dateset_path = REPO_ROOT / dateset_path
+        payload = _load_dateset_payload(dateset_path)
+        local_root = _local_root_from_payload(payload)
+    env_use_sample = os.environ.get("WRDS_USE_SAMPLE") == "1"
+    use_sample = (
+        args.use_sample
+        or env_use_sample
+        or not ingest_sppx_surface.has_wrds_credentials(local_root=local_root)
+    )
     output_root = None
     if args.output_root:
         output_root = Path(args.output_root)
         if not output_root.is_absolute():
             output_root = REPO_ROOT / output_root
-    if args.dateset:
-        dateset_path = Path(args.dateset)
-        if not dateset_path.is_absolute():
-            dateset_path = REPO_ROOT / dateset_path
+    if dateset_path is not None:
         run_dateset(
             args.symbol.upper(),
             dateset_path,
             use_sample,
             args.fast,
             output_root=output_root,
+            local_root=local_root,
         )
     else:
         run(
@@ -739,6 +779,7 @@ def main() -> None:
             use_sample,
             args.fast,
             wrds_root=output_root,
+            local_root=local_root,
         )
 
 

@@ -1,7 +1,7 @@
 ---
-generated_at: 2025-12-20T22:52:41Z
-git_sha: cf1d770d18d26b8db15c0638c692ac50f5f2747e
-branch: feature/ticket-01-artifact-completeness
+generated_at: 2025-12-21T20:30:38Z
+git_sha: 30002fe1a2fd69644b54a36237b8d820da8743f0
+branch: feature/ticket-06-wrds-local-guardrails
 commands:
   - date -u +%Y-%m-%dT%H:%M:%SZ
   - git rev-parse HEAD
@@ -13,3 +13,4 @@ commands:
 
 - `ROADMAP (1).md` notes Heston QE bias remains under investigation; QE is still described as experimental in roadmap notes.
 - WRDS live runs are gated by environment variables (`WRDS_ENABLED=1` + credentials); MARKET tests skip without them (`wrds_pipeline/tests/test_wrds_pipeline.py`).
+- Prior local-run WRDS artifacts under `docs/artifacts/wrds/per_date/` contained strike/IV surfaces derived from real data, which risks redistribution; keep committed WRDS artifacts sample-only and isolate any local/live outputs under `docs/artifacts/wrds_local/` or external paths.

@@ -1,0 +1,149 @@
+[reproduce] running tests (label=SLOW)
+UpdateCTestConfiguration  from :build/DartConfiguration.tcl
+Test project build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 11
+    Start 11: MonteCarloSlow.PriceCloseToBS
+
+11: Test command: build/unit_tests "--gtest_filter=MonteCarloSlow.PriceCloseToBS"
+11: Working Directory: build
+11: Test timeout computed to be: 10000000
+11: Running main() from external/googletest/googletest/src/gtest_main.cc
+11: Note: Google Test filter = MonteCarloSlow.PriceCloseToBS
+11: [==========] Running 1 test from 1 test suite.
+11: [----------] Global test environment set-up.
+11: [----------] 1 test from MonteCarloSlow
+11: [ RUN      ] MonteCarloSlow.PriceCloseToBS
+11: [       OK ] MonteCarloSlow.PriceCloseToBS (19 ms)
+11: [----------] 1 test from MonteCarloSlow (19 ms total)
+11: 
+11: [----------] Global test environment tear-down
+11: [==========] 1 test from 1 test suite ran. (19 ms total)
+11: [  PASSED  ] 1 test.
+1/7 Test #11: MonteCarloSlow.PriceCloseToBS .......................   Passed    0.02 sec
+test 13
+    Start 13: MonteCarloSlow.GreeksCloseToAnalytic
+
+13: Test command: build/unit_tests "--gtest_filter=MonteCarloSlow.GreeksCloseToAnalytic"
+13: Working Directory: build
+13: Test timeout computed to be: 10000000
+13: Running main() from external/googletest/googletest/src/gtest_main.cc
+13: Note: Google Test filter = MonteCarloSlow.GreeksCloseToAnalytic
+13: [==========] Running 1 test from 1 test suite.
+13: [----------] Global test environment set-up.
+13: [----------] 1 test from MonteCarloSlow
+13: [ RUN      ] MonteCarloSlow.GreeksCloseToAnalytic
+13: [       OK ] MonteCarloSlow.GreeksCloseToAnalytic (30 ms)
+13: [----------] 1 test from MonteCarloSlow (30 ms total)
+13: 
+13: [----------] Global test environment tear-down
+13: [==========] 1 test from 1 test suite ran. (30 ms total)
+13: [  PASSED  ] 1 test.
+2/7 Test #13: MonteCarloSlow.GreeksCloseToAnalytic ................   Passed    0.03 sec
+test 14
+    Start 14: MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
+
+14: Test command: build/unit_tests "--gtest_filter=MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic"
+14: Working Directory: build
+14: Test timeout computed to be: 10000000
+14: Running main() from external/googletest/googletest/src/gtest_main.cc
+14: Note: Google Test filter = MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
+14: [==========] Running 1 test from 1 test suite.
+14: [----------] Global test environment set-up.
+14: [----------] 1 test from MonteCarloSlow
+14: [ RUN      ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
+14: [       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (116 ms)
+14: [----------] 1 test from MonteCarloSlow (116 ms total)
+14: 
+14: [----------] Global test environment tear-down
+14: [==========] 1 test from 1 test suite ran. (116 ms total)
+14: [  PASSED  ] 1 test.
+3/7 Test #14: MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic ...   Passed    0.12 sec
+test 15
+    Start 15: MonteCarloSlow.ThetaCloseToPDE
+
+15: Test command: build/unit_tests "--gtest_filter=MonteCarloSlow.ThetaCloseToPDE"
+15: Working Directory: build
+15: Test timeout computed to be: 10000000
+15: Running main() from external/googletest/googletest/src/gtest_main.cc
+15: Note: Google Test filter = MonteCarloSlow.ThetaCloseToPDE
+15: [==========] Running 1 test from 1 test suite.
+15: [----------] Global test environment set-up.
+15: [----------] 1 test from MonteCarloSlow
+15: [ RUN      ] MonteCarloSlow.ThetaCloseToPDE
+15: [       OK ] MonteCarloSlow.ThetaCloseToPDE (35 ms)
+15: [----------] 1 test from MonteCarloSlow (35 ms total)
+15: 
+15: [----------] Global test environment tear-down
+15: [==========] 1 test from 1 test suite ran. (35 ms total)
+15: [  PASSED  ] 1 test.
+4/7 Test #15: MonteCarloSlow.ThetaCloseToPDE ......................   Passed    0.04 sec
+test 16
+    Start 16: MonteCarloSlow.GammaMixedVarianceLowerThanLR
+
+16: Test command: build/unit_tests "--gtest_filter=MonteCarloSlow.GammaMixedVarianceLowerThanLR"
+16: Working Directory: build
+16: Test timeout computed to be: 10000000
+16: Running main() from external/googletest/googletest/src/gtest_main.cc
+16: Note: Google Test filter = MonteCarloSlow.GammaMixedVarianceLowerThanLR
+16: [==========] Running 1 test from 1 test suite.
+16: [----------] Global test environment set-up.
+16: [----------] 1 test from MonteCarloSlow
+16: [ RUN      ] MonteCarloSlow.GammaMixedVarianceLowerThanLR
+16: [       OK ] MonteCarloSlow.GammaMixedVarianceLowerThanLR (34 ms)
+16: [----------] 1 test from MonteCarloSlow (34 ms total)
+16: 
+16: [----------] Global test environment tear-down
+16: [==========] 1 test from 1 test suite ran. (34 ms total)
+16: [  PASSED  ] 1 test.
+5/7 Test #16: MonteCarloSlow.GammaMixedVarianceLowerThanLR ........   Passed    0.04 sec
+test 17
+    Start 17: MonteCarloSlow.QmcReducesErrorVsAnalytic
+
+17: Test command: build/unit_tests "--gtest_filter=MonteCarloSlow.QmcReducesErrorVsAnalytic"
+17: Working Directory: build
+17: Test timeout computed to be: 10000000
+17: Running main() from external/googletest/googletest/src/gtest_main.cc
+17: Note: Google Test filter = MonteCarloSlow.QmcReducesErrorVsAnalytic
+17: [==========] Running 1 test from 1 test suite.
+17: [----------] Global test environment set-up.
+17: [----------] 1 test from MonteCarloSlow
+17: [ RUN      ] MonteCarloSlow.QmcReducesErrorVsAnalytic
+17: [       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1432 ms)
+17: [----------] 1 test from MonteCarloSlow (1432 ms total)
+17: 
+17: [----------] Global test environment tear-down
+17: [==========] 1 test from 1 test suite ran. (1432 ms total)
+17: [  PASSED  ] 1 test.
+6/7 Test #17: MonteCarloSlow.QmcReducesErrorVsAnalytic ............   Passed    1.44 sec
+test 31
+    Start 31: AmericanSlow.LsmcMatchesPsorWithinSe
+
+31: Test command: build/unit_tests "--gtest_filter=AmericanSlow.LsmcMatchesPsorWithinSe"
+31: Working Directory: build
+31: Test timeout computed to be: 10000000
+31: Running main() from external/googletest/googletest/src/gtest_main.cc
+31: Note: Google Test filter = AmericanSlow.LsmcMatchesPsorWithinSe
+31: [==========] Running 1 test from 1 test suite.
+31: [----------] Global test environment set-up.
+31: [----------] 1 test from AmericanSlow
+31: [ RUN      ] AmericanSlow.LsmcMatchesPsorWithinSe
+31: [       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (696 ms)
+31: [----------] 1 test from AmericanSlow (696 ms total)
+31: 
+31: [----------] Global test environment tear-down
+31: [==========] 1 test from 1 test suite ran. (696 ms total)
+31: [  PASSED  ] 1 test.
+7/7 Test #31: AmericanSlow.LsmcMatchesPsorWithinSe ................   Passed    0.70 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+SLOW    =   2.39 sec*proc (7 tests)
+
+Total Test time (real) =   2.40 sec
