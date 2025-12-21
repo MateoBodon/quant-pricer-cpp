@@ -51,3 +51,7 @@
 49. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat <<'EOF' > docs/agent_runs/20251221_003701_wrds_cache_build/TESTS.md
 50. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat <<'EOF' > docs/agent_runs/20251221_003701_wrds_cache_build/META.json
 51. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch (docs/WRDS_Results.md)
+52. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add wrds_pipeline/ingest_sppx_surface.py scripts/build_wrds_cache.py docs/WRDS_Results.md CHANGELOG.md PROGRESS.md docs/agent_runs/20251221_003701_wrds_cache_build
+53. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "wrds: add real-data cache support + builder"
+54. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git rev-parse HEAD
+55. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch (docs/agent_runs/20251221_003701_wrds_cache_build/META.json)
