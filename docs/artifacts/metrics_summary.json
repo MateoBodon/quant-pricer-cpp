@@ -1,7 +1,7 @@
 {
   "artifacts_root": "docs/artifacts",
-  "generated_at": "2025-12-21T20:29:56.983890+00:00",
-  "manifest_git_sha": "30002fe1a2fd69644b54a36237b8d820da8743f0",
+  "generated_at": "2025-12-21T21:34:11.595989+00:00",
+  "manifest_git_sha": "718e430b0e1ad6085274fcbfe9eb0231372512ad",
   "manifest_path": "docs/artifacts/manifest.json",
   "metrics": {
     "benchmarks": {
@@ -10,11 +10,11 @@
           "payoffs": {
             "Asian": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 0.9832660270887658
+              "time_scaled_error_ratio_prng_over_qmc": 0.9197927996383138
             },
             "Barrier": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 1.254705399958854
+              "time_scaled_error_ratio_prng_over_qmc": 1.2934833634199163
             }
           }
         },
@@ -23,10 +23,10 @@
       },
       "mc_paths": {
         "metrics": {
-          "efficiency_max_threads": 0.1189564997411394,
-          "paths_per_sec_1t": 12364148.91380953,
-          "paths_per_sec_max_threads": 11766367.01651994,
-          "speedup_max_threads": 0.9516519979291151,
+          "efficiency_max_threads": 0.1254096874286405,
+          "paths_per_sec_1t": 13388493.928318013,
+          "paths_per_sec_max_threads": 13432374.709524907,
+          "speedup_max_threads": 1.0032774994291245,
           "threads_max": 8
         },
         "source": "docs/artifacts/bench/bench_mc_paths.csv",
@@ -68,11 +68,11 @@
         },
         "max_abs_diff_cents_overall": 0.8615834347,
         "runtime_ratio_by_category": {
-          "american": 3.1379537858,
-          "barrier": 9.7777763944,
-          "vanilla": 0.6770399859
+          "american": 13.0430846859,
+          "barrier": 5.9636408862,
+          "vanilla": 1.7459886516
         },
-        "runtime_ratio_median": 3.1379537858
+        "runtime_ratio_median": 5.9636408862
       },
       "source": "docs/artifacts/ql_parity/ql_parity.csv",
       "status": "ok"
@@ -81,19 +81,19 @@
       "metrics": {
         "payoffs": {
           "asian": {
-            "rmse_ratio_max": 3.1371271426,
-            "rmse_ratio_median": 3.1371271426,
-            "rmse_ratio_min": 3.1371271426,
+            "rmse_ratio_max": 3.0388772979,
+            "rmse_ratio_median": 3.0388772979,
+            "rmse_ratio_min": 3.0388772979,
             "rows": 6
           },
           "call": {
-            "rmse_ratio_max": 9.5626348028,
-            "rmse_ratio_median": 9.5626348028,
-            "rmse_ratio_min": 9.5626348028,
+            "rmse_ratio_max": 9.3596716111,
+            "rmse_ratio_median": 9.3596716111,
+            "rmse_ratio_min": 9.3596716111,
             "rows": 6
           }
         },
-        "rmse_ratio_overall_median": 6.349880972699999
+        "rmse_ratio_overall_median": 6.199274454499999
       },
       "source": "docs/artifacts/qmc_vs_prng_equal_time.csv",
       "status": "ok"

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="7"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="2"
+	timestamp="2025-12-21T16:33:32"
+	>
+	<testcase name="MonteCarloSlow.PriceCloseToBS" classname="MonteCarloSlow.PriceCloseToBS" time="0.0230191" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.PriceCloseToBS
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.PriceCloseToBS
+[       OK ] MonteCarloSlow.PriceCloseToBS (18 ms)
+[----------] 1 test from MonteCarloSlow (18 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (18 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.GreeksCloseToAnalytic" classname="MonteCarloSlow.GreeksCloseToAnalytic" time="0.0357877" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.GreeksCloseToAnalytic
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.GreeksCloseToAnalytic
+[       OK ] MonteCarloSlow.GreeksCloseToAnalytic (32 ms)
+[----------] 1 test from MonteCarloSlow (32 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (32 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic" classname="MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic" time="0.0884046" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic
+[       OK ] MonteCarloSlow.GreeksAcrossMoneynessAndAntithetic (85 ms)
+[----------] 1 test from MonteCarloSlow (85 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (85 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.ThetaCloseToPDE" classname="MonteCarloSlow.ThetaCloseToPDE" time="0.0332769" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.ThetaCloseToPDE
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.ThetaCloseToPDE
+[       OK ] MonteCarloSlow.ThetaCloseToPDE (30 ms)
+[----------] 1 test from MonteCarloSlow (30 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (30 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.GammaMixedVarianceLowerThanLR" classname="MonteCarloSlow.GammaMixedVarianceLowerThanLR" time="0.0317388" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.GammaMixedVarianceLowerThanLR
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.GammaMixedVarianceLowerThanLR
+[       OK ] MonteCarloSlow.GammaMixedVarianceLowerThanLR (28 ms)
+[----------] 1 test from MonteCarloSlow (28 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (29 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="MonteCarloSlow.QmcReducesErrorVsAnalytic" classname="MonteCarloSlow.QmcReducesErrorVsAnalytic" time="1.47748" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MonteCarloSlow.QmcReducesErrorVsAnalytic
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MonteCarloSlow
+[ RUN      ] MonteCarloSlow.QmcReducesErrorVsAnalytic
+[       OK ] MonteCarloSlow.QmcReducesErrorVsAnalytic (1474 ms)
+[----------] 1 test from MonteCarloSlow (1474 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (1474 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+	<testcase name="AmericanSlow.LsmcMatchesPsorWithinSe" classname="AmericanSlow.LsmcMatchesPsorWithinSe" time="0.663776" status="run">
+		<properties>
+			<property name="cmake_labels" value="SLOW"/>
+		</properties>
+		<system-out>Running main() from /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/external/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = AmericanSlow.LsmcMatchesPsorWithinSe
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AmericanSlow
+[ RUN      ] AmericanSlow.LsmcMatchesPsorWithinSe
+[       OK ] AmericanSlow.LsmcMatchesPsorWithinSe (658 ms)
+[----------] 1 test from AmericanSlow (658 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (658 ms total)
+[  PASSED  ] 1 test.
+</system-out>
+	</testcase>
+</testsuite>

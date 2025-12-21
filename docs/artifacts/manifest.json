@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-12-21T20:29:56.986726+00:00",
+  "generated_at": "2025-12-21T21:43:44.424883+00:00",
   "git": {
     "branch": "feature/ticket-06-wrds-local-guardrails",
     "dirty": true,
-    "sha": "30002fe1a2fd69644b54a36237b8d820da8743f0"
+    "sha": "718e430b0e1ad6085274fcbfe9eb0231372512ad"
   },
   "omp_threads": 11,
   "runs": {
@@ -37,7 +37,7 @@
         ],
         "mc_json": "docs/artifacts/bench/bench_mc.json",
         "pde_json": "docs/artifacts/bench/bench_pde.json",
-        "timestamp": "2025-12-21T20:24:23.801906+00:00"
+        "timestamp": "2025-12-21T21:31:43.203032+00:00"
       }
     ],
     "greeks_reliability": {
@@ -66,37 +66,37 @@
     },
     "heston": [
       {
-        "command": ".venv/bin/python3.12 scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp28wfsma3",
-        "cost": 0.10029705759776192,
+        "command": ".venv/bin/python3.12 scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpe2rlat_c",
+        "cost": 0.5647900315675191,
         "csv_rows": 12,
         "date": "2024-06-14",
         "diagnostics": {
           "attempts": [
             {
-              "feller": -0.006745697398658601,
-              "nit": 33,
-              "rmse_price": 160.45444901187653,
-              "rmse_vol": 0.13267540976922307,
+              "feller": 0.024723981973646857,
+              "nit": 40,
+              "rmse_price": 295.14514077126654,
+              "rmse_vol": 0.15865407101074352,
               "success": true
             },
             {
-              "feller": -0.024797944860732973,
-              "nit": 29,
-              "rmse_price": 474.676241105951,
-              "rmse_vol": 0.232580586657378,
+              "feller": -0.024799939270508192,
+              "nit": 41,
+              "rmse_price": 474.67852172306,
+              "rmse_vol": 0.2325823717851068,
               "success": true
             }
           ],
-          "feller_violation": true,
+          "feller_violation": false,
           "param_transform": "exp",
-          "residual_norm": 0.4478773439185377,
+          "residual_norm": 1.0628170412328917,
           "retry_failures": 0,
           "warnings": [],
           "weight_mode": "vega"
         },
         "fast": true,
-        "feller": -0.006745697398658601,
-        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp28wfsma3/fit_20240614.png",
+        "feller": 0.024723981973646857,
+        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpe2rlat_c/fit_20240614.png",
         "input": "data/samples/spx_20240614_sample.csv",
         "inputs": [
           {
@@ -110,28 +110,26 @@
         "n_maturities": 2,
         "n_obs": 12,
         "n_strikes": 6,
-        "nit": 33,
+        "nit": 40,
         "param_transform": "exp",
         "params": {
-          "kappa": 2.2709286263002415,
-          "rho": -0.050000000007185075,
-          "sigma": 0.09495591621883727,
-          "theta": 0.0005,
+          "kappa": 0.056635731106378054,
+          "rho": -0.9499999989617641,
+          "sigma": 0.17863859922405123,
+          "theta": 0.5,
           "v0": 0.0005
         },
-        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp28wfsma3/params_20240614.json",
+        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpe2rlat_c/params_20240614.json",
         "retries": 2,
-        "rmse_price": 160.45444901187653,
-        "rmse_vol": 0.13267540976922307,
-        "rmspe_price": 0.5983241172388144,
-        "rmspe_price_pct": 59.83241172388144,
-        "rmspe_vol": 0.5833468462312976,
-        "rmspe_vol_pct": 58.33468462312976,
+        "rmse_price": 295.14514077126654,
+        "rmse_vol": 0.15865407101074352,
+        "rmspe_price": 3.344406259169165,
+        "rmspe_price_pct": 334.4406259169165,
+        "rmspe_vol": 0.7101236370474729,
+        "rmspe_vol_pct": 71.0123637047473,
         "seed": 19,
-        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp28wfsma3/fit_20240614.csv",
-        "warnings": [
-          "WARNING: Feller condition violated (-0.0067) for 2024-06-14"
-        ],
+        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpe2rlat_c/fit_20240614.csv",
+        "warnings": [],
         "weight_mode": "vega"
       }
     ],
@@ -171,23 +169,23 @@
           "diagnostics": {
             "attempts": [
               {
-                "feller": -0.07518366055907891,
+                "feller": -0.0751830253561815,
                 "nit": 32,
-                "rmse_price": 1.134304134726924,
-                "rmse_vol": 0.12470152912224196,
+                "rmse_price": 1.1343065574606017,
+                "rmse_vol": 0.1247015526605728,
                 "success": true
               },
               {
-                "feller": 0.17914840063658716,
+                "feller": 0.17914519701007903,
                 "nit": 31,
-                "rmse_price": 3.3314583179287136,
-                "rmse_vol": 0.25080733428918023,
+                "rmse_price": 3.331438671851496,
+                "rmse_vol": 0.25080704059417236,
                 "success": true
               }
             ],
             "feller_violation": true,
             "param_transform": "none",
-            "residual_norm": 31.846313086100537,
+            "residual_norm": 31.846373217808555,
             "retry_failures": 0,
             "warnings": [],
             "weight_mode": "iv"
@@ -195,21 +193,21 @@
           "fast_mode": true,
           "figure_png": "artifacts/heston/series_runs/fit_20230601.png",
           "input_csv": "data/normalized/spy_20230601.csv",
-          "kappa": 1.648402381657841,
+          "kappa": 1.6484011531081277,
           "metric": "price",
           "n_maturities": 2,
           "n_obs": 12,
           "n_strikes": 12,
           "param_transform": "none",
           "params_json": "artifacts/heston/series_runs/params_20230601.json",
-          "rho": -0.7035308273706163,
-          "rmse_price": 1.134304134726924,
-          "rmse_vol": 0.12470152912224196,
-          "rmspe_vol_pct": 71.53087509669386,
-          "sigma_v": 0.38217416796420406,
+          "rho": -0.7035308405203152,
+          "rmse_price": 1.1343065574606017,
+          "rmse_vol": 0.1247015526605728,
+          "rmspe_vol_pct": 71.53089144300138,
+          "sigma_v": 0.3821734285531325,
           "table_csv": "artifacts/heston/series_runs/fit_20230601.csv",
-          "theta": 0.021497613352382296,
-          "v0": 0.000500003363516606,
+          "theta": 0.021497650618067056,
+          "v0": 0.0005000290921767422,
           "weight_mode": "iv"
         },
         {
@@ -217,17 +215,17 @@
           "diagnostics": {
             "attempts": [
               {
-                "feller": -1.0598158425668398,
+                "feller": -1.116833699638097,
                 "nit": 6,
-                "rmse_price": 294.04621684865464,
-                "rmse_vol": 0.24032637868589085,
+                "rmse_price": 261.2875097099112,
+                "rmse_vol": 0.21448344142976353,
                 "success": true
               },
               {
-                "feller": -0.08366771159678928,
+                "feller": -0.08366922909376115,
                 "nit": 2,
-                "rmse_price": 4725.084630245336,
-                "rmse_vol": 1.1050663748149505,
+                "rmse_price": 4720.335515179451,
+                "rmse_vol": 1.101732466745798,
                 "success": true
               }
             ],
@@ -241,21 +239,21 @@
           "fast_mode": true,
           "figure_png": "artifacts/heston/series_runs/fit_20240614.png",
           "input_csv": "data/samples/spx_20240614_sample.csv",
-          "kappa": -0.7643858670662701,
+          "kappa": -0.6911680784562146,
           "metric": "price",
           "n_maturities": 2,
           "n_obs": 12,
           "n_strikes": 6,
           "param_transform": "none",
           "params_json": "artifacts/heston/series_runs/params_20240614.json",
-          "rho": -0.7156445808116046,
-          "rmse_price": 294.04621684865464,
-          "rmse_vol": 0.24032637868589085,
-          "rmspe_vol_pct": 104.84701443732374,
-          "sigma_v": -0.8223337849607235,
+          "rho": -0.7151151637513242,
+          "rmse_price": 261.2875097099112,
+          "rmse_vol": 0.21448344142976353,
+          "rmspe_vol_pct": 93.31922547509885,
+          "sigma_v": -0.8845713543286544,
           "table_csv": "artifacts/heston/series_runs/fit_20240614.csv",
-          "theta": 0.2509092627204178,
-          "v0": -0.07082446265016393,
+          "theta": 0.24188560580380544,
+          "v0": -0.07580816265827056,
           "weight_mode": "iv"
         }
       ],
@@ -792,7 +790,7 @@
     },
     "metrics_snapshot": {
       "artifacts_root": "docs/artifacts",
-      "generated_at": "2025-12-21T20:29:56.983890+00:00",
+      "generated_at": "2025-12-21T21:34:11.595989+00:00",
       "inputs": [
         {
           "path": "docs/artifacts/tri_engine_agreement.csv",
@@ -801,8 +799,8 @@
         },
         {
           "path": "docs/artifacts/qmc_vs_prng_equal_time.csv",
-          "sha256": "5d2249f297838535cdf89f90292aef4a9d6fefeca0fc7bc79c9abe84216ba4bc",
-          "size_bytes": 1127
+          "sha256": "3bd10fb8f18452682adf1553fd590fcec61fcd6b21092a2b8e897cb2a36652e9",
+          "size_bytes": 1125
         },
         {
           "path": "docs/artifacts/pde_order_slope.csv",
@@ -811,17 +809,17 @@
         },
         {
           "path": "docs/artifacts/ql_parity/ql_parity.csv",
-          "sha256": "8907426a0275fb2a9201a13991839a99e9677970e4742ef8f9bc5a92a885d4e6",
-          "size_bytes": 481
+          "sha256": "6bdfe1bdd5eb1b692f7931e54cabeefbe267128418ac64967eb930210ca344ef",
+          "size_bytes": 480
         },
         {
           "path": "docs/artifacts/bench/bench_mc_paths.csv",
-          "sha256": "5f4e322030dafb873d0d1368235c3f08acbe749e335cb1d9a8b7274513a6f28a",
-          "size_bytes": 245
+          "sha256": "d66756420bc5202dc6a98b82e28883767ee3176e89a7ba16ed5a09da445ae56b",
+          "size_bytes": 248
         },
         {
           "path": "docs/artifacts/bench/bench_mc_equal_time.csv",
-          "sha256": "5fe81b9e4959e47eb68c910533169792eb189a0cc8a8177f0e3ab97ed56ee077",
+          "sha256": "af63a270df1a6e66cf46b2fbf6d14e83903e1fec10929df6177329a69b5f2706",
           "size_bytes": 340
         },
         {
@@ -852,6 +850,14 @@
       }
     },
     "parity_checks": [
+      {
+        "command": ".venv/bin/python3.12 scripts/parity_checks.py --fast",
+        "csv": "artifacts/parity_checks.csv",
+        "fast": true,
+        "inputs": [],
+        "png": "artifacts/parity_checks.png",
+        "rows": 15
+      },
       {
         "command": ".venv/bin/python3.12 scripts/parity_checks.py --fast",
         "csv": "artifacts/parity_checks.csv",
@@ -916,12 +922,12 @@
     ],
     "qmc_vs_prng_equal_time": {
       "budget_count": 6,
-      "command": ".venv/bin/python3.12 scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmppd_oui1v/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmppd_oui1v/qmc_summary.csv",
-      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmppd_oui1v/qmc_summary.csv",
+      "command": ".venv/bin/python3.12 scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpwngzjixd/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpwngzjixd/qmc_summary.csv",
+      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpwngzjixd/qmc_summary.csv",
       "csv_rows": 12,
       "fast": true,
-      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmppd_oui1v/qmc_plot.png",
-      "generated_at": "2025-12-21T20:26:20.092293+00:00",
+      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpwngzjixd/qmc_plot.png",
+      "generated_at": "2025-12-21T21:34:02.270393+00:00",
       "inputs": [],
       "paths": [
         256,
@@ -953,140 +959,140 @@
       },
       "summary_rows": [
         {
-          "paths_prng": 322.9454958744418,
-          "paths_qmc": 11.451388734762595,
+          "paths_prng": 241.76190482656006,
+          "paths_qmc": 14.393724179639337,
           "payoff": "call",
-          "rmse_prng": 0.8188448734044503,
-          "rmse_qmc": 0.12127276958047933,
-          "rmse_ratio": 6.75209180294218,
-          "time_seconds": 2.2090331185609102e-05
+          "rmse_prng": 0.9463947356843934,
+          "rmse_qmc": 0.10816974020827581,
+          "rmse_ratio": 8.74916343389708,
+          "time_seconds": 2.256250202966233e-05
         },
         {
-          "paths_prng": 760.9932253193728,
-          "paths_qmc": 26.984210521520968,
+          "paths_prng": 547.9517435286092,
+          "paths_qmc": 32.62327977503922,
           "payoff": "call",
-          "rmse_prng": 0.5334280572801122,
-          "rmse_qmc": 0.07900189642677463,
-          "rmse_ratio": 6.752091802942181,
-          "time_seconds": 5.205396140234634e-05
+          "rmse_prng": 0.6286299866067744,
+          "rmse_qmc": 0.0718502964719186,
+          "rmse_ratio": 8.749163433897078,
+          "time_seconds": 5.1137760245521676e-05
         },
         {
-          "paths_prng": 1793.214943016682,
-          "paths_qmc": 63.58596623825625,
+          "paths_prng": 1241.928969129535,
+          "paths_qmc": 73.94044584972382,
           "payoff": "call",
-          "rmse_prng": 0.3474962126960644,
-          "rmse_qmc": 0.051464971572905034,
-          "rmse_ratio": 6.75209180294218,
-          "time_seconds": 0.00012266067334663403
+          "rmse_prng": 0.41755902179174625,
+          "rmse_qmc": 0.04772559398924793,
+          "rmse_ratio": 8.74916343389708,
+          "time_seconds": 0.00011590339225190941
         },
         {
-          "paths_prng": 4225.556450267738,
-          "paths_qmc": 149.8348487619483,
+          "paths_prng": 2814.8237186558376,
+          "paths_qmc": 167.58552696590007,
           "payoff": "call",
-          "rmse_prng": 0.22637282795700148,
-          "rmse_qmc": 0.03352632555415804,
-          "rmse_ratio": 6.75209180294218,
-          "time_seconds": 0.00028903930422424085
+          "rmse_prng": 0.27735796954392544,
+          "rmse_qmc": 0.03170108452533316,
+          "rmse_ratio": 8.74916343389708,
+          "time_seconds": 0.0002626942648837735
         },
         {
-          "paths_prng": 9957.159560783984,
-          "paths_qmc": 353.0729063610368,
+          "paths_prng": 6379.779169384269,
+          "paths_qmc": 379.8314782347685,
           "payoff": "call",
-          "rmse_prng": 0.14746824674624887,
-          "rmse_qmc": 0.021840379403904216,
-          "rmse_ratio": 6.7520918029421795,
-          "time_seconds": 0.0006810962071791504
+          "rmse_prng": 0.1842313044499273,
+          "rmse_qmc": 0.021057019432984398,
+          "rmse_ratio": 8.74916343389708,
+          "time_seconds": 0.0005953947978747738
         },
         {
-          "paths_prng": 23463.18826544844,
-          "paths_qmc": 831.9858713528329,
+          "paths_prng": 14459.726902381513,
+          "paths_qmc": 860.8855100438678,
           "payoff": "call",
-          "rmse_prng": 0.09606667016830865,
-          "rmse_qmc": 0.014227690169503949,
-          "rmse_ratio": 6.75209180294218,
-          "time_seconds": 0.001604944506349663
+          "rmse_prng": 0.12237316849100502,
+          "rmse_qmc": 0.013986842218181904,
+          "rmse_ratio": 8.749163433897078,
+          "time_seconds": 0.0013494583351227145
         },
         {
-          "paths_prng": 431.1115479985366,
-          "paths_qmc": 94.68964217901286,
+          "paths_prng": 262.42427791156416,
+          "paths_qmc": 50.3850044731919,
           "payoff": "asian",
-          "rmse_prng": 0.3137856893033757,
-          "rmse_qmc": 0.1113757925913684,
-          "rmse_ratio": 2.8173598768866945,
-          "time_seconds": 0.00021411116661814353
+          "rmse_prng": 0.40218508030022715,
+          "rmse_qmc": 0.15268324961667604,
+          "rmse_ratio": 2.6341139667248776,
+          "time_seconds": 5.706250279520949e-05
         },
         {
-          "paths_prng": 682.7183505891891,
-          "paths_qmc": 149.9527364239281,
+          "paths_prng": 488.07227513994695,
+          "paths_qmc": 93.70902708344084,
           "payoff": "asian",
-          "rmse_prng": 0.2493487371311976,
-          "rmse_qmc": 0.08850439703384248,
-          "rmse_ratio": 2.8173598768866945,
-          "time_seconds": 0.0003390714611912047
+          "rmse_prng": 0.29490755054585127,
+          "rmse_qmc": 0.11195702018638329,
+          "rmse_ratio": 2.6341139667248776,
+          "time_seconds": 0.00010612823548979343
         },
         {
-          "paths_prng": 1081.1687796236097,
-          "paths_qmc": 237.46866757099053,
+          "paths_prng": 907.7458368412142,
+          "paths_qmc": 174.28562027016036,
           "payoff": "asian",
-          "rmse_prng": 0.1981441309415834,
-          "rmse_qmc": 0.07032971987964183,
-          "rmse_ratio": 2.817359876886694,
-          "time_seconds": 0.0005369615121446744
+          "rmse_prng": 0.21624487736847728,
+          "rmse_qmc": 0.08209397167327012,
+          "rmse_ratio": 2.634113966724877,
+          "time_seconds": 0.00019738360247883524
         },
         {
-          "paths_prng": 1712.1642168018711,
-          "paths_qmc": 376.0609470874794,
+          "paths_prng": 1688.279679615659,
+          "paths_qmc": 324.1467591580843,
           "payoff": "asian",
-          "rmse_prng": 0.15745456374995678,
-          "rmse_qmc": 0.0558872741255728,
-          "rmse_ratio": 2.8173598768866954,
-          "time_seconds": 0.000850344834424461
+          "rmse_prng": 0.15856442773864285,
+          "rmse_qmc": 0.060196494814457,
+          "rmse_ratio": 2.6341139667248776,
+          "time_seconds": 0.0003671057598170442
         },
         {
-          "paths_prng": 2711.4233786119144,
-          "paths_qmc": 595.538928865445,
+          "paths_prng": 3139.962928964374,
+          "paths_qmc": 602.867415623953,
           "payoff": "asian",
-          "rmse_prng": 0.1251207367479298,
-          "rmse_qmc": 0.044410633435368455,
-          "rmse_ratio": 2.817359876886695,
-          "time_seconds": 0.0013466260077827374
+          "rmse_prng": 0.11626947213755552,
+          "rmse_qmc": 0.04413987914202476,
+          "rmse_ratio": 2.6341139667248776,
+          "time_seconds": 0.0006827651192823884
         },
         {
-          "paths_prng": 4293.873605077212,
-          "paths_qmc": 943.1094043160482,
+          "paths_prng": 5839.889749496379,
+          "paths_qmc": 1121.2486645404094,
           "payoff": "asian",
-          "rmse_prng": 0.09942677043776092,
-          "rmse_qmc": 0.03529075971211454,
-          "rmse_ratio": 2.817359876886694,
-          "time_seconds": 0.0021325485043538115
+          "rmse_prng": 0.08525613432937246,
+          "rmse_qmc": 0.03236615249239788,
+          "rmse_ratio": 2.634113966724877,
+          "time_seconds": 0.0012698471643185865
         }
       ],
       "time_grid": {
         "asian": [
-          0.00021411116661814353,
-          0.0003390714611912047,
-          0.0005369615121446744,
-          0.000850344834424461,
-          0.0013466260077827374,
-          0.0021325485043538115
+          5.706250279520949e-05,
+          0.00010612823548979343,
+          0.00019738360247883524,
+          0.0003671057598170442,
+          0.0006827651192823884,
+          0.0012698471643185865
         ],
         "call": [
-          2.2090331185609102e-05,
-          5.205396140234634e-05,
-          0.00012266067334663403,
-          0.00028903930422424085,
-          0.0006810962071791504,
-          0.001604944506349663
+          2.256250202966233e-05,
+          5.1137760245521676e-05,
+          0.00011590339225190941,
+          0.0002626942648837735,
+          0.0005953947978747738,
+          0.0013494583351227145
         ]
       },
       "time_per_path": {
         "asian": {
-          "prng": 4.96649109985962e-07,
-          "qmc": 2.2611888870945527e-06
+          "prng": 2.1744368794429647e-07,
+          "qmc": 1.1325294776061885e-06
         },
         "call": {
-          "prng": 6.840266072079734e-08,
-          "qmc": 1.9290525976600748e-06
+          "prng": 9.332529889623704e-08,
+          "qmc": 1.5675235781979309e-06
         }
       }
     },
@@ -1097,7 +1103,7 @@
       "fast": true,
       "skip_slow": false,
       "skip_wrds": false,
-      "timestamp": "20251221T202352Z"
+      "timestamp": "20251221T213113Z"
     },
     "tri_engine_agreement": {
       "csv": "docs/artifacts/tri_engine_agreement.csv",
@@ -1137,7 +1143,7 @@
         "pricing_csv": "docs/artifacts/wrds/wrds_agg_pricing.csv",
         "summary_fig": "docs/artifacts/wrds/wrds_multi_date_summary.png",
         "symbol": "SPX",
-        "timestamp": "2025-12-21T20:25:59.418744+00:00"
+        "timestamp": "2025-12-21T21:33:04.804706+00:00"
       }
     ],
     "wrds_heston": [
@@ -1242,6 +1248,40 @@
         "price_rmse_ticks": 186.53798931427306,
         "summary": "docs/artifacts/wrds/per_date/2024-06-14/heston_fit.json",
         "surface_csv": "docs/artifacts/wrds/per_date/2024-06-14/heston_fit_table.csv"
+      },
+      {
+        "figure": "docs/artifacts/wrds/heston_fit.png",
+        "iv_mae_bps": 136.23345293556548,
+        "iv_mae_volpts_vega_wt": 0.012770286094983348,
+        "iv_p90_bps": 227.00602766219546,
+        "iv_rmse_volpts_vega_wt": 0.01600708367053968,
+        "params": {
+          "kappa": 6.0,
+          "rho": 0.1,
+          "sigma": 0.05,
+          "theta": 0.027856702249938234,
+          "v0": 0.06563695404575022
+        },
+        "price_rmse_ticks": 186.53798931427306,
+        "summary": "docs/artifacts/wrds/heston_fit.json",
+        "surface_csv": "docs/artifacts/wrds/heston_fit_table.csv"
+      },
+      {
+        "figure": "docs/artifacts/wrds/heston_fit.png",
+        "iv_mae_bps": 136.23345293556548,
+        "iv_mae_volpts_vega_wt": 0.012770286094983348,
+        "iv_p90_bps": 227.00602766219546,
+        "iv_rmse_volpts_vega_wt": 0.01600708367053968,
+        "params": {
+          "kappa": 6.0,
+          "rho": 0.1,
+          "sigma": 0.05,
+          "theta": 0.027856702249938234,
+          "v0": 0.06563695404575022
+        },
+        "price_rmse_ticks": 186.53798931427306,
+        "summary": "docs/artifacts/wrds/heston_fit.json",
+        "surface_csv": "docs/artifacts/wrds/heston_fit_table.csv"
       }
     ],
     "wrds_pipeline": [
@@ -1262,7 +1302,7 @@
         "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
         "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-21T20:24:39.558609+00:00",
+        "timestamp": "2025-12-21T21:31:56.453862+00:00",
         "trade_date": "2024-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
@@ -1290,7 +1330,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2020-03-16/spx_2020-03-17_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2020-03-16/spx_2020-03-16_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-21T20:24:54.564796+00:00",
+        "timestamp": "2025-12-21T21:32:10.150614+00:00",
         "trade_date": "2020-03-16",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2020-03-16/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2020-03-16/bs_oos_summary.csv",
@@ -1318,7 +1358,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2020-03-17/spx_2020-03-18_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2020-03-17/spx_2020-03-17_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-21T20:25:10.123080+00:00",
+        "timestamp": "2025-12-21T21:32:25.326437+00:00",
         "trade_date": "2020-03-17",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2020-03-17/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2020-03-17/bs_oos_summary.csv",
@@ -1346,7 +1386,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2022-06-13/spx_2022-06-14_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2022-06-13/spx_2022-06-13_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-21T20:25:26.124793+00:00",
+        "timestamp": "2025-12-21T21:32:37.887861+00:00",
         "trade_date": "2022-06-13",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2022-06-13/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2022-06-13/bs_oos_summary.csv",
@@ -1374,7 +1414,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2022-06-14/spx_2022-06-15_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2022-06-14/spx_2022-06-14_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-21T20:25:41.773497+00:00",
+        "timestamp": "2025-12-21T21:32:51.633549+00:00",
         "trade_date": "2022-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2022-06-14/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2022-06-14/bs_oos_summary.csv",
@@ -1402,7 +1442,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2024-06-14/spx_2024-06-17_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2024-06-14/spx_2024-06-14_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-21T20:25:57.738875+00:00",
+        "timestamp": "2025-12-21T21:33:04.002478+00:00",
         "trade_date": "2024-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2024-06-14/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2024-06-14/bs_oos_summary.csv",
@@ -1412,6 +1452,62 @@
         "wrds_heston_insample_fig": "docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_insample.png",
         "wrds_heston_oos_csv": "docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_oos.csv",
         "wrds_heston_oos_fig": "docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_oos.png"
+      },
+      {
+        "fit_fig": "docs/artifacts/wrds/heston_fit.png",
+        "fit_json": "docs/artifacts/wrds/heston_fit.json",
+        "fit_table": "docs/artifacts/wrds/heston_fit_table.csv",
+        "label": null,
+        "next_trade_date": "2024-06-17",
+        "oos_detail": "docs/artifacts/wrds/oos_pricing_detail.csv",
+        "oos_summary": "docs/artifacts/wrds/oos_pricing_summary.csv",
+        "pnl_detail": "docs/artifacts/wrds/delta_hedge_pnl.csv",
+        "pnl_summary": "docs/artifacts/wrds/delta_hedge_pnl_summary.csv",
+        "regime": null,
+        "source_next": "sample",
+        "source_today": "sample",
+        "summary_fig": "docs/artifacts/wrds/heston_wrds_summary.png",
+        "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
+        "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
+        "symbol": "SPX",
+        "timestamp": "2025-12-21T21:34:39.357690+00:00",
+        "trade_date": "2024-06-14",
+        "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
+        "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
+        "wrds_heston_hedge_csv": "docs/artifacts/wrds/wrds_heston_hedge.csv",
+        "wrds_heston_hedge_fig": "docs/artifacts/wrds/wrds_heston_hedge.png",
+        "wrds_heston_insample_csv": "docs/artifacts/wrds/wrds_heston_insample.csv",
+        "wrds_heston_insample_fig": "docs/artifacts/wrds/wrds_heston_insample.png",
+        "wrds_heston_oos_csv": "docs/artifacts/wrds/wrds_heston_oos.csv",
+        "wrds_heston_oos_fig": "docs/artifacts/wrds/wrds_heston_oos.png"
+      },
+      {
+        "fit_fig": "docs/artifacts/wrds/heston_fit.png",
+        "fit_json": "docs/artifacts/wrds/heston_fit.json",
+        "fit_table": "docs/artifacts/wrds/heston_fit_table.csv",
+        "label": null,
+        "next_trade_date": "2024-06-17",
+        "oos_detail": "docs/artifacts/wrds/oos_pricing_detail.csv",
+        "oos_summary": "docs/artifacts/wrds/oos_pricing_summary.csv",
+        "pnl_detail": "docs/artifacts/wrds/delta_hedge_pnl.csv",
+        "pnl_summary": "docs/artifacts/wrds/delta_hedge_pnl_summary.csv",
+        "regime": null,
+        "source_next": "sample",
+        "source_today": "sample",
+        "summary_fig": "docs/artifacts/wrds/heston_wrds_summary.png",
+        "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
+        "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
+        "symbol": "SPX",
+        "timestamp": "2025-12-21T21:43:44.424556+00:00",
+        "trade_date": "2024-06-14",
+        "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
+        "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
+        "wrds_heston_hedge_csv": "docs/artifacts/wrds/wrds_heston_hedge.csv",
+        "wrds_heston_hedge_fig": "docs/artifacts/wrds/wrds_heston_hedge.png",
+        "wrds_heston_insample_csv": "docs/artifacts/wrds/wrds_heston_insample.csv",
+        "wrds_heston_insample_fig": "docs/artifacts/wrds/wrds_heston_insample.png",
+        "wrds_heston_oos_csv": "docs/artifacts/wrds/wrds_heston_oos.csv",
+        "wrds_heston_oos_fig": "docs/artifacts/wrds/wrds_heston_oos.png"
       }
     ]
   },
