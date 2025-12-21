@@ -48,5 +48,6 @@ docs/artifacts/wrds/*
 !docs/artifacts/wrds/wrds_bs_heston_ivrmse.png
 !docs/artifacts/wrds/wrds_bs_heston_oos_heatmap.png
 !docs/artifacts/wrds/wrds_bs_heston_pnl_sigma.png
+docs/artifacts/wrds_local/
 docs/validation_pack.zip
 docs/gpt_bundles/

@@ -1,0 +1,22 @@
+{
+  "run_name": "20251221_205619_ticket-06_wrds-local-bundle",
+  "ticket_id": "ticket-06",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "718e430b0e1ad6085274fcbfe9eb0231372512ad",
+  "git_sha_after": "718e430b0e1ad6085274fcbfe9eb0231372512ad",
+  "branch": "feature/ticket-06-wrds-local-guardrails",
+  "timestamp_local": "2025-12-21T16:09:44-0500",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "cmake version 4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "Python 3.12.2"
+  },
+  "dataset": {
+    "mode": "wrds_live",
+    "dataset_id": "wrds_pipeline_dates_panel.yaml",
+    "config_path": "wrds_pipeline_dates_panel.yaml",
+    "config_hash": "b8e55c430a4623d5b3763c68fbdf22b6735c36a39b9f24a7a2297893832bc916"
+  },
+  "notes": "WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds, output_root=docs/artifacts/wrds_local. Local artifacts not committed; docs/artifacts/manifest.json updated with wrds_local paths."
+}

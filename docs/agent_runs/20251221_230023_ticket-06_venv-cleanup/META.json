@@ -1,0 +1,22 @@
+{
+  "run_name": "20251221_230023_ticket-06_venv-cleanup",
+  "ticket_id": "ticket-06",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "9daa70ce719bb53044c6017f5d3ec3cedebcf275",
+  "git_sha_after": "9daa70ce719bb53044c6017f5d3ec3cedebcf275",
+  "branch": "feature/ticket-06-venv-cleanup",
+  "timestamp_local": "2025-12-21T18:02:13-0500",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "cmake version 4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "Python 3.12.2"
+  },
+  "dataset": {
+    "mode": "none",
+    "dataset_id": "n/a",
+    "config_path": "",
+    "config_hash": ""
+  },
+  "notes": "Resolved stash conflicts, preserved local manifest at docs/artifacts/wrds_local/manifest_local.json (untracked), removed tracked .venv from git, and updated .gitignore to ignore docs/artifacts/wrds_local/."
+}
