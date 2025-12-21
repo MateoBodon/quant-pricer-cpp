@@ -351,7 +351,12 @@ def write_surface(out_path: Path, df: pd.DataFrame) -> None:
 
 
 def has_wrds_credentials() -> bool:
-    return _has_wrds_credentials()
+    if _has_wrds_credentials():
+        return True
+    cache_root = _cache_root()
+    if cache_root is None:
+        return False
+    return (cache_root / "cache_manifest.json").exists()
 
 
 if __name__ == "__main__":  # pragma: no cover
