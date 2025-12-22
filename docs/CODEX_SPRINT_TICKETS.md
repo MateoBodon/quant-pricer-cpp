@@ -7,6 +7,7 @@
 Make the repo interview-safe by eliminating “missing evidence” and enforcing artifact + validity gates.
 
 **Process note:** The prior `ticket-06_checklist-final` GPT bundle is marked **FAIL** due to missing run logs (process-only).
+**Process note:** Ticket-06b is marked **FAIL** due to missing negative-test evidence and unrelated diff churn (see Ticket-06c).
 
 ---
 
@@ -202,6 +203,7 @@ Make the repo interview-safe by eliminating “missing evidence” and enforcing
 ---
 
 ## Ticket-06b — Bundle + run-log completeness hard gate
+**Status:** FAIL — missing negative-test evidence and unrelated diff churn (see Ticket-06c).
 **Goal (1 sentence):** `make gpt-bundle` must produce an auditable bundle that always contains the required run log files, and it must fail fast if anything required is missing.
 
 **Why:**
@@ -243,6 +245,50 @@ Make the repo interview-safe by eliminating “missing evidence” and enforcing
 
 **Expected artifacts/logs to produce:**
 - `docs/gpt_bundles/<timestamp>_ticket-06b_<RUN_NAME>.zip`
+- `docs/agent_runs/<RUN_NAME>/*`
+
+**Exit checklist:**
+- Tests run: ✅
+- Artifacts/logs: ✅
+- Docs updates: ✅
+
+---
+
+## Ticket-06c — Prove bundler hard-gate + clean the diff
+**Goal (1 sentence):** Prove `make gpt-bundle` fail-fast behavior for missing inputs and missing ticket IDs, complete META provenance, and remove unrelated diff churn.
+
+**Why:**
+- Bundles must be audit-safe with explicit negative-test evidence and clean diffs.
+
+**Files/modules likely touched:**
+- `scripts/gpt_bundle.py`
+- `Makefile` (gpt-bundle target)
+- `docs/CODEX_SPRINT_TICKETS.md`
+- `PROGRESS.md`
+- `docs/agent_runs/<RUN_NAME>/`
+
+**Acceptance criteria (objective):**
+1) Logged negative tests prove:
+   - bundling fails (exit code != 0) and prints a clear list of missing required files when any required item is absent.
+   - bundling fails (exit code != 0) when the ticket id is not present in `docs/CODEX_SPRINT_TICKETS.md`.
+2) `META.json` includes `git_sha_before` and `git_sha_after` (matches HEAD after commit).
+3) Diff excludes unrelated `artifacts/heston/**` churn (revert on this branch; move to separate ticket if needed).
+4) A new bundle is generated and includes all required items.
+
+**Minimal tests/commands to run:**
+- `python3 -m compileall scripts/gpt_bundle.py`
+- `python3 scripts/gpt_bundle.py --self-test`
+- `make gpt-bundle TICKET=ticket-06c RUN_NAME=<RUN_NAME>`
+- Verify contents:
+  - `python3 - << 'PY'`
+    `import zipfile, glob`
+    `zpath = sorted(glob.glob("docs/gpt_bundles/*ticket-06c*.zip"))[-1]`
+    `z = zipfile.ZipFile(zpath)`
+    `print("\\n".join(z.namelist()))`
+    `PY`
+
+**Expected artifacts/logs to produce:**
+- `docs/gpt_bundles/<timestamp>_ticket-06c_<RUN_NAME>.zip`
 - `docs/agent_runs/<RUN_NAME>/*`
 
 **Exit checklist:**

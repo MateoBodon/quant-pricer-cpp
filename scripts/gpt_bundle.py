@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import re
+import shutil
 import subprocess
 import sys
+import uuid
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -12,12 +15,20 @@ from typing import Iterable, List, Tuple
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-RUN_LOG_FILES = (
-    "PROMPT.md",
-    "COMMANDS.md",
-    "RESULTS.md",
-    "TESTS.md",
-    "META.json",
+REQUIRED_PATHS = (
+    "AGENTS.md",
+    "docs/PLAN_OF_RECORD.md",
+    "docs/DOCS_AND_LOGGING_SYSTEM.md",
+    "docs/CODEX_SPRINT_TICKETS.md",
+    "PROGRESS.md",
+    "project_state/CURRENT_RESULTS.md",
+    "project_state/KNOWN_ISSUES.md",
+    "project_state/CONFIG_REFERENCE.md",
+    "docs/agent_runs/{run_name}/PROMPT.md",
+    "docs/agent_runs/{run_name}/COMMANDS.md",
+    "docs/agent_runs/{run_name}/RESULTS.md",
+    "docs/agent_runs/{run_name}/TESTS.md",
+    "docs/agent_runs/{run_name}/META.json",
 )
 
 
@@ -37,21 +48,14 @@ def _add_path(zf: zipfile.ZipFile, path: Path) -> None:
         zf.write(path, str(path.relative_to(REPO_ROOT)))
 
 
+def _render_required_paths(run_name: str) -> List[str]:
+    return [path.format(run_name=run_name) for path in REQUIRED_PATHS]
+
+
 def _required_items(run_name: str) -> List[Tuple[str, Path]]:
-    items = [
-        ("AGENTS.md", REPO_ROOT / "AGENTS.md"),
-        ("docs/PLAN_OF_RECORD.md", REPO_ROOT / "docs" / "PLAN_OF_RECORD.md"),
-        ("docs/DOCS_AND_LOGGING_SYSTEM.md", REPO_ROOT / "docs" / "DOCS_AND_LOGGING_SYSTEM.md"),
-        ("docs/CODEX_SPRINT_TICKETS.md", REPO_ROOT / "docs" / "CODEX_SPRINT_TICKETS.md"),
-        ("PROGRESS.md", REPO_ROOT / "PROGRESS.md"),
-        ("project_state/CURRENT_RESULTS.md", REPO_ROOT / "project_state" / "CURRENT_RESULTS.md"),
-        ("project_state/KNOWN_ISSUES.md", REPO_ROOT / "project_state" / "KNOWN_ISSUES.md"),
-        ("project_state/CONFIG_REFERENCE.md", REPO_ROOT / "project_state" / "CONFIG_REFERENCE.md"),
-    ]
-    run_dir = REPO_ROOT / "docs" / "agent_runs" / run_name
-    for filename in RUN_LOG_FILES:
-        relative = f"docs/agent_runs/{run_name}/{filename}"
-        items.append((relative, run_dir / filename))
+    items: List[Tuple[str, Path]] = []
+    for rel_path in _render_required_paths(run_name):
+        items.append((rel_path, REPO_ROOT / rel_path))
     return items
 
 
@@ -74,10 +78,97 @@ def _verify_zip(zip_path: Path, required_paths: Iterable[str]) -> List[str]:
     return missing
 
 
+def _find_ticket_id(ticket_path: Path) -> str | None:
+    if not ticket_path.exists():
+        return None
+    try:
+        content = ticket_path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    match = re.search(r"ticket-\d+[a-z]?", content, re.IGNORECASE)
+    if not match:
+        return None
+    return match.group(0).lower()
+
+
+def _run_self_test() -> int:
+    ticket_path = REPO_ROOT / "docs" / "CODEX_SPRINT_TICKETS.md"
+    valid_ticket = _find_ticket_id(ticket_path)
+    if not valid_ticket:
+        print("[gpt-bundle] self-test failed: no ticket id found in docs/CODEX_SPRINT_TICKETS.md")
+        return 2
+
+    temp_run_name = f"_gpt_bundle_selftest_{uuid.uuid4().hex[:8]}"
+    run_dir = REPO_ROOT / "docs" / "agent_runs" / temp_run_name
+    run_log_paths = [
+        REPO_ROOT / path
+        for path in _render_required_paths(temp_run_name)
+        if path.startswith("docs/agent_runs/")
+    ]
+
+    try:
+        run_dir.mkdir(parents=True, exist_ok=True)
+        for path in run_log_paths:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("self-test\n", encoding="utf-8")
+
+        missing_run = f"{temp_run_name}_missing"
+        missing_cmd = [
+            sys.executable,
+            str(Path(__file__).resolve()),
+            "--ticket",
+            valid_ticket,
+            "--run-name",
+            missing_run,
+        ]
+        missing_result = subprocess.run(
+            missing_cmd, cwd=REPO_ROOT, text=True, capture_output=True
+        )
+        print("[gpt-bundle][self-test] missing-file exit code:", missing_result.returncode)
+        if missing_result.stdout:
+            print(missing_result.stdout.rstrip())
+        if missing_result.stderr:
+            print(missing_result.stderr.rstrip())
+        if missing_result.returncode == 0 or "missing required items" not in (
+            missing_result.stdout + missing_result.stderr
+        ).lower():
+            print("[gpt-bundle][self-test] missing-file case did not fail as expected.")
+            return 1
+
+        missing_ticket = "ticket-does-not-exist"
+        ticket_cmd = [
+            sys.executable,
+            str(Path(__file__).resolve()),
+            "--ticket",
+            missing_ticket,
+            "--run-name",
+            temp_run_name,
+        ]
+        ticket_result = subprocess.run(
+            ticket_cmd, cwd=REPO_ROOT, text=True, capture_output=True
+        )
+        print("[gpt-bundle][self-test] missing-ticket exit code:", ticket_result.returncode)
+        if ticket_result.stdout:
+            print(ticket_result.stdout.rstrip())
+        if ticket_result.stderr:
+            print(ticket_result.stderr.rstrip())
+        if ticket_result.returncode == 0 or "ticket id not found" not in (
+            ticket_result.stdout + ticket_result.stderr
+        ).lower():
+            print("[gpt-bundle][self-test] missing-ticket case did not fail as expected.")
+            return 1
+    finally:
+        if run_dir.exists():
+            shutil.rmtree(run_dir)
+
+    print("[gpt-bundle] self-test passed")
+    return 0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Create the Prompt-3 GPT bundle zip.")
-    parser.add_argument("--ticket", required=True, help="Ticket id (e.g., ticket-01)")
-    parser.add_argument("--run-name", required=True, help="Run name under docs/agent_runs/")
+    parser.add_argument("--ticket", help="Ticket id (e.g., ticket-01)")
+    parser.add_argument("--run-name", help="Run name under docs/agent_runs/")
     parser.add_argument(
         "--timestamp",
         default=None,
@@ -88,7 +179,18 @@ def main() -> None:
         metavar="ZIP",
         help="Verify that an existing bundle contains the required files for this ticket/run.",
     )
+    parser.add_argument(
+        "--self-test",
+        action="store_true",
+        help="Run negative tests to prove missing-file and missing-ticket failures.",
+    )
     args = parser.parse_args()
+
+    if args.self_test:
+        sys.exit(_run_self_test())
+
+    if not args.ticket or not args.run_name:
+        parser.error("--ticket and --run-name are required unless --self-test is used")
 
     timestamp = args.timestamp or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     output_dir = REPO_ROOT / "docs" / "gpt_bundles"
