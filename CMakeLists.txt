@@ -221,6 +221,12 @@ add_test(
 set_tests_properties(parity_checks_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME artifacts_root_guard_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_artifacts_root_guard_fast.py
+)
+set_tests_properties(artifacts_root_guard_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME heston_safety_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_heston_safety_fast.py
 )

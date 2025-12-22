@@ -1,7 +1,7 @@
 {
   "artifacts_root": "docs/artifacts",
-  "generated_at": "2025-12-22T00:19:37.698292+00:00",
-  "manifest_git_sha": "ae2691df74d6b813e23a231ee5308a6573456f45",
+  "generated_at": "2025-12-22T21:02:46.901536+00:00",
+  "manifest_git_sha": "aeb31c63c19ae8671a3be1f31bf7b003c4492c06",
   "manifest_path": "docs/artifacts/manifest.json",
   "metrics": {
     "benchmarks": {
@@ -10,11 +10,11 @@
           "payoffs": {
             "Asian": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 0.9529382047362169
+              "time_scaled_error_ratio_prng_over_qmc": 1.0321559922131234
             },
             "Barrier": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 1.2603625416028157
+              "time_scaled_error_ratio_prng_over_qmc": 1.2196884326928112
             }
           }
         },
@@ -23,10 +23,10 @@
       },
       "mc_paths": {
         "metrics": {
-          "efficiency_max_threads": 0.1351648724722844,
-          "paths_per_sec_1t": 11416958.750528043,
-          "paths_per_sec_max_threads": 12345374.188291645,
-          "speedup_max_threads": 1.0813189797782758,
+          "efficiency_max_threads": 0.1241165505993214,
+          "paths_per_sec_1t": 13036449.91395943,
+          "paths_per_sec_max_threads": 12944313.563051725,
+          "speedup_max_threads": 0.9929324047945716,
           "threads_max": 8
         },
         "source": "docs/artifacts/bench/bench_mc_paths.csv",
@@ -68,11 +68,11 @@
         },
         "max_abs_diff_cents_overall": 0.8615834347,
         "runtime_ratio_by_category": {
-          "american": 12.8176009813,
-          "barrier": 2.6743777522,
-          "vanilla": 1.8176698596
+          "american": 13.2177572145,
+          "barrier": 4.5753454565,
+          "vanilla": 1.5622408537
         },
-        "runtime_ratio_median": 2.6743777522
+        "runtime_ratio_median": 4.5753454565
       },
       "source": "docs/artifacts/ql_parity/ql_parity.csv",
       "status": "ok"
@@ -81,19 +81,19 @@
       "metrics": {
         "payoffs": {
           "asian": {
-            "rmse_ratio_max": 2.5477375238,
-            "rmse_ratio_median": 2.5477375238,
-            "rmse_ratio_min": 2.5477375238,
+            "rmse_ratio_max": 2.6259412744,
+            "rmse_ratio_median": 2.6259412744,
+            "rmse_ratio_min": 2.6259412744,
             "rows": 6
           },
           "call": {
-            "rmse_ratio_max": 8.6280067686,
-            "rmse_ratio_median": 8.6280067686,
-            "rmse_ratio_min": 8.6280067686,
+            "rmse_ratio_max": 12.1981002298,
+            "rmse_ratio_median": 12.1981002298,
+            "rmse_ratio_min": 12.1981002298,
             "rows": 6
           }
         },
-        "rmse_ratio_overall_median": 5.5878721462000005
+        "rmse_ratio_overall_median": 7.4120207521
       },
       "source": "docs/artifacts/qmc_vs_prng_equal_time.csv",
       "status": "ok"
@@ -113,30 +113,30 @@
       "bundle": "sample bundle regression harness",
       "oos": {
         "metrics": {
-          "rows": 15,
-          "weighted_iv_mae_bps": 134.0592281709936,
-          "weighted_price_mae_ticks": 162.40324677206775
+          "rows": 10,
+          "weighted_iv_mae_bps": 10.599150358889375,
+          "weighted_price_mae_ticks": 11.810067521540365
         },
         "source": "docs/artifacts/wrds/wrds_agg_oos.csv",
         "status": "ok"
       },
       "pnl": {
         "metrics": {
-          "mean_pnl": -0.6156493960232174,
-          "mean_pnl_ticks": -12.312987920464357,
-          "median_pnl_sigma": 62.69949398003994,
-          "rows": 15
+          "mean_pnl": -20.42912408124312,
+          "mean_pnl_ticks": -408.58248162486234,
+          "median_pnl_sigma": 239.06936760233862,
+          "rows": 10
         },
         "source": "docs/artifacts/wrds/wrds_agg_pnl.csv",
         "status": "ok"
       },
       "pricing": {
         "metrics": {
-          "median_iv_mae_bps": 136.23345293556548,
-          "median_iv_mae_volpts_vega_wt": 0.0127702860949833,
-          "median_iv_rmse_volpts_vega_wt": 0.0160070836705396,
-          "median_price_mae_ticks": 161.11145009446895,
-          "median_price_rmse_ticks": 186.53798931427303,
+          "median_iv_mae_bps": 10.599311577054154,
+          "median_iv_mae_volpts_vega_wt": 0.001059928777374,
+          "median_iv_rmse_volpts_vega_wt": 0.0012082816720515,
+          "median_price_mae_ticks": 12.396367623901345,
+          "median_price_rmse_ticks": 14.807701070337508,
           "rows": 5
         },
         "source": "docs/artifacts/wrds/wrds_agg_pricing.csv",

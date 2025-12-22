@@ -627,6 +627,12 @@ def main() -> None:
     args = parse_args()
     artifacts_root = args.artifacts.resolve()
     manifest_path = args.manifest.resolve()
+    canonical_manifest = MANIFEST_PATH.resolve()
+    if manifest_path != canonical_manifest:
+        raise SystemExit(
+            "metrics_summary requires canonical manifest at "
+            f"{canonical_manifest} (got {manifest_path})"
+        )
     json_out = (args.output_json or artifacts_root / "metrics_summary.json").resolve()
     md_out = (args.output_md or artifacts_root / "metrics_summary.md").resolve()
 
