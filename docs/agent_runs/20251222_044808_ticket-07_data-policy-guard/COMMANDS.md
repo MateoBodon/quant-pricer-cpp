@@ -203,16 +203,12 @@ PY
 RUN_NAME=20251222_044808_ticket-07_data-policy-guard
 mkdir -p docs/agent_runs/$RUN_NAME
 cat <<'MD' > docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/PROMPT.md
-...prompt content...
 MD
 cat <<'MD' > docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/TESTS.md
-...test output...
 MD
 cat <<'MD' > docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/RESULTS.md
-...results content...
 MD
 cat <<'JSON' > docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/META.json
-...meta...
 JSON
 rg -n \"LAST_COMMIT|DIFF.patch|git diff\" -n scripts/gpt_bundle.py
 sed -n '200,280p' scripts/gpt_bundle.py
@@ -225,18 +221,14 @@ sed -n '1,80p' Makefile
 date -u +%Y%m%dT%H%M%SZ
 apply_patch (docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/RESULTS.md)
 cat <<'MD' > docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/COMMANDS.md
-...command log...
 MD
-# (failed command due to unmatched backtick while rewriting COMMANDS.md)
 cat <<'MD' > docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/COMMANDS.md
-...command log...
 MD
 python3 - <<'PY'
 from pathlib import Path
 
 run_name = \"20251222_044808_ticket-07_data-policy-guard\"
 path = Path(\"docs/agent_runs\") / run_name / \"COMMANDS.md\"
-lines = [...]
 path.write_text('\n'.join(lines) + '\n')
 PY
 RUN_NAME=20251222_044808_ticket-07_data-policy-guard
