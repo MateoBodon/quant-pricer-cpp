@@ -286,3 +286,7 @@ apply_patch (docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/RESULTS
 apply_patch (docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/TESTS.md)
 git add docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/COMMANDS.md docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/RESULTS.md docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/TESTS.md
 git commit -m "ticket-07: finalize checklist + bundle" -m "Tests: python3 scripts/check_data_policy.py; git ls-files | xargs rg -n \"strike,.*market_iv|\\bsecid\\b|best_bid|best_ask|best_offer\" -S; git ls-files -z -- artifacts docs/artifacts data wrds_pipeline/sample_data | xargs -0 rg -n \"strike,.*market_iv|\\bsecid\\b|best_bid|best_ask|best_offer\" -S; rg -n \"WRDS_PASSWORD|WRDS_USERNAME|password|token|secret\" -S .; python3 scripts/gpt_bundle.py --ticket ticket-07 --run-name 20251222_044808_ticket-07_data-policy-guard --verify docs/gpt_bundles/20251222T170132Z_ticket-07_20251222_044808_ticket-07_data-policy-guard.zip" -m "Artifacts: docs/gpt_bundles/20251222T170132Z_ticket-07_20251222_044808_ticket-07_data-policy-guard.zip" -m "Run log: docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/" -m "Removed/Changed: docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/COMMANDS.md; docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/RESULTS.md; docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/TESTS.md"
+git stash push -u -m "pre-merge local changes"
+git checkout main
+git merge feature/ticket-07_data-policy-guard
+git push origin main
