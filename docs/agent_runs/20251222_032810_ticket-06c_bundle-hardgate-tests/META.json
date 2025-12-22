@@ -1,0 +1,22 @@
+{
+  "run_name": "20251222_032810_ticket-06c_bundle-hardgate-tests",
+  "ticket_id": "ticket-06c",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "6415d34ba794230674b0f5fb47afa2669103721f",
+  "git_sha_after": "8ca5f90a94bde2a8d8af7010c665d15cd0eafcbc",
+  "branch": "feature/ticket-06c_bundle-hardgate-tests",
+  "timestamp_local": "2025-12-21T22:40:47",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "cmake version 4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "Python 3.12.2"
+  },
+  "dataset": {
+    "mode": "synthetic",
+    "dataset_id": "n/a",
+    "config_path": "n/a",
+    "config_hash": "n/a"
+  },
+  "notes": "Bundler hard-gate self-test and ticket validation; no data pipeline run."
+}
