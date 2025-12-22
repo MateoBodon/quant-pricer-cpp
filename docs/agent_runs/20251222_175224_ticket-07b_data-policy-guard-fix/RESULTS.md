@@ -23,9 +23,16 @@
 ## Tests
 - FAST initially failed due to `matplotlib` missing in the Python3.13 interpreter; reconfigured CMake to use Python 3.12 and FAST passed (see `TESTS.md`).
 - Sample-mode WRDS pipeline smoke run succeeded with `source_today=sample` and `source_next=sample`.
+- Checklist verification: positive + negative `check_data_policy` runs and a green FAST run recorded in `TESTS.md`.
+
+## Checklist verification notes
+- `python3 scripts/check_data_policy.py` passes on the branch.
+- Negative test proves guard fails when a tracked CSV contains `strike,market_iv` (see `TESTS.md`).
+- `wrds_pipeline/sample_data/spx_options_sample.csv` begins with `# SYNTHETIC_DATA` and loader skips comment lines.
+- `git ls-files | rg '\.(csv|parquet|json)$'` reviewed; no restricted patterns found in tracked `data/` (see `TESTS.md` for guard pass).
 
 ## Bundle
-- `docs/gpt_bundles/20251222T181613Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip`
+- `docs/gpt_bundles/20251222T183217Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip`
 
 ## Human merge checklist
 - [x] New guard + test files are tracked and appear in git diff

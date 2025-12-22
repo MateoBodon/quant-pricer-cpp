@@ -191,3 +191,52 @@ git status -sb
 RUN_NAME=20251222_175224_ticket-07b_data-policy-guard-fix
 TIMESTAMP=20251222T181613Z
 make gpt-bundle TICKET=ticket-07b RUN_NAME=$RUN_NAME TIMESTAMP=$TIMESTAMP
+git ls-files scripts/check_data_policy.py tests/test_data_policy_fast.py
+python3 scripts/check_data_policy.py
+cat <<'EOF' > data/policy_guard_negative_test.csv
+strike,market_iv
+100,0.25
+EOF
+git add data/policy_guard_negative_test.csv
+python3 scripts/check_data_policy.py || true
+git restore --staged data/policy_guard_negative_test.csv
+rm -f data/policy_guard_negative_test.csv
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/Library/Frameworks/Python.framework/Versions/3.12/bin/python3
+ctest --test-dir build -L FAST --output-on-failure
+git status -sb
+git restore artifacts/greeks_reliability.png artifacts/heston/params_series.csv artifacts/heston/params_series.png artifacts/heston/series_runs/fit_20230601.png artifacts/heston/series_runs/fit_20240614.png artifacts/heston/series_runs/params_20230601.json artifacts/heston/series_runs/params_20240614.json docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md
+rm -f artifacts/heston/series_runs/fit_20230601.csv artifacts/heston/series_runs/fit_20240614.csv
+git status -sb
+git ls-files | rg -n "\.(csv|parquet|json)$"
+head -n 1 wrds_pipeline/sample_data/spx_options_sample.csv
+rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S data
+date -u +%Y%m%dT%H%M%SZ
+apply_patch (docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/RESULTS.md)
+cat <<'MD' >> docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/TESTS.md
+apply_patch (docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/RESULTS.md)
+date +%Y-%m-%dT%H:%M:%S
+git rev-parse HEAD
+apply_patch (docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/META.json)
+apply_patch (PROGRESS.md)
+git add PROGRESS.md docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/COMMANDS.md docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/META.json docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/RESULTS.md docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/TESTS.md
+git status -sb
+git commit -m "ticket-07b: checklist verification + bundle refresh" \
+  -m "Tests: python3 scripts/check_data_policy.py; cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/Library/Frameworks/Python.framework/Versions/3.12/bin/python3; ctest --test-dir build -L FAST --output-on-failure" \
+  -m "Artifacts: docs/gpt_bundles/20251222T183217Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip" \
+  -m "Run log: docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/"
+git status -sb
+git status --porcelain
+RUN_NAME=20251222_175224_ticket-07b_data-policy-guard-fix
+TIMESTAMP=20251222T183217Z
+make gpt-bundle TICKET=ticket-07b RUN_NAME=$RUN_NAME TIMESTAMP=$TIMESTAMP
+python3 - <<'PY'
+import zipfile
+from pathlib import Path
+zpath = Path("docs/gpt_bundles/20251222T183217Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip")
+with zipfile.ZipFile(zpath) as zf:
+    text = zf.read("LAST_COMMIT.txt").decode("utf-8", errors="ignore")
+print(text.splitlines()[0])
+PY
+git checkout main
+git merge feature/ticket-07b_data-policy-guard-fix
+git push origin main

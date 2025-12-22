@@ -37,3 +37,31 @@
     ```
     [wrds_pipeline] SPX 2024-06-14 source_today=sample source_next=sample
     ```
+
+## Checklist verification (2025-12-22)
+
+- `python3 scripts/check_data_policy.py`
+  - Output:
+    ```
+    [data-policy] OK: no restricted patterns found in tracked data artifacts.
+    ```
+- Negative test (tracked forbidden CSV):
+  - Commands:
+    - `cat > data/policy_guard_negative_test.csv` (with `strike,market_iv`)
+    - `git add data/policy_guard_negative_test.csv`
+    - `python3 scripts/check_data_policy.py` (expected fail)
+    - `git restore --staged data/policy_guard_negative_test.csv`
+    - `rm -f data/policy_guard_negative_test.csv`
+  - Output:
+    ```
+    [data-policy] FAIL: restricted patterns found in tracked data artifacts:
+    data/policy_guard_negative_test.csv:1:strike,market_iv
+    ```
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/Library/Frameworks/Python.framework/Versions/3.12/bin/python3`
+- `ctest --test-dir build -L FAST --output-on-failure` — **PASSED**
+  - Output (tail):
+    ```
+    100% tests passed, 0 tests failed out of 56
+    The following tests did not run:
+    	 53 - RngDeterminism.CounterRngThreadInvariant (Skipped)
+    ```
