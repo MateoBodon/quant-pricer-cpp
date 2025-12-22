@@ -20,3 +20,5 @@ Cleaned tracked `.venv` from git history, added `docs/artifacts/wrds_local/` to 
 
 ## 2025-12-22
 Ran the Ticket-06 checklist: `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` (FAST tests failed due to missing matplotlib), `ctest --test-dir build -L FAST --output-on-failure` (same failures), and `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast` (python shim required because `python` is not on PATH). Regenerated metrics/manifest artifacts, updated `project_state/CURRENT_RESULTS.md` + `project_state/KNOWN_ISSUES.md`, added `.agent/` to `.gitignore`, and added a `gpt-bundle` Makefile target. Run log: `docs/agent_runs/20251222_001445_ticket-06_checklist-final/`. Bundle: `docs/gpt_bundles/20251222T002413Z_ticket-06_20251222_001445_ticket-06_checklist-final.zip`.
+
+Hardened `gpt-bundle` to require run log files and ticket presence, added Ticket-06b to sprint tickets, and marked the prior `ticket-06_checklist-final` bundle as FAIL due to missing run logs (process-only). Run log: `docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/`. Bundle: `docs/gpt_bundles/20251222T015729Z_ticket-06b_20251222_014941_ticket-06b_bundle-integrity.zip`.

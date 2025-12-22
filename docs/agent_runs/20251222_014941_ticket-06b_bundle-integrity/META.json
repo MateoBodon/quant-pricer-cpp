@@ -1,0 +1,22 @@
+{
+  "run_name": "20251222_014941_ticket-06b_bundle-integrity",
+  "ticket_id": "ticket-06b",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "4a82ea3fa8ba517efe2cca4ff4754ce72529d567",
+  "git_sha_after": "",
+  "branch": "feature/ticket-06b_bundle-integrity",
+  "timestamp_local": "2025-12-21T20:55:20-0500",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "cmake version 4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "Python 3.12.2"
+  },
+  "dataset": {
+    "mode": "synthetic",
+    "dataset_id": "",
+    "config_path": "",
+    "config_hash": ""
+  },
+  "notes": "Bundler hard gate update for required files/ticket entry; compileall run; ctest FAST skipped (bundler-only change)."
+}
