@@ -267,3 +267,20 @@ lines.extend(append)
 path.write_text('\n'.join(lines) + '\n')
 PY
 git status -sb
+git branch --show-current
+python3 scripts/check_data_policy.py
+git ls-files | xargs rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S
+git ls-files -z -- artifacts docs/artifacts data wrds_pipeline/sample_data | xargs -0 rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S
+rg -n "WRDS_PASSWORD|WRDS_USERNAME|password|token|secret" -S .
+python3 scripts/gpt_bundle.py --ticket ticket-07 --run-name 20251222_044808_ticket-07_data-policy-guard --verify docs/gpt_bundles/20251222T050914Z_ticket-07_20251222_044808_ticket-07_data-policy-guard.zip
+apply_patch (docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/TESTS.md)
+apply_patch (docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/RESULTS.md)
+rm -f artifacts/heston/fit_20230601.csv artifacts/heston/fit_20240614.csv artifacts/heston/series_runs/fit_20230601.csv artifacts/heston/series_runs/fit_20240614.csv
+git status -sb
+date -u +%Y%m%dT%H%M%SZ
+RUN_NAME=20251222_044808_ticket-07_data-policy-guard
+TIMESTAMP=20251222T170132Z
+make gpt-bundle TICKET=ticket-07 RUN_NAME=$RUN_NAME TIMESTAMP=$TIMESTAMP
+python3 scripts/gpt_bundle.py --ticket ticket-07 --run-name 20251222_044808_ticket-07_data-policy-guard --verify docs/gpt_bundles/20251222T170132Z_ticket-07_20251222_044808_ticket-07_data-policy-guard.zip
+apply_patch (docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/RESULTS.md)
+apply_patch (docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/TESTS.md)

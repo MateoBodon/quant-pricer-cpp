@@ -53,7 +53,13 @@ After (`python3 scripts/check_data_policy.py`):
   - `PROGRESS.md`
 
 ## Bundle
-- Bundle: `docs/gpt_bundles/20251222T050914Z_ticket-07_20251222_044808_ticket-07_data-policy-guard.zip`
+- Bundle: `docs/gpt_bundles/20251222T170132Z_ticket-07_20251222_044808_ticket-07_data-policy-guard.zip`
+- Verified: `python3 scripts/gpt_bundle.py --verify` passed.
+
+## Checklist notes
+- `git ls-files | xargs rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S` reports only code/docs (and a path split on `ROADMAP (1).md`); no tracked data artifacts matched.
+- `git ls-files -z -- artifacts docs/artifacts data wrds_pipeline/sample_data | xargs -0 rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S` produced no matches (rg exit 1 when empty).
+- Secret scan hits limited to documentation/env references and code tokens; no credentials or secret values committed.
 
 ## Human merge checklist
 - [ ] No tracked quote-surface artifacts remain (scan is clean)

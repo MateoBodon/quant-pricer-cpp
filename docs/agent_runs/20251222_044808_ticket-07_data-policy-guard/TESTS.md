@@ -34,3 +34,21 @@
     ```
     [wrds_pipeline] SPX 2024-06-14 source_today=sample source_next=sample
     ```
+
+## Checklist validations (post-run)
+- `python3 scripts/check_data_policy.py`
+  - Output:
+    ```
+    [data-policy] OK: no restricted patterns found in tracked data artifacts.
+    ```
+- `git ls-files | xargs rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S`
+  - Output: matches only in code/docs + command files; no data-artifact hits (also reports `ROADMAP (1).md` path split due to spaces).
+- `git ls-files -z -- artifacts docs/artifacts data wrds_pipeline/sample_data | xargs -0 rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S`
+  - Output: no matches (exit code 1 from `rg` when no matches).
+- `rg -n "WRDS_PASSWORD|WRDS_USERNAME|password|token|secret" -S .`
+  - Output: hits limited to documentation/env references and code tokens; no secrets committed.
+- `python3 scripts/gpt_bundle.py --ticket ticket-07 --run-name 20251222_044808_ticket-07_data-policy-guard --verify docs/gpt_bundles/20251222T170132Z_ticket-07_20251222_044808_ticket-07_data-policy-guard.zip`
+  - Output:
+    ```
+    [gpt-bundle] bundle verification passed: docs/gpt_bundles/20251222T170132Z_ticket-07_20251222_044808_ticket-07_data-policy-guard.zip
+    ```
