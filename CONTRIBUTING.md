@@ -12,6 +12,7 @@ cmake --build build --parallel
 ## Tests
 
 ```bash
+pip install -r requirements-dev.txt
 ctest --test-dir build --output-on-failure
 ```
 

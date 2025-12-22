@@ -1,0 +1,23 @@
+{
+  "run_name": "20251222_175224_ticket-07b_data-policy-guard-fix",
+  "ticket_id": "ticket-07b",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "01146501a408595d96244765c7ad7563efc3166c",
+  "git_sha_after": "01146501a408595d96244765c7ad7563efc3166c",
+  "branch_before": "main",
+  "branch_after": "feature/ticket-07b_data-policy-guard-fix",
+  "timestamp_local": "2025-12-22T13:11:47",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "cmake version 4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "Python 3.12.2"
+  },
+  "dataset": {
+    "mode": "wrds_sample",
+    "dataset_id": "sample",
+    "config_path": "wrds_pipeline/sample_data/spx_options_sample.csv",
+    "config_hash": "eb154b2fcc0b3f28ebe7a3c7af440b0752b84a2715da4a529dc2a5b04e89b40e"
+  },
+  "notes": "FAST initially failed due to matplotlib missing in Python3.13; reconfigured CMake to use Python 3.12. Synthetic sample data regenerated with SYNTHETIC_DATA marker and guard enforcement."
+}

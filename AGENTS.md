@@ -70,7 +70,7 @@ Update when relevant:
 - Commit policy:
   - ✅ OK: tiny license-safe derived summaries (aggregated error tables), synthetic samples, config YAMLs.
   - ❌ NOT OK: raw WRDS extracts, quote-level data, anything that violates WRDS/OptionMetrics licensing.
-- Data-policy guard: `python3 scripts/check_data_policy.py` must pass; tracked artifacts/data under `artifacts/`, `docs/artifacts/`, `data/`, and `wrds_pipeline/sample_data/` may not contain restricted columns (`strike,.*market_iv`, `secid`, `best_bid/ask/offer`).
+- Data-policy guard: `python3 scripts/check_data_policy.py` must pass; tracked artifacts/data under `artifacts/`, `docs/artifacts/`, `data/`, and `wrds_pipeline/sample_data/` may not contain restricted columns (`strike,.*market_iv`, `secid`, `best_bid/ask/offer`). Any tracked CSV under `wrds_pipeline/sample_data/` must begin with `# SYNTHETIC_DATA`.
 
 ---
 

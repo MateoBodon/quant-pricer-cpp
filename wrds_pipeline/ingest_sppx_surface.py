@@ -329,7 +329,7 @@ def _fetch_from_wrds(symbol: str, trade_date: str) -> pd.DataFrame:
 
 
 def _load_sample(symbol: str, trade_date: str) -> pd.DataFrame:
-    df = pd.read_csv(SAMPLE_PATH, parse_dates=["trade_date", "exdate"])
+    df = pd.read_csv(SAMPLE_PATH, comment="#", parse_dates=["trade_date", "exdate"])
     df = df[df["trade_date"] == pd.to_datetime(trade_date)]
     if df.empty:
         raise RuntimeError(f"Sample data missing trade date {trade_date}")

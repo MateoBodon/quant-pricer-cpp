@@ -134,6 +134,48 @@ Make the repo interview-safe by eliminating “missing evidence” and enforcing
 
 ---
 
+## Ticket-07b — Data policy guard: mergeable + synthetic sample
+**Goal (1 sentence):** Make the data-policy guard mergeable and non-bypassable; replace sample data with an explicitly synthetic, marked sample.
+
+**Why:**
+- Ticket-07 left FAST red (missing matplotlib) and sample data could bypass the guard by renaming columns.
+
+**Files/modules likely touched:**
+- `scripts/check_data_policy.py`
+- `tests/test_data_policy_fast.py`
+- `wrds_pipeline/sample_data/spx_options_sample.csv`
+- `wrds_pipeline/ingest_sppx_surface.py`
+- `requirements-dev.txt`
+- `CONTRIBUTING.md`
+- `AGENTS.md`
+- `project_state/KNOWN_ISSUES.md`
+- `PROGRESS.md`
+- `docs/agent_runs/<RUN_NAME>/`
+
+**Acceptance criteria (objective):**
+1) `scripts/check_data_policy.py` and `tests/test_data_policy_fast.py` are tracked and run in FAST.
+2) Guard scans git-tracked data/artifact files for restricted patterns and enforces a `# SYNTHETIC_DATA` marker for tracked CSVs under `wrds_pipeline/sample_data/`.
+3) `wrds_pipeline/sample_data/spx_options_sample.csv` is synthetic and starts with the marker; loader skips comment lines.
+4) FAST is green, and sample-mode pipeline smoke succeeds.
+
+**Minimal tests/commands to run:**
+- `python3 -m compileall scripts/check_data_policy.py tests/test_data_policy_fast.py`
+- `python3 scripts/check_data_policy.py`
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`
+- `ctest --test-dir build -L FAST --output-on-failure`
+- `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast`
+
+**Expected artifacts/logs to produce:**
+- `docs/agent_runs/<RUN_NAME>/*`
+- `docs/gpt_bundles/<timestamp>_ticket-07b_<RUN_NAME>.zip`
+
+**Exit checklist:**
+- Tests run: ✅
+- Artifacts/logs: ✅
+- Docs updates: ✅
+
+---
+
 ## Ticket-03 — QuantLib parity suite: grid-based, summarized, regression-safe
 **Goal (1 sentence):** QuantLib parity must be a grid (not cherry-picked cases) and summarized into `metrics_summary` with max/median error.
 

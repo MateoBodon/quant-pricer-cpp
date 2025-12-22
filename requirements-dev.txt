@@ -1,0 +1,2 @@
+# Dev/test dependencies (FAST tests + artifact scripts)
+-r requirements-artifacts.txt

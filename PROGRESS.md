@@ -26,3 +26,7 @@ Hardened `gpt-bundle` to require run log files and ticket presence, added Ticket
 Proved `gpt-bundle` hard-gate behavior with REQUIRED_PATHS + self-test (missing-file + missing-ticket), marked Ticket-06b FAIL, added Ticket-06c, and reverted unrelated Heston artifact churn. Run log: `docs/agent_runs/20251222_032810_ticket-06c_bundle-hardgate-tests/`. Bundle: `docs/gpt_bundles/20251222T033950Z_ticket-06c_20251222_032810_ticket-06c_bundle-hardgate-tests.zip`.
 
 Implemented the data-policy guard (`scripts/check_data_policy.py` + FAST test), removed tracked Heston fit CSV surfaces, and sanitized WRDS sample data columns to avoid raw quote headers. Updated `project_state/KNOWN_ISSUES.md`. Run log: `docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/`.
+
+Marked Ticket-07 as **FAIL**: FAST remained red due to missing matplotlib and the sample data could bypass the guard by renaming columns. Run log: `docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/`.
+
+Completed Ticket-07b: enforced `# SYNTHETIC_DATA` markers in the data-policy guard, regenerated synthetic WRDS sample CSV (with comment-skipping loader), added `requirements-dev.txt` + CONTRIBUTING install note, and made FAST green with the sample pipeline smoke. Run log: `docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/`. Bundle: `docs/gpt_bundles/20251222T181613Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip`.

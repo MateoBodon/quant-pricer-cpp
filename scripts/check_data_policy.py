@@ -15,6 +15,7 @@ PATTERNS = [
 ]
 
 DATA_EXTS = {".csv", ".parquet", ".json"}
+SYNTHETIC_MARKER = "# SYNTHETIC_DATA"
 
 CODE_DOC_EXTS = {
     ".c",
@@ -41,6 +42,7 @@ DATA_DIR_PREFIXES = (
     "data/",
     "wrds_pipeline/sample_data/",
 )
+SAMPLE_DATA_PREFIX = "wrds_pipeline/sample_data/"
 
 
 def _git_tracked_files() -> List[str]:
@@ -65,6 +67,19 @@ def _is_guarded_data_file(path: str) -> bool:
     return any(path.startswith(prefix) for prefix in DATA_DIR_PREFIXES)
 
 
+def _requires_synthetic_marker(path: str) -> bool:
+    return path.startswith(SAMPLE_DATA_PREFIX) and Path(path).suffix == ".csv"
+
+
+def _has_synthetic_marker(path: str) -> bool:
+    text = Path(path).read_text(errors="ignore")
+    for idx, line in enumerate(text.splitlines(), 1):
+        if line.strip() == "":
+            continue
+        return line.startswith(SYNTHETIC_MARKER)
+    return False
+
+
 def _scan_lines(path: str) -> Iterable[Tuple[int, str]]:
     data = Path(path).read_bytes()
     text = data.decode("utf-8", errors="ignore")
@@ -85,6 +100,10 @@ def main() -> int:
         path = Path(rel_path)
         if not path.exists():
             continue
+        if _requires_synthetic_marker(rel_path) and not _has_synthetic_marker(rel_path):
+            violations.append(
+                (rel_path, 1, f"missing {SYNTHETIC_MARKER} marker")
+            )
         for line_no, line in _scan_lines(rel_path):
             violations.append((rel_path, line_no, line))
 
