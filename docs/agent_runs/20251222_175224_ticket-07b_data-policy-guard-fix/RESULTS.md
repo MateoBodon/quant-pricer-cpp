@@ -33,7 +33,7 @@
 - `git ls-files | rg '\.(csv|parquet|json)$'` reviewed; no restricted patterns found in tracked `data/` (see `TESTS.md` for guard pass).
 
 ## Bundle
-- `docs/gpt_bundles/20251222T184840Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip`
+- `docs/gpt_bundles/20251222T185123Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip`
 
 ## Human merge checklist
 - [x] New guard + test files are tracked and appear in git diff

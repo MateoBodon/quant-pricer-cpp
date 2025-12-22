@@ -247,3 +247,41 @@ apply_patch (docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/ME
 date -u +%Y%m%dT%H%M%SZ
 apply_patch (docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/RESULTS.md)
 apply_patch (PROGRESS.md)
+git add PROGRESS.md docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/COMMANDS.md docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/META.json docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/RESULTS.md docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/TESTS.md
+git commit -m "ticket-07b: align meta to merged commit" -m "Tests: not run (meta alignment + bundle refresh only)" -m "Artifacts: docs/gpt_bundles/20251222T184840Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip" -m "Run log: docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/"
+RUN_NAME=20251222_175224_ticket-07b_data-policy-guard-fix
+TIMESTAMP=20251222T184840Z
+make gpt-bundle TICKET=ticket-07b RUN_NAME=$RUN_NAME TIMESTAMP=$TIMESTAMP
+python3 - <<'PY'
+import zipfile
+from pathlib import Path
+zpath = Path("docs/gpt_bundles/20251222T184840Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip")
+with zipfile.ZipFile(zpath) as zf:
+    text = zf.read("LAST_COMMIT.txt").decode("utf-8", errors="ignore")
+print(text.splitlines()[0])
+PY
+git checkout main
+git merge feature/ticket-07b_meta-align
+git push origin main
+date -u +%Y%m%dT%H%M%SZ
+apply_patch (docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/RESULTS.md)
+apply_patch (PROGRESS.md)
+git add PROGRESS.md docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/COMMANDS.md docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/META.json docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/RESULTS.md docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/TESTS.md
+git commit -m "ticket-07b: finalize meta alignment bundle" \
+  -m "Tests: not run (log/bundle refresh only)" \
+  -m "Artifacts: docs/gpt_bundles/20251222T185123Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip" \
+  -m "Run log: docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/"
+RUN_NAME=20251222_175224_ticket-07b_data-policy-guard-fix
+TIMESTAMP=20251222T185123Z
+make gpt-bundle TICKET=ticket-07b RUN_NAME=$RUN_NAME TIMESTAMP=$TIMESTAMP
+python3 - <<'PY'
+import zipfile
+from pathlib import Path
+zpath = Path("docs/gpt_bundles/20251222T185123Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip")
+with zipfile.ZipFile(zpath) as zf:
+    text = zf.read("LAST_COMMIT.txt").decode("utf-8", errors="ignore")
+print(text.splitlines()[0])
+PY
+git checkout main
+git merge feature/ticket-07b_meta-align
+git push origin main
