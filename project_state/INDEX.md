@@ -1,24 +1,27 @@
 ---
-generated_at: 2025-12-20T21:11:15Z
-git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
-branch: master
+generated_at: 2025-12-22T19:13:19Z
+git_sha: 5265c6de1a7e13f4bfc8708f188986cee30b18ed
+branch: feature/ticket-00_project_state_refresh
 commands:
   - date -u +%Y-%m-%dT%H:%M:%SZ
   - git rev-parse HEAD
   - git rev-parse --abbrev-ref HEAD
   - python3 -V
+  - c++ --version
+  - cmake --version
+  - uname -a
   - rg --files
   - rg --files -g '*.py'
+  - rg --files tests
+  - rg -n "argparse|click|typer" scripts wrds_pipeline python tests tools
   - python3 tools/project_state_generate.py
-  - uname -a
-  - cmake --version
 ---
 
 # Project State Index
 
 ## How to read this folder
 - Start with `project_state/ARCHITECTURE.md` for the system map and core components.
-- Use `project_state/MODULE_SUMMARIES.md` and `project_state/FUNCTION_INDEX.md` for API surface and symbols.
+- Use `project_state/MODULE_SUMMARIES.md` and `project_state/FUNCTION_INDEX.md` for APIs and symbol inventory.
 - Check `project_state/PIPELINE_FLOW.md` and `project_state/DATAFLOW.md` for build/test/artifact flows.
 - Consult `project_state/CURRENT_RESULTS.md`, `project_state/KNOWN_ISSUES.md`, and `project_state/OPEN_QUESTIONS.md` before quoting results.
 - Generated machine indices live under `project_state/_generated/`.
@@ -31,10 +34,10 @@ commands:
 - `project_state/PIPELINE_FLOW.md` — build/test/repro pipelines and CLI entrypoints.
 - `project_state/DATAFLOW.md` — data lineage from inputs to artifacts.
 - `project_state/EXPERIMENTS.md` — experiments and artifact-producing scripts.
-- `project_state/CURRENT_RESULTS.md` — latest artifact snapshot and status.
+- `project_state/CURRENT_RESULTS.md` — latest artifact snapshot and status (from committed metrics summary).
 - `project_state/RESEARCH_NOTES.md` — research/validation notes from docs.
 - `project_state/OPEN_QUESTIONS.md` — unresolved items/ambiguities.
-- `project_state/KNOWN_ISSUES.md` — known gaps and missing artifacts.
+- `project_state/KNOWN_ISSUES.md` — known gaps and constraints.
 - `project_state/ROADMAP.md` — condensed roadmap (from `ROADMAP (1).md`).
 - `project_state/CONFIG_REFERENCE.md` — config files, env vars, build flags.
 - `project_state/SERVER_ENVIRONMENT.md` — environment snapshot used for generation.

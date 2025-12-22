@@ -296,6 +296,215 @@
       ],
       "module": "scripts.american_consistency"
     },
+    "scripts/build_wrds_cache.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 36,
+          "name": "_today_utc",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 40,
+          "name": "_bdates",
+          "signature": "(start, end)"
+        },
+        {
+          "docstring": null,
+          "lineno": 46,
+          "name": "_sha256",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 54,
+          "name": "_cache_path",
+          "signature": "(cache_root, symbol, trade_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 60,
+          "name": "_cache_meta_path",
+          "signature": "(cache_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 64,
+          "name": "_write_cache",
+          "signature": "(cache_root, symbol, trade_date, df)"
+        },
+        {
+          "docstring": null,
+          "lineno": 82,
+          "name": "_load_dateset",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 106,
+          "name": "_require_wrds_env",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 113,
+          "name": "_iter_dates",
+          "signature": "(args)"
+        },
+        {
+          "docstring": null,
+          "lineno": 119,
+          "name": "_write_manifest",
+          "signature": "(cache_root, summary)"
+        },
+        {
+          "docstring": null,
+          "lineno": 124,
+          "name": "_append_index",
+          "signature": "(index_path, entry)"
+        },
+        {
+          "docstring": null,
+          "lineno": 130,
+          "name": "_summarize_index",
+          "signature": "(index_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 187,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "datetime",
+        "hashlib",
+        "json",
+        "os",
+        "pandas",
+        "pathlib",
+        "sys",
+        "typing",
+        "warnings",
+        "wrds_pipeline",
+        "yaml"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "hashlib"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "os"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "warnings"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "date",
+            "datetime",
+            "timedelta",
+            "timezone"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Iterable",
+            "List"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pandas"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "wrds_pipeline",
+          "names": [
+            "ingest_sppx_surface"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "yaml"
+          ],
+          "type": "import"
+        }
+      ],
+      "module": "scripts.build_wrds_cache"
+    },
     "scripts/calibrate_heston.py": {
       "classes": [
         {
@@ -669,6 +878,114 @@
         }
       ],
       "module": "scripts.calibrate_heston_series"
+    },
+    "scripts/check_data_policy.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 48,
+          "name": "_git_tracked_files",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 59,
+          "name": "_is_allowed_code_doc",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 63,
+          "name": "_is_guarded_data_file",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 70,
+          "name": "_requires_synthetic_marker",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 74,
+          "name": "_has_synthetic_marker",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 83,
+          "name": "_scan_lines",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 93,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "pathlib",
+        "re",
+        "subprocess",
+        "sys",
+        "typing"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "re"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Iterable",
+            "List",
+            "Tuple"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.check_data_policy"
     },
     "scripts/data/cboe_csv.py": {
       "classes": [],
@@ -1150,107 +1467,143 @@
       "module": "scripts.generate_bench_artifacts"
     },
     "scripts/generate_metrics_summary.py": {
-      "classes": [],
+      "classes": [
+        {
+          "docstring": null,
+          "lineno": 34,
+          "name": "RequiredArtifact"
+        }
+      ],
       "functions": [
         {
           "docstring": null,
-          "lineno": 31,
+          "lineno": 102,
           "name": "_safe_load_csv",
           "signature": "(path)"
         },
         {
           "docstring": null,
-          "lineno": 40,
+          "lineno": 111,
+          "name": "_rel_path",
+          "signature": "(path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 118,
           "name": "_status_block",
           "signature": "(status, source, metrics=None, reason=None, notes=None)"
         },
         {
           "docstring": null,
-          "lineno": 60,
+          "lineno": 138,
           "name": "_weighted_average",
           "signature": "(values, weights)"
         },
         {
           "docstring": "Return (slope, r2) for y ~ a*x + b using least squares.",
-          "lineno": 69,
+          "lineno": 147,
           "name": "_regression_slope",
           "signature": "(x, y)"
         },
         {
           "docstring": null,
-          "lineno": 84,
+          "lineno": 159,
+          "name": "_required_artifact",
+          "signature": "(name)"
+        },
+        {
+          "docstring": null,
+          "lineno": 166,
+          "name": "_required_path",
+          "signature": "(name, artifacts_root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 170,
+          "name": "_validate_required_artifacts",
+          "signature": "(artifacts_root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 217,
           "name": "tri_engine_metrics",
           "signature": "(path)"
         },
         {
           "docstring": null,
-          "lineno": 115,
+          "lineno": 248,
           "name": "qmc_vs_prng_metrics",
           "signature": "(path)"
         },
         {
           "docstring": null,
-          "lineno": 141,
+          "lineno": 274,
           "name": "pde_order_metrics",
           "signature": "(path)"
         },
         {
           "docstring": null,
-          "lineno": 174,
+          "lineno": 307,
           "name": "ql_parity_metrics",
           "signature": "(path)"
         },
         {
           "docstring": null,
-          "lineno": 204,
+          "lineno": 337,
           "name": "_collapse_status",
           "signature": "(statuses)"
         },
         {
           "docstring": null,
-          "lineno": 213,
+          "lineno": 346,
           "name": "benchmark_metrics",
           "signature": "(root)"
         },
         {
           "docstring": null,
-          "lineno": 276,
+          "lineno": 409,
+          "name": "_wrds_bundle_label",
+          "signature": "(pricing_df)"
+        },
+        {
+          "docstring": null,
+          "lineno": 435,
           "name": "wrds_metrics",
           "signature": "(root)"
         },
         {
           "docstring": null,
-          "lineno": 337,
+          "lineno": 497,
           "name": "_fmt",
           "signature": "(value)"
         },
         {
           "docstring": null,
-          "lineno": 345,
+          "lineno": 505,
           "name": "_highlights",
           "signature": "(name, block)"
         },
         {
           "docstring": null,
-          "lineno": 385,
+          "lineno": 546,
           "name": "render_markdown",
           "signature": "(summary)"
         },
         {
           "docstring": null,
-          "lineno": 424,
+          "lineno": 585,
           "name": "parse_args",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 434,
+          "lineno": 595,
           "name": "build_summary",
           "signature": "(artifacts_root, manifest_path)"
         },
         {
           "docstring": null,
-          "lineno": 465,
+          "lineno": 626,
           "name": "main",
           "signature": "()"
         }
@@ -1265,6 +1618,7 @@
         "numpy",
         "pandas",
         "pathlib",
+        "sys",
         "typing"
       ],
       "imports_detail": [
@@ -1289,6 +1643,14 @@
           "module": null,
           "names": [
             "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
           ],
           "type": "import"
         },
@@ -1420,6 +1782,172 @@
         }
       ],
       "module": "scripts.generate_synthetic_data"
+    },
+    "scripts/gpt_bundle.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 35,
+          "name": "_run_git",
+          "signature": "(args)"
+        },
+        {
+          "docstring": null,
+          "lineno": 42,
+          "name": "_add_path",
+          "signature": "(zf, path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 51,
+          "name": "_render_required_paths",
+          "signature": "(run_name)"
+        },
+        {
+          "docstring": null,
+          "lineno": 55,
+          "name": "_required_items",
+          "signature": "(run_name)"
+        },
+        {
+          "docstring": null,
+          "lineno": 62,
+          "name": "_ticket_present",
+          "signature": "(ticket_path, ticket_id)"
+        },
+        {
+          "docstring": null,
+          "lineno": 72,
+          "name": "_verify_zip",
+          "signature": "(zip_path, required_paths)"
+        },
+        {
+          "docstring": null,
+          "lineno": 81,
+          "name": "_find_ticket_id",
+          "signature": "(ticket_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 94,
+          "name": "_run_self_test",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 168,
+          "name": "main",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "datetime",
+        "pathlib",
+        "re",
+        "shutil",
+        "subprocess",
+        "sys",
+        "typing",
+        "uuid",
+        "zipfile"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "argparse"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "re"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "shutil"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "uuid"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "zipfile"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "datetime",
+          "names": [
+            "datetime",
+            "timezone"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": "typing",
+          "names": [
+            "Iterable",
+            "List",
+            "Tuple"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "scripts.gpt_bundle"
     },
     "scripts/greeks_reliability.py": {
       "classes": [
@@ -2041,72 +2569,84 @@
         {
           "docstring": null,
           "lineno": 24,
+          "name": "_relativize_string",
+          "signature": "(value)"
+        },
+        {
+          "docstring": null,
+          "lineno": 36,
+          "name": "_relativize_value",
+          "signature": "(value)"
+        },
+        {
+          "docstring": null,
+          "lineno": 50,
           "name": "_git_info",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 34,
+          "lineno": 60,
           "name": "_cpu_brand",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 55,
+          "lineno": 81,
           "name": "_system_info",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 67,
+          "lineno": 93,
           "name": "_omp_threads",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 74,
+          "lineno": 100,
           "name": "_cmake_value",
           "signature": "(lines, key)"
         },
         {
           "docstring": null,
-          "lineno": 82,
+          "lineno": 108,
           "name": "_cmake_cache_path",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 89,
+          "lineno": 115,
           "name": "_compile_info",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 114,
+          "lineno": 140,
           "name": "load_manifest",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 120,
+          "lineno": 146,
           "name": "ensure_metadata",
           "signature": "(manifest)"
         },
         {
           "docstring": null,
-          "lineno": 147,
+          "lineno": 173,
           "name": "save_manifest",
           "signature": "(manifest)"
         },
         {
           "docstring": null,
-          "lineno": 153,
+          "lineno": 180,
           "name": "describe_inputs",
           "signature": "(paths)"
         },
         {
           "docstring": null,
-          "lineno": 170,
+          "lineno": 197,
           "name": "update_run",
           "signature": "(key, data, append=False, id_field=None)"
         }
@@ -4043,6 +4583,58 @@
       ],
       "module": "tests.test_cli_fast"
     },
+    "tests/test_data_policy_fast.py": {
+      "classes": [],
+      "functions": [
+        {
+          "docstring": null,
+          "lineno": 12,
+          "name": "test_data_policy_guard",
+          "signature": "()"
+        }
+      ],
+      "imports": [
+        "__future__",
+        "pathlib",
+        "subprocess",
+        "sys"
+      ],
+      "imports_detail": [
+        {
+          "level": 0,
+          "module": "__future__",
+          "names": [
+            "annotations"
+          ],
+          "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "subprocess"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "sys"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ],
+          "type": "from"
+        }
+      ],
+      "module": "tests.test_data_policy_fast"
+    },
     "tests/test_greeks_reliability_fast.py": {
       "classes": [],
       "functions": [
@@ -5482,80 +6074,154 @@
       "functions": [
         {
           "docstring": null,
-          "lineno": 20,
+          "lineno": 30,
+          "name": "_cache_root",
+          "signature": "()"
+        },
+        {
+          "docstring": null,
+          "lineno": 39,
+          "name": "_local_root",
+          "signature": "(explicit_root=None)"
+        },
+        {
+          "docstring": null,
+          "lineno": 54,
+          "name": "_local_optionm_root",
+          "signature": "(local_root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 60,
+          "name": "_local_opprcd_path",
+          "signature": "(trade_date, local_root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 68,
+          "name": "_local_secprd_path",
+          "signature": "(trade_date, local_root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 76,
+          "name": "_local_secnmd_path",
+          "signature": "(local_root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 83,
+          "name": "_resolve_secid_local",
+          "signature": "(symbol, trade_date, local_root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 109,
+          "name": "_fetch_from_local",
+          "signature": "(symbol, trade_date, local_root)"
+        },
+        {
+          "docstring": null,
+          "lineno": 189,
+          "name": "_cache_path",
+          "signature": "(symbol, trade_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 198,
+          "name": "_cache_meta_path",
+          "signature": "(cache_path)"
+        },
+        {
+          "docstring": null,
+          "lineno": 202,
+          "name": "_load_cache",
+          "signature": "(symbol, trade_date)"
+        },
+        {
+          "docstring": null,
+          "lineno": 213,
+          "name": "_write_cache",
+          "signature": "(symbol, trade_date, df, source)"
+        },
+        {
+          "docstring": null,
+          "lineno": 230,
           "name": "_has_wrds_credentials",
           "signature": "()"
         },
         {
           "docstring": null,
-          "lineno": 28,
+          "lineno": 238,
           "name": "_table_for_trade_date",
           "signature": "(trade_date)"
         },
         {
           "docstring": null,
-          "lineno": 33,
+          "lineno": 243,
           "name": "_secprd_table",
           "signature": "(trade_date)"
         },
         {
           "docstring": null,
-          "lineno": 38,
+          "lineno": 248,
           "name": "_resolve_secid",
           "signature": "(conn, ticker, trade_date)"
         },
         {
           "docstring": null,
-          "lineno": 57,
+          "lineno": 267,
           "name": "_fetch_from_wrds",
           "signature": "(symbol, trade_date)"
         },
         {
           "docstring": null,
-          "lineno": 121,
+          "lineno": 331,
           "name": "_load_sample",
           "signature": "(symbol, trade_date)"
         },
         {
           "docstring": null,
-          "lineno": 150,
+          "lineno": 366,
           "name": "load_surface",
-          "signature": "(symbol, trade_date, force_sample=False)"
+          "signature": "(symbol, trade_date, force_sample=False, *, local_root=None)"
         },
         {
           "docstring": null,
-          "lineno": 168,
+          "lineno": 403,
           "name": "_prepare_quotes",
           "signature": "(df)"
         },
         {
           "docstring": null,
-          "lineno": 225,
+          "lineno": 460,
           "name": "aggregate_surface",
           "signature": "(df)"
         },
         {
           "docstring": null,
-          "lineno": 286,
+          "lineno": 521,
           "name": "write_surface",
           "signature": "(out_path, df)"
         },
         {
           "docstring": null,
-          "lineno": 291,
+          "lineno": 526,
           "name": "has_wrds_credentials",
-          "signature": "()"
+          "signature": "(local_root=None)"
         }
       ],
       "imports": [
         ".bs_utils",
         "__future__",
         "datetime",
+        "json",
         "numpy",
         "os",
         "pandas",
         "pathlib",
         "psycopg2",
+        "pyarrow.dataset",
         "typing"
       ],
       "imports_detail": [
@@ -5571,6 +6237,14 @@
           "level": 0,
           "module": null,
           "names": [
+            "json"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
             "os"
           ],
           "type": "import"
@@ -5579,7 +6253,8 @@
           "level": 0,
           "module": "datetime",
           "names": [
-            "datetime"
+            "datetime",
+            "timezone"
           ],
           "type": "from"
         },
@@ -5623,6 +6298,30 @@
             "implied_vol_from_price"
           ],
           "type": "from"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pyarrow.dataset"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pyarrow.dataset"
+          ],
+          "type": "import"
+        },
+        {
+          "level": 0,
+          "module": null,
+          "names": [
+            "pyarrow.dataset"
+          ],
+          "type": "import"
         },
         {
           "level": 0,
@@ -5770,18 +6469,24 @@
         {
           "docstring": null,
           "lineno": 251,
+          "name": "_local_root_from_payload",
+          "signature": "(payload)"
+        },
+        {
+          "docstring": null,
+          "lineno": 264,
           "name": "run",
-          "signature": "(symbol, trade_date, next_trade_date, use_sample, fast, *, output_dir=None, label=None, regime=None, wrds_root=None)"
+          "signature": "(symbol, trade_date, next_trade_date, use_sample, fast, *, output_dir=None, label=None, regime=None, wrds_root=None, local_root=None)"
         },
         {
           "docstring": null,
-          "lineno": 471,
+          "lineno": 493,
           "name": "run_dateset",
-          "signature": "(symbol, dateset_path, use_sample, fast, *, output_root=None)"
+          "signature": "(symbol, dateset_path, use_sample, fast, *, output_root=None, local_root=None)"
         },
         {
           "docstring": null,
-          "lineno": 698,
+          "lineno": 727,
           "name": "main",
           "signature": "()"
         }
@@ -6078,20 +6783,23 @@
       "module": "wrds_pipeline.tests.test_wrds_pipeline"
     }
   },
-  "generated_at": "2025-12-20T21:30:07.845737+00:00",
-  "git_sha": "3297510aedecac18e790474b1319636ac560d3b2",
+  "generated_at": "2025-12-22T19:31:11.184321+00:00",
+  "git_sha": "5265c6de1a7e13f4bfc8708f188986cee30b18ed",
   "modules": {
     "python.examples.quickstart": "python/examples/quickstart.py",
     "python.scripts.cibw_smoke": "python/scripts/cibw_smoke.py",
     "scripts.american_consistency": "scripts/american_consistency.py",
+    "scripts.build_wrds_cache": "scripts/build_wrds_cache.py",
     "scripts.calibrate_heston": "scripts/calibrate_heston.py",
     "scripts.calibrate_heston_series": "scripts/calibrate_heston_series.py",
+    "scripts.check_data_policy": "scripts/check_data_policy.py",
     "scripts.data.cboe_csv": "scripts/data/cboe_csv.py",
     "scripts.data.wrds_fetch_options": "scripts/data/wrds_fetch_options.py",
     "scripts.data.wrds_fetch_returns": "scripts/data/wrds_fetch_returns.py",
     "scripts.generate_bench_artifacts": "scripts/generate_bench_artifacts.py",
     "scripts.generate_metrics_summary": "scripts/generate_metrics_summary.py",
     "scripts.generate_synthetic_data": "scripts/generate_synthetic_data.py",
+    "scripts.gpt_bundle": "scripts/gpt_bundle.py",
     "scripts.greeks_reliability": "scripts/greeks_reliability.py",
     "scripts.greeks_variance": "scripts/greeks_variance.py",
     "scripts.heston_qe_vs_analytic": "scripts/heston_qe_vs_analytic.py",
@@ -6109,6 +6817,7 @@
     "scripts.sabr_slice_calibration": "scripts/sabr_slice_calibration.py",
     "scripts.tri_engine_agreement": "scripts/tri_engine_agreement.py",
     "tests.test_cli_fast": "tests/test_cli_fast.py",
+    "tests.test_data_policy_fast": "tests/test_data_policy_fast.py",
     "tests.test_greeks_reliability_fast": "tests/test_greeks_reliability_fast.py",
     "tests.test_heston_fast": "tests/test_heston_fast.py",
     "tests.test_heston_safety_fast": "tests/test_heston_safety_fast.py",

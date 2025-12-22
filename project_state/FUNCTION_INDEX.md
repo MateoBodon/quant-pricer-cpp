@@ -1,17 +1,20 @@
 ---
-generated_at: 2025-12-20T21:11:15Z
-git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
-branch: master
+generated_at: 2025-12-22T19:13:19Z
+git_sha: 5265c6de1a7e13f4bfc8708f188986cee30b18ed
+branch: feature/ticket-00_project_state_refresh
 commands:
   - date -u +%Y-%m-%dT%H:%M:%SZ
   - git rev-parse HEAD
   - git rev-parse --abbrev-ref HEAD
   - python3 -V
+  - c++ --version
+  - cmake --version
+  - uname -a
   - rg --files
   - rg --files -g '*.py'
+  - rg --files tests
+  - rg -n "argparse|click|typer" scripts wrds_pipeline python tests tools
   - python3 tools/project_state_generate.py
-  - uname -a
-  - cmake --version
 ---
 
 # Function Index
@@ -40,6 +43,22 @@ Derived from `project_state/_generated/symbol_index.json`.
 - classes:
   - `AmericanSpec`
 
+### scripts.build_wrds_cache (`scripts/build_wrds_cache.py`)
+- functions:
+  - `_today_utc()`
+  - `_bdates(start, end)`
+  - `_sha256(path)`
+  - `_cache_path(cache_root, symbol, trade_date)`
+  - `_cache_meta_path(cache_path)`
+  - `_write_cache(cache_root, symbol, trade_date, df)`
+  - `_load_dateset(path)`
+  - `_require_wrds_env()`
+  - `_iter_dates(args)`
+  - `_write_manifest(cache_root, summary)`
+  - `_append_index(index_path, entry)`
+  - `_summarize_index(index_path)`
+  - `main()`
+
 ### scripts.calibrate_heston (`scripts/calibrate_heston.py`)
 - functions:
   - `black_scholes_call(spot, strike, r, q, sigma, T)`
@@ -64,6 +83,16 @@ Derived from `project_state/_generated/symbol_index.json`.
 ### scripts.calibrate_heston_series (`scripts/calibrate_heston_series.py`)
 - functions:
   - `resolve_inputs(inputs, pattern, input_dir)`
+  - `main()`
+
+### scripts.check_data_policy (`scripts/check_data_policy.py`)
+- functions:
+  - `_git_tracked_files()`
+  - `_is_allowed_code_doc(path)`
+  - `_is_guarded_data_file(path)`
+  - `_requires_synthetic_marker(path)`
+  - `_has_synthetic_marker(path)`
+  - `_scan_lines(path)`
   - `main()`
 
 ### scripts.data.cboe_csv (`scripts/data/cboe_csv.py`)
@@ -100,15 +129,20 @@ Derived from `project_state/_generated/symbol_index.json`.
 ### scripts.generate_metrics_summary (`scripts/generate_metrics_summary.py`)
 - functions:
   - `_safe_load_csv(path)`
+  - `_rel_path(path)`
   - `_status_block(status, source, metrics=None, reason=None, notes=None)`
   - `_weighted_average(values, weights)`
-  - `_regression_slope(x, y)` — Return (slope, r2) for y ~ a*x + b using least squares.
+  - `_regression_slope(x, y)`
+  - `_required_artifact(name)`
+  - `_required_path(name, artifacts_root)`
+  - `_validate_required_artifacts(artifacts_root)`
   - `tri_engine_metrics(path)`
   - `qmc_vs_prng_metrics(path)`
   - `pde_order_metrics(path)`
   - `ql_parity_metrics(path)`
   - `_collapse_status(statuses)`
   - `benchmark_metrics(root)`
+  - `_wrds_bundle_label(pricing_df)`
   - `wrds_metrics(root)`
   - `_fmt(value)`
   - `_highlights(name, block)`
@@ -116,12 +150,26 @@ Derived from `project_state/_generated/symbol_index.json`.
   - `parse_args()`
   - `build_summary(artifacts_root, manifest_path)`
   - `main()`
+- classes:
+  - `RequiredArtifact`
 
 ### scripts.generate_synthetic_data (`scripts/generate_synthetic_data.py`)
 - functions:
   - `bs_call(S, K, r, q, sigma, T)`
   - `make_options_csv(path)`
   - `make_returns_csv(path, days=1500)`
+  - `main()`
+
+### scripts.gpt_bundle (`scripts/gpt_bundle.py`)
+- functions:
+  - `_run_git(args)`
+  - `_add_path(zf, path)`
+  - `_render_required_paths(run_name)`
+  - `_required_items(run_name)`
+  - `_ticket_present(ticket_path, ticket_id)`
+  - `_verify_zip(zip_path, required_paths)`
+  - `_find_ticket_id(ticket_path)`
+  - `_run_self_test()`
   - `main()`
 
 ### scripts.greeks_reliability (`scripts/greeks_reliability.py`)
@@ -164,6 +212,8 @@ Derived from `project_state/_generated/symbol_index.json`.
 ### scripts.manifest_utils (`scripts/manifest_utils.py`)
 - functions:
   - `_rel_path(path)`
+  - `_relativize_string(value)`
+  - `_relativize_value(value)`
   - `_git_info()`
   - `_cpu_brand()`
   - `_system_info()`
@@ -284,6 +334,10 @@ Derived from `project_state/_generated/symbol_index.json`.
   - `smoke_cli(cli)`
   - `main(argv=None)`
 
+### tests.test_data_policy_fast (`tests/test_data_policy_fast.py`)
+- functions:
+  - `test_data_policy_guard()`
+
 ### tests.test_greeks_reliability_fast (`tests/test_greeks_reliability_fast.py`)
 - functions:
   - `main()`
@@ -336,6 +390,9 @@ Derived from `project_state/_generated/symbol_index.json`.
 - classes:
   - `SymbolInfo`
 
+### wrds_pipeline (`wrds_pipeline/__init__.py`)
+- functions: (none)
+
 ### wrds_pipeline.bs_utils (`wrds_pipeline/bs_utils.py`)
 - functions:
   - `_norm_cdf(x)`
@@ -357,12 +414,12 @@ Derived from `project_state/_generated/symbol_index.json`.
 
 ### wrds_pipeline.calibrate_heston (`wrds_pipeline/calibrate_heston.py`)
 - functions:
-  - `_heston_cf(u, T, params, r, q, log_spot)` — Risk-neutral characteristic function φ(u).
+  - `_heston_cf(u, T, params, r, q, log_spot)`
   - `heston_call_price(spot, strike, rate, div, T, params, n_points=32, phi_max=None)`
   - `_model_iv(row, params)`
   - `_positive_weights(values, default=1.0)`
   - `_moneyness_taper(surface)`
-  - `_vega_quote_weights(surface, default=1.0)` — Positive weights combining liquidity (quotes), sensitivity (vega), and wing taper.
+  - `_vega_quote_weights(surface, default=1.0)`
   - `_weighted_percentile(values, weights, percentile)`
   - `compute_insample_metrics(surface)`
   - `compute_oos_iv_metrics(surface)`
@@ -386,8 +443,8 @@ Derived from `project_state/_generated/symbol_index.json`.
   - `_concat_csv(files)`
   - `_bucket_rmse(df, error_col, weight_col=None)`
   - `_bucket_mae(df, error_col, weight_col=None)`
-  - `_load_insample(model)` — Load per-row insample surfaces across all dates for a model.
-  - `_load_oos(model)` — Load per-row OOS surfaces across all dates for a model.
+  - `_load_insample(model)`
+  - `_load_oos(model)`
   - `_load_pnl()`
   - `_aggregate_buckets()`
   - `_merge_comparison(buckets)`
@@ -404,17 +461,29 @@ Derived from `project_state/_generated/symbol_index.json`.
 
 ### wrds_pipeline.ingest_sppx_surface (`wrds_pipeline/ingest_sppx_surface.py`)
 - functions:
+  - `_cache_root()`
+  - `_local_root(explicit_root=None)`
+  - `_local_optionm_root(local_root)`
+  - `_local_opprcd_path(trade_date, local_root)`
+  - `_local_secprd_path(trade_date, local_root)`
+  - `_local_secnmd_path(local_root)`
+  - `_resolve_secid_local(symbol, trade_date, local_root)`
+  - `_fetch_from_local(symbol, trade_date, local_root)`
+  - `_cache_path(symbol, trade_date)`
+  - `_cache_meta_path(cache_path)`
+  - `_load_cache(symbol, trade_date)`
+  - `_write_cache(symbol, trade_date, df, source)`
   - `_has_wrds_credentials()`
   - `_table_for_trade_date(trade_date)`
   - `_secprd_table(trade_date)`
   - `_resolve_secid(conn, ticker, trade_date)`
   - `_fetch_from_wrds(symbol, trade_date)`
   - `_load_sample(symbol, trade_date)`
-  - `load_surface(symbol, trade_date, force_sample=False)`
+  - `load_surface(symbol, trade_date, force_sample=False, *, local_root=None)`
   - `_prepare_quotes(df)`
   - `aggregate_surface(df)`
   - `write_surface(out_path, df)`
-  - `has_wrds_credentials()`
+  - `has_wrds_credentials(local_root=None)`
 
 ### wrds_pipeline.oos_pricing (`wrds_pipeline/oos_pricing.py`)
 - functions:
@@ -430,8 +499,9 @@ Derived from `project_state/_generated/symbol_index.json`.
   - `_plot_hedge_distribution(pnl_detail, out_path)`
   - `_plot_multi_date_summary(pricing, oos, pnl, out_path)`
   - `_load_dateset_payload(path)`
-  - `run(symbol, trade_date, next_trade_date, use_sample, fast, *, output_dir=None, label=None, regime=None, wrds_root=None)`
-  - `run_dateset(symbol, dateset_path, use_sample, fast, *, output_root=None)`
+  - `_local_root_from_payload(payload)`
+  - `run(symbol, trade_date, next_trade_date, use_sample, fast, *, output_dir=None, label=None, regime=None, wrds_root=None, local_root=None)`
+  - `run_dateset(symbol, dateset_path, use_sample, fast, *, output_root=None, local_root=None)`
   - `main()`
 
 ### wrds_pipeline.tests.test_wrds_pipeline (`wrds_pipeline/tests/test_wrds_pipeline.py`)
@@ -440,16 +510,12 @@ Derived from `project_state/_generated/symbol_index.json`.
   - `_has_wrds_env()`
   - `_expected_artifacts(base)`
   - `_write_dateset(path)`
-  - `_baseline_sigma()` — Reference Δ-hedge σ from bundled sample comparison (regression harness).
+  - `_baseline_sigma()`
   - `_assert_tolerances(wrds_root, dates)`
   - `main()`
 
-
-## C++ public API highlights (non-exhaustive)
-- Black–Scholes (`include/quant/black_scholes.hpp`): `call_price`, `put_price`, `delta_call`, `gamma`, `vega`, `theta_call`, `rho_call`, `implied_vol_call`.
-- Monte Carlo (`include/quant/mc.hpp`): `price_european_call`, `greeks_european_call` with `McParams` and `McResult`.
-- PDE (`include/quant/pde.hpp`): `price_crank_nicolson` returning `PdeResult`.
-- Barrier analytics/MC/PDE (`include/quant/bs_barrier.hpp`, `include/quant/mc_barrier.hpp`, `include/quant/pde_barrier.hpp`).
-- American (`include/quant/american.hpp`): `price_binomial_crr`, `price_psor`, `price_lsmc` with `Params`/`PsorParams`/`LsmcParams`.
-- Heston (`include/quant/heston.hpp`): analytic characteristic-function pricing and QE MC.
-- Risk (`include/quant/risk.hpp`): VaR/CVaR and Kupiec backtest utilities.
+## C++ API highlights (non-exhaustive)
+- `quant::bs` (Black–Scholes) — price/greek helpers in `include/quant/black_scholes.hpp`.
+- `quant::mc` — GBM/QMC Monte Carlo pricing + Greeks in `include/quant/mc.hpp`.
+- `quant::pde` — Crank–Nicolson solvers in `include/quant/pde.hpp`.
+- `quant::american`, `quant::barrier`, `quant::heston`, `quant::risk` — specialty engines in matching headers.

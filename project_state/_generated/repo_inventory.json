@@ -4,13 +4,13 @@
       "ext": "md",
       "path": "AGENTS.md",
       "role": "misc",
-      "size_bytes": 4859
+      "size_bytes": 3688
     },
     {
       "ext": "md",
       "path": "CHANGELOG.md",
       "role": "repo_meta",
-      "size_bytes": 2964
+      "size_bytes": 3888
     },
     {
       "ext": "cff",
@@ -22,13 +22,13 @@
       "ext": "txt",
       "path": "CMakeLists.txt",
       "role": "repo_meta",
-      "size_bytes": 10272
+      "size_bytes": 10468
     },
     {
       "ext": "md",
       "path": "CONTRIBUTING.md",
       "role": "repo_meta",
-      "size_bytes": 962
+      "size_bytes": 998
     },
     {
       "ext": "",
@@ -46,19 +46,19 @@
       "ext": "",
       "path": "Makefile",
       "role": "repo_meta",
-      "size_bytes": 138
+      "size_bytes": 482
     },
     {
       "ext": "md",
       "path": "PROGRESS.md",
       "role": "misc",
-      "size_bytes": 356
+      "size_bytes": 5233
     },
     {
       "ext": "md",
       "path": "README.md",
       "role": "repo_meta",
-      "size_bytes": 48365
+      "size_bytes": 48836
     },
     {
       "ext": "md",
@@ -85,22 +85,10 @@
       "size_bytes": 119593
     },
     {
-      "ext": "csv",
-      "path": "artifacts/heston/fit_20230601.csv",
-      "role": "artifacts",
-      "size_bytes": 1920
-    },
-    {
       "ext": "png",
       "path": "artifacts/heston/fit_20230601.png",
       "role": "artifacts",
       "size_bytes": 83941
-    },
-    {
-      "ext": "csv",
-      "path": "artifacts/heston/fit_20240614.csv",
-      "role": "artifacts",
-      "size_bytes": 736
     },
     {
       "ext": "png",
@@ -124,19 +112,13 @@
       "ext": "csv",
       "path": "artifacts/heston/params_series.csv",
       "role": "artifacts",
-      "size_bytes": 1902
+      "size_bytes": 1904
     },
     {
       "ext": "png",
       "path": "artifacts/heston/params_series.png",
       "role": "artifacts",
-      "size_bytes": 181956
-    },
-    {
-      "ext": "csv",
-      "path": "artifacts/heston/series_runs/fit_20230601.csv",
-      "role": "artifacts",
-      "size_bytes": 604
+      "size_bytes": 179387
     },
     {
       "ext": "png",
@@ -145,28 +127,22 @@
       "size_bytes": 84105
     },
     {
-      "ext": "csv",
-      "path": "artifacts/heston/series_runs/fit_20240614.csv",
-      "role": "artifacts",
-      "size_bytes": 616
-    },
-    {
       "ext": "png",
       "path": "artifacts/heston/series_runs/fit_20240614.png",
       "role": "artifacts",
-      "size_bytes": 80179
+      "size_bytes": 79990
     },
     {
       "ext": "json",
       "path": "artifacts/heston/series_runs/params_20230601.json",
       "role": "artifacts",
-      "size_bytes": 1463
+      "size_bytes": 1470
     },
     {
       "ext": "json",
       "path": "artifacts/heston/series_runs/params_20240614.json",
       "role": "artifacts",
-      "size_bytes": 1461
+      "size_bytes": 1457
     },
     {
       "ext": "json",
@@ -242,6 +218,12 @@
     },
     {
       "ext": "md",
+      "path": "docs/CODEX_SPRINT_TICKETS.md",
+      "role": "docs",
+      "size_bytes": 15286
+    },
+    {
+      "ext": "md",
       "path": "docs/Design.md",
       "role": "docs",
       "size_bytes": 3657
@@ -280,7 +262,7 @@
       "ext": "md",
       "path": "docs/WRDS_Results.md",
       "role": "docs",
-      "size_bytes": 9507
+      "size_bytes": 10424
     },
     {
       "ext": "md",
@@ -314,6 +296,366 @@
     },
     {
       "ext": "md",
+      "path": "docs/agent_runs/20251220_221500_ticket-01_artifact-completeness/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 10926
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251220_221500_ticket-01_artifact-completeness/META.json",
+      "role": "docs",
+      "size_bytes": 1032
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251220_221500_ticket-01_artifact-completeness/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 5019
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251220_221500_ticket-01_artifact-completeness/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 1433
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251220_221500_ticket-01_artifact-completeness/TESTS.md",
+      "role": "docs",
+      "size_bytes": 471
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_003701_wrds_cache_build/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 9887
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251221_003701_wrds_cache_build/META.json",
+      "role": "docs",
+      "size_bytes": 1070
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_003701_wrds_cache_build/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 318
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_003701_wrds_cache_build/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 1345
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_003701_wrds_cache_build/TESTS.md",
+      "role": "docs",
+      "size_bytes": 173
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_202201_ticket-06_wrds-local-guardrails/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 16576
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251221_202201_ticket-06_wrds-local-guardrails/META.json",
+      "role": "docs",
+      "size_bytes": 1068
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_202201_ticket-06_wrds-local-guardrails/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 4764
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_202201_ticket-06_wrds-local-guardrails/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 2074
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_202201_ticket-06_wrds-local-guardrails/TESTS.md",
+      "role": "docs",
+      "size_bytes": 694
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 5724
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle/META.json",
+      "role": "docs",
+      "size_bytes": 1091
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 161
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 1062
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle/TESTS.md",
+      "role": "docs",
+      "size_bytes": 58
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_213044_ticket-06_checklist-merge/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 6981
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251221_213044_ticket-06_checklist-merge/META.json",
+      "role": "docs",
+      "size_bytes": 1136
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_213044_ticket-06_checklist-merge/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 1058
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_213044_ticket-06_checklist-merge/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 1332
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_213044_ticket-06_checklist-merge/TESTS.md",
+      "role": "docs",
+      "size_bytes": 466
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 9480
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/META.json",
+      "role": "docs",
+      "size_bytes": 983
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 406
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 597
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/TESTS.md",
+      "role": "docs",
+      "size_bytes": 62
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_001445_ticket-06_checklist-final/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 7167
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251222_001445_ticket-06_checklist-final/META.json",
+      "role": "docs",
+      "size_bytes": 1033
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_001445_ticket-06_checklist-final/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 1059
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_001445_ticket-06_checklist-final/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 1624
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_001445_ticket-06_checklist-final/TESTS.md",
+      "role": "docs",
+      "size_bytes": 674
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 7815
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/META.json",
+      "role": "docs",
+      "size_bytes": 908
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 4851
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 1948
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/TESTS.md",
+      "role": "docs",
+      "size_bytes": 568
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_032810_ticket-06c_bundle-hardgate-tests/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 4983
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251222_032810_ticket-06c_bundle-hardgate-tests/META.json",
+      "role": "docs",
+      "size_bytes": 877
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_032810_ticket-06c_bundle-hardgate-tests/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 4774
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_032810_ticket-06c_bundle-hardgate-tests/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 3539
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_032810_ticket-06c_bundle-hardgate-tests/TESTS.md",
+      "role": "docs",
+      "size_bytes": 913
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 12034
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/META.json",
+      "role": "docs",
+      "size_bytes": 1069
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 4746
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 3063
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/TESTS.md",
+      "role": "docs",
+      "size_bytes": 2325
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_142116_ticket-00_project_state_rebuild/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 11209
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251222_142116_ticket-00_project_state_rebuild/META.json",
+      "role": "docs",
+      "size_bytes": 818
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_142116_ticket-00_project_state_rebuild/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 9838
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_142116_ticket-00_project_state_rebuild/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 1401
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_142116_ticket-00_project_state_rebuild/TESTS.md",
+      "role": "docs",
+      "size_bytes": 153
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/COMMANDS.md",
+      "role": "docs",
+      "size_bytes": 14573
+    },
+    {
+      "ext": "json",
+      "path": "docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/META.json",
+      "role": "docs",
+      "size_bytes": 1072
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/PROMPT.md",
+      "role": "docs",
+      "size_bytes": 5353
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/RESULTS.md",
+      "role": "docs",
+      "size_bytes": 2441
+    },
+    {
+      "ext": "md",
+      "path": "docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/TESTS.md",
+      "role": "docs",
+      "size_bytes": 2629
+    },
+    {
+      "ext": "md",
       "path": "docs/api/index.md",
       "role": "docs",
       "size_bytes": 1876
@@ -328,25 +670,25 @@
       "ext": "csv",
       "path": "docs/artifacts/bench/bench_mc_equal_time.csv",
       "role": "docs",
-      "size_bytes": 338
+      "size_bytes": 341
     },
     {
       "ext": "png",
       "path": "docs/artifacts/bench/bench_mc_equal_time.png",
       "role": "docs",
-      "size_bytes": 104363
+      "size_bytes": 109725
     },
     {
       "ext": "csv",
       "path": "docs/artifacts/bench/bench_mc_paths.csv",
       "role": "docs",
-      "size_bytes": 247
+      "size_bytes": 248
     },
     {
       "ext": "png",
       "path": "docs/artifacts/bench/bench_mc_paths.png",
       "role": "docs",
-      "size_bytes": 65875
+      "size_bytes": 68189
     },
     {
       "ext": "csv",
@@ -370,7 +712,7 @@
       "ext": "csv",
       "path": "docs/artifacts/bench/bench_pde_order.csv",
       "role": "docs",
-      "size_bytes": 216
+      "size_bytes": 213
     },
     {
       "ext": "png",
@@ -382,13 +724,13 @@
       "ext": "csv",
       "path": "docs/artifacts/bench/bench_pde_walltime.csv",
       "role": "docs",
-      "size_bytes": 155
+      "size_bytes": 156
     },
     {
       "ext": "png",
       "path": "docs/artifacts/bench/bench_pde_walltime.png",
       "role": "docs",
-      "size_bytes": 51296
+      "size_bytes": 51027
     },
     {
       "ext": "csv",
@@ -406,31 +748,19 @@
       "ext": "csv",
       "path": "docs/artifacts/heston_qe_vs_analytic.csv",
       "role": "docs",
-      "size_bytes": 8803
+      "size_bytes": 3595
     },
     {
       "ext": "png",
       "path": "docs/artifacts/heston_qe_vs_analytic.png",
       "role": "docs",
-      "size_bytes": 167504
-    },
-    {
-      "ext": "log",
-      "path": "docs/artifacts/logs/slow_20251218T185425Z.log",
-      "role": "docs",
-      "size_bytes": 8416
-    },
-    {
-      "ext": "xml",
-      "path": "docs/artifacts/logs/slow_20251218T185425Z.xml",
-      "role": "docs",
-      "size_bytes": 6368
+      "size_bytes": 158684
     },
     {
       "ext": "json",
       "path": "docs/artifacts/manifest.json",
       "role": "docs",
-      "size_bytes": 95195
+      "size_bytes": 48858
     },
     {
       "ext": "csv",
@@ -442,55 +772,115 @@
       "ext": "png",
       "path": "docs/artifacts/mc_greeks_ci.png",
       "role": "docs",
-      "size_bytes": 40393
+      "size_bytes": 40554
     },
     {
       "ext": "json",
       "path": "docs/artifacts/metrics_summary.json",
       "role": "docs",
-      "size_bytes": 3592
+      "size_bytes": 4429
     },
     {
       "ext": "md",
       "path": "docs/artifacts/metrics_summary.md",
       "role": "docs",
-      "size_bytes": 1564
+      "size_bytes": 1905
     },
     {
       "ext": "csv",
       "path": "docs/artifacts/pde_order_slope.csv",
       "role": "docs",
-      "size_bytes": 220
+      "size_bytes": 142
     },
     {
       "ext": "png",
       "path": "docs/artifacts/pde_order_slope.png",
       "role": "docs",
-      "size_bytes": 66216
+      "size_bytes": 58104
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/ql_parity/ql_parity.csv",
+      "role": "docs",
+      "size_bytes": 480
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/ql_parity/ql_parity.png",
+      "role": "docs",
+      "size_bytes": 155360
     },
     {
       "ext": "csv",
       "path": "docs/artifacts/qmc_vs_prng_equal_time.csv",
       "role": "docs",
-      "size_bytes": 1147
+      "size_bytes": 1122
     },
     {
       "ext": "png",
       "path": "docs/artifacts/qmc_vs_prng_equal_time.png",
       "role": "docs",
-      "size_bytes": 161184
+      "size_bytes": 164711
     },
     {
       "ext": "csv",
       "path": "docs/artifacts/tri_engine_agreement.csv",
       "role": "docs",
-      "size_bytes": 571
+      "size_bytes": 359
     },
     {
       "ext": "png",
       "path": "docs/artifacts/tri_engine_agreement.png",
       "role": "docs",
-      "size_bytes": 208886
+      "size_bytes": 189204
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/wrds/wrds_agg_oos.csv",
+      "role": "docs",
+      "size_bytes": 1482
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/wrds/wrds_agg_pnl.csv",
+      "role": "docs",
+      "size_bytes": 1463
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/wrds/wrds_agg_pricing.csv",
+      "role": "docs",
+      "size_bytes": 1223
+    },
+    {
+      "ext": "csv",
+      "path": "docs/artifacts/wrds/wrds_bs_heston_comparison.csv",
+      "role": "docs",
+      "size_bytes": 1143
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/wrds/wrds_bs_heston_ivrmse.png",
+      "role": "docs",
+      "size_bytes": 55476
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/wrds/wrds_bs_heston_oos_heatmap.png",
+      "role": "docs",
+      "size_bytes": 58738
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/wrds/wrds_bs_heston_pnl_sigma.png",
+      "role": "docs",
+      "size_bytes": 44077
+    },
+    {
+      "ext": "png",
+      "path": "docs/artifacts/wrds/wrds_multi_date_summary.png",
+      "role": "docs",
+      "size_bytes": 172263
     },
     {
       "ext": "html",
@@ -3952,133 +4342,133 @@
       "ext": "md",
       "path": "project_state/ARCHITECTURE.md",
       "role": "project_state",
-      "size_bytes": 3265
+      "size_bytes": 3682
     },
     {
       "ext": "md",
       "path": "project_state/CHANGELOG.md",
       "role": "project_state",
-      "size_bytes": 1265
+      "size_bytes": 1831
     },
     {
       "ext": "md",
       "path": "project_state/CONFIG_REFERENCE.md",
       "role": "project_state",
-      "size_bytes": 1706
+      "size_bytes": 2516
     },
     {
       "ext": "md",
       "path": "project_state/CURRENT_RESULTS.md",
       "role": "project_state",
-      "size_bytes": 1347
+      "size_bytes": 1989
     },
     {
       "ext": "md",
       "path": "project_state/DATAFLOW.md",
       "role": "project_state",
-      "size_bytes": 2065
+      "size_bytes": 2755
     },
     {
       "ext": "md",
       "path": "project_state/DEPENDENCY_GRAPH.md",
       "role": "project_state",
-      "size_bytes": 1530
+      "size_bytes": 1799
     },
     {
       "ext": "md",
       "path": "project_state/EXPERIMENTS.md",
       "role": "project_state",
-      "size_bytes": 1949
+      "size_bytes": 2394
     },
     {
       "ext": "md",
       "path": "project_state/FUNCTION_INDEX.md",
       "role": "project_state",
-      "size_bytes": 15367
+      "size_bytes": 16874
     },
     {
       "ext": "md",
       "path": "project_state/INDEX.md",
       "role": "project_state",
-      "size_bytes": 2641
+      "size_bytes": 2816
     },
     {
       "ext": "md",
       "path": "project_state/KNOWN_ISSUES.md",
       "role": "project_state",
-      "size_bytes": 790
+      "size_bytes": 1107
     },
     {
       "ext": "md",
       "path": "project_state/MODULE_SUMMARIES.md",
       "role": "project_state",
-      "size_bytes": 6374
+      "size_bytes": 6955
     },
     {
       "ext": "md",
       "path": "project_state/OPEN_QUESTIONS.md",
       "role": "project_state",
-      "size_bytes": 946
+      "size_bytes": 1120
     },
     {
       "ext": "md",
       "path": "project_state/PIPELINE_FLOW.md",
       "role": "project_state",
-      "size_bytes": 2601
+      "size_bytes": 3305
     },
     {
       "ext": "md",
       "path": "project_state/RESEARCH_NOTES.md",
       "role": "project_state",
-      "size_bytes": 1237
+      "size_bytes": 1463
     },
     {
       "ext": "md",
       "path": "project_state/ROADMAP.md",
       "role": "project_state",
-      "size_bytes": 1232
+      "size_bytes": 1379
     },
     {
       "ext": "md",
       "path": "project_state/SERVER_ENVIRONMENT.md",
       "role": "project_state",
-      "size_bytes": 726
+      "size_bytes": 926
     },
     {
       "ext": "md",
       "path": "project_state/STYLE_GUIDE.md",
       "role": "project_state",
-      "size_bytes": 1200
+      "size_bytes": 1443
     },
     {
       "ext": "md",
       "path": "project_state/TEST_COVERAGE.md",
       "role": "project_state",
-      "size_bytes": 1186
+      "size_bytes": 1332
     },
     {
       "ext": "json",
       "path": "project_state/_generated/import_graph.json",
       "role": "project_state",
-      "size_bytes": 5458
+      "size_bytes": 5918
     },
     {
       "ext": "txt",
       "path": "project_state/_generated/make_targets.txt",
       "role": "project_state",
-      "size_bytes": 6
+      "size_bytes": 17
     },
     {
       "ext": "json",
       "path": "project_state/_generated/repo_inventory.json",
       "role": "project_state",
-      "size_bytes": 113252
+      "size_bytes": 125607
     },
     {
       "ext": "json",
       "path": "project_state/_generated/symbol_index.json",
       "role": "project_state",
-      "size_bytes": 131796
+      "size_bytes": 147424
     },
     {
       "ext": "toml",
@@ -4117,10 +4507,22 @@
       "size_bytes": 79
     },
     {
+      "ext": "txt",
+      "path": "requirements-dev.txt",
+      "role": "misc",
+      "size_bytes": 86
+    },
+    {
       "ext": "py",
       "path": "scripts/american_consistency.py",
       "role": "scripts",
       "size_bytes": 8702
+    },
+    {
+      "ext": "py",
+      "path": "scripts/build_wrds_cache.py",
+      "role": "scripts",
+      "size_bytes": 11562
     },
     {
       "ext": "py",
@@ -4133,6 +4535,12 @@
       "path": "scripts/calibrate_heston_series.py",
       "role": "scripts",
       "size_bytes": 6485
+    },
+    {
+      "ext": "py",
+      "path": "scripts/check_data_policy.py",
+      "role": "scripts",
+      "size_bytes": 3160
     },
     {
       "ext": "sh",
@@ -4180,13 +4588,19 @@
       "ext": "py",
       "path": "scripts/generate_metrics_summary.py",
       "role": "scripts",
-      "size_bytes": 19825
+      "size_bytes": 25365
     },
     {
       "ext": "py",
       "path": "scripts/generate_synthetic_data.py",
       "role": "scripts",
       "size_bytes": 2378
+    },
+    {
+      "ext": "py",
+      "path": "scripts/gpt_bundle.py",
+      "role": "scripts",
+      "size_bytes": 8774
     },
     {
       "ext": "py",
@@ -4216,7 +4630,7 @@
       "ext": "py",
       "path": "scripts/manifest_utils.py",
       "role": "scripts",
-      "size_bytes": 6089
+      "size_bytes": 6961
     },
     {
       "ext": "py",
@@ -4270,7 +4684,7 @@
       "ext": "sh",
       "path": "scripts/reproduce_all.sh",
       "role": "scripts",
-      "size_bytes": 7238
+      "size_bytes": 7712
     },
     {
       "ext": "py",
@@ -4441,6 +4855,12 @@
       "size_bytes": 10721
     },
     {
+      "ext": "py",
+      "path": "tests/test_data_policy_fast.py",
+      "role": "tests",
+      "size_bytes": 483
+    },
+    {
       "ext": "cpp",
       "path": "tests/test_digital.cpp",
       "role": "tests",
@@ -4606,7 +5026,7 @@
       "ext": "py",
       "path": "wrds_pipeline/ingest_sppx_surface.py",
       "role": "wrds_pipeline",
-      "size_bytes": 9686
+      "size_bytes": 18473
     },
     {
       "ext": "py",
@@ -4618,13 +5038,13 @@
       "ext": "py",
       "path": "wrds_pipeline/pipeline.py",
       "role": "wrds_pipeline",
-      "size_bytes": 25727
+      "size_bytes": 27112
     },
     {
       "ext": "csv",
       "path": "wrds_pipeline/sample_data/spx_options_sample.csv",
       "role": "wrds_pipeline",
-      "size_bytes": 8132
+      "size_bytes": 6221
     },
     {
       "ext": "py",
@@ -4636,46 +5056,46 @@
       "ext": "yaml",
       "path": "wrds_pipeline_dates_panel.yaml",
       "role": "misc",
-      "size_bytes": 799
+      "size_bytes": 906
     }
   ],
-  "generated_at": "2025-12-20T21:30:07.823252+00:00",
-  "git_sha": "3297510aedecac18e790474b1319636ac560d3b2",
+  "generated_at": "2025-12-22T19:31:11.165347+00:00",
+  "git_sha": "5265c6de1a7e13f4bfc8708f188986cee30b18ed",
   "root": "/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp",
   "summary": {
     "role_counts": {
-      "artifacts": 18,
+      "artifacts": 14,
       "benchmarks": 3,
       "cmake": 1,
       "cpp_headers": 22,
       "cpp_sources": 18,
       "data": 6,
-      "docs": 77,
+      "docs": 146,
       "external": 517,
-      "misc": 7,
+      "misc": 8,
       "project_state": 22,
       "python_bindings": 4,
       "repo_meta": 13,
-      "scripts": 29,
-      "tests": 24,
+      "scripts": 32,
+      "tests": 25,
       "wrds_pipeline": 12
     },
     "role_sizes_bytes": {
-      "artifacts": 651330,
+      "artifacts": 644701,
       "benchmarks": 11898,
       "cmake": 475,
       "cpp_headers": 30447,
       "cpp_sources": 191031,
       "data": 578900,
-      "docs": 5589324,
+      "docs": 6209153,
       "external": 5439082,
-      "misc": 32424,
-      "project_state": 297939,
+      "misc": 36323,
+      "project_state": 334652,
       "python_bindings": 20571,
-      "repo_meta": 67962,
-      "scripts": 245787,
-      "tests": 71294,
-      "wrds_pipeline": 91561
+      "repo_meta": 69933,
+      "scripts": 276169,
+      "tests": 71777,
+      "wrds_pipeline": 99822
     }
   }
 }

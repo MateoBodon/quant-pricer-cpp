@@ -9,7 +9,7 @@
 - wrds(cache): add WRDS parquet cache support and a bulk cache builder script for real-data slices
 - wrds(local): document local WRDS OptionMetrics parquet stash and include a manifest in the validation bundle
 - wrds(local): require explicit WRDS_LOCAL_ROOT / dateset config for local mode, keep sample artifacts as default, and scrub repo-relative paths in committed artifacts
-
+- docs(project_state): refresh project_state docs and generated indices
 ## v0.3.2
 
 - feat(wrds): multi-date OptionMetrics panel (vega-weighted RMSE/MAE, OOS bps, Δ-hedged PnL) with aggregated CSV/PNG artifacts, manifest updates, and deterministic sample bundle.

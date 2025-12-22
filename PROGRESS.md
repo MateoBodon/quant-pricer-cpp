@@ -19,6 +19,7 @@ Completed the Ticket-06 checklist: reran `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scrip
 Cleaned tracked `.venv` from git history, added `docs/artifacts/wrds_local/` to `.gitignore`, and preserved the local manifest at `docs/artifacts/wrds_local/manifest_local.json` (untracked). Run log: `docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/`.
 
 ## 2025-12-22
+
 Ran the Ticket-06 checklist: `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` (FAST tests failed due to missing matplotlib), `ctest --test-dir build -L FAST --output-on-failure` (same failures), and `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast` (python shim required because `python` is not on PATH). Regenerated metrics/manifest artifacts, updated `project_state/CURRENT_RESULTS.md` + `project_state/KNOWN_ISSUES.md`, added `.agent/` to `.gitignore`, and added a `gpt-bundle` Makefile target. Run log: `docs/agent_runs/20251222_001445_ticket-06_checklist-final/`. Bundle: `docs/gpt_bundles/20251222T002413Z_ticket-06_20251222_001445_ticket-06_checklist-final.zip`.
 
 Hardened `gpt-bundle` to require run log files and ticket presence, added Ticket-06b to sprint tickets, and marked the prior `ticket-06_checklist-final` bundle as FAIL due to missing run logs (process-only). Run log: `docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/`. Bundle: `docs/gpt_bundles/20251222T015729Z_ticket-06b_20251222_014941_ticket-06b_bundle-integrity.zip`.
@@ -30,3 +31,5 @@ Implemented the data-policy guard (`scripts/check_data_policy.py` + FAST test), 
 Marked Ticket-07 as **FAIL**: FAST remained red due to missing matplotlib and the sample data could bypass the guard by renaming columns. Run log: `docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/`.
 
 Completed Ticket-07b: enforced `# SYNTHETIC_DATA` markers in the data-policy guard, regenerated synthetic WRDS sample CSV (with comment-skipping loader), added `requirements-dev.txt` + CONTRIBUTING install note, and made FAST green with the sample pipeline smoke. Checklist verification (negative guard test + clean data scan) recorded. Run log: `docs/agent_runs/20251222_175224_ticket-07b_data-policy-guard-fix/`. Bundle: `docs/gpt_bundles/20251222T185123Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip`.
+
+Rebuilt the `project_state/` documentation set and refreshed generated indices (`project_state/_generated/*`). Produced bundle: `docs/gpt_bundles/project_state_20251222T192635Z_5265c6d.zip`. Run log: `docs/agent_runs/20251222_142116_ticket-00_project_state_rebuild/`.

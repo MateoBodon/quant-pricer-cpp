@@ -1,22 +1,25 @@
 ---
-generated_at: 2025-12-20T21:11:15Z
-git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
-branch: master
+generated_at: 2025-12-22T19:13:19Z
+git_sha: 5265c6de1a7e13f4bfc8708f188986cee30b18ed
+branch: feature/ticket-00_project_state_refresh
 commands:
   - date -u +%Y-%m-%dT%H:%M:%SZ
   - git rev-parse HEAD
   - git rev-parse --abbrev-ref HEAD
   - python3 -V
+  - c++ --version
+  - cmake --version
+  - uname -a
   - rg --files
   - rg --files -g '*.py'
+  - rg --files tests
+  - rg -n "argparse|click|typer" scripts wrds_pipeline python tests tools
   - python3 tools/project_state_generate.py
-  - uname -a
-  - cmake --version
 ---
 
 # Open Questions
 
-- There is no `PROGRESS.md` in the repo root; should one be created and maintained? (Checked: `rg --files -g 'PROGRESS.md'` returned none.)
-- `ROADMAP (1).md` exists, but there is no `docs/ROADMAP.md`; should it be moved/renamed to align with the roadmap doc references?
-- `docs/artifacts/metrics_summary.md` reports missing QL parity, benchmark, and WRDS artifacts; are these expected to be regenerated on the next run? (`docs/artifacts/metrics_summary.md`).
-- `docs/agent_runs/` had no historical runs before this rebuild; if prior runs exist elsewhere, where should they be indexed?
+- `ROADMAP (1).md` is the active roadmap source; should it be renamed/moved to `docs/ROADMAP.md` to match references in the roadmap text?
+- There are two dateset configs: `wrds_pipeline_dates_panel.yaml` and `wrds_pipeline/dateset.yaml` (JSON payload). Which should be the single source of truth for multi-date WRDS runs?
+- Artifact outputs are split between `docs/artifacts/` (repro pipeline) and `artifacts/` (several scripts default here). Should defaults be unified to avoid confusion?
+- Both `docs/artifacts/manifest.json` and `artifacts/manifest.json` exist. Which one is canonical for downstream consumers?

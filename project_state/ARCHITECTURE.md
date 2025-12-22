@@ -1,61 +1,63 @@
 ---
-generated_at: 2025-12-20T21:11:15Z
-git_sha: 36c52c1d72dbcaacd674729ea9ab4719b3fd6408
-branch: master
+generated_at: 2025-12-22T19:13:19Z
+git_sha: 5265c6de1a7e13f4bfc8708f188986cee30b18ed
+branch: feature/ticket-00_project_state_refresh
 commands:
   - date -u +%Y-%m-%dT%H:%M:%SZ
   - git rev-parse HEAD
   - git rev-parse --abbrev-ref HEAD
   - python3 -V
+  - c++ --version
+  - cmake --version
+  - uname -a
   - rg --files
   - rg --files -g '*.py'
+  - rg --files tests
+  - rg -n "argparse|click|typer" scripts wrds_pipeline python tests tools
   - python3 tools/project_state_generate.py
-  - uname -a
-  - cmake --version
 ---
 
 # Architecture
 
 ## System overview
-- **C++20 core library** (`include/quant/`, `src/`): pricing engines for Black–Scholes analytics, Monte Carlo, PDE, barriers, American, exotics, Heston, risk, multi-asset.
-- **CLI executable** (`src/main.cpp` → `quant_cli`): command-line pricing front-end for multiple engines with JSON output option.
-- **Python bindings** (`python/pybind_module.cpp` + `pyproject.toml`): `pyquant_pricer` via pybind11/scikit-build.
-- **Artifacts + validation** (`scripts/`, `docs/artifacts/`): reproducible figures/CSVs and manifest metadata.
-- **WRDS pipeline** (`wrds_pipeline/`): IvyDB/OptionMetrics ingestion, calibration, OOS and Δ-hedge aggregates.
+- **C++20 core library** (`include/quant/`, `src/`): Black–Scholes analytics, Monte Carlo (QMC + VR), PDE, American, barrier, exotic, Heston, risk, and multi-asset engines.
+- **CLI executable** (`src/main.cpp` → `quant_cli`): command-line front-end for core engines with optional JSON output.
+- **Python bindings** (`python/pybind_module.cpp`, `pyproject.toml`): `pyquant_pricer` via pybind11/scikit-build-core.
+- **Artifacts + validation** (`scripts/`, `docs/artifacts/`): reproducible CSV/PNG evidence, metrics summary, validation bundle.
+- **WRDS pipeline** (`wrds_pipeline/`): IvyDB/OptionMetrics ingest, calibration, OOS, and Δ-hedge diagnostics (sample-only by default).
+- **Run logging + bundles** (`docs/agent_runs/`, `scripts/gpt_bundle.py`, `docs/gpt_bundles/`): auditable runs and GPT bundles.
 
 ## Core C++ library layout
-- Public API headers live in `include/quant/` (namespaces such as `quant::bs`, `quant::mc`, `quant::pde`, `quant::heston`).
-- Implementations live in `src/` (one .cpp per engine or component).
+- Public API headers live in `include/quant/` (namespaces: `quant::bs`, `quant::mc`, `quant::pde`, `quant::american`, `quant::heston`, `quant::risk`).
+- Implementations live in `src/` (one `.cpp` per engine/component).
 - QMC utilities are under `include/quant/qmc/` and `src/qmc/`.
-- RNG abstractions and term structures are shared across engines (`include/quant/rng.hpp`, `include/quant/term_structures.hpp`).
+- Shared utilities: RNGs (`include/quant/rng.hpp`), term structures (`include/quant/term_structures.hpp`), math/stats helpers.
 
 ## CLI architecture
-- `quant_cli` composes the same headers the library exposes (`src/main.cpp`).
-- Engines are routed by the first CLI argument: `bs`, `iv`, `mc`, `barrier`, `pde`, `american`, `digital`, `asian`, `heston`, `risk`.
-- Optional JSON output is supported for scripting and test harnesses.
+- `quant_cli` routes by the first argument: `bs`, `iv`, `mc`, `barrier`, `pde`, `american`, `digital`, `asian`, `heston`, `risk`.
+- Each engine builds parameter structs and calls the corresponding C++ API, emitting text or JSON.
 
 ## Python bindings
-- `python/pybind_module.cpp` binds a subset of the core API (BS, MC, PDE, American, barrier, Heston, risk).
-- Build is driven by CMake and scikit-build (`pyproject.toml` with `QUANT_ENABLE_PYBIND=ON`).
-- Example usage lives in `python/examples/quickstart.py`.
+- `pyquant_pricer` exposes BS analytics/Greeks, MC pricing + Greeks, PDE pricing, American (binomial/PSOR/LSMC), barrier BS/MC/PDE, Heston analytic + MC, and risk utilities.
+- Build is driven by scikit-build-core (`pyproject.toml`), with `QUANT_ENABLE_PYBIND=ON`.
 
 ## Data/artifact architecture
-- Artifact generation scripts are under `scripts/` and write to `docs/artifacts/`.
-- `scripts/reproduce_all.sh` orchestrates build + tests + artifact refresh and updates `docs/artifacts/manifest.json` via `scripts/manifest_utils.py`.
-- Metrics snapshot summaries are derived by `scripts/generate_metrics_summary.py` (outputs `docs/artifacts/metrics_summary.md/json`).
+- Artifact scripts in `scripts/` emit CSV/PNG outputs under `docs/artifacts/` during reproducible runs.
+- `scripts/manifest_utils.py` maintains `docs/artifacts/manifest.json` (git + system metadata).
+- `scripts/generate_metrics_summary.py` produces `docs/artifacts/metrics_summary.md/json` (single source of truth for status).
+- Data-policy guard: `scripts/check_data_policy.py` enforces restricted-column rules and `# SYNTHETIC_DATA` markers for sample CSVs.
 
 ## WRDS pipeline architecture
 - Entry point: `python -m wrds_pipeline.pipeline` (`wrds_pipeline/pipeline.py`).
-- Pipeline stages: surface ingest → calibration (Heston/BS) → OOS pricing → Δ-hedged PnL → aggregated CSV/PNG outputs.
-- Configuration for multi-date runs is in `wrds_pipeline_dates_panel.yaml`.
-- MARKET tests wrap the pipeline (`wrds_pipeline/tests/test_wrds_pipeline.py`).
+- Pipeline stages: surface ingest (`ingest_sppx_surface`) → calibration (`calibrate_heston` + `calibrate_bs`) → OOS pricing (`oos_pricing`) → Δ-hedged PnL (`delta_hedge_pnl`) → aggregation/plots (`pipeline.py`).
+- Configurations live in `wrds_pipeline_dates_panel.yaml` and `wrds_pipeline/dateset.yaml`.
 
 ## Key repository layout
 - `include/quant/` — public C++ headers (API surface).
 - `src/` — C++ implementations + CLI (`src/main.cpp`).
 - `python/` — pybind module + examples.
 - `wrds_pipeline/` — WRDS pipeline package.
-- `scripts/` — experiment and artifact generation scripts.
+- `scripts/` — artifact generation, validation, and tooling scripts.
 - `benchmarks/` — Google Benchmark targets.
 - `tests/` — C++ unit tests and Python FAST tests.
 - `docs/` — docs, results, and artifacts (`docs/artifacts/`).

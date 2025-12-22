@@ -1,0 +1,22 @@
+{
+  "run_name": "20251222_142116_ticket-00_project_state_rebuild",
+  "ticket_id": "ticket-00",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "5265c6de1a7e13f4bfc8708f188986cee30b18ed",
+  "git_sha_after": "",
+  "branch": "feature/ticket-00_project_state_refresh",
+  "timestamp_local": "2025-12-22T14:24:44",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "3.12.2"
+  },
+  "dataset": {
+    "mode": "synthetic",
+    "dataset_id": "n/a",
+    "config_path": "",
+    "config_hash": ""
+  },
+  "notes": "Documentation-only project_state rebuild; no tests or artifact generation executed."
+}

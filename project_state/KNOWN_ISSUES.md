@@ -1,19 +1,25 @@
 ---
-generated_at: 2025-12-22T18:07:22Z
-git_sha: 01146501a408595d96244765c7ad7563efc3166c
-branch: feature/ticket-07b_data-policy-guard-fix
+generated_at: 2025-12-22T19:13:19Z
+git_sha: 5265c6de1a7e13f4bfc8708f188986cee30b18ed
+branch: feature/ticket-00_project_state_refresh
 commands:
   - date -u +%Y-%m-%dT%H:%M:%SZ
   - git rev-parse HEAD
   - git rev-parse --abbrev-ref HEAD
-  - rg -n "strike,.*market_iv" -S .
-  - rg -n "\\bsecid\\b|best_bid|best_ask|best_offer" -S .
+  - python3 -V
+  - c++ --version
+  - cmake --version
+  - uname -a
+  - rg --files
+  - rg --files -g '*.py'
+  - rg --files tests
+  - rg -n "argparse|click|typer" scripts wrds_pipeline python tests tools
+  - python3 tools/project_state_generate.py
 ---
 
 # Known Issues
 
-- `ROADMAP (1).md` notes Heston QE bias remains under investigation; QE is still described as experimental in roadmap notes.
+- Heston QE bias remains under investigation (see `ROADMAP (1).md` and `docs/Results.md` notes).
 - WRDS live runs are gated by environment variables (`WRDS_ENABLED=1` + credentials); MARKET tests skip without them (`wrds_pipeline/tests/test_wrds_pipeline.py`).
-- Prior local-run WRDS artifacts under `docs/artifacts/wrds/per_date/` contained strike/IV surfaces derived from real data, which risks redistribution; keep committed WRDS artifacts sample-only and isolate any local/live outputs under `docs/artifacts/wrds_local/` or external paths.
-- (Resolved 2025-12-22) Removed tracked Heston fit tables with `strike`/`market_iv` columns and added a data-policy guard to block reintroducing restricted columns in tracked artifacts.
-- Data-policy guard now requires a `# SYNTHETIC_DATA` marker for tracked CSVs under `wrds_pipeline/sample_data/` to prevent renaming-based bypasses.
+- Live/local WRDS outputs must not be committed; keep them outside the repo or under gitignored paths such as `docs/artifacts/wrds_local/` (data-policy guard enforces restricted-column rules).
+- Script defaults are split between `docs/artifacts/` and `artifacts/`, which can lead to confusion if the wrong artifact root is used in summaries.
