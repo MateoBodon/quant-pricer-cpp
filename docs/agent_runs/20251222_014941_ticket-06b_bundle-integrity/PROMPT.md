@@ -95,3 +95,14 @@ Full-autonomy mode is NOT requested; do not use yolo/no-approval modes.
 - Ticket-06b exists in docs/CODEX_SPRINT_TICKETS.md
 - PROGRESS.md updated
 - No secrets or raw WRDS data committed
+
+---
+
+Follow-up user request (2025-12-22):
+
+yes finish everything, then make sure everything on this checklist is complete,  unzip -l docs/gpt_bundles/*ticket-06b*.zip shows all required files, including docs/agent_runs/<RUN_NAME>/{COMMANDS,RESULTS,TESTS,META}.
+ docs/CODEX_SPRINT_TICKETS.md contains Ticket-06b with acceptance criteria.
+ PROGRESS.md has a new entry referencing the run log folder and bundle path.
+ scripts/gpt_bundle.py exits non-zero when you intentionally remove one required file (sanity check).
+ No secrets: rg -n "WRDS_PASSWORD|WRDS_USERNAME|password|token|secret" -S .
+ No raw market data: rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S . (if hits, verify they’re not committed quote surfaces).  after the checklist is complete commit changes, then merge to main and push to origin

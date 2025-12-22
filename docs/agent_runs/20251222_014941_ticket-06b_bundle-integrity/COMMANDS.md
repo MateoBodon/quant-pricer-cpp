@@ -35,3 +35,23 @@
 33. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "ticket-06b: gpt-bundle completeness hard gate" -m "Tests: python3 -m compileall scripts/gpt_bundle.py" -m "Bundle: docs/gpt_bundles/20251222T015729Z_ticket-06b_20251222_014941_ticket-06b_bundle-integrity.zip" -m "Run log: docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/"
 34. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] make gpt-bundle TICKET=ticket-06b RUN_NAME=20251222_014941_ticket-06b_bundle-integrity TIMESTAMP=20251222T015729Z
 35. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] python3 - << 'PY' (list bundle contents)
+36. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status -sb
+37. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] unzip -l docs/gpt_bundles/*ticket-06b*.zip
+38. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] rg -n "WRDS_PASSWORD|WRDS_USERNAME|password|token|secret" -S .
+39. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S .
+40. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] mv PROGRESS.md PROGRESS.md.bak
+41. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] python3 scripts/gpt_bundle.py --ticket ticket-06b --run-name 20251222_014941_ticket-06b_bundle-integrity --timestamp 20251222T015729Z; echo "exit=$?"
+42. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] mv PROGRESS.md.bak PROGRESS.md
+43. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat <<'EOF' >> docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/PROMPT.md
+44. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat <<'EOF' > docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/RESULTS.md
+45. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat <<'EOF' > docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/TESTS.md
+46. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat <<'EOF' > docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/META.json
+47. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat <<'EOF' >> docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/COMMANDS.md
+48. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity
+49. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "ticket-06b: finalize checklist verification" -m "Tests: python3 -m compileall scripts/gpt_bundle.py; make gpt-bundle TICKET=ticket-06b RUN_NAME=20251222_014941_ticket-06b_bundle-integrity TIMESTAMP=20251222T015729Z; python3 scripts/gpt_bundle.py --ticket ticket-06b --run-name 20251222_014941_ticket-06b_bundle-integrity --timestamp 20251222T015729Z (with PROGRESS.md temporarily moved)" -m "Bundle: docs/gpt_bundles/20251222T015729Z_ticket-06b_20251222_014941_ticket-06b_bundle-integrity.zip" -m "Run log: docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/"
+50. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git stash push -u -m "wip/pre-merge-ticket-06b"
+51. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git checkout main
+52. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git merge feature/ticket-06b_bundle-integrity
+53. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git push origin main
+54. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git checkout feature/ticket-06b_bundle-integrity
+55. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git stash pop

@@ -18,5 +18,5 @@
     "config_path": "",
     "config_hash": ""
   },
-  "notes": "Bundler hard gate update for required files/ticket entry; compileall run; ctest FAST skipped (bundler-only change)."
+  "notes": "Bundler hard gate update; bundle contents verified; sanity check for missing file; secrets/raw-data scans executed; FAST tests skipped (bundler-only change)."
 }
