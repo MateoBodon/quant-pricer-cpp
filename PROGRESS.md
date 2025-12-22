@@ -24,3 +24,5 @@ Ran the Ticket-06 checklist: `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce
 Hardened `gpt-bundle` to require run log files and ticket presence, added Ticket-06b to sprint tickets, and marked the prior `ticket-06_checklist-final` bundle as FAIL due to missing run logs (process-only). Run log: `docs/agent_runs/20251222_014941_ticket-06b_bundle-integrity/`. Bundle: `docs/gpt_bundles/20251222T015729Z_ticket-06b_20251222_014941_ticket-06b_bundle-integrity.zip`.
 
 Proved `gpt-bundle` hard-gate behavior with REQUIRED_PATHS + self-test (missing-file + missing-ticket), marked Ticket-06b FAIL, added Ticket-06c, and reverted unrelated Heston artifact churn. Run log: `docs/agent_runs/20251222_032810_ticket-06c_bundle-hardgate-tests/`. Bundle: `docs/gpt_bundles/20251222T033950Z_ticket-06c_20251222_032810_ticket-06c_bundle-hardgate-tests.zip`.
+
+Implemented the data-policy guard (`scripts/check_data_policy.py` + FAST test), removed tracked Heston fit CSV surfaces, and sanitized WRDS sample data columns to avoid raw quote headers. Updated `project_state/KNOWN_ISSUES.md`. Run log: `docs/agent_runs/20251222_044808_ticket-07_data-policy-guard/`.

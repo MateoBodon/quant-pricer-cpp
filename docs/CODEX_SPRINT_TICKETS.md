@@ -89,6 +89,51 @@ Make the repo interview-safe by eliminating “missing evidence” and enforcing
 
 ---
 
+## Ticket-07 — Data policy cleanup + automated “no quote surfaces” guard
+**Goal (1 sentence):** Remove quote-surface artifacts and add a guard that blocks committing raw/redistributable WRDS/OptionMetrics-like data.
+
+**Why:**
+- Eliminate license/compliance landmines from tracked artifacts and prevent regressions.
+
+**Files/modules likely touched:**
+- `scripts/check_data_policy.py`
+- `tests/test_data_policy_fast.py`
+- `CMakeLists.txt`
+- `artifacts/heston/*`
+- `wrds_pipeline/ingest_sppx_surface.py`
+- `wrds_pipeline/sample_data/spx_options_sample.csv`
+- `AGENTS.md`
+- `project_state/KNOWN_ISSUES.md`
+- `PROGRESS.md`
+- `docs/agent_runs/<RUN_NAME>/`
+
+**Acceptance criteria (objective):**
+1) `scripts/check_data_policy.py` scans git-tracked files for:
+   - `strike,.*market_iv`
+   - `\bsecid\b`
+   - `best_bid|best_ask|best_offer`
+   and fails only on tracked data/artifact files (`.csv`, `.parquet`, `.json`) outside code/docs.
+2) Quote-surface artifacts (e.g., `artifacts/heston/fit_*.csv`, `artifacts/heston/series_runs/fit_*.csv`) are removed or replaced with synthetic/public samples and documented.
+3) FAST suite runs the data policy guard (test or fast repro integration).
+4) `project_state/KNOWN_ISSUES.md` and `PROGRESS.md` updated; `AGENTS.md` updated if new policy rule added.
+
+**Minimal tests/commands to run:**
+- `python3 -m compileall scripts/check_data_policy.py`
+- `python3 scripts/check_data_policy.py`
+- `ctest --test-dir build -L FAST --output-on-failure`
+- `WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast` (or `python3` if `python` is not on PATH)
+
+**Expected artifacts/logs to produce:**
+- `docs/agent_runs/<RUN_NAME>/*`
+- `docs/gpt_bundles/<timestamp>_ticket-07_<RUN_NAME>.zip`
+
+**Exit checklist:**
+- Tests run: ✅
+- Artifacts/logs: ✅
+- Docs updates: ✅
+
+---
+
 ## Ticket-03 — QuantLib parity suite: grid-based, summarized, regression-safe
 **Goal (1 sentence):** QuantLib parity must be a grid (not cherry-picked cases) and summarized into `metrics_summary` with max/median error.
 

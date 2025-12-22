@@ -15,4 +15,4 @@ commands:
 - `ROADMAP (1).md` notes Heston QE bias remains under investigation; QE is still described as experimental in roadmap notes.
 - WRDS live runs are gated by environment variables (`WRDS_ENABLED=1` + credentials); MARKET tests skip without them (`wrds_pipeline/tests/test_wrds_pipeline.py`).
 - Prior local-run WRDS artifacts under `docs/artifacts/wrds/per_date/` contained strike/IV surfaces derived from real data, which risks redistribution; keep committed WRDS artifacts sample-only and isolate any local/live outputs under `docs/artifacts/wrds_local/` or external paths.
-- `artifacts/heston/fit_*.csv` and `artifacts/heston/series_runs/fit_*.csv` include `strike`/`market_iv` columns; audit provenance/licensing and replace with synthetic or clearly public-source inputs if needed.
+- (Resolved 2025-12-22) Removed tracked Heston fit tables with `strike`/`market_iv` columns and added a data-policy guard to block reintroducing restricted columns in tracked artifacts.

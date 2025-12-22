@@ -1,0 +1,22 @@
+{
+  "run_name": "20251222_044808_ticket-07_data-policy-guard",
+  "ticket_id": "ticket-07",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "e11f198468d860fdbd47ec8b41f8f2b6cad561f5",
+  "git_sha_after": "",
+  "branch": "feature/ticket-07_data-policy-guard",
+  "timestamp_local": "2025-12-22T00:01:31",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "cmake version 4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "Python 3.12.2"
+  },
+  "dataset": {
+    "mode": "wrds_sample",
+    "dataset_id": "spx_options_sample.csv (trade_date=2024-06-14)",
+    "config_path": "wrds_pipeline/sample_data/spx_options_sample.csv",
+    "config_hash": "6d46dd40a3c62a32164132b8eef58f733f9dcd2ecfc436afe58b11396e141b88"
+  },
+  "notes": "FAST tests failed due to missing matplotlib; WRDS sample run required python3 because python is not on PATH. Data-policy guard added and quote-surface CSVs removed."
+}

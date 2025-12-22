@@ -1,4 +1,4 @@
-trade_date,exdate,cp_flag,strike_price,best_bid,best_offer,spot,rate,dividend,forward_price
+trade_date,exdate,cp_flag,strike_price,bid,ask,spot,rate,dividend,forward_price
 2020-03-16,2020-04-20,C,4100.0,318.2,320.8,4405.0,0.015,0.01,4418.5
 2020-03-16,2020-04-20,C,4300.0,197.4,199.9,4405.0,0.015,0.01,4418.5
 2020-03-16,2020-04-20,C,4500.0,93.1,95.0,4405.0,0.015,0.01,4418.5

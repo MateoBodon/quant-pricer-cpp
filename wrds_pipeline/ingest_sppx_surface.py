@@ -336,6 +336,12 @@ def _load_sample(symbol: str, trade_date: str) -> pd.DataFrame:
     df = df.copy()
     df["cp_flag"] = "C"
     df["strike"] = df["strike_price"] / 1.0
+    bid_col = "best_bid" if "best_bid" in df.columns else "bid"
+    offer_col = "best_offer" if "best_offer" in df.columns else "ask"
+    if bid_col not in df.columns or offer_col not in df.columns:
+        raise RuntimeError("Sample data missing bid/ask columns")
+    df["best_bid"] = df[bid_col]
+    df["best_offer"] = df[offer_col]
     df["rate"] = df.get("rate", 0.015)
     df["divyield"] = df.get("dividend", 0.01)
     df["underlying_bid"] = df.get("spot", SPOT_FALLBACK)

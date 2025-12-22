@@ -1,111 +1,91 @@
-# AGENTS.md
+# AGENTS.md — quant-pricer-cpp
 
-## Project overview
-
-- `quant-pricer-cpp` is a modern C++20 option-pricing library:
-  - Black–Scholes analytics, Monte Carlo (variance reduction, pathwise/LR Greeks, QMC), Crank–Nicolson PDE, barriers, American, exotics, Heston analytic + QE MC.
-  - Python bindings (`pyquant_pricer`) and a CLI (`quant_cli`) wrap the C++ core.
-  - Tests, Google Benchmark, coverage, and a deterministic artifact pipeline live under `docs/artifacts/`.
-
-When in doubt: **extend existing patterns and scripts instead of inventing new ones.**
+Codex (and humans) must treat this repo as **quant-interview-grade** engineering: correctness, reproducibility, and defensible evaluation are the product.
 
 ---
 
-## Setup & build
+## 0) Stop-the-line rules (non-negotiable)
+- **No fabricated results.** Never claim an artifact/metric exists unless it was generated in the current run and logged.
+- **No “green by deletion.”** Do not delete failing plots/tables or loosen checks to hide missing evidence.
+- **No evaluation weakening.** Do not change splits/panels/tolerances after seeing results without:
+  1) updating `docs/PLAN_OF_RECORD.md`,
+  2) explaining the change in `docs/agent_runs/<RUN>/RESULTS.md`,
+  3) updating `project_state/CURRENT_RESULTS.md`.
+- **No raw WRDS data committed.** Ever. Only license-safe derived summaries or small synthetic samples may be committed.
+- **No dangerous autonomy.** Do signal if a task would require:
+  - network access,
+  - running commands outside sandbox,
+  - or destructive git/FS operations.
+  Prefer safe defaults.
 
-From the repo root:
-
-```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j
-```
-
-Tests:
-
-- Full suite (run before committing pricing changes): `ctest --test-dir build --output-on-failure`
-- Fast loop while iterating: `ctest --test-dir build -L FAST --output-on-failure`
-
-Optional local Python rebuild: `pip install -e .`
-
----
-
-## WRDS data, comparison, and MARKET tests
-
-Environment for live IvyDB pulls: set `WRDS_ENABLED=1`, `WRDS_USERNAME`, `WRDS_PASSWORD`. With no credentials the pipeline falls back to the bundled deterministic sample.
-
-Primary pipeline commands (always prefer the existing scripts):
-
-```bash
-# Sample bundle (deterministic, no credentials)
-python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample --fast
-
-# Live IvyDB (opt-in, requires env)
-WRDS_ENABLED=1 python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --fast
-```
-
-BS vs Heston comparison (reads existing artifacts only):
-
-```bash
-python -m wrds_pipeline.compare_bs_heston --wrds-root docs/artifacts/wrds
-```
-
-MARKET tests:
-
-- Command: `ctest --test-dir build -L MARKET --output-on-failure`
-- Behaviour: skips cleanly with exit code 77 unless `WRDS_ENABLED=1` with credentials. When enabled, runs a two-date `--fast` WRDS pipeline subset (calm + stress) using the production filters (DTE ≥21d, moneyness 0.75–1.25 with soft wing taper, vega×quote weights) and asserts moderate bands on IV RMSE/OOS MAE and Δ‑hedged σ, then checks the comparison CSV/plots exist.
-- The MARKET test writes to a temporary artifact root; it does not touch `docs/artifacts/wrds/`.
-
-Rules for agents:
-
-- ✅ Prefer real WRDS runs when `WRDS_ENABLED=1` is present.
-- ✅ Only commit aggregated outputs under `docs/artifacts/wrds/` (pricing/oos/pnl CSVs, PNGs, comparison CSV/plots).
-- ❌ Never commit raw IvyDB tables or credentials; never print secrets in logs.
-
-WRDS pipeline filters (sample + live):
-- Drops ultra-short expiries (DTE < 21d) and tightens wings to moneyness 0.75–1.25 with a soft taper beyond 1.2 to keep front-tenor/wings noise out of the fit/OOS aggregates.
-- OOS and comparison aggregates are weighted by `vega × quotes` to stop deep-OTM clutter dominating error stats.
-- The bundled sample snapshot is a deterministic regression harness, not a performance claim; re-run live pulls for headline numbers.
+If any of the above would be violated: STOP and document why in the run log.
 
 ---
 
-## What to run before committing pricing/WRDS changes
-
+## 1) How to build + test (canonical)
+### Build (Release)
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`
 - `cmake --build build -j`
-- `ctest --test-dir build -L FAST --output-on-failure` (run full suite if pricing logic changed).
-- WRDS sample refresh (or live if env set): `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample --fast`
-- BS vs Heston comparison regeneration: `python -m wrds_pipeline.compare_bs_heston --wrds-root docs/artifacts/wrds`
-- For major releases: `WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`
 
-If you touch specific engines also run:
+### Tests
+- FAST:
+  - `ctest --test-dir build -L FAST --output-on-failure`
+- Full:
+  - `ctest --test-dir build --output-on-failure`
+- MARKET / WRDS integration (opt-in):
+  - `ctest --test-dir build -L MARKET --output-on-failure`
 
-- Monte Carlo: `python scripts/mc_greeks_ci.py ...` and/or `python scripts/qmc_vs_prng_equal_time.py ...`
-- PDE: `python scripts/pde_order_slope.py ...`
-- Heston QE: `python scripts/heston_qe_vs_analytic.py ...`
-- QuantLib parity: `python scripts/ql_parity.py ...`
-
----
-
-## Code style & conventions
-
-- C++20, clang-format and clang-tidy as configured in the repo.
-- Prefer existing `quant::` namespaces (`quant::bs`, `quant::mc`, `quant::pde`, `quant::heston`, ...).
-- Use `apply_patch` style edits; avoid wholesale rewrites.
-- New modules go under `include/quant/` (headers) and `src/` (implementation); add tests under `tests/` and wire into CMake (and Python bindings when needed).
+### Reproducible artifact run
+- `./scripts/reproduce_all.sh`
+- For fast CI-like runs, use any repo-supported fast flags/env (e.g., `REPRO_FAST=1`).
+- For sample-mode WRDS smoke:
+  - `WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast`
 
 ---
 
-## Data & artifacts
+## 2) Documentation + run logging protocol (mandatory)
+Follow `docs/DOCS_AND_LOGGING_SYSTEM.md`.
 
-- Only aggregated WRDS outputs belong in git: `docs/artifacts/wrds/wrds_agg_pricing*.csv`, `wrds_agg_oos*.csv`, `wrds_agg_pnl*.csv`, summary PNGs, and the BS-vs-Heston comparison CSV/plots.
-- Do not commit temporary CSVs/PNGs elsewhere. Keep docs (Results/WRDS_Results/ROADMAP) and artifacts in sync when behaviour changes.
+Every meaningful change must include a run log folder:
+- `docs/agent_runs/YYYYMMDD_HHMMSS_ticket-XX_slug/`
+  - `PROMPT.md`
+  - `COMMANDS.md`
+  - `RESULTS.md`
+  - `TESTS.md`
+  - `META.json`
+
+Always update:
+- `PROGRESS.md` (one entry per run)
+
+Update when relevant:
+- `project_state/CURRENT_RESULTS.md` (when metrics/artifacts change)
+- `project_state/KNOWN_ISSUES.md` (when a risk/bug is found or fixed)
+- `CHANGELOG.md` (user-visible changes)
 
 ---
 
-## Git etiquette
+## 3) Data policy (WRDS / OptionMetrics)
+- Credentials must be provided via environment variables; do not print them to logs.
+- Cache directories must be outside the repo or in gitignored paths.
+- Commit policy:
+  - ✅ OK: tiny license-safe derived summaries (aggregated error tables), synthetic samples, config YAMLs.
+  - ❌ NOT OK: raw WRDS extracts, quote-level data, anything that violates WRDS/OptionMetrics licensing.
+- Data-policy guard: `python3 scripts/check_data_policy.py` must pass; tracked artifacts/data under `artifacts/`, `docs/artifacts/`, `data/`, and `wrds_pipeline/sample_data/` may not contain restricted columns (`strike,.*market_iv`, `secid`, `best_bid/ask/offer`).
 
-- Small, focused commits with messages like:
-  - `fix heston qe bias for high vol-of-vol`
-  - `add barrier mc edge-case tests`
-  - `update wrds oos metrics and summary`
-- Never force-push or reset history without explicit instruction.
-- If unrelated changes exist locally, do not revert them—work around or ask.
+---
+
+## 4) Branch + commit policy
+- Work on feature branches: `feature/ticket-XX_short-slug`
+- Each commit must include in the body:
+  - `Tests: <exact commands run>`
+  - `Artifacts: <paths generated/updated>`
+  - `Run log: docs/agent_runs/<RUN_NAME>/`
+
+Do not force-push. Do not rewrite history unless explicitly instructed.
+
+---
+
+## 5) If uncertain policy (don’t spam questions)
+- Make assumptions explicit in `docs/agent_runs/<RUN>/RESULTS.md` and proceed with the minimal safe change.
+- If a change risks breaking evaluation validity or leaking data: STOP and explain.
+- Prefer small, reviewable diffs over broad refactors.

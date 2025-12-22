@@ -240,6 +240,12 @@ add_test(
 set_tests_properties(metrics_snapshot_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME data_policy_guard_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_data_policy_fast.py
+)
+set_tests_properties(data_policy_guard_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME market_wrds_pipeline
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/wrds_pipeline/tests/test_wrds_pipeline.py
 )
