@@ -74,3 +74,8 @@
 72. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git checkout -b codex/ticket-01-unify-artifacts
 73. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch <<'PATCH' (docs/agent_runs/20251222_204744_ticket-01_unify-artifacts/META.json)
 74. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status -sb
+75. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add CMakeLists.txt scripts/generate_metrics_summary.py tests/test_parity_fast.py tests/test_greeks_reliability_fast.py tests/test_heston_series_fast.py tests/test_artifacts_root_guard_fast.py project_state/CURRENT_RESULTS.md PROGRESS.md CHANGELOG.md
+76. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add -u docs/artifacts
+77. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/validation_pack.zip
+78. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251222_204744_ticket-01_unify-artifacts
+79. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status -sb
