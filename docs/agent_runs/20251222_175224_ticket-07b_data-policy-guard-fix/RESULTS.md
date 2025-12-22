@@ -19,6 +19,7 @@
 - Updated the sample loader to skip comment lines (`comment="#"`).
 - Added `requirements-dev.txt` and documented `pip install -r requirements-dev.txt` in `CONTRIBUTING.md` to cover matplotlib for FAST tests.
 - Updated `AGENTS.md`, `docs/CODEX_SPRINT_TICKETS.md` (Ticket-07b), `project_state/KNOWN_ISSUES.md`, `PROGRESS.md`, and `CHANGELOG.md`.
+- Aligned run-log `META.json` to the merged commit `c8679de`.
 
 ## Tests
 - FAST initially failed due to `matplotlib` missing in the Python3.13 interpreter; reconfigured CMake to use Python 3.12 and FAST passed (see `TESTS.md`).
@@ -32,7 +33,7 @@
 - `git ls-files | rg '\.(csv|parquet|json)$'` reviewed; no restricted patterns found in tracked `data/` (see `TESTS.md` for guard pass).
 
 ## Bundle
-- `docs/gpt_bundles/20251222T183217Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip`
+- `docs/gpt_bundles/20251222T184840Z_ticket-07b_20251222_175224_ticket-07b_data-policy-guard-fix.zip`
 
 ## Human merge checklist
 - [x] New guard + test files are tracked and appear in git diff
