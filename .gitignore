@@ -32,6 +32,7 @@ CTestTestfile.cmake
 # IDE
 .vscode/
 .idea/
+.agent/
 .venv/
 .env
 

@@ -1,0 +1,22 @@
+{
+  "run_name": "20251222_001445_ticket-06_checklist-final",
+  "ticket_id": "ticket-06",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "ae2691df74d6b813e23a231ee5308a6573456f45",
+  "git_sha_after": "",
+  "branch": "feature/ticket-06-checklist-final",
+  "timestamp_local": "2025-12-21T19:25:48-0500",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "cmake version 4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "Python 3.12.2"
+  },
+  "dataset": {
+    "mode": "wrds_sample",
+    "dataset_id": "wrds_pipeline_dates_panel.yaml",
+    "config_path": "wrds_pipeline_dates_panel.yaml",
+    "config_hash": "b8e55c430a4623d5b3763c68fbdf22b6735c36a39b9f24a7a2297893832bc916"
+  },
+  "notes": "REPRO_FAST run completed with FAST test failures due to missing matplotlib; WRDS sample run required python3 because python is not on PATH. GPT bundle generated."
+}

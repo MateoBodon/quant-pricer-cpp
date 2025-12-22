@@ -1,20 +1,21 @@
 ---
-generated_at: 2025-12-21T20:30:38Z
-git_sha: 30002fe1a2fd69644b54a36237b8d820da8743f0
-branch: feature/ticket-06-wrds-local-guardrails
+generated_at: 2025-12-22T00:21:44Z
+git_sha: ae2691df74d6b813e23a231ee5308a6573456f45
+branch: main
 commands:
   - date -u +%Y-%m-%dT%H:%M:%SZ
   - git rev-parse HEAD
   - git rev-parse --abbrev-ref HEAD
   - REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
-  - python3 scripts/generate_metrics_summary.py --artifacts docs/artifacts --manifest docs/artifacts/manifest.json
-  - rg -n "ql parity|benchmarks|wrds" docs/artifacts/metrics_summary.md
+  - ctest --test-dir build -L FAST --output-on-failure
+  - WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast
+  - rg -n "sample bundle|wrds" docs/artifacts/metrics_summary.md
 ---
 
 # Current Results
 
 ## Metrics snapshot (latest committed)
-Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-21T20:29:56.983890+00:00**).
+Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-22T00:19:37.698292+00:00**).
 
 Status summary (from `docs/artifacts/metrics_summary.md`):
 - tri engine agreement: ok
