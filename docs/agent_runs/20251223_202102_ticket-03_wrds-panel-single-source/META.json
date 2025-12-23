@@ -1,0 +1,24 @@
+{
+  "run_name": "20251223_202102_ticket-03_wrds-panel-single-source",
+  "ticket_id": "ticket-03",
+  "started_at_utc": "2025-12-23T20:21:02Z",
+  "finished_at_utc": "2025-12-23T20:43:56Z",
+  "git_sha_before": "231f765438570c3bf35a9062290d5d0213b74ad9",
+  "git_sha_after": "231f765438570c3bf35a9062290d5d0213b74ad9",
+  "branch_name": "codex/ticket-03-wrds-panel-single-source",
+  "host_os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "python_version": "Python 3.12.2",
+  "build_type": "Release",
+  "dataset_id": "WRDS_SAMPLE_wrds_panel_calm_stress_v1",
+  "config_hashes": {
+    "scenario_grid": null,
+    "tolerances": null,
+    "wrds_panel": "af16ea93a04692590f532d223eab06866ddd0738d2c4b90b5783bce47fbcc71f"
+  },
+  "tools": {
+    "codex_cli": "unknown",
+    "cmake": "cmake version 4.1.2"
+  },
+  "notes": "WRDS sample smoke executed via python3; reproduce_all rerun after accidental interrupted invocation to restore artifacts."
+}

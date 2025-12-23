@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-12-23T19:26:59.178225+00:00",
+  "generated_at": "2025-12-23T20:39:22.375103+00:00",
   "git": {
-    "branch": "codex/ticket-02-wrds-asof-checks",
+    "branch": "codex/ticket-03-wrds-panel-single-source",
     "dirty": true,
-    "sha": "13ad1796367e706e22dca21a7aeeb9bc1742fc43"
+    "sha": "231f765438570c3bf35a9062290d5d0213b74ad9"
   },
   "omp_threads": 11,
   "runs": {
@@ -37,12 +37,12 @@
         ],
         "mc_json": "docs/artifacts/bench/bench_mc.json",
         "pde_json": "docs/artifacts/bench/bench_pde.json",
-        "timestamp": "2025-12-22T21:01:26.512738+00:00"
+        "timestamp": "2025-12-23T20:38:01.703760+00:00"
       }
     ],
     "heston": [
       {
-        "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpaqycx30a",
+        "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmps77ggfbw",
         "cost": 0.10009447672986851,
         "csv_rows": 12,
         "date": "2024-06-14",
@@ -72,7 +72,7 @@
         },
         "fast": true,
         "feller": -0.005343760505443038,
-        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpaqycx30a/fit_20240614.png",
+        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmps77ggfbw/fit_20240614.png",
         "input": "data/samples/spx_20240614_sample.csv",
         "inputs": [
           {
@@ -95,7 +95,7 @@
           "theta": 0.0005,
           "v0": 0.0005
         },
-        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpaqycx30a/params_20240614.json",
+        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmps77ggfbw/params_20240614.json",
         "retries": 2,
         "rmse_price": 159.96845408718906,
         "rmse_vol": 0.11992444527012011,
@@ -104,7 +104,7 @@
         "rmspe_vol": 0.5456505978852593,
         "rmspe_vol_pct": 54.56505978852593,
         "seed": 19,
-        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpaqycx30a/fit_20240614.csv",
+        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmps77ggfbw/fit_20240614.csv",
         "warnings": [
           "WARNING: Feller condition violated (-0.0053) for 2024-06-14"
         ],
@@ -641,7 +641,7 @@
     },
     "metrics_snapshot": {
       "artifacts_root": "docs/artifacts",
-      "generated_at": "2025-12-23T18:51:36.651181+00:00",
+      "generated_at": "2025-12-23T20:39:22.372867+00:00",
       "inputs": [
         {
           "path": "docs/artifacts/tri_engine_agreement.csv",
@@ -650,8 +650,8 @@
         },
         {
           "path": "docs/artifacts/qmc_vs_prng_equal_time.csv",
-          "sha256": "494aa11761252d4e7ee2eba8ae90cea7b67f4d6c29011a6c3c88e9e29a603b4a",
-          "size_bytes": 1126
+          "sha256": "cc408b52837a4ff13ab65b8c1ccd5155c996015e4baaf7f9d739abfcf9f1b4dc",
+          "size_bytes": 1125
         },
         {
           "path": "docs/artifacts/pde_order_slope.csv",
@@ -660,17 +660,17 @@
         },
         {
           "path": "docs/artifacts/ql_parity/ql_parity.csv",
-          "sha256": "5486f6bf2413c25dcc185d9eaeb2c96fc007bcbead3cf0cdfe3e145a2d0bc82b",
-          "size_bytes": 480
+          "sha256": "64190202063e431329271fa1daba89a663ffcb113dd5bfa3e80880b7d7113cb1",
+          "size_bytes": 481
         },
         {
           "path": "docs/artifacts/bench/bench_mc_paths.csv",
-          "sha256": "bb4de9de89e95fc3dd7f93028d2b1ea23f83d33e11c3d456dad86d13d4cb19b3",
-          "size_bytes": 248
+          "sha256": "56b5400f1c1e5b55c9fc1cb405fd31b193ae9a8617f46c85fc6c6fcf1607e0a6",
+          "size_bytes": 245
         },
         {
           "path": "docs/artifacts/bench/bench_mc_equal_time.csv",
-          "sha256": "f89dda794e273ee267d5c4c07888336bbe084f5171cb17cce40eff7751770d56",
+          "sha256": "8d9ee1e1a6149f7c3eca609a8399c8de2a128275958ee71b81801f526cad6885",
           "size_bytes": 340
         },
         {
@@ -755,12 +755,12 @@
     ],
     "qmc_vs_prng_equal_time": {
       "budget_count": 6,
-      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp177p5gby/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp177p5gby/qmc_summary.csv",
-      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp177p5gby/qmc_summary.csv",
+      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpgtfhh3lr/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpgtfhh3lr/qmc_summary.csv",
+      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpgtfhh3lr/qmc_summary.csv",
       "csv_rows": 12,
       "fast": true,
-      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp177p5gby/qmc_plot.png",
-      "generated_at": "2025-12-23T18:51:23.070019+00:00",
+      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpgtfhh3lr/qmc_plot.png",
+      "generated_at": "2025-12-23T20:39:01.306740+00:00",
       "inputs": [],
       "paths": [
         256,
@@ -792,140 +792,140 @@
       },
       "summary_rows": [
         {
-          "paths_prng": 267.4103922023262,
-          "paths_qmc": 11.771109701465338,
+          "paths_prng": 327.4043198486354,
+          "paths_qmc": 15.031990472188568,
           "payoff": "call",
-          "rmse_prng": 0.8998644807417905,
-          "rmse_qmc": 0.11961445648007647,
-          "rmse_ratio": 7.523041170961438,
-          "time_seconds": 1.98473329267775e-05
+          "rmse_prng": 0.8132499544166275,
+          "rmse_qmc": 0.10584835887040978,
+          "rmse_ratio": 7.683160731970252,
+          "time_seconds": 1.847916670764486e-05
         },
         {
-          "paths_prng": 639.9783423266563,
-          "paths_qmc": 28.171138795493217,
+          "paths_prng": 747.0846944937073,
+          "paths_qmc": 34.30061648160053,
           "payoff": "call",
-          "rmse_prng": 0.5816793035873435,
-          "rmse_qmc": 0.07731970228111956,
-          "rmse_ratio": 7.523041170961439,
-          "time_seconds": 4.749951234682731e-05
+          "rmse_prng": 0.5383705941986117,
+          "rmse_qmc": 0.07007149960541735,
+          "rmse_ratio": 7.683160731970253,
+          "time_seconds": 4.21665255383975e-05
         },
         {
-          "paths_prng": 1531.6243892918246,
-          "paths_qmc": 67.42041159774003,
+          "paths_prng": 1704.7287006011172,
+          "paths_qmc": 78.26856284898587,
           "payoff": "call",
-          "rmse_prng": 0.37600196414346987,
-          "rmse_qmc": 0.049980048706209215,
-          "rmse_ratio": 7.523041170961438,
-          "time_seconds": 0.00011367792748326359
+          "rmse_prng": 0.3564007536965438,
+          "rmse_qmc": 0.04638725729289139,
+          "rmse_ratio": 7.683160731970251,
+          "time_seconds": 9.621731889267296e-05
         },
         {
-          "paths_prng": 3665.5510268442486,
-          "paths_qmc": 161.35350200098628,
+          "paths_prng": 3889.920331753826,
+          "paths_qmc": 178.5964381640697,
           "payoff": "call",
-          "rmse_prng": 0.24305055409027168,
-          "rmse_qmc": 0.03230748690149864,
-          "rmse_ratio": 7.523041170961438,
-          "time_seconds": 0.0002720590287860775
+          "rmse_prng": 0.23593691521087204,
+          "rmse_qmc": 0.03070831438279294,
+          "rmse_ratio": 7.683160731970252,
+          "time_seconds": 0.00021955265075051134
         },
         {
-          "paths_prng": 8772.558353299295,
-          "paths_qmc": 386.15831602035183,
+          "paths_prng": 8876.180815197273,
+          "paths_qmc": 407.528726270789,
           "payoff": "call",
-          "rmse_prng": 0.1571097427061513,
-          "rmse_qmc": 0.020883807377339237,
-          "rmse_ratio": 7.523041170961439,
-          "time_seconds": 0.000651103664384811
+          "rmse_prng": 0.1561899838366195,
+          "rmse_qmc": 0.020328871057805724,
+          "rmse_ratio": 7.683160731970252,
+          "time_seconds": 0.0005009843030997904
         },
         {
-          "paths_prng": 20994.87348517306,
-          "paths_qmc": 924.1711099072543,
+          "paths_prng": 20254.03585285102,
+          "paths_qmc": 929.915873144797,
           "payoff": "call",
-          "rmse_prng": 0.10155694293963778,
-          "rmse_qmc": 0.013499453297111079,
-          "rmse_ratio": 7.523041170961439,
-          "time_seconds": 0.0015582500006227444
+          "rmse_prng": 0.10339760113028433,
+          "rmse_qmc": 0.013457690752197668,
+          "rmse_ratio": 7.683160731970252,
+          "time_seconds": 0.0011431666668310452
         },
         {
-          "paths_prng": 423.8381758037052,
-          "paths_qmc": 80.15407453443525,
+          "paths_prng": 401.33414133467744,
+          "paths_qmc": 74.89826255990583,
           "payoff": "asian",
-          "rmse_prng": 0.3164666321290198,
-          "rmse_qmc": 0.12105402755784203,
-          "rmse_ratio": 2.6142594221229505,
-          "time_seconds": 0.00010141666643903591
+          "rmse_prng": 0.32521824948891853,
+          "rmse_qmc": 0.12522936363813497,
+          "rmse_ratio": 2.596980772246636,
+          "time_seconds": 7.105566570923354e-05
         },
         {
-          "paths_prng": 694.9516374895722,
-          "paths_qmc": 131.4256443359297,
+          "paths_prng": 713.713407987363,
+          "paths_qmc": 133.19548156603298,
           "payoff": "asian",
-          "rmse_prng": 0.2471443405602532,
-          "rmse_qmc": 0.09453703732262184,
-          "rmse_ratio": 2.614259422122951,
-          "time_seconds": 0.00016628912267493205
+          "rmse_prng": 0.24387429860358703,
+          "rmse_qmc": 0.09390685568788888,
+          "rmse_ratio": 2.5969807722466354,
+          "time_seconds": 0.0001263619914356037
         },
         {
-          "paths_prng": 1139.486261551657,
-          "paths_qmc": 215.4937236745677,
+          "paths_prng": 1269.233728899612,
+          "paths_qmc": 236.86846267518752,
           "payoff": "asian",
-          "rmse_prng": 0.19300715737405344,
-          "rmse_qmc": 0.0738286169080033,
-          "rmse_ratio": 2.614259422122951,
-          "time_seconds": 0.0002726580678592996
+          "rmse_prng": 0.1828761873383678,
+          "rmse_qmc": 0.07041876832232473,
+          "rmse_ratio": 2.596980772246636,
+          "time_seconds": 0.0002247161112375121
         },
         {
-          "paths_prng": 1868.3730927743193,
-          "paths_qmc": 353.33701560126644,
+          "paths_prng": 2257.144451186961,
+          "paths_qmc": 421.23552503762073,
           "payoff": "asian",
-          "rmse_prng": 0.15072877134538615,
-          "rmse_qmc": 0.057656394032610754,
-          "rmse_ratio": 2.614259422122951,
-          "time_seconds": 0.00044706725715363594
+          "rmse_prng": 0.13713499162033435,
+          "rmse_qmc": 0.05280554753653394,
+          "rmse_ratio": 2.596980772246636,
+          "time_seconds": 0.0003996243654916137
         },
         {
-          "paths_prng": 3063.5016248897773,
-          "paths_qmc": 579.3535164975389,
+          "paths_prng": 4013.9975463313976,
+          "paths_qmc": 749.105075237639,
           "payoff": "asian",
-          "rmse_prng": 0.11771150262194316,
-          "rmse_qmc": 0.04502671067217716,
-          "rmse_ratio": 2.614259422122951,
-          "time_seconds": 0.0007330394951746463
+          "rmse_prng": 0.10283463473521147,
+          "rmse_qmc": 0.03959776515643961,
+          "rmse_ratio": 2.596980772246636,
+          "time_seconds": 0.0007106728245478654
         },
         {
-          "paths_prng": 5023.109271910246,
-          "paths_qmc": 949.9443371561126,
+          "paths_prng": 7138.300915336446,
+          "paths_qmc": 1332.172574230701,
           "payoff": "asian",
-          "rmse_prng": 0.09192669538694459,
-          "rmse_qmc": 0.03516357045862496,
-          "rmse_ratio": 2.614259422122952,
-          "time_seconds": 0.0012019375002031059
+          "rmse_prng": 0.0771135213279607,
+          "rmse_qmc": 0.02969352801994378,
+          "rmse_ratio": 2.5969807722466354,
+          "time_seconds": 0.0012638265009930667
         }
       ],
       "time_grid": {
         "asian": [
-          0.00010141666643903591,
-          0.00016628912267493205,
-          0.0002726580678592996,
-          0.00044706725715363594,
-          0.0007330394951746463,
-          0.0012019375002031059
+          7.105566570923354e-05,
+          0.0001263619914356037,
+          0.0002247161112375121,
+          0.0003996243654916137,
+          0.0007106728245478654,
+          0.0012638265009930667
         ],
         "call": [
-          1.98473329267775e-05,
-          4.749951234682731e-05,
-          0.00011367792748326359,
-          0.0002720590287860775,
-          0.000651103664384811,
-          0.0015582500006227444
+          1.847916670764486e-05,
+          4.21665255383975e-05,
+          9.621731889267296e-05,
+          0.00021955265075051134,
+          0.0005009843030997904,
+          0.0011431666668310452
         ]
       },
       "time_per_path": {
         "asian": {
-          "prng": 2.392815754426181e-07,
-          "qmc": 1.2652715040140095e-06
+          "prng": 1.7704864448594057e-07,
+          "qmc": 9.486957811925361e-07
         },
         "call": {
-          "prng": 7.422049967213222e-08,
-          "qmc": 1.6861055100273839e-06
+          "prng": 5.6441426051397535e-08,
+          "qmc": 1.229322672990918e-06
         }
       }
     },
@@ -936,7 +936,7 @@
       "fast": true,
       "skip_slow": false,
       "skip_wrds": false,
-      "timestamp": "20251222T210057Z"
+      "timestamp": "20251223T203730Z"
     },
     "tri_engine_agreement": {
       "csv": "docs/artifacts/tri_engine_agreement.csv",
@@ -966,139 +966,28 @@
       {
         "comparison_csv": "docs/artifacts/wrds/wrds_bs_heston_comparison.csv",
         "dateset": "wrds_pipeline_dates_panel.yaml",
+        "dateset_inputs": [
+          {
+            "path": "wrds_pipeline_dates_panel.yaml",
+            "sha256": "af16ea93a04692590f532d223eab06866ddd0738d2c4b90b5783bce47fbcc71f",
+            "size_bytes": 944
+          }
+        ],
         "ivrmse_fig": "docs/artifacts/wrds/wrds_bs_heston_ivrmse.png",
         "oos_bs_csv": "docs/artifacts/wrds/wrds_agg_oos_bs.csv",
         "oos_csv": "docs/artifacts/wrds/wrds_agg_oos.csv",
         "oos_heatmap_fig": "docs/artifacts/wrds/wrds_bs_heston_oos_heatmap.png",
+        "panel_id": "wrds_panel_calm_stress_v1",
         "pnl_csv": "docs/artifacts/wrds/wrds_agg_pnl.csv",
         "pnl_fig": "docs/artifacts/wrds/wrds_bs_heston_pnl_sigma.png",
         "pricing_bs_csv": "docs/artifacts/wrds/wrds_agg_pricing_bs.csv",
         "pricing_csv": "docs/artifacts/wrds/wrds_agg_pricing.csv",
         "summary_fig": "docs/artifacts/wrds/wrds_multi_date_summary.png",
         "symbol": "SPX",
-        "timestamp": "2025-12-22T21:02:07.665798+00:00"
+        "timestamp": "2025-12-23T20:38:43.500797+00:00"
       }
     ],
     "wrds_heston": [
-      {
-        "figure": "docs/artifacts/wrds/heston_fit.png",
-        "iv_mae_bps": 10.599209020201132,
-        "iv_mae_volpts_vega_wt": 0.001059914693753718,
-        "iv_p90_bps": 17.602208519820472,
-        "iv_rmse_volpts_vega_wt": 0.0012083062914642752,
-        "params": {
-          "kappa": 1.0054574812702344,
-          "rho": 0.01958979172423554,
-          "sigma": 0.48775222492108905,
-          "theta": 0.2,
-          "v0": 0.04396430677489712
-        },
-        "price_rmse_ticks": 17.08615098946495,
-        "summary": "docs/artifacts/wrds/heston_fit.json",
-        "surface_csv": "docs/artifacts/wrds/heston_fit_table.csv"
-      },
-      {
-        "figure": "docs/artifacts/wrds/per_date/2020-03-16/heston_fit.png",
-        "iv_mae_bps": 10.598098224830164,
-        "iv_mae_volpts_vega_wt": 0.0010598265527836128,
-        "iv_p90_bps": 17.597011869773247,
-        "iv_rmse_volpts_vega_wt": 0.0012082741569960787,
-        "params": {
-          "kappa": 1.005548234850052,
-          "rho": 0.01958963710928998,
-          "sigma": 0.4878379314858293,
-          "theta": 0.2,
-          "v0": 0.043963529973304195
-        },
-        "price_rmse_ticks": 10.629226821864512,
-        "summary": "docs/artifacts/wrds/per_date/2020-03-16/heston_fit.json",
-        "surface_csv": "docs/artifacts/wrds/per_date/2020-03-16/heston_fit_table.csv"
-      },
-      {
-        "figure": "docs/artifacts/wrds/per_date/2020-03-17/heston_fit.png",
-        "iv_mae_bps": 10.599401111973506,
-        "iv_mae_volpts_vega_wt": 0.0010599373740384564,
-        "iv_p90_bps": 17.6031584450978,
-        "iv_rmse_volpts_vega_wt": 0.0012082892498057744,
-        "params": {
-          "kappa": 1.0054636226652678,
-          "rho": 0.019585399309859485,
-          "sigma": 0.4877528736817677,
-          "theta": 0.2,
-          "v0": 0.043964236590530545
-        },
-        "price_rmse_ticks": 10.82132041702985,
-        "summary": "docs/artifacts/wrds/per_date/2020-03-17/heston_fit.json",
-        "surface_csv": "docs/artifacts/wrds/per_date/2020-03-17/heston_fit_table.csv"
-      },
-      {
-        "figure": "docs/artifacts/wrds/per_date/2022-06-13/heston_fit.png",
-        "iv_mae_bps": 10.599311577054154,
-        "iv_mae_volpts_vega_wt": 0.0010599287773740548,
-        "iv_p90_bps": 17.60299081122546,
-        "iv_rmse_volpts_vega_wt": 0.0012082816720515798,
-        "params": {
-          "kappa": 1.0054937629504908,
-          "rho": 0.019585470068311295,
-          "sigma": 0.48776551126708784,
-          "theta": 0.2,
-          "v0": 0.043963849441214696
-        },
-        "price_rmse_ticks": 14.807701070337508,
-        "summary": "docs/artifacts/wrds/per_date/2022-06-13/heston_fit.json",
-        "surface_csv": "docs/artifacts/wrds/per_date/2022-06-13/heston_fit_table.csv"
-      },
-      {
-        "figure": "docs/artifacts/wrds/per_date/2022-06-14/heston_fit.png",
-        "iv_mae_bps": 10.59949271807093,
-        "iv_mae_volpts_vega_wt": 0.0010599601907347,
-        "iv_p90_bps": 17.603065315168752,
-        "iv_rmse_volpts_vega_wt": 0.001208281278770794,
-        "params": {
-          "kappa": 1.0054628828676042,
-          "rho": 0.019585167923630294,
-          "sigma": 0.4877509002166835,
-          "theta": 0.2,
-          "v0": 0.043964218500143884
-        },
-        "price_rmse_ticks": 14.998300977007034,
-        "summary": "docs/artifacts/wrds/per_date/2022-06-14/heston_fit.json",
-        "surface_csv": "docs/artifacts/wrds/per_date/2022-06-14/heston_fit_table.csv"
-      },
-      {
-        "figure": "docs/artifacts/wrds/per_date/2024-06-14/heston_fit.png",
-        "iv_mae_bps": 10.599209020201132,
-        "iv_mae_volpts_vega_wt": 0.001059914693753718,
-        "iv_p90_bps": 17.602208519820472,
-        "iv_rmse_volpts_vega_wt": 0.0012083062914642752,
-        "params": {
-          "kappa": 1.0054574812702344,
-          "rho": 0.01958979172423554,
-          "sigma": 0.48775222492108905,
-          "theta": 0.2,
-          "v0": 0.04396430677489712
-        },
-        "price_rmse_ticks": 17.08615098946495,
-        "summary": "docs/artifacts/wrds/per_date/2024-06-14/heston_fit.json",
-        "surface_csv": "docs/artifacts/wrds/per_date/2024-06-14/heston_fit_table.csv"
-      },
-      {
-        "figure": "docs/artifacts/wrds/heston_fit.png",
-        "iv_mae_bps": 10.599209020201132,
-        "iv_mae_volpts_vega_wt": 0.001059914693753718,
-        "iv_p90_bps": 17.602208519820472,
-        "iv_rmse_volpts_vega_wt": 0.0012083062914642752,
-        "params": {
-          "kappa": 1.0054574812702344,
-          "rho": 0.01958979172423554,
-          "sigma": 0.48775222492108905,
-          "theta": 0.2,
-          "v0": 0.04396430677489712
-        },
-        "price_rmse_ticks": 17.08615098946495,
-        "summary": "docs/artifacts/wrds/heston_fit.json",
-        "surface_csv": "docs/artifacts/wrds/heston_fit_table.csv"
-      },
       {
         "figure": "docs/artifacts/wrds/heston_fit.png",
         "iv_mae_bps": 10.599209020201132,
@@ -1119,7 +1008,83 @@
         "trade_date": "2024-06-14"
       },
       {
-        "figure": "docs/artifacts/wrds/heston_fit.png",
+        "figure": "docs/artifacts/wrds/per_date/2020-03-16/heston_fit.png",
+        "iv_mae_bps": 10.598098224830164,
+        "iv_mae_volpts_vega_wt": 0.0010598265527836128,
+        "iv_p90_bps": 17.597011869773247,
+        "iv_rmse_volpts_vega_wt": 0.0012082741569960787,
+        "next_trade_date": "2020-03-17",
+        "params": {
+          "kappa": 1.005548234850052,
+          "rho": 0.01958963710928998,
+          "sigma": 0.4878379314858293,
+          "theta": 0.2,
+          "v0": 0.043963529973304195
+        },
+        "price_rmse_ticks": 10.629226821864512,
+        "summary": "docs/artifacts/wrds/per_date/2020-03-16/heston_fit.json",
+        "surface_csv": "docs/artifacts/wrds/per_date/2020-03-16/heston_fit_table.csv",
+        "trade_date": "2020-03-16"
+      },
+      {
+        "figure": "docs/artifacts/wrds/per_date/2020-03-17/heston_fit.png",
+        "iv_mae_bps": 10.599401111973506,
+        "iv_mae_volpts_vega_wt": 0.0010599373740384564,
+        "iv_p90_bps": 17.6031584450978,
+        "iv_rmse_volpts_vega_wt": 0.0012082892498057744,
+        "next_trade_date": "2020-03-18",
+        "params": {
+          "kappa": 1.0054636226652678,
+          "rho": 0.019585399309859485,
+          "sigma": 0.4877528736817677,
+          "theta": 0.2,
+          "v0": 0.043964236590530545
+        },
+        "price_rmse_ticks": 10.82132041702985,
+        "summary": "docs/artifacts/wrds/per_date/2020-03-17/heston_fit.json",
+        "surface_csv": "docs/artifacts/wrds/per_date/2020-03-17/heston_fit_table.csv",
+        "trade_date": "2020-03-17"
+      },
+      {
+        "figure": "docs/artifacts/wrds/per_date/2022-06-13/heston_fit.png",
+        "iv_mae_bps": 10.599311577054154,
+        "iv_mae_volpts_vega_wt": 0.0010599287773740548,
+        "iv_p90_bps": 17.60299081122546,
+        "iv_rmse_volpts_vega_wt": 0.0012082816720515798,
+        "next_trade_date": "2022-06-14",
+        "params": {
+          "kappa": 1.0054937629504908,
+          "rho": 0.019585470068311295,
+          "sigma": 0.48776551126708784,
+          "theta": 0.2,
+          "v0": 0.043963849441214696
+        },
+        "price_rmse_ticks": 14.807701070337508,
+        "summary": "docs/artifacts/wrds/per_date/2022-06-13/heston_fit.json",
+        "surface_csv": "docs/artifacts/wrds/per_date/2022-06-13/heston_fit_table.csv",
+        "trade_date": "2022-06-13"
+      },
+      {
+        "figure": "docs/artifacts/wrds/per_date/2022-06-14/heston_fit.png",
+        "iv_mae_bps": 10.59949271807093,
+        "iv_mae_volpts_vega_wt": 0.0010599601907347,
+        "iv_p90_bps": 17.603065315168752,
+        "iv_rmse_volpts_vega_wt": 0.001208281278770794,
+        "next_trade_date": "2022-06-15",
+        "params": {
+          "kappa": 1.0054628828676042,
+          "rho": 0.019585167923630294,
+          "sigma": 0.4877509002166835,
+          "theta": 0.2,
+          "v0": 0.043964218500143884
+        },
+        "price_rmse_ticks": 14.998300977007034,
+        "summary": "docs/artifacts/wrds/per_date/2022-06-14/heston_fit.json",
+        "surface_csv": "docs/artifacts/wrds/per_date/2022-06-14/heston_fit_table.csv",
+        "trade_date": "2022-06-14"
+      },
+      {
+        "figure": "docs/artifacts/wrds/per_date/2024-06-14/heston_fit.png",
         "iv_mae_bps": 10.599209020201132,
         "iv_mae_volpts_vega_wt": 0.001059914693753718,
         "iv_p90_bps": 17.602208519820472,
@@ -1133,8 +1098,8 @@
           "v0": 0.04396430677489712
         },
         "price_rmse_ticks": 17.08615098946495,
-        "summary": "docs/artifacts/wrds/heston_fit.json",
-        "surface_csv": "docs/artifacts/wrds/heston_fit_table.csv",
+        "summary": "docs/artifacts/wrds/per_date/2024-06-14/heston_fit.json",
+        "surface_csv": "docs/artifacts/wrds/per_date/2024-06-14/heston_fit_table.csv",
         "trade_date": "2024-06-14"
       }
     ],
@@ -1156,7 +1121,7 @@
         "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
         "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-22T21:01:34.594862+00:00",
+        "timestamp": "2025-12-23T20:38:10.004101+00:00",
         "trade_date": "2024-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
@@ -1184,7 +1149,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2020-03-16/spx_2020-03-17_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2020-03-16/spx_2020-03-16_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-22T21:01:41.746389+00:00",
+        "timestamp": "2025-12-23T20:38:17.105312+00:00",
         "trade_date": "2020-03-16",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2020-03-16/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2020-03-16/bs_oos_summary.csv",
@@ -1212,7 +1177,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2020-03-17/spx_2020-03-18_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2020-03-17/spx_2020-03-17_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-22T21:01:48.690941+00:00",
+        "timestamp": "2025-12-23T20:38:23.198748+00:00",
         "trade_date": "2020-03-17",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2020-03-17/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2020-03-17/bs_oos_summary.csv",
@@ -1240,7 +1205,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2022-06-13/spx_2022-06-14_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2022-06-13/spx_2022-06-13_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-22T21:01:54.482078+00:00",
+        "timestamp": "2025-12-23T20:38:29.227150+00:00",
         "trade_date": "2022-06-13",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2022-06-13/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2022-06-13/bs_oos_summary.csv",
@@ -1268,7 +1233,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2022-06-14/spx_2022-06-15_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2022-06-14/spx_2022-06-14_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-22T21:02:00.832551+00:00",
+        "timestamp": "2025-12-23T20:38:36.491347+00:00",
         "trade_date": "2022-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2022-06-14/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2022-06-14/bs_oos_summary.csv",
@@ -1296,7 +1261,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2024-06-14/spx_2024-06-17_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2024-06-14/spx_2024-06-14_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-22T21:02:06.897442+00:00",
+        "timestamp": "2025-12-23T20:38:42.704321+00:00",
         "trade_date": "2024-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2024-06-14/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2024-06-14/bs_oos_summary.csv",
@@ -1306,90 +1271,6 @@
         "wrds_heston_insample_fig": "docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_insample.png",
         "wrds_heston_oos_csv": "docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_oos.csv",
         "wrds_heston_oos_fig": "docs/artifacts/wrds/per_date/2024-06-14/wrds_heston_oos.png"
-      },
-      {
-        "fit_fig": "docs/artifacts/wrds/heston_fit.png",
-        "fit_json": "docs/artifacts/wrds/heston_fit.json",
-        "fit_table": "docs/artifacts/wrds/heston_fit_table.csv",
-        "label": null,
-        "next_trade_date": "2024-06-17",
-        "oos_detail": "docs/artifacts/wrds/oos_pricing_detail.csv",
-        "oos_summary": "docs/artifacts/wrds/oos_pricing_summary.csv",
-        "pnl_detail": "docs/artifacts/wrds/delta_hedge_pnl.csv",
-        "pnl_summary": "docs/artifacts/wrds/delta_hedge_pnl_summary.csv",
-        "regime": null,
-        "source_next": "sample",
-        "source_today": "sample",
-        "summary_fig": "docs/artifacts/wrds/heston_wrds_summary.png",
-        "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
-        "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
-        "symbol": "SPX",
-        "timestamp": "2025-12-22T21:03:14.615608+00:00",
-        "trade_date": "2024-06-14",
-        "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
-        "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
-        "wrds_heston_hedge_csv": "docs/artifacts/wrds/wrds_heston_hedge.csv",
-        "wrds_heston_hedge_fig": "docs/artifacts/wrds/wrds_heston_hedge.png",
-        "wrds_heston_insample_csv": "docs/artifacts/wrds/wrds_heston_insample.csv",
-        "wrds_heston_insample_fig": "docs/artifacts/wrds/wrds_heston_insample.png",
-        "wrds_heston_oos_csv": "docs/artifacts/wrds/wrds_heston_oos.csv",
-        "wrds_heston_oos_fig": "docs/artifacts/wrds/wrds_heston_oos.png"
-      },
-      {
-        "fit_fig": "docs/artifacts/wrds/heston_fit.png",
-        "fit_json": "docs/artifacts/wrds/heston_fit.json",
-        "fit_table": "docs/artifacts/wrds/heston_fit_table.csv",
-        "label": null,
-        "next_trade_date": "2024-06-17",
-        "oos_detail": "docs/artifacts/wrds/oos_pricing_detail.csv",
-        "oos_summary": "docs/artifacts/wrds/oos_pricing_summary.csv",
-        "pnl_detail": "docs/artifacts/wrds/delta_hedge_pnl.csv",
-        "pnl_summary": "docs/artifacts/wrds/delta_hedge_pnl_summary.csv",
-        "regime": null,
-        "source_next": "sample",
-        "source_today": "sample",
-        "summary_fig": "docs/artifacts/wrds/heston_wrds_summary.png",
-        "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
-        "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
-        "symbol": "SPX",
-        "timestamp": "2025-12-23T18:52:05.921922+00:00",
-        "trade_date": "2024-06-14",
-        "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
-        "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
-        "wrds_heston_hedge_csv": "docs/artifacts/wrds/wrds_heston_hedge.csv",
-        "wrds_heston_hedge_fig": "docs/artifacts/wrds/wrds_heston_hedge.png",
-        "wrds_heston_insample_csv": "docs/artifacts/wrds/wrds_heston_insample.csv",
-        "wrds_heston_insample_fig": "docs/artifacts/wrds/wrds_heston_insample.png",
-        "wrds_heston_oos_csv": "docs/artifacts/wrds/wrds_heston_oos.csv",
-        "wrds_heston_oos_fig": "docs/artifacts/wrds/wrds_heston_oos.png"
-      },
-      {
-        "fit_fig": "docs/artifacts/wrds/heston_fit.png",
-        "fit_json": "docs/artifacts/wrds/heston_fit.json",
-        "fit_table": "docs/artifacts/wrds/heston_fit_table.csv",
-        "label": null,
-        "next_trade_date": "2024-06-17",
-        "oos_detail": "docs/artifacts/wrds/oos_pricing_detail.csv",
-        "oos_summary": "docs/artifacts/wrds/oos_pricing_summary.csv",
-        "pnl_detail": "docs/artifacts/wrds/delta_hedge_pnl.csv",
-        "pnl_summary": "docs/artifacts/wrds/delta_hedge_pnl_summary.csv",
-        "regime": null,
-        "source_next": "sample",
-        "source_today": "sample",
-        "summary_fig": "docs/artifacts/wrds/heston_wrds_summary.png",
-        "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
-        "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
-        "symbol": "SPX",
-        "timestamp": "2025-12-23T19:26:59.177474+00:00",
-        "trade_date": "2024-06-14",
-        "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
-        "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
-        "wrds_heston_hedge_csv": "docs/artifacts/wrds/wrds_heston_hedge.csv",
-        "wrds_heston_hedge_fig": "docs/artifacts/wrds/wrds_heston_hedge.png",
-        "wrds_heston_insample_csv": "docs/artifacts/wrds/wrds_heston_insample.csv",
-        "wrds_heston_insample_fig": "docs/artifacts/wrds/wrds_heston_insample.png",
-        "wrds_heston_oos_csv": "docs/artifacts/wrds/wrds_heston_oos.csv",
-        "wrds_heston_oos_fig": "docs/artifacts/wrds/wrds_heston_oos.png"
       }
     ]
   },

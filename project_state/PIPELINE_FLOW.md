@@ -56,7 +56,7 @@ commands:
 
 ## WRDS pipeline flow
 - Single-date or panel runs: `python -m wrds_pipeline.pipeline [--symbol SPX] [--trade-date YYYY-MM-DD] [--use-sample] [--fast]`.
-- Multi-date panel uses `wrds_pipeline_dates_panel.yaml` (invoked automatically in `scripts/reproduce_all.sh`).
+- Multi-date panel uses the canonical `wrds_pipeline_dates_panel.yaml` (invoked automatically in `scripts/reproduce_all.sh`; `panel_id` is logged and written to `docs/artifacts/manifest.json`, override with `--dateset` or `WRDS_DATESET`).
 - BS vs Heston comparison: `python -m wrds_pipeline.compare_bs_heston --wrds-root docs/artifacts/wrds`.
 - Local cache builder: `python scripts/build_wrds_cache.py --symbol SPX --start-date YYYY-MM-DD --end-date YYYY-MM-DD`.
 

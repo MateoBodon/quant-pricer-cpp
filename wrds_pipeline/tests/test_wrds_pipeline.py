@@ -40,6 +40,7 @@ def _expected_artifacts(base: Path) -> list[Path]:
 
 def _write_dateset(path: Path) -> Path:
     payload = {
+        "panel_id": "wrds_test_smoke",
         "dates": [
             {
                 "trade_date": "2020-03-16",

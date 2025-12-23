@@ -20,6 +20,5 @@ commands:
 # Open Questions
 
 - `ROADMAP (1).md` is the active roadmap source; should it be renamed/moved to `docs/ROADMAP.md` to match references in the roadmap text?
-- There are two dateset configs: `wrds_pipeline_dates_panel.yaml` and `wrds_pipeline/dateset.yaml` (JSON payload). Which should be the single source of truth for multi-date WRDS runs?
 - Artifact outputs are split between `docs/artifacts/` (repro pipeline) and `artifacts/` (several scripts default here). Should defaults be unified to avoid confusion?
 - Both `docs/artifacts/manifest.json` and `artifacts/manifest.json` exist. Which one is canonical for downstream consumers?
