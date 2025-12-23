@@ -39,3 +39,5 @@ Canonicalized artifact-root usage in the FAST pipeline by routing parity/greeks/
 ## 2025-12-23
 
 Ran a local WRDS single-date smoke using `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds` with `--trade-date 2024-06-14` and `--fast`, writing outputs to the gitignored `docs/artifacts/wrds_local/`. Run log: `docs/agent_runs/20251223_030719_ticket-01_wrds-local-smoke/`.
+
+Documented canonical-manifest handling for local WRDS runs in `project_state/KNOWN_ISSUES.md`. Run log: `docs/agent_runs/20251223_044441_ticket-01_wrds-manifest-note/`.
