@@ -222,6 +222,8 @@ git commit -F /tmp/ticket-03-commit-msg-4.txt
 git rev-parse HEAD
 date -u +%Y-%m-%dT%H:%M:%SZ
 git status -sb
+cat <<'EOF' > /tmp/ticket-03-commit-msg-9.txt
+git commit -F /tmp/ticket-03-commit-msg-9.txt
 date -u +%Y-%m-%dT%H:%M:%SZ
 git rev-parse HEAD
 python3 - <<'PY'
@@ -283,3 +285,11 @@ path.write_text(json.dumps(data, indent=2) + '\n')
 PY
 git status -sb
 git add docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
+cat <<'EOF' > /tmp/ticket-03-commit-msg-8.txt
+ticket-03: finalize run log metadata
+
+Tests: ctest --test-dir build -L FAST --output-on-failure; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
+Artifacts: none (run log metadata)
+Run log: docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/
+EOF
+git commit -F /tmp/ticket-03-commit-msg-8.txt
