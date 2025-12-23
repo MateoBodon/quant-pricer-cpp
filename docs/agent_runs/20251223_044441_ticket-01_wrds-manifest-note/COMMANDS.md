@@ -14,3 +14,5 @@
 12. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat > docs/agent_runs/20251223_044441_ticket-01_wrds-manifest-note/RESULTS.md <<'EOF'
 13. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat > docs/agent_runs/20251223_044441_ticket-01_wrds-manifest-note/TESTS.md <<'EOF'
 14. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat > docs/agent_runs/20251223_044441_ticket-01_wrds-manifest-note/META.json <<'EOF'
+15. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add project_state/KNOWN_ISSUES.md PROGRESS.md docs/agent_runs/20251223_044441_ticket-01_wrds-manifest-note
+16. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "docs: clarify local WRDS manifest handling" -m "Tests: not run (doc-only change)" -m "Artifacts: none" -m "Run log: docs/agent_runs/20251223_044441_ticket-01_wrds-manifest-note/"
