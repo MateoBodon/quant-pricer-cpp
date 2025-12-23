@@ -437,3 +437,20 @@ git commit -m "ticket-02: finalize checklist + include AGENTS" \
   -m "Tests: WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast" \
   -m "Artifacts: docs/artifacts/manifest.json" \
   -m "Run log: docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/"
+git status -sb
+RUN_DIR=$(ls -td docs/agent_runs/*_ticket-02_wrds-asof-checks | head -n1)
+RUN_NAME=$(basename "$RUN_DIR")
+TIMESTAMP=20251223T193039Z
+make gpt-bundle TICKET=ticket-02 RUN_NAME=${RUN_NAME} TIMESTAMP=${TIMESTAMP}
+RUN_DIR=$(ls -td docs/agent_runs/*_ticket-02_wrds-asof-checks | head -n1)
+RUN_NAME=$(basename "$RUN_DIR")
+ZIP="docs/gpt_bundles/20251223T193039Z_ticket-02_${RUN_NAME}.zip"
+python3 scripts/gpt_bundle.py --ticket ticket-02 --run-name ${RUN_NAME} --verify ${ZIP}
+git status -sb
+git add docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/COMMANDS.md
+
+git commit -m "ticket-02: record bundle verification" \
+  -m "Tests: make gpt-bundle TICKET=ticket-02 RUN_NAME=20251223_183500_ticket-02_wrds-asof-checks TIMESTAMP=20251223T193039Z" \
+  -m "Tests: python3 scripts/gpt_bundle.py --ticket ticket-02 --run-name 20251223_183500_ticket-02_wrds-asof-checks --verify docs/gpt_bundles/20251223T193039Z_ticket-02_20251223_183500_ticket-02_wrds-asof-checks.zip" \
+  -m "Artifacts: none" \
+  -m "Run log: docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/"
