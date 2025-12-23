@@ -224,3 +224,13 @@ date -u +%Y-%m-%dT%H:%M:%SZ
 sed -n '1,40p' docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
 git status -sb
 git add docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
+cat <<'EOF' > /tmp/ticket-03-commit-msg-5.txt
+ticket-03: refresh run log metadata
+
+Tests: ctest --test-dir build -L FAST --output-on-failure; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
+Artifacts: none (run log metadata only)
+Run log: docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/
+EOF
+git commit -F /tmp/ticket-03-commit-msg-5.txt
+tail -n 5 docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md
+git status -sb
