@@ -454,3 +454,10 @@ git commit -m "ticket-02: record bundle verification" \
   -m "Tests: python3 scripts/gpt_bundle.py --ticket ticket-02 --run-name 20251223_183500_ticket-02_wrds-asof-checks --verify docs/gpt_bundles/20251223T193039Z_ticket-02_20251223_183500_ticket-02_wrds-asof-checks.zip" \
   -m "Artifacts: none" \
   -m "Run log: docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/"
+git status -sb
+git add docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/COMMANDS.md
+
+git commit -m "ticket-02: update run log commands" \
+  -m "Tests: not run (run log update only)" \
+  -m "Artifacts: none" \
+  -m "Run log: docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/"
