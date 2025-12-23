@@ -468,3 +468,6 @@ git commit -m "ticket-02: log branch switch" \
   -m "Tests: not run (run log update only)" \
   -m "Artifacts: none" \
   -m "Run log: docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/"
+git switch main
+git merge codex/ticket-02-wrds-asof-checks
+git push origin main
