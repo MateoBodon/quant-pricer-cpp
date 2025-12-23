@@ -47,3 +47,22 @@
 45. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status -sb
 46. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add scripts/gpt_bundle.py docs/CODEX_SPRINT_TICKETS.md PROGRESS.md CHANGELOG.md docs/agent_runs/20251223_062006_ticket-01b_bundle-integrity
 47. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "ticket-01b: harden gpt-bundle evidence gates" -m "Tests: python3 -m compileall scripts/gpt_bundle.py; make gpt-bundle TICKET=ticket-01b RUN_NAME=_gpt_bundle_emptytest_20251223_062606 (expected fail on empty run logs)" -m "Artifacts: docs/gpt_bundles/20251223T063041Z_ticket-01_20251222_204744_ticket-01_unify-artifacts.zip; docs/gpt_bundles/20251223T063041Z_ticket-01b_20251223_062006_ticket-01b_bundle-integrity.zip" -m "Run log: docs/agent_runs/20251223_062006_ticket-01b_bundle-integrity/"
+48. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] for f in PROMPT.md COMMANDS.md RESULTS.md TESTS.md META.json; do wc -c "docs/agent_runs/20251223_062006_ticket-01b_bundle-integrity/$f"; done
+49. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] unzip -l docs/gpt_bundles/20251223T063041Z_ticket-01_20251222_204744_ticket-01_unify-artifacts.zip | rg -n "docs/agent_runs/20251222_204744_ticket-01_unify-artifacts/"
+50. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] unzip -l docs/gpt_bundles/20251223T063041Z_ticket-01_20251222_204744_ticket-01_unify-artifacts.zip | rg -n "ticket-01_finalize"
+51. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] unzip -p docs/gpt_bundles/20251223T063041Z_ticket-01_20251222_204744_ticket-01_unify-artifacts.zip DIFF.patch | rg -n "scripts/reproduce_all.sh|scripts/generate_metrics_summary.py|tests/" | head -n 20
+52. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] unzip -p docs/gpt_bundles/20251223T063041Z_ticket-01_20251222_204744_ticket-01_unify-artifacts.zip DIFF.patch | rg -n "artifacts_root_guard|generate_metrics_summary.py|manifest" | head -n 20
+53. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] unzip -p docs/gpt_bundles/20251223T063041Z_ticket-01_20251222_204744_ticket-01_unify-artifacts.zip DIFF.patch | rg -n "diff --git a/scripts" | head -n 20
+54. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] patterns='WRDS_PASSWORD|WRDS_USERNAME|password|token|secret|strike,.*market_iv|\\bsecid\\b|best_bid|best_ask|best_offer'; unzip -p docs/gpt_bundles/20251223T063041Z_ticket-01_20251222_204744_ticket-01_unify-artifacts.zip DIFF.patch | rg -n "$patterns"
+55. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] rg -n "emptytest" docs/agent_runs/20251223_062006_ticket-01b_bundle-integrity/TESTS.md
+56. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] rg -n "ticket-01b|20251223T063041Z" PROGRESS.md
+57. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] rg -n "ticket-01b|Status" docs/CODEX_SPRINT_TICKETS.md
+58. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] patterns='WRDS_PASSWORD|WRDS_USERNAME|password|token|secret|strike,.*market_iv|\\bsecid\\b|best_bid|best_ask|best_offer'; rg -n "$patterns" docs/agent_runs/20251223_062006_ticket-01b_bundle-integrity
+59. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] FINAL_TS=$(date -u +%Y%m%dT%H%M%SZ); echo "$FINAL_TS"
+60. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] TIMESTAMP=20251223T170537Z make gpt-bundle TICKET=ticket-01b RUN_NAME=20251223_062006_ticket-01b_bundle-integrity
+61. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat <<'EOF' > docs/agent_runs/20251223_062006_ticket-01b_bundle-integrity/RESULTS.md
+62. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch (PROGRESS.md)
+63. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git rev-parse HEAD
+64. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] date -u +%Y-%m-%dT%H:%M:%SZ
+65. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat <<'EOF' > docs/agent_runs/20251223_062006_ticket-01b_bundle-integrity/META.json
+66. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status -sb
