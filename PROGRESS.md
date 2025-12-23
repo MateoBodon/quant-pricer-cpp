@@ -35,3 +35,7 @@ Completed Ticket-07b: enforced `# SYNTHETIC_DATA` markers in the data-policy gua
 Rebuilt the `project_state/` documentation set and refreshed generated indices (`project_state/_generated/*`). Produced bundle: `docs/gpt_bundles/project_state_20251222T192635Z_5265c6d.zip`. Run log: `docs/agent_runs/20251222_142116_ticket-00_project_state_rebuild/`.
 
 Canonicalized artifact-root usage in the FAST pipeline by routing parity/greeks/Heston series tests to temp outputs, adding `artifacts_root_guard_fast`, and enforcing canonical manifest usage in `scripts/generate_metrics_summary.py`. Regenerated sample-mode artifacts + validation pack via `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`, verified no new files under `artifacts/`, and re-ran the WRDS sample smoke. Tests: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`, `cmake --build build -j`, `ctest --test-dir build -L FAST --output-on-failure`, `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`, `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast`. Run log: `docs/agent_runs/20251222_204744_ticket-01_unify-artifacts/`.
+
+## 2025-12-23
+
+Ran a local WRDS single-date smoke using `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds` with `--trade-date 2024-06-14` and `--fast`, writing outputs to the gitignored `docs/artifacts/wrds_local/`. Run log: `docs/agent_runs/20251223_030719_ticket-01_wrds-local-smoke/`.
