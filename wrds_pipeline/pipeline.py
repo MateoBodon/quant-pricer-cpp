@@ -23,7 +23,7 @@ for path in (REPO_ROOT, SCRIPTS_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-from manifest_utils import ARTIFACTS_ROOT, update_run
+from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
 
 from . import (
     calibrate_heston,
@@ -259,6 +259,18 @@ def _local_root_from_payload(payload: Dict[str, object]) -> Path | None:
     if not root.is_absolute():
         root = REPO_ROOT / root
     return root
+
+
+def _panel_id_from_payload(payload: Dict[str, object], path: Path) -> str:
+    panel_id = payload.get("panel_id") or payload.get("dataset_id")
+    if panel_id:
+        return str(panel_id)
+    fallback = path.stem
+    print(
+        "[wrds_pipeline] WARNING: dateset missing panel_id; "
+        f"using fallback {fallback}"
+    )
+    return fallback
 
 
 def run(
@@ -500,11 +512,16 @@ def run_dateset(
     local_root: Path | None = None,
 ) -> Dict[str, Path]:
     payload = _load_dateset_payload(dateset_path)
+    panel_id = _panel_id_from_payload(payload, dateset_path)
     if local_root is None:
         local_root = _local_root_from_payload(payload)
     entries = payload.get("dates", [])
     if not entries:
         raise RuntimeError(f"{dateset_path} does not contain any dates")
+    print(
+        f"[wrds_pipeline] dateset={dateset_path} panel_id={panel_id} "
+        f"entries={len(entries)}"
+    )
     if output_root is None and local_root is not None and not use_sample:
         wrds_root = ARTIFACTS_ROOT / "wrds_local"
     else:
@@ -701,6 +718,8 @@ def run_dateset(
         {
             "symbol": symbol,
             "dateset": str(dateset_path),
+            "panel_id": panel_id,
+            "dateset_inputs": describe_inputs([dateset_path]),
             "pricing_csv": str(pricing_csv),
             "pricing_bs_csv": str(bs_pricing_csv),
             "oos_csv": str(oos_csv),

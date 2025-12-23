@@ -50,7 +50,7 @@ commands:
 ## WRDS pipeline architecture
 - Entry point: `python -m wrds_pipeline.pipeline` (`wrds_pipeline/pipeline.py`).
 - Pipeline stages: surface ingest (`ingest_sppx_surface`) → calibration (`calibrate_heston` + `calibrate_bs`) → OOS pricing (`oos_pricing`) → Δ-hedged PnL (`delta_hedge_pnl`) → aggregation/plots (`pipeline.py`).
-- Configurations live in `wrds_pipeline_dates_panel.yaml` and `wrds_pipeline/dateset.yaml`.
+- Canonical multi-date configuration lives in `wrds_pipeline_dates_panel.yaml` (with an explicit `panel_id` logged into provenance).
 
 ## Key repository layout
 - `include/quant/` — public C++ headers (API surface).

@@ -109,8 +109,7 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 
 **Files/modules likely touched:**
 - `wrds_pipeline/pipeline.py`
-- `wrds_pipeline/dateset.yaml` (or equivalent)
-- `wrds_pipeline_dates_panel.yaml` (or equivalent)
+- `wrds_pipeline_dates_panel.yaml` (canonical panel config)
 - `scripts/reproduce_all.sh`
 - `project_state/CONFIG_REFERENCE.md`
 - `PROGRESS.md`, `project_state/OPEN_QUESTIONS.md`

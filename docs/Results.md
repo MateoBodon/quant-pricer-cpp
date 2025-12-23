@@ -117,7 +117,7 @@ The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `seci
 - Δ-hedged distributions per bucket are stored in [artifacts/wrds/wrds_agg_pnl.csv](artifacts/wrds/wrds_agg_pnl.csv) with `mean_ticks` and `pnl_sigma` (tick σ).
 - Overview figure: [artifacts/wrds/wrds_multi_date_summary.png](artifacts/wrds/wrds_multi_date_summary.png); detailed narrative lives in [`docs/WRDS_Results.md`](WRDS_Results.md).
 
-Regenerate the bundled sample snapshot with `./scripts/reproduce_all.sh` (the pipeline runs even without credentials) or explicitly via `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample`. To hit the live WRDS database export `WRDS_ENABLED=1`, `WRDS_USERNAME`, `WRDS_PASSWORD`, then run the same command without `--use-sample`. MARKET tests (`ctest -L MARKET`) remain opt-in and skip automatically when the env vars are absent.
+Regenerate the bundled sample snapshot with `./scripts/reproduce_all.sh` (the pipeline runs even without credentials) or explicitly via `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample`. To hit the live WRDS database export `WRDS_ENABLED=1`, `WRDS_USERNAME`, `WRDS_PASSWORD`, then run the same command without `--use-sample`. The panel identifier (`panel_id` in the YAML) is logged at run start and recorded in `docs/artifacts/manifest.json` under `runs.wrds_dateset`. MARKET tests (`ctest -L MARKET`) remain opt-in and skip automatically when the env vars are absent.
 
 ## Manifest & determinism
 

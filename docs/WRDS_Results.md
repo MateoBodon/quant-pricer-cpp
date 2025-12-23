@@ -133,7 +133,7 @@ The batch runner iterates every entry in [`wrds_pipeline_dates_panel.yaml`](../w
 
 ![WRDS multi-date summary](artifacts/wrds/wrds_multi_date_summary.png)
 
-Run `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample` for the deterministic bundle, or drop `--use-sample` (with `WRDS_ENABLED=1`) to pull live IvyDB data.
+Run `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample` for the deterministic bundle, or drop `--use-sample` (with `WRDS_ENABLED=1`) to pull live IvyDB data. The panel identifier (`panel_id` in the YAML) is logged at run start and recorded in `docs/artifacts/manifest.json` under `runs.wrds_dateset`.
 
 ## Reproducing this bundle
 

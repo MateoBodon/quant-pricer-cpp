@@ -12,6 +12,7 @@
 - wrds(local): document local WRDS OptionMetrics parquet stash and include a manifest in the validation bundle
 - wrds(local): require explicit WRDS_LOCAL_ROOT / dateset config for local mode, keep sample artifacts as default, and scrub repo-relative paths in committed artifacts
 - wrds(validity): hard-fail as-of correctness checks for calibration/OOS and add poison FAST coverage (with `WRDS_SAMPLE_PATH` override)
+- wrds(panel): make `wrds_pipeline_dates_panel.yaml` the canonical panel config and log `panel_id` in WRDS provenance
 - docs(project_state): refresh project_state docs and generated indices
 ## v0.3.2
 
