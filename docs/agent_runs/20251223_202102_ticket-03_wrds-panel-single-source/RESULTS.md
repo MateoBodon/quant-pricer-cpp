@@ -3,6 +3,7 @@
 - Canonicalized the WRDS panel config to `wrds_pipeline_dates_panel.yaml` (added `panel_id`) and removed the legacy `wrds_pipeline/dateset.yaml`.
 - WRDS dateset runs now log `panel_id` and write it + `dateset_inputs` (hash) into `docs/artifacts/manifest.json` under `runs.wrds_dateset`.
 - Docs refreshed to remove dual-config ambiguity and describe the canonical panel + provenance (`project_state/CONFIG_REFERENCE.md`, `project_state/PIPELINE_FLOW.md`, `project_state/ARCHITECTURE.md`, `project_state/OPEN_QUESTIONS.md`, `docs/WRDS_Results.md`, `docs/Results.md`, `docs/CODEX_SPRINT_TICKETS.md`, `CHANGELOG.md`, `PROGRESS.md`).
+- Synced `project_state/CURRENT_RESULTS.md` to the latest `docs/artifacts/metrics_summary.md` snapshot.
 - Regenerated canonical artifacts and validation pack via `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`.
 - Note: an attempted TESTS.md write accidentally invoked `reproduce_all.sh` via shell expansion; it was interrupted and then rerun to completion to restore artifacts.
 - Assumption: `project_state/_generated/repo_inventory.json` was not regenerated; historical logs still reference the removed dateset file.

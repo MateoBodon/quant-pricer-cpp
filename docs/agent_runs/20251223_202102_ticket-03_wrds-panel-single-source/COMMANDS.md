@@ -199,3 +199,15 @@ Run log: docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/
 EOF
 git commit -F /tmp/ticket-03-commit-msg-2.txt
 git status -sb
+rg -n 'wrds_pipeline/dateset.yaml|wrds_pipeline_dates_panel.yaml'
+rg -n 'wrds_dateset|panel_id' docs/artifacts/manifest.json
+git show -s --format=fuller 8bddc8d10fcb10ab32919f45b985bb97db7a5dd8
+rg -n 'cmake -S \.' docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md
+rg -n 'ctest --test-dir build -L FAST|WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast|REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh' docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md
+sed -n '1,200p' project_state/CURRENT_RESULTS.md
+sed -n '1,200p' docs/artifacts/metrics_summary.md
+rg -n 'WRDS_PASSWORD=|WRDS_USERNAME=|WRDS_PASSWORD|WRDS_USERNAME' docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source
+git diff --name-status main..HEAD
+date -u +%Y-%m-%dT%H:%M:%SZ
+git status -sb
+git add docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/RESULTS.md project_state/CURRENT_RESULTS.md
