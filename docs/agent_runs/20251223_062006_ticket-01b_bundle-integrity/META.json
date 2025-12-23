@@ -1,0 +1,24 @@
+{
+  "run_name": "20251223_062006_ticket-01b_bundle-integrity",
+  "ticket_id": "ticket-01b",
+  "started_at_utc": "2025-12-23T06:20:06Z",
+  "finished_at_utc": "2025-12-23T06:33:39Z",
+  "git_sha_before": "17e4e52b97bb26211ca2b3672bc5182b56dffb91",
+  "git_sha_after": "17e4e52b97bb26211ca2b3672bc5182b56dffb91",
+  "branch_name": "codex/ticket-01b-bundle-integrity",
+  "host_os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "python_version": "Python 3.12.2",
+  "build_type": "Release",
+  "dataset_id": "N/A",
+  "config_hashes": {
+    "scenario_grid": null,
+    "tolerances": null,
+    "wrds_panel": null
+  },
+  "tools": {
+    "codex_cli": "unknown",
+    "cmake": "cmake version 4.1.2"
+  },
+  "notes": "Added gpt-bundle empty-run gating + base diff/commit log support; regenerated ticket-01 bundle with BASE_SHA=cf1d770d18d26b8db15c0638c692ac50f5f2747e and produced ticket-01b bundle for this run."
+}
