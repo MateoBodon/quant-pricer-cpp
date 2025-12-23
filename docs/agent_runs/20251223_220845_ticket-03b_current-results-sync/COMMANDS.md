@@ -314,3 +314,12 @@ git diff --stat
 date -u +%Y-%m-%dT%H:%M:%SZ
 apply_patch <<'PATCH' (docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/META.json finished_at_utc)
 git add PROGRESS.md docs/CODEX_SPRINT_TICKETS.md docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md project_state/CURRENT_RESULTS.md scripts/gpt_bundle.py tests/test_metrics_snapshot_fast.py docs/agent_runs/20251223_220845_ticket-03b_current-results-sync
+git commit -m "ticket-03b: sync CURRENT_RESULTS + guard meta integrity" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast" -m "Artifacts: docs/artifacts/manifest.json, docs/artifacts/metrics_summary.json, docs/artifacts/metrics_summary.md" -m "Run log: docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/"
+make gpt-bundle TICKET=ticket-03b RUN_NAME=20251223_220845_ticket-03b_current-results-sync
+cat docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/META.json
+git rev-parse HEAD
+apply_patch <<'PATCH' (docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/META.json git_sha_after)
+make gpt-bundle TICKET=ticket-03b RUN_NAME=20251223_220845_ticket-03b_current-results-sync
+apply_patch <<'PATCH' (docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/RESULTS.md bundle path)
+git status -sb
+git add docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/META.json docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/RESULTS.md
