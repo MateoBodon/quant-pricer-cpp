@@ -174,3 +174,19 @@ rg -n 'gpt_bundles' .gitignore
 rm -rf docs/artifacts/logs
 git status -sb
 git add -A
+git status -sb
+
+cat <<'EOF' > /tmp/ticket-03-commit-msg.txt
+ticket-03: single WRDS panel config + provenance panel id
+
+Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
+Artifacts: docs/artifacts/bench/*, docs/artifacts/manifest.json, docs/artifacts/metrics_summary.md, docs/artifacts/metrics_summary.json, docs/artifacts/ql_parity/*, docs/artifacts/qmc_vs_prng_equal_time.*; docs/validation_pack.zip
+Run log: docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/
+EOF
+git commit -F /tmp/ticket-03-commit-msg.txt
+git status -sb
+make gpt-bundle TICKET=ticket-03 RUN_NAME=20251223_202102_ticket-03_wrds-panel-single-source
+date -u +%Y-%m-%dT%H:%M:%SZ
+git rev-parse HEAD
+git status -sb
+git add docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/RESULTS.md docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md

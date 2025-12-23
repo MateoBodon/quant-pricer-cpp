@@ -7,7 +7,7 @@
 - Note: an attempted TESTS.md write accidentally invoked `reproduce_all.sh` via shell expansion; it was interrupted and then rerun to completion to restore artifacts.
 - Assumption: `project_state/_generated/repo_inventory.json` was not regenerated; historical logs still reference the removed dateset file.
 
-Bundle: `docs/gpt_bundles/20251223T204340Z_ticket-03_20251223_202102_ticket-03_wrds-panel-single-source.zip`
+Bundle: `docs/gpt_bundles/20251223T204819Z_ticket-03_20251223_202102_ticket-03_wrds-panel-single-source.zip`
 
 Human merge checklist:
 - Only one WRDS panel config remains authoritative; the other is removed or a clearly documented alias
