@@ -221,6 +221,10 @@ EOF
 git commit -F /tmp/ticket-03-commit-msg-4.txt
 git rev-parse HEAD
 date -u +%Y-%m-%dT%H:%M:%SZ
+git status -sb
+date -u +%Y-%m-%dT%H:%M:%SZ
+git rev-parse HEAD
+python3 - <<'PY'
 sed -n '1,40p' docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
 git status -sb
 git add docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
@@ -256,5 +260,26 @@ data['git_sha_after'] = '0ae3ce2c74861462f12d607acbb6d030f607429d'
 path.write_text(json.dumps(data, indent=2) + '\n')
 PY
 sed -n '1,10p' docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
+git status -sb
+git add docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
+tail -n 12 docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md
+cat <<'EOF' > /tmp/ticket-03-commit-msg-6.txt
+git commit -F /tmp/ticket-03-commit-msg-6.txt
+cat <<'EOF' > /tmp/ticket-03-commit-msg-7.txt
+git commit -F /tmp/ticket-03-commit-msg-7.txt
+git rev-parse HEAD
+tail -n 8 docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md
+tail -n 20 docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md
+date -u +%Y-%m-%dT%H:%M:%SZ
+git rev-parse HEAD
+python3 - <<'PY'
+import json
+from pathlib import Path
+path = Path('docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json')
+data = json.loads(path.read_text())
+data['finished_at_utc'] = '2025-12-23T21:07:55Z'
+data['git_sha_after'] = '6b39c6c1381cf375a7f56d4f755bedf887f5a6c9'
+path.write_text(json.dumps(data, indent=2) + '\n')
+PY
 git status -sb
 git add docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
