@@ -1,0 +1,24 @@
+{
+  "run_name": "20251223_062006_ticket-01b_bundle-integrity",
+  "ticket_id": "ticket-01b",
+  "started_at_utc": "2025-12-23T06:20:06Z",
+  "finished_at_utc": "2025-12-23T17:08:22Z",
+  "git_sha_before": "17e4e52b97bb26211ca2b3672bc5182b56dffb91",
+  "git_sha_after": "4fcdb023a5e4956bb99d9cb8e14e7398ac90271b",
+  "branch_name": "codex/ticket-01b-bundle-integrity",
+  "host_os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "python_version": "Python 3.12.2",
+  "build_type": "Release",
+  "dataset_id": "N/A",
+  "config_hashes": {
+    "scenario_grid": null,
+    "tolerances": null,
+    "wrds_panel": null
+  },
+  "tools": {
+    "codex_cli": "unknown",
+    "cmake": "cmake version 4.1.2"
+  },
+  "notes": "Verified bundle evidence, checked DIFF.patch for ticket-01 scripts/tests changes, scanned diffs/logs for secrets/raw WRDS columns (doc-only hits), and generated final ticket-01b bundle (20251223T170537Z)."
+}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -30,6 +31,10 @@ REQUIRED_PATHS = (
     "docs/agent_runs/{run_name}/TESTS.md",
     "docs/agent_runs/{run_name}/META.json",
 )
+try:
+    MIN_RUNLOG_BYTES = int(os.getenv("GPT_BUNDLE_MIN_RUNLOG_BYTES", "20"))
+except ValueError:
+    MIN_RUNLOG_BYTES = 20
 
 
 def _run_git(args: List[str]) -> str:
@@ -37,6 +42,13 @@ def _run_git(args: List[str]) -> str:
         return subprocess.check_output(args, cwd=REPO_ROOT, text=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         return f"[error] {' '.join(args)}\n{exc.output}"
+
+
+def _try_git(args: List[str]) -> str | None:
+    result = subprocess.run(args, cwd=REPO_ROOT, text=True, capture_output=True)
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip()
 
 
 def _add_path(zf: zipfile.ZipFile, path: Path) -> None:
@@ -57,6 +69,23 @@ def _required_items(run_name: str) -> List[Tuple[str, Path]]:
     for rel_path in _render_required_paths(run_name):
         items.append((rel_path, REPO_ROOT / rel_path))
     return items
+
+
+def _run_log_issues(required: List[Tuple[str, Path]], run_name: str) -> List[str]:
+    issues: List[str] = []
+    run_prefix = f"docs/agent_runs/{run_name}/"
+    min_bytes = max(1, MIN_RUNLOG_BYTES)
+    for label, path in required:
+        if not label.startswith(run_prefix):
+            continue
+        try:
+            size = path.stat().st_size
+        except OSError:
+            issues.append(f"{label} (unreadable)")
+            continue
+        if size < min_bytes:
+            issues.append(f"{label} ({size} bytes < {min_bytes})")
+    return issues
 
 
 def _ticket_present(ticket_path: Path, ticket_id: str) -> bool:
@@ -89,6 +118,49 @@ def _find_ticket_id(ticket_path: Path) -> str | None:
     if not match:
         return None
     return match.group(0).lower()
+
+
+def _resolve_base_sha(ticket_id: str, explicit_base: str | None) -> Tuple[str | None, str | None]:
+    base = explicit_base or os.getenv("BASE_SHA")
+    if base:
+        return base, "explicit"
+
+    for ref in ("main", "origin/main"):
+        if _try_git(["git", "rev-parse", "--verify", ref]):
+            merge_base = _try_git(["git", "merge-base", "HEAD", ref])
+            if merge_base:
+                return merge_base, f"merge-base:{ref}"
+
+    ticket_match = _try_git(
+        ["git", "log", "--reverse", "--format=%H", "--grep", re.escape(ticket_id)]
+    )
+    if ticket_match:
+        commit = ticket_match.splitlines()[0].strip()
+        parent = _try_git(["git", "rev-parse", f"{commit}^"])
+        return parent or commit, f"ticket-grep:{commit}"
+
+    return None, None
+
+
+def _build_diff_payload(base_sha: str | None) -> Tuple[str, str]:
+    sections: List[str] = []
+    commit_log = ""
+    if base_sha:
+        base_diff = _run_git(["git", "diff", "--patch", f"{base_sha}..HEAD"])
+        if base_diff.strip():
+            sections.append(f"### git diff --patch {base_sha}..HEAD\n{base_diff}")
+        commit_log = _run_git(["git", "log", "--oneline", f"{base_sha}..HEAD"])
+
+    work_diff = _run_git(["git", "diff", "--patch"])
+    if work_diff.strip():
+        sections.append("### git diff --patch (working tree)\n" + work_diff)
+
+    cached_diff = _run_git(["git", "diff", "--cached", "--patch"])
+    if cached_diff.strip():
+        sections.append("### git diff --cached --patch (staged)\n" + cached_diff)
+
+    diff_payload = "\n\n".join(sections) if sections else "No diff\n"
+    return diff_payload, commit_log
 
 
 def _run_self_test() -> int:
@@ -170,6 +242,10 @@ def main() -> None:
     parser.add_argument("--ticket", help="Ticket id (e.g., ticket-01)")
     parser.add_argument("--run-name", help="Run name under docs/agent_runs/")
     parser.add_argument(
+        "--base-sha",
+        help="Optional base commit for DIFF.patch (defaults to BASE_SHA env or merge-base).",
+    )
+    parser.add_argument(
         "--timestamp",
         default=None,
         help="Optional UTC timestamp for the bundle filename (e.g., 20251221T185600Z)",
@@ -200,6 +276,7 @@ def main() -> None:
     required = _required_items(args.run_name)
     required_labels = [label for label, _ in required]
     missing = [label for label, path in required if not path.exists()]
+    run_log_issues = _run_log_issues(required, args.run_name)
     ticket_path = REPO_ROOT / "docs" / "CODEX_SPRINT_TICKETS.md"
     ticket_ok = _ticket_present(ticket_path, args.ticket)
 
@@ -214,10 +291,14 @@ def main() -> None:
         print(f"[gpt-bundle] bundle verification passed: {args.verify}")
         return
 
-    if missing or not ticket_ok:
+    if missing or run_log_issues or not ticket_ok:
         if missing:
             print("[gpt-bundle] missing required items:")
             for item in missing:
+                print(f"  - {item}")
+        if run_log_issues:
+            print("[gpt-bundle] run log files missing content:")
+            for item in run_log_issues:
                 print(f"  - {item}")
         if not ticket_ok:
             print(
@@ -225,21 +306,24 @@ def main() -> None:
             )
         sys.exit(1)
 
-    diff_text = _run_git(["git", "diff", "--patch"])
-    cached_text = _run_git(["git", "diff", "--cached", "--patch"])
-    if diff_text.strip() and cached_text.strip():
-        diff_payload = (
-            "### git diff --patch (working tree)\n"
-            + diff_text
-            + "\n\n### git diff --cached --patch (staged)\n"
-            + cached_text
-        )
-    else:
-        diff_payload = diff_text if diff_text.strip() else cached_text
-    if not diff_payload.strip():
-        diff_payload = "No local diff\n"
+    base_sha, base_source = _resolve_base_sha(args.ticket, args.base_sha)
+    if base_sha and not _try_git(["git", "rev-parse", "--verify", base_sha]):
+        print(f"[gpt-bundle] base SHA not found: {base_sha}")
+        sys.exit(1)
+    if base_sha:
+        print(f"[gpt-bundle] using base SHA {base_sha} ({base_source})")
+
+    diff_payload, commit_log = _build_diff_payload(base_sha)
 
     last_commit = _run_git(["git", "log", "-1", "--pretty=fuller"])
+    commit_payload = ""
+    if base_sha:
+        commit_payload = f"Base SHA: {base_sha}\nBase source: {base_source}\n\n"
+        commit_payload += commit_log.strip() + ("\n" if commit_log.strip() else "")
+        if not commit_log.strip():
+            commit_payload += "No commits in range\n"
+    else:
+        commit_payload = "Base SHA: (not set)\n"
 
     with zipfile.ZipFile(
         output_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
@@ -248,6 +332,7 @@ def main() -> None:
             _add_path(zf, path)
 
         zf.writestr("DIFF.patch", diff_payload)
+        zf.writestr("COMMITS.txt", commit_payload)
         zf.writestr("LAST_COMMIT.txt", last_commit)
 
     print(f"[gpt-bundle] wrote {output_path}")
