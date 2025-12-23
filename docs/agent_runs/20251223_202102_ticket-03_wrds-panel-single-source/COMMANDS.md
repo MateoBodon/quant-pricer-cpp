@@ -190,3 +190,12 @@ date -u +%Y-%m-%dT%H:%M:%SZ
 git rev-parse HEAD
 git status -sb
 git add docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/RESULTS.md docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md
+cat <<'EOF' > /tmp/ticket-03-commit-msg-2.txt
+ticket-03: update run log + metrics snapshot
+
+Tests: ctest --test-dir build -L FAST --output-on-failure; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast
+Artifacts: docs/artifacts/manifest.json, docs/artifacts/metrics_summary.md, docs/artifacts/metrics_summary.json
+Run log: docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/
+EOF
+git commit -F /tmp/ticket-03-commit-msg-2.txt
+git status -sb
