@@ -25,3 +25,4 @@
 23. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "chore: finalize ticket-01 bundle" -m "Tests: not run (merge + bundle generation only)" -m "Artifacts: docs/gpt_bundles/20251223T054424Z_ticket-01_20251223_054210_ticket-01_finalize.zip (gitignored)" -m "Run log: docs/agent_runs/20251223_054210_ticket-01_finalize/"
 24. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git rev-parse HEAD
 25. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch <<'PATCH' (docs/agent_runs/20251223_054210_ticket-01_finalize/META.json)
+26. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git push origin main
