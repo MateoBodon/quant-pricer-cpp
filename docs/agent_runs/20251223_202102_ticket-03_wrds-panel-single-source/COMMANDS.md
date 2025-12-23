@@ -234,3 +234,27 @@ EOF
 git commit -F /tmp/ticket-03-commit-msg-5.txt
 tail -n 5 docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md
 git status -sb
+git rev-parse HEAD
+date -u +%Y-%m-%dT%H:%M:%SZ
+sed -n '1,20p' docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
+python3 - <<'PY'
+from pathlib import Path
+path = Path('docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json')
+text = path.read_text()
+text = text.replace('finished_at_utc: 2025-12-23T21:01:20Z', 'finished_at_utc: 2025-12-23T21:03:06Z')
+text = text.replace('git_sha_after: 0fa4ef18e6e5ef057cb183b341113fa0b25154c2', 'git_sha_after: 0ae3ce2c74861462f12d607acbb6d030f607429d')
+path.write_text(text)
+PY
+sed -n '1,10p' docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
+python3 - <<'PY'
+import json
+from pathlib import Path
+path = Path('docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json')
+data = json.loads(path.read_text())
+data['finished_at_utc'] = '2025-12-23T21:03:06Z'
+data['git_sha_after'] = '0ae3ce2c74861462f12d607acbb6d030f607429d'
+path.write_text(json.dumps(data, indent=2) + '\n')
+PY
+sed -n '1,10p' docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
+git status -sb
+git add docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251223_202102_ticket-03_wrds-panel-single-source/META.json
