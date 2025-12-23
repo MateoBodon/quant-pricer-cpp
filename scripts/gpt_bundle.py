@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -51,6 +52,11 @@ def _try_git(args: List[str]) -> str | None:
     return result.stdout.strip()
 
 
+def _check_git(args: List[str]) -> bool:
+    result = subprocess.run(args, cwd=REPO_ROOT, text=True, capture_output=True)
+    return result.returncode == 0
+
+
 def _add_path(zf: zipfile.ZipFile, path: Path) -> None:
     if path.is_dir():
         for item in sorted(path.rglob("*")):
@@ -85,6 +91,31 @@ def _run_log_issues(required: List[Tuple[str, Path]], run_name: str) -> List[str
             continue
         if size < min_bytes:
             issues.append(f"{label} ({size} bytes < {min_bytes})")
+    return issues
+
+
+def _meta_issues(meta_path: Path) -> List[str]:
+    issues: List[str] = []
+    try:
+        with meta_path.open("r", encoding="utf-8") as fh:
+            meta = json.load(fh)
+    except OSError as exc:
+        issues.append(f"META.json unreadable: {exc}")
+        return issues
+    except json.JSONDecodeError as exc:
+        issues.append(f"META.json invalid JSON: {exc}")
+        return issues
+
+    sha = meta.get("git_sha_after")
+    if not isinstance(sha, str) or not sha.strip():
+        issues.append("META.json missing git_sha_after")
+        return issues
+    sha = sha.strip()
+    if not _check_git(["git", "cat-file", "-e", f"{sha}^{{commit}}"]):
+        issues.append(f"META.json git_sha_after not found in repo: {sha}")
+        return issues
+    if not _check_git(["git", "merge-base", "--is-ancestor", sha, "HEAD"]):
+        issues.append(f"META.json git_sha_after not in HEAD history: {sha}")
     return issues
 
 
@@ -304,6 +335,13 @@ def main() -> None:
             print(
                 f"[gpt-bundle] ticket id not found in docs/CODEX_SPRINT_TICKETS.md: {args.ticket}"
             )
+        sys.exit(1)
+
+    meta_issues = _meta_issues(REPO_ROOT / f"docs/agent_runs/{args.run_name}/META.json")
+    if meta_issues:
+        print("[gpt-bundle] run log META.json invalid:")
+        for item in meta_issues:
+            print(f"  - {item}")
         sys.exit(1)
 
     base_sha, base_source = _resolve_base_sha(args.ticket, args.base_sha)

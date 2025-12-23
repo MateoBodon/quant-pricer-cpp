@@ -1,7 +1,7 @@
 ---
-generated_at: 2025-12-23T21:00:05Z
-git_sha: 231f765438570c3bf35a9062290d5d0213b74ad9
-branch: codex/ticket-03-wrds-panel-single-source
+generated_at: 2025-12-23T22:30:27Z
+git_sha: eb8b83464526fd2f5a4a82dcfc044d488cfb1c9c
+branch: codex/ticket-03b-current-results-sync
 commands:
   - REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
   - WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast
@@ -11,8 +11,8 @@ commands:
 # Current Results
 
 ## Metrics snapshot (latest committed)
-Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-23T20:45:47.766341+00:00**).
-Manifest git SHA recorded in snapshot: `231f765438570c3bf35a9062290d5d0213b74ad9`.
+Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-23T22:28:29.174703+00:00**).
+Manifest git SHA recorded in snapshot: `eb8b83464526fd2f5a4a82dcfc044d488cfb1c9c`.
 
 Status overview (from `docs/artifacts/metrics_summary.md`):
 - tri engine agreement: ok
@@ -28,7 +28,7 @@ Status overview (from `docs/artifacts/metrics_summary.md`):
 - PDE order: slope=-2.0124, rmse_finest=0.00115728.
 - QL parity: max diff=0.861583 cents.
 - Benchmarks: MC paths/sec (1t)=1.11734e+07, eff@max=0.146101.
-- WRDS: median iv_rmse=0.00120828 (sample bundle).
+- WRDS: median iv_rmse=0.00120828 (sample bundle regression harness).
 
 ## Key artifact locations
 - Validation figures + CSVs: `docs/artifacts/` (tri-engine, QMC vs PRNG, PDE order, MC Greeks, Heston QE, etc.).

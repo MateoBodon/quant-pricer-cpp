@@ -102,6 +102,8 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 
 ## ticket-03 — Eliminate dual WRDS panel configs (single source of truth)
 
+**Status:** **FAIL** (run log META git_sha_after integrity not enforced; CURRENT_RESULTS sync guard missing—superseded by ticket-03b).
+
 **Goal (1 sentence):** Choose one WRDS date-panel config and remove/deprecate the other to prevent protocol drift.
 
 **Why (from Prompt-1 diagnosis):**
@@ -127,6 +129,30 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 - Updated provenance in `docs/artifacts/wrds/*`
 - Run logs under `docs/agent_runs/<RUN_NAME>/`
 - Doc updates: `PROGRESS.md` and `project_state/CONFIG_REFERENCE.md`
+
+---
+
+## ticket-03b — Sync CURRENT_RESULTS + run-log/meta integrity guardrails
+
+**Status:** **IN PROGRESS** (current run).
+
+**Goal (1 sentence):** Sync `project_state/CURRENT_RESULTS.md` with the latest committed metrics snapshot and add guardrails so run metadata + CURRENT_RESULTS cannot silently drift.
+
+**Acceptance criteria (objective):**
+- `project_state/CURRENT_RESULTS.md` matches `docs/artifacts/metrics_summary.*` (timestamp, manifest SHA, headline metrics).
+- Guardrail prevents bundling if run log META `git_sha_after` is missing/invalid.
+- FAST test fails if CURRENT_RESULTS drifts from metrics snapshot.
+
+**Minimal tests/commands to run:**
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`
+- `cmake --build build -j`
+- `ctest --test-dir build -L FAST --output-on-failure`
+- `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast`
+
+**Expected artifacts/logs to produce:**
+- Updated run log under `docs/agent_runs/<RUN_NAME>/`
+- Doc updates: `PROGRESS.md`, `project_state/CURRENT_RESULTS.md` (if metrics sync changes)
+- Bundle via `make gpt-bundle TICKET=ticket-03b RUN_NAME=<RUN_NAME>`
 
 ---
 
