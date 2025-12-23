@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-12-23T18:52:05.922208+00:00",
+  "generated_at": "2025-12-23T19:26:59.178225+00:00",
   "git": {
-    "branch": "main",
+    "branch": "codex/ticket-02-wrds-asof-checks",
     "dirty": true,
-    "sha": "cacbba6c6ddef36d904491d40aad57f5d45b80eb"
+    "sha": "13ad1796367e706e22dca21a7aeeb9bc1742fc43"
   },
   "omp_threads": 11,
   "runs": {
@@ -1117,6 +1117,25 @@
         "summary": "docs/artifacts/wrds/heston_fit.json",
         "surface_csv": "docs/artifacts/wrds/heston_fit_table.csv",
         "trade_date": "2024-06-14"
+      },
+      {
+        "figure": "docs/artifacts/wrds/heston_fit.png",
+        "iv_mae_bps": 10.599209020201132,
+        "iv_mae_volpts_vega_wt": 0.001059914693753718,
+        "iv_p90_bps": 17.602208519820472,
+        "iv_rmse_volpts_vega_wt": 0.0012083062914642752,
+        "next_trade_date": "2024-06-17",
+        "params": {
+          "kappa": 1.0054574812702344,
+          "rho": 0.01958979172423554,
+          "sigma": 0.48775222492108905,
+          "theta": 0.2,
+          "v0": 0.04396430677489712
+        },
+        "price_rmse_ticks": 17.08615098946495,
+        "summary": "docs/artifacts/wrds/heston_fit.json",
+        "surface_csv": "docs/artifacts/wrds/heston_fit_table.csv",
+        "trade_date": "2024-06-14"
       }
     ],
     "wrds_pipeline": [
@@ -1334,6 +1353,34 @@
         "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
         "symbol": "SPX",
         "timestamp": "2025-12-23T18:52:05.921922+00:00",
+        "trade_date": "2024-06-14",
+        "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
+        "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
+        "wrds_heston_hedge_csv": "docs/artifacts/wrds/wrds_heston_hedge.csv",
+        "wrds_heston_hedge_fig": "docs/artifacts/wrds/wrds_heston_hedge.png",
+        "wrds_heston_insample_csv": "docs/artifacts/wrds/wrds_heston_insample.csv",
+        "wrds_heston_insample_fig": "docs/artifacts/wrds/wrds_heston_insample.png",
+        "wrds_heston_oos_csv": "docs/artifacts/wrds/wrds_heston_oos.csv",
+        "wrds_heston_oos_fig": "docs/artifacts/wrds/wrds_heston_oos.png"
+      },
+      {
+        "fit_fig": "docs/artifacts/wrds/heston_fit.png",
+        "fit_json": "docs/artifacts/wrds/heston_fit.json",
+        "fit_table": "docs/artifacts/wrds/heston_fit_table.csv",
+        "label": null,
+        "next_trade_date": "2024-06-17",
+        "oos_detail": "docs/artifacts/wrds/oos_pricing_detail.csv",
+        "oos_summary": "docs/artifacts/wrds/oos_pricing_summary.csv",
+        "pnl_detail": "docs/artifacts/wrds/delta_hedge_pnl.csv",
+        "pnl_summary": "docs/artifacts/wrds/delta_hedge_pnl_summary.csv",
+        "regime": null,
+        "source_next": "sample",
+        "source_today": "sample",
+        "summary_fig": "docs/artifacts/wrds/heston_wrds_summary.png",
+        "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
+        "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
+        "symbol": "SPX",
+        "timestamp": "2025-12-23T19:26:59.177474+00:00",
         "trade_date": "2024-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",

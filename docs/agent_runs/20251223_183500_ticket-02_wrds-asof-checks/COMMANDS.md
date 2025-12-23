@@ -352,3 +352,88 @@ git commit -m "ticket-02: WRDS as-of correctness gates + poison tests" \
   -m "Tests: WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast" \
   -m "Artifacts: docs/artifacts/manifest.json, docs/artifacts/metrics_summary.md, docs/artifacts/metrics_summary.json" \
   -m "Run log: docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/"
+sed -n '1,160p' tests/test_data_policy_fast.py
+git diff -- AGENTS.md
+ctest --test-dir build -R wrds_asof_poison_fast --output-on-failure
+WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast
+ls -la docs/artifacts/wrds | head -n 20
+cat <<'EOF' >> "$RUN_DIR/TESTS.md"
+- `ctest --test-dir build -R wrds_asof_poison_fast --output-on-failure` — PASS
+- `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast` — PASS (confirmed outputs under `docs/artifacts/wrds/`)
+tail -n 10 "$RUN_DIR/TESTS.md"
+python3 - <<'PY'
+from pathlib import Path
+import json
+
+run_dir = Path('docs/agent_runs').glob('*_ticket-02_wrds-asof-checks')
+run_dir = next(run_dir)
+required = [
+    'PROMPT.md',
+    'COMMANDS.md',
+    'RESULTS.md',
+    'TESTS.md',
+    'META.json',
+]
+missing = [name for name in required if not (run_dir / name).exists()]
+empty = [name for name in required if (run_dir / name).exists() and (run_dir / name).stat().st_size == 0]
+print('missing', missing)
+print('empty', empty)
+meta = json.loads((run_dir / 'META.json').read_text())
+print('meta.run_name', meta.get('run_name'))
+print('meta.ticket_id', meta.get('ticket_id'))
+PY
+cat "$RUN_DIR/RESULTS.md"
+git rev-parse HEAD
+apply_patch (docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/RESULTS.md)
+git status -sb
+rg -n "def main|DIFF" -n scripts/gpt_bundle.py
+sed -n '240,360p' scripts/gpt_bundle.py
+rg -n "gpt-bundle" -n Makefile
+cat Makefile
+RUN_DIR=$(ls -td docs/agent_runs/*_ticket-02_wrds-asof-checks | head -n1)
+RUN_NAME=$(basename "$RUN_DIR")
+BUNDLE_TS=$(date -u +%Y%m%dT%H%M%SZ)
+BUNDLE_PATH="docs/gpt_bundles/${BUNDLE_TS}_ticket-02_${RUN_NAME}.zip"
+printf '%s\n' "$BUNDLE_TS" > "$RUN_DIR/BUNDLE_TS.txt"
+printf '%s\n' "$BUNDLE_PATH" > "$RUN_DIR/BUNDLE_PATH.txt"
+BUNDLE_PATH=$(cat "$RUN_DIR/BUNDLE_PATH.txt")
+python3 - <<'PY'
+from pathlib import Path
+bundle_path = Path("docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/BUNDLE_PATH.txt").read_text().strip()
+results = Path("docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/RESULTS.md")
+lines = results.read_text().splitlines()
+new_lines = []
+for line in lines:
+    if line.startswith("- Bundle:"):
+        new_lines.append(f"- Bundle: `{bundle_path}`.")
+    else:
+        new_lines.append(line)
+results.write_text("\n".join(new_lines) + "\n")
+PY
+rm -f "$RUN_DIR/BUNDLE_TS.txt" "$RUN_DIR/BUNDLE_PATH.txt"
+rg -n "Bundle:" "$RUN_DIR/RESULTS.md"
+python3 - <<'PY'
+import json
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+run_dir = Path('docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks')
+meta_path = run_dir / 'META.json'
+meta = json.loads(meta_path.read_text())
+sha = subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
+branch = subprocess.check_output(['git','rev-parse','--abbrev-ref','HEAD'], text=True).strip()
+meta['finished_at_utc'] = datetime.now(timezone.utc).isoformat().replace('+00:00','Z')
+meta['git_sha_before'] = sha
+meta['git_sha_after'] = sha
+meta['branch_name'] = branch
+meta_path.write_text(json.dumps(meta, indent=2) + '\n')
+PY
+git status -sb
+git add AGENTS.md docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/COMMANDS.md docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/META.json docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/RESULTS.md docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/TESTS.md docs/artifacts/manifest.json
+
+git commit -m "ticket-02: finalize checklist + include AGENTS" \
+  -m "Tests: ctest --test-dir build -R wrds_asof_poison_fast --output-on-failure" \
+  -m "Tests: WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast" \
+  -m "Artifacts: docs/artifacts/manifest.json" \
+  -m "Run log: docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/"

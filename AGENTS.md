@@ -1,91 +1,108 @@
-# AGENTS.md — quant-pricer-cpp
+# AGENTS.md — quant-pricer-cpp (Repository instructions for Codex + contributors)
 
-Codex (and humans) must treat this repo as **quant-interview-grade** engineering: correctness, reproducibility, and defensible evaluation are the product.
-
----
-
-## 0) Stop-the-line rules (non-negotiable)
-- **No fabricated results.** Never claim an artifact/metric exists unless it was generated in the current run and logged.
-- **No “green by deletion.”** Do not delete failing plots/tables or loosen checks to hide missing evidence.
-- **No evaluation weakening.** Do not change splits/panels/tolerances after seeing results without:
-  1) updating `docs/PLAN_OF_RECORD.md`,
-  2) explaining the change in `docs/agent_runs/<RUN>/RESULTS.md`,
-  3) updating `project_state/CURRENT_RESULTS.md`.
-- **No raw WRDS data committed.** Ever. Only license-safe derived summaries or small synthetic samples may be committed.
-- **No dangerous autonomy.** Do signal if a task would require:
-  - network access,
-  - running commands outside sandbox,
-  - or destructive git/FS operations.
-  Prefer safe defaults.
-
-If any of the above would be violated: STOP and document why in the run log.
+This file defines hard rules and the execution protocol for agent-assisted work in this repo.
 
 ---
 
-## 1) How to build + test (canonical)
+## 1) Stop-the-line rules (non-negotiable)
+
+- **No fabricated results.** Never claim a test passed, a benchmark ran, or a plot was generated unless it actually ran in this workspace and is logged.
+- **Validity > metrics.** If there is any sign of:
+  - lookahead / leakage / survivorship bias (WRDS),
+  - mutable/cherry-picked grids (synthetic),
+  - silent defaults that change evaluation,
+  you must fix it or clearly document the limitation before proceeding.
+- **No p-hacking.** Do not tune scenario grids, tolerances, filters, or date panels to make numbers look better. Any change to evaluation protocol must:
+  - update config version/hash,
+  - regenerate artifacts,
+  - be documented in PROGRESS and (if relevant) CURRENT_RESULTS.
+- **No raw WRDS/OptionMetrics data committed.** Ever. Only license-safe derived tiny samples may be committed, and must pass the repo data policy guard.
+- **Artifacts must be reproducible.** Official results must live under `docs/artifacts/` with provenance (`manifest.json` + `metrics_summary.*`).
+
+---
+
+## 2) How to build and test (default commands)
+
 ### Build (Release)
 - `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`
 - `cmake --build build -j`
 
-### Tests
-- FAST:
-  - `ctest --test-dir build -L FAST --output-on-failure`
-- Full:
-  - `ctest --test-dir build --output-on-failure`
-- MARKET / WRDS integration (opt-in):
-  - `ctest --test-dir build -L MARKET --output-on-failure`
+### Fast unit tests
+- `ctest --test-dir build -L FAST --output-on-failure`
 
-### Reproducible artifact run
-- `./scripts/reproduce_all.sh`
-- For fast CI-like runs, use any repo-supported fast flags/env (e.g., `REPRO_FAST=1`).
-- For sample-mode WRDS smoke:
-  - `WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast`
+### WRDS / market-data tests (only when enabled)
+- `ctest --test-dir build -L MARKET --output-on-failure`
+- Or Python test entrypoints as documented by the repo (prefer `--fast` modes)
 
 ---
 
-## 2) Documentation + run logging protocol (mandatory)
-Follow `docs/DOCS_AND_LOGGING_SYSTEM.md`.
+## 3) Official reproduction run (the only pipeline allowed for headline results)
 
-Every meaningful change must include a run log folder:
-- `docs/agent_runs/YYYYMMDD_HHMMSS_ticket-XX_slug/`
-  - `PROMPT.md`
-  - `COMMANDS.md`
-  - `RESULTS.md`
-  - `TESTS.md`
-  - `META.json`
+Run (fast + sample mode):
+- `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`
 
-Always update:
-- `PROGRESS.md` (one entry per run)
+This run must:
+- generate/update `docs/artifacts/manifest.json`
+- generate/update `docs/artifacts/metrics_summary.md` + `metrics_summary.json`
+- generate/update `docs/validation_pack.zip` (if configured)
 
-Update when relevant:
-- `project_state/CURRENT_RESULTS.md` (when metrics/artifacts change)
-- `project_state/KNOWN_ISSUES.md` (when a risk/bug is found or fixed)
-- `CHANGELOG.md` (user-visible changes)
+If anything writes to `artifacts/` during the official pipeline, treat as a failure.
 
 ---
 
-## 3) Data policy (WRDS / OptionMetrics)
-- Credentials must be provided via environment variables; do not print them to logs.
-- Cache directories must be outside the repo or in gitignored paths.
-- Commit policy:
-  - ✅ OK: tiny license-safe derived summaries (aggregated error tables), synthetic samples, config YAMLs.
-  - ❌ NOT OK: raw WRDS extracts, quote-level data, anything that violates WRDS/OptionMetrics licensing.
-- Data-policy guard: `python3 scripts/check_data_policy.py` must pass; tracked artifacts/data under `artifacts/`, `docs/artifacts/`, `data/`, and `wrds_pipeline/sample_data/` may not contain restricted columns (`strike,.*market_iv`, `secid`, `best_bid/ask/offer`). Any tracked CSV under `wrds_pipeline/sample_data/` must begin with `# SYNTHETIC_DATA`.
+## 4) Documentation + run logging protocol (required)
+
+### Where things go
+- Prompts: `docs/prompts/`
+- GPT analysis outputs: `docs/gpt_outputs/`
+- Codex run logs: `docs/agent_runs/<RUN_NAME>/`
+- Artifacts: `docs/artifacts/`
+
+### Run naming convention
+- `YYYYMMDD_HHMMSS_ticket-XX_<slug>`
+
+### Required files per run
+Inside `docs/agent_runs/<RUN_NAME>/`:
+- `PROMPT.md`
+- `COMMANDS.md`
+- `RESULTS.md`
+- `TESTS.md`
+- `META.json`
+- `SOURCES.md` (only if web research used)
+
+### Living docs update rules
+- Always: `PROGRESS.md`
+- If results change: `project_state/CURRENT_RESULTS.md`
+- If risks/bugs change: `project_state/KNOWN_ISSUES.md`
+- If user-visible behavior changes: `CHANGELOG.md`
 
 ---
 
-## 4) Branch + commit policy
-- Work on feature branches: `feature/ticket-XX_short-slug`
-- Each commit must include in the body:
-  - `Tests: <exact commands run>`
-  - `Artifacts: <paths generated/updated>`
-  - `Run log: docs/agent_runs/<RUN_NAME>/`
+## 5) Data policy (WRDS handling)
 
-Do not force-push. Do not rewrite history unless explicitly instructed.
+- WRDS credentials must never be printed in logs.
+- Raw WRDS extracts must never be committed.
+- Any cache must live in gitignored directories.
+- Run the repo’s data policy guard (or its FAST test) after touching any data scripts.
 
 ---
 
-## 5) If uncertain policy (don’t spam questions)
-- Make assumptions explicit in `docs/agent_runs/<RUN>/RESULTS.md` and proceed with the minimal safe change.
-- If a change risks breaking evaluation validity or leaking data: STOP and explain.
-- Prefer small, reviewable diffs over broad refactors.
+## 6) Branch + commit policy
+
+- Create a feature branch per ticket: `codex/ticket-XX-<slug>`
+- Commit message starts with `ticket-XX: ...`
+- Commit body must include:
+  - `Tests: <exact commands>`
+  - `Artifacts: <paths updated>`
+- Do not use destructive git commands (`reset --hard`, `clean -fdx`) unless explicitly asked and logged.
+
+---
+
+## 7) If uncertain policy (don’t spam questions)
+
+- Make assumptions explicit in `docs/agent_runs/<RUN_NAME>/RESULTS.md`.
+- Prefer minimal safe changes.
+- If blocked, implement the smallest diagnostic to unblock (e.g., a failing test that demonstrates the issue).
+- Ask a question only if progress is impossible without it.
+
+---
