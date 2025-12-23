@@ -361,7 +361,7 @@ def run(
         )
     else:
         oos_detail, oos_summary, oos_metrics = oos_pricing.evaluate(
-            agg_next, calib["params"]
+            agg_next, calib["params"], expected_quote_date=next_trade_date
         )
     if agg_next.empty:
         oos_metrics = calibrate_heston.compute_oos_iv_metrics(oos_detail)

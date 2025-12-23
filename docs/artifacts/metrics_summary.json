@@ -1,7 +1,7 @@
 {
   "artifacts_root": "docs/artifacts",
-  "generated_at": "2025-12-22T21:02:46.901536+00:00",
-  "manifest_git_sha": "aeb31c63c19ae8671a3be1f31bf7b003c4492c06",
+  "generated_at": "2025-12-23T18:51:36.651181+00:00",
+  "manifest_git_sha": "cacbba6c6ddef36d904491d40aad57f5d45b80eb",
   "manifest_path": "docs/artifacts/manifest.json",
   "metrics": {
     "benchmarks": {

@@ -19,12 +19,24 @@ import pandas as pd
 
 from .bs_utils import bs_vega, implied_vol_from_price
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SAMPLE_PATH_ENV = "WRDS_SAMPLE_PATH"
 SAMPLE_PATH = Path(__file__).resolve().parent / "sample_data" / "spx_options_sample.csv"
 SPOT_FALLBACK = 4500.0
 MIN_DTE_DAYS = 21  # ignore ultra-short tenor noise for calibration/OOS
 CACHE_ROOT_ENV = "WRDS_CACHE_ROOT"
 DEFAULT_CACHE_ROOT = Path("/Volumes/Storage/Data/wrds_cache")
 LOCAL_ROOT_ENV = "WRDS_LOCAL_ROOT"
+
+
+def _resolve_sample_path() -> Path:
+    raw = os.environ.get(SAMPLE_PATH_ENV)
+    if not raw:
+        return SAMPLE_PATH
+    candidate = Path(raw).expanduser()
+    if not candidate.is_absolute():
+        candidate = (REPO_ROOT / candidate).resolve()
+    return candidate
 
 
 def _cache_root() -> Path | None:
@@ -329,7 +341,13 @@ def _fetch_from_wrds(symbol: str, trade_date: str) -> pd.DataFrame:
 
 
 def _load_sample(symbol: str, trade_date: str) -> pd.DataFrame:
-    df = pd.read_csv(SAMPLE_PATH, comment="#", parse_dates=["trade_date", "exdate"])
+    sample_path = _resolve_sample_path()
+    if not sample_path.exists():
+        raise RuntimeError(f"Sample data file not found: {sample_path}")
+    df = pd.read_csv(sample_path, comment="#")
+    for col in ("trade_date", "quote_date", "exdate"):
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col])
     df = df[df["trade_date"] == pd.to_datetime(trade_date)]
     if df.empty:
         raise RuntimeError(f"Sample data missing trade date {trade_date}")
@@ -346,9 +364,12 @@ def _load_sample(symbol: str, trade_date: str) -> pd.DataFrame:
     df["divyield"] = df.get("dividend", 0.01)
     df["underlying_bid"] = df.get("spot", SPOT_FALLBACK)
     df["underlying_ask"] = df.get("spot", SPOT_FALLBACK)
+    if "quote_date" not in df.columns:
+        df["quote_date"] = df["trade_date"]
     return df[
         [
             "trade_date",
+            "quote_date",
             "exdate",
             "cp_flag",
             "strike",
@@ -379,17 +400,18 @@ def load_surface(
                 if not local_df.empty:
                     local_df["trade_date"] = pd.to_datetime(local_df["date"])
                     local_df.drop(columns=["date"], inplace=True)
-                    return local_df, "local"
+                    return _standardize_quote_date(local_df), "local"
             except Exception as exc:
                 print(f"[wrds_pipeline] local WRDS fetch failed ({exc}); falling back")
         cached = _load_cache(symbol, str(trade_date))
         if cached is not None and not cached.empty:
-            return cached, "cache"
+            return _standardize_quote_date(cached), "cache"
     if not force_sample and _has_wrds_credentials():
         try:
             raw = _fetch_from_wrds(symbol, str(trade_date))
             raw["trade_date"] = pd.to_datetime(raw["date"])
             raw.drop(columns=["date"], inplace=True)
+            raw = _standardize_quote_date(raw)
             _write_cache(symbol, str(trade_date), raw, "wrds")
             return raw, "wrds"
         except Exception as exc:  # pragma: no cover
@@ -397,12 +419,23 @@ def load_surface(
                 f"[wrds_pipeline] WRDS fetch failed ({exc}); falling back to sample data"
             )
     sample = _load_sample(symbol, str(trade_date))
-    return sample, "sample"
+    return _standardize_quote_date(sample), "sample"
+
+
+def _standardize_quote_date(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df["trade_date"] = pd.to_datetime(df["trade_date"])
+    if "quote_date" in df.columns:
+        df["quote_date"] = pd.to_datetime(df["quote_date"])
+    else:
+        df["quote_date"] = df["trade_date"]
+    return df
 
 
 def _prepare_quotes(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["trade_date"] = pd.to_datetime(df["trade_date"])
+    df["quote_date"] = pd.to_datetime(df.get("quote_date", df["trade_date"]))
     df["exdate"] = pd.to_datetime(df["exdate"])
     df["days_to_expiration"] = (df["exdate"] - df["trade_date"]).dt.days
     df = df[df["days_to_expiration"] >= MIN_DTE_DAYS]
@@ -479,6 +512,7 @@ def aggregate_surface(df: pd.DataFrame) -> pd.DataFrame:
         )
         .agg(
             trade_date=("trade_date", "first"),
+            quote_date=("quote_date", "first"),
             spot=("spot", "mean"),
             strike=("strike", "mean"),
             rate=("rate", "mean"),
@@ -498,6 +532,7 @@ def aggregate_surface(df: pd.DataFrame) -> pd.DataFrame:
     columns = [
         "symbol",
         "trade_date",
+        "quote_date",
         "tenor_bucket",
         "moneyness",
         "ttm_years",

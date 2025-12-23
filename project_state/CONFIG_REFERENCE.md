@@ -44,6 +44,7 @@ commands:
   - `WRDS_USE_SAMPLE=1` for deterministic sample bundle.
   - `WRDS_CACHE_ROOT` to override cache location.
   - `WRDS_LOCAL_ROOT` to explicitly enable local OptionMetrics parquet mode.
+  - `WRDS_SAMPLE_PATH` to override the WRDS sample CSV path (used by FAST poison tests).
   - `WRDS_SYMBOL`, `WRDS_TRADE_DATE`, `WRDS_DATESET` for targeted runs.
 
 ## Artifact reproduction configuration

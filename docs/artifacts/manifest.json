@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-12-22T21:03:14.615906+00:00",
+  "generated_at": "2025-12-23T18:52:05.922208+00:00",
   "git": {
     "branch": "main",
     "dirty": true,
-    "sha": "aeb31c63c19ae8671a3be1f31bf7b003c4492c06"
+    "sha": "cacbba6c6ddef36d904491d40aad57f5d45b80eb"
   },
   "omp_threads": 11,
   "runs": {
@@ -42,7 +42,7 @@
     ],
     "heston": [
       {
-        "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpes30z60s",
+        "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpaqycx30a",
         "cost": 0.10009447672986851,
         "csv_rows": 12,
         "date": "2024-06-14",
@@ -72,7 +72,7 @@
         },
         "fast": true,
         "feller": -0.005343760505443038,
-        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpes30z60s/fit_20240614.png",
+        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpaqycx30a/fit_20240614.png",
         "input": "data/samples/spx_20240614_sample.csv",
         "inputs": [
           {
@@ -95,7 +95,7 @@
           "theta": 0.0005,
           "v0": 0.0005
         },
-        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpes30z60s/params_20240614.json",
+        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpaqycx30a/params_20240614.json",
         "retries": 2,
         "rmse_price": 159.96845408718906,
         "rmse_vol": 0.11992444527012011,
@@ -104,7 +104,7 @@
         "rmspe_vol": 0.5456505978852593,
         "rmspe_vol_pct": 54.56505978852593,
         "seed": 19,
-        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpes30z60s/fit_20240614.csv",
+        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpaqycx30a/fit_20240614.csv",
         "warnings": [
           "WARNING: Feller condition violated (-0.0053) for 2024-06-14"
         ],
@@ -641,7 +641,7 @@
     },
     "metrics_snapshot": {
       "artifacts_root": "docs/artifacts",
-      "generated_at": "2025-12-22T21:02:46.901536+00:00",
+      "generated_at": "2025-12-23T18:51:36.651181+00:00",
       "inputs": [
         {
           "path": "docs/artifacts/tri_engine_agreement.csv",
@@ -755,12 +755,12 @@
     ],
     "qmc_vs_prng_equal_time": {
       "budget_count": 6,
-      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpp3snk566/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpp3snk566/qmc_summary.csv",
-      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpp3snk566/qmc_summary.csv",
+      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp177p5gby/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp177p5gby/qmc_summary.csv",
+      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp177p5gby/qmc_summary.csv",
       "csv_rows": 12,
       "fast": true,
-      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpp3snk566/qmc_plot.png",
-      "generated_at": "2025-12-22T21:02:22.676444+00:00",
+      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp177p5gby/qmc_plot.png",
+      "generated_at": "2025-12-23T18:51:23.070019+00:00",
       "inputs": [],
       "paths": [
         256,
@@ -792,140 +792,140 @@
       },
       "summary_rows": [
         {
-          "paths_prng": 331.8488871101097,
-          "paths_qmc": 12.772499998211373,
+          "paths_prng": 267.4103922023262,
+          "paths_qmc": 11.771109701465338,
           "payoff": "call",
-          "rmse_prng": 0.8077855266194296,
-          "rmse_qmc": 0.11482974995500621,
-          "rmse_ratio": 7.034636293608099,
-          "time_seconds": 2.3340166080743074e-05
+          "rmse_prng": 0.8998644807417905,
+          "rmse_qmc": 0.11961445648007647,
+          "rmse_ratio": 7.523041170961438,
+          "time_seconds": 1.98473329267775e-05
         },
         {
-          "paths_prng": 782.2287115116579,
-          "paths_qmc": 30.10712587705153,
+          "paths_prng": 639.9783423266563,
+          "paths_qmc": 28.171138795493217,
           "payoff": "call",
-          "rmse_prng": 0.5261376418654813,
-          "rmse_qmc": 0.07479244411591643,
-          "rmse_ratio": 7.0346362936080995,
-          "time_seconds": 5.5017053692121765e-05
+          "rmse_prng": 0.5816793035873435,
+          "rmse_qmc": 0.07731970228111956,
+          "rmse_ratio": 7.523041170961439,
+          "time_seconds": 4.749951234682731e-05
         },
         {
-          "paths_prng": 1843.856589189529,
-          "paths_qmc": 70.96801947179958,
+          "paths_prng": 1531.6243892918246,
+          "paths_qmc": 67.42041159774003,
           "payoff": "call",
-          "rmse_prng": 0.34269098549742594,
-          "rmse_qmc": 0.04871481213731067,
-          "rmse_ratio": 7.034636293608098,
-          "time_seconds": 0.00012968528957722994
+          "rmse_prng": 0.37600196414346987,
+          "rmse_qmc": 0.049980048706209215,
+          "rmse_ratio": 7.523041170961438,
+          "time_seconds": 0.00011367792748326359
         },
         {
-          "paths_prng": 4346.308274631749,
-          "paths_qmc": 167.284642456976,
+          "paths_prng": 3665.5510268442486,
+          "paths_qmc": 161.35350200098628,
           "payoff": "call",
-          "rmse_prng": 0.2232060628181063,
-          "rmse_qmc": 0.031729581104415955,
-          "rmse_ratio": 7.034636293608101,
-          "time_seconds": 0.0003056920210021776
+          "rmse_prng": 0.24305055409027168,
+          "rmse_qmc": 0.03230748690149864,
+          "rmse_ratio": 7.523041170961438,
+          "time_seconds": 0.0002720590287860775
         },
         {
-          "paths_prng": 10245.04602412474,
-          "paths_qmc": 394.32059412448825,
+          "paths_prng": 8772.558353299295,
+          "paths_qmc": 386.15831602035183,
           "payoff": "call",
-          "rmse_prng": 0.1453815495217765,
-          "rmse_qmc": 0.020666533912190303,
-          "rmse_ratio": 7.0346362936081,
-          "time_seconds": 0.0007205721790731394
+          "rmse_prng": 0.1571097427061513,
+          "rmse_qmc": 0.020883807377339237,
+          "rmse_ratio": 7.523041170961439,
+          "time_seconds": 0.000651103664384811
         },
         {
-          "paths_prng": 24149.45314603282,
-          "paths_qmc": 929.485986680933,
+          "paths_prng": 20994.87348517306,
+          "paths_qmc": 924.1711099072543,
           "payoff": "call",
-          "rmse_prng": 0.09469184965005456,
-          "rmse_qmc": 0.013460802477605652,
-          "rmse_ratio": 7.0346362936081,
-          "time_seconds": 0.0016985208300563197
+          "rmse_prng": 0.10155694293963778,
+          "rmse_qmc": 0.013499453297111079,
+          "rmse_ratio": 7.523041170961439,
+          "time_seconds": 0.0015582500006227444
         },
         {
-          "paths_prng": 290.6222022575557,
-          "paths_qmc": 56.52321109907254,
+          "paths_prng": 423.8381758037052,
+          "paths_qmc": 80.15407453443525,
           "payoff": "asian",
-          "rmse_prng": 0.38217613711365184,
-          "rmse_qmc": 0.14415464210989143,
-          "rmse_ratio": 2.651153868651089,
-          "time_seconds": 5.3916669761141144e-05
+          "rmse_prng": 0.3164666321290198,
+          "rmse_qmc": 0.12105402755784203,
+          "rmse_ratio": 2.6142594221229505,
+          "time_seconds": 0.00010141666643903591
         },
         {
-          "paths_prng": 530.845022369114,
-          "paths_qmc": 103.24422919922054,
+          "paths_prng": 694.9516374895722,
+          "paths_qmc": 131.4256443359297,
           "payoff": "asian",
-          "rmse_prng": 0.28277700242681464,
-          "rmse_qmc": 0.10666185986809283,
-          "rmse_ratio": 2.651153868651089,
-          "time_seconds": 9.848317005063568e-05
+          "rmse_prng": 0.2471443405602532,
+          "rmse_qmc": 0.09453703732262184,
+          "rmse_ratio": 2.614259422122951,
+          "time_seconds": 0.00016628912267493205
         },
         {
-          "paths_prng": 969.6314857745502,
-          "paths_qmc": 188.58395791169244,
+          "paths_prng": 1139.486261551657,
+          "paths_qmc": 215.4937236745677,
           "payoff": "asian",
-          "rmse_prng": 0.20923031381657214,
-          "rmse_qmc": 0.07892047168240326,
-          "rmse_ratio": 2.651153868651089,
-          "time_seconds": 0.00017988749724695842
+          "rmse_prng": 0.19300715737405344,
+          "rmse_qmc": 0.0738286169080033,
+          "rmse_ratio": 2.614259422122951,
+          "time_seconds": 0.0002726580678592996
         },
         {
-          "paths_prng": 1771.1105474991534,
-          "paths_qmc": 344.46389359946403,
+          "paths_prng": 1868.3730927743193,
+          "paths_qmc": 353.33701560126644,
           "payoff": "asian",
-          "rmse_prng": 0.1548121800715079,
-          "rmse_qmc": 0.058394264437875334,
-          "rmse_ratio": 2.651153868651089,
-          "time_seconds": 0.00032857910289785193
+          "rmse_prng": 0.15072877134538615,
+          "rmse_qmc": 0.057656394032610754,
+          "rmse_ratio": 2.614259422122951,
+          "time_seconds": 0.00044706725715363594
         },
         {
-          "paths_prng": 3235.077055028817,
-          "paths_qmc": 629.1912382561466,
+          "paths_prng": 3063.5016248897773,
+          "paths_qmc": 579.3535164975389,
           "payoff": "asian",
-          "rmse_prng": 0.11454750825209871,
-          "rmse_qmc": 0.043206661675348416,
-          "rmse_ratio": 2.651153868651089,
-          "time_seconds": 0.0006001763797566123
+          "rmse_prng": 0.11771150262194316,
+          "rmse_qmc": 0.04502671067217716,
+          "rmse_ratio": 2.614259422122951,
+          "time_seconds": 0.0007330394951746463
         },
         {
-          "paths_prng": 5909.13061115906,
-          "paths_qmc": 1149.268825134476,
+          "paths_prng": 5023.109271910246,
+          "paths_qmc": 949.9443371561126,
           "payoff": "asian",
-          "rmse_prng": 0.08475516358405362,
-          "rmse_qmc": 0.031969160517709656,
-          "rmse_ratio": 2.6511538686510896,
-          "time_seconds": 0.0010962708329316229
+          "rmse_prng": 0.09192669538694459,
+          "rmse_qmc": 0.03516357045862496,
+          "rmse_ratio": 2.614259422122952,
+          "time_seconds": 0.0012019375002031059
         }
       ],
       "time_grid": {
         "asian": [
-          5.3916669761141144e-05,
-          9.848317005063568e-05,
-          0.00017988749724695842,
-          0.00032857910289785193,
-          0.0006001763797566123,
-          0.0010962708329316229
+          0.00010141666643903591,
+          0.00016628912267493205,
+          0.0002726580678592996,
+          0.00044706725715363594,
+          0.0007330394951746463,
+          0.0012019375002031059
         ],
         "call": [
-          2.3340166080743074e-05,
-          5.5017053692121765e-05,
-          0.00012968528957722994,
-          0.0003056920210021776,
-          0.0007205721790731394,
-          0.0016985208300563197
+          1.98473329267775e-05,
+          4.749951234682731e-05,
+          0.00011367792748326359,
+          0.0002720590287860775,
+          0.000651103664384811,
+          0.0015582500006227444
         ]
       },
       "time_per_path": {
         "asian": {
-          "prng": 1.8552150985821453e-07,
-          "qmc": 9.538854695752739e-07
+          "prng": 2.392815754426181e-07,
+          "qmc": 1.2652715040140095e-06
         },
         "call": {
-          "prng": 7.033371810886517e-08,
-          "qmc": 1.8273764794685121e-06
+          "prng": 7.422049967213222e-08,
+          "qmc": 1.6861055100273839e-06
         }
       }
     },
@@ -1098,6 +1098,25 @@
         "price_rmse_ticks": 17.08615098946495,
         "summary": "docs/artifacts/wrds/heston_fit.json",
         "surface_csv": "docs/artifacts/wrds/heston_fit_table.csv"
+      },
+      {
+        "figure": "docs/artifacts/wrds/heston_fit.png",
+        "iv_mae_bps": 10.599209020201132,
+        "iv_mae_volpts_vega_wt": 0.001059914693753718,
+        "iv_p90_bps": 17.602208519820472,
+        "iv_rmse_volpts_vega_wt": 0.0012083062914642752,
+        "next_trade_date": "2024-06-17",
+        "params": {
+          "kappa": 1.0054574812702344,
+          "rho": 0.01958979172423554,
+          "sigma": 0.48775222492108905,
+          "theta": 0.2,
+          "v0": 0.04396430677489712
+        },
+        "price_rmse_ticks": 17.08615098946495,
+        "summary": "docs/artifacts/wrds/heston_fit.json",
+        "surface_csv": "docs/artifacts/wrds/heston_fit_table.csv",
+        "trade_date": "2024-06-14"
       }
     ],
     "wrds_pipeline": [
@@ -1287,6 +1306,34 @@
         "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
         "symbol": "SPX",
         "timestamp": "2025-12-22T21:03:14.615608+00:00",
+        "trade_date": "2024-06-14",
+        "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
+        "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
+        "wrds_heston_hedge_csv": "docs/artifacts/wrds/wrds_heston_hedge.csv",
+        "wrds_heston_hedge_fig": "docs/artifacts/wrds/wrds_heston_hedge.png",
+        "wrds_heston_insample_csv": "docs/artifacts/wrds/wrds_heston_insample.csv",
+        "wrds_heston_insample_fig": "docs/artifacts/wrds/wrds_heston_insample.png",
+        "wrds_heston_oos_csv": "docs/artifacts/wrds/wrds_heston_oos.csv",
+        "wrds_heston_oos_fig": "docs/artifacts/wrds/wrds_heston_oos.png"
+      },
+      {
+        "fit_fig": "docs/artifacts/wrds/heston_fit.png",
+        "fit_json": "docs/artifacts/wrds/heston_fit.json",
+        "fit_table": "docs/artifacts/wrds/heston_fit_table.csv",
+        "label": null,
+        "next_trade_date": "2024-06-17",
+        "oos_detail": "docs/artifacts/wrds/oos_pricing_detail.csv",
+        "oos_summary": "docs/artifacts/wrds/oos_pricing_summary.csv",
+        "pnl_detail": "docs/artifacts/wrds/delta_hedge_pnl.csv",
+        "pnl_summary": "docs/artifacts/wrds/delta_hedge_pnl_summary.csv",
+        "regime": null,
+        "source_next": "sample",
+        "source_today": "sample",
+        "summary_fig": "docs/artifacts/wrds/heston_wrds_summary.png",
+        "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
+        "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
+        "symbol": "SPX",
+        "timestamp": "2025-12-23T18:52:05.921922+00:00",
         "trade_date": "2024-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",

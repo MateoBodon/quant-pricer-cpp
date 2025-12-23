@@ -18,6 +18,7 @@ import pandas as pd
 from manifest_utils import update_run
 from scipy.optimize import least_squares
 
+from .asof_checks import assert_quote_date_matches
 from .bs_utils import bs_call, bs_delta_call, bs_vega, implied_vol_from_price
 
 Params = Tuple[float, float, float, float, float]  # kappa, theta, sigma, rho, v0
@@ -391,6 +392,7 @@ def apply_model(surface: pd.DataFrame, params_dict: Dict[str, float]) -> pd.Data
 
 def calibrate(surface: pd.DataFrame, config: CalibrationConfig) -> Dict[str, object]:
     surface = surface.copy()
+    assert_quote_date_matches(surface, context="calibration")
     surface["vega"] = surface["vega"].where(surface["vega"] > 0, 1.0)
 
     x0 = np.array([1.0, 0.05, 0.5, -0.5, 0.04])
@@ -544,6 +546,8 @@ def record_manifest(
         "summary": str(out_json),
         "surface_csv": str(surface_csv),
         "figure": str(figure),
+        "trade_date": summary.get("trade_date"),
+        "next_trade_date": summary.get("next_trade_date"),
         "params": summary["params"],
         "iv_rmse_volpts_vega_wt": summary["iv_rmse_volpts_vega_wt"],
         "iv_mae_volpts_vega_wt": summary["iv_mae_volpts_vega_wt"],

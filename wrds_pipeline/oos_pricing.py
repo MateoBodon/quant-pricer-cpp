@@ -8,14 +8,22 @@ from typing import Dict, Tuple
 import numpy as np
 import pandas as pd
 
+from .asof_checks import assert_quote_date_matches
 from .calibrate_heston import apply_model, compute_oos_iv_metrics, _vega_quote_weights
 
 TICK_SIZE = 0.05
 
 
 def evaluate(
-    oos_surface: pd.DataFrame, params: Dict[str, float]
+    oos_surface: pd.DataFrame,
+    params: Dict[str, float],
+    *,
+    expected_quote_date: str | None = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, float]]:
+    if expected_quote_date is not None:
+        assert_quote_date_matches(
+            oos_surface, expected_date=expected_quote_date, context="oos"
+        )
     modeled = apply_model(oos_surface.copy(), params)
     # Drop rows where the model produced NaN / inf so aggregates remain meaningful.
     mask = modeled[["iv_error_bps", "price_error_ticks"]].replace([float("inf"), -float("inf")], float("nan")).notnull().all(axis=1)
