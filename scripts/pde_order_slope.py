@@ -22,7 +22,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from manifest_utils import update_run
+from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
+from protocol_utils import (
+    load_protocol_configs,
+    record_protocol_manifest,
+    select_grid_block,
+)
 
 
 def run(cmd: List[str], cwd: Path | None = None) -> str:
@@ -58,21 +63,44 @@ def main() -> None:
     ap.add_argument(
         "--skip-build", action="store_true", help="Assume quant_cli is already built"
     )
-    ap.add_argument("--output", default="artifacts/pde_order_slope.png")
-    ap.add_argument("--csv", default="artifacts/pde_order_slope.csv")
+    ap.add_argument(
+        "--scenario-grid", type=Path, help="Path to frozen scenario grid JSON"
+    )
+    ap.add_argument(
+        "--tolerances", type=Path, help="Path to frozen tolerance JSON"
+    )
+    ap.add_argument(
+        "--output", default=str(ARTIFACTS_ROOT / "pde_order_slope.png")
+    )
+    ap.add_argument(
+        "--csv", default=str(ARTIFACTS_ROOT / "pde_order_slope.csv")
+    )
     args = ap.parse_args()
+
+    scenario_config, tolerance_config, provenance = load_protocol_configs(
+        args.scenario_grid, args.tolerances
+    )
+    protocol_entry = record_protocol_manifest(
+        scenario_config, tolerance_config, provenance
+    )
+    grid = select_grid_block(scenario_config, "pde_order_slope", args.fast)
 
     root = Path(__file__).resolve().parents[1]
     build_dir = root / "build"
     quant_cli = ensure_build(root, build_dir, args.skip_build)
 
-    S, K, r, q, sigma, T = 100.0, 100.0, 0.02, 0.0, 0.2, 1.0
+    S = float(grid["spot"])
+    K = float(grid["strike"])
+    r = float(grid["rate"])
+    q = float(grid["dividend"])
+    sigma = float(grid["vol"])
+    T = float(grid["tenor"])
+    smax_mult = float(grid.get("smax_mult", 4.0))
+    logspace = int(grid.get("logspace", 1))
+    neumann = int(grid.get("neumann", 1))
     analytic = black_scholes_call(S, K, r, q, sigma, T)
 
-    if args.fast:
-        grid_nodes = [101, 201, 401]
-    else:
-        grid_nodes = [101, 201, 401, 801, 1201]
+    grid_nodes = list(grid["grid_nodes"])
 
     records = []
     for M in grid_nodes:
@@ -89,9 +117,9 @@ def main() -> None:
             "call",
             str(M),
             str(N),
-            "4.0",
-            "1",
-            "1",
+            str(smax_mult),
+            str(logspace),
+            str(neumann),
         ]
         out = run(cmd)
         price = float(out.split()[0])
@@ -127,6 +155,11 @@ def main() -> None:
     fig.savefig(fig_path, dpi=180)
     plt.close(fig)
 
+    tol = tolerance_config.get("pde_order_slope", {})
+    slope_ok = None
+    if "slope_min" in tol and "slope_max" in tol:
+        slope_ok = float(tol["slope_min"]) <= float(slope) <= float(tol["slope_max"])
+
     payload = {
         "command": shlex.join([sys.executable] + sys.argv),
         "fast": bool(args.fast),
@@ -141,8 +174,15 @@ def main() -> None:
         "dividend": q,
         "vol": sigma,
         "tenor": T,
+        "smax_mult": smax_mult,
+        "logspace": logspace,
+        "neumann": neumann,
         "analytic": analytic,
         "records": records,
+        "protocol": protocol_entry,
+        "tolerances": tol,
+        "tolerance_checks": {"slope_in_band": slope_ok},
+        "inputs": describe_inputs([quant_cli, args.scenario_grid, args.tolerances]),
     }
     update_run("pde_order_slope", payload)
 

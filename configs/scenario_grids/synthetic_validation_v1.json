@@ -1,0 +1,133 @@
+{
+  "id": "synthetic_validation_v1",
+  "description": "Frozen scenario grid for headline synthetic validation scripts.",
+  "tri_engine_agreement": {
+    "spot": 100.0,
+    "rate": 0.02,
+    "dividend": 0.0,
+    "vol": 0.2,
+    "tenor": 1.0,
+    "strikes": [80, 90, 95, 100, 105, 110, 120],
+    "paths": 200000,
+    "seed": 1337,
+    "steps": 64,
+    "nodes": 601,
+    "fast": {
+      "strikes": [85, 95, 105, 115],
+      "paths": 60000,
+      "steps": 32,
+      "nodes": 301
+    }
+  },
+  "pde_order_slope": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.02,
+    "dividend": 0.0,
+    "vol": 0.2,
+    "tenor": 1.0,
+    "grid_nodes": [101, 201, 401, 801, 1201],
+    "smax_mult": 4.0,
+    "logspace": 1,
+    "neumann": 1,
+    "fast": {
+      "grid_nodes": [101, 201, 401]
+    }
+  },
+  "mc_greeks_ci": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.02,
+    "dividend": 0.0,
+    "vol": 0.2,
+    "tenor": 1.0,
+    "paths": 200000,
+    "seed": 2025,
+    "steps": 1,
+    "fast": {
+      "paths": 100000
+    }
+  },
+  "ql_parity": {
+    "eval_date": "2024-01-01",
+    "scenarios": [
+      {
+        "name": "vanilla_call_atm",
+        "label": "Call ATM 6M",
+        "kind": "vanilla",
+        "params": {
+          "type": "call",
+          "S": 100.0,
+          "K": 100.0,
+          "r": 0.02,
+          "q": 0.005,
+          "vol": 0.2,
+          "T": 0.5
+        }
+      },
+      {
+        "name": "vanilla_put_otm",
+        "label": "Put OTM 1.5y",
+        "kind": "vanilla",
+        "params": {
+          "type": "put",
+          "S": 95.0,
+          "K": 105.0,
+          "r": 0.015,
+          "q": 0.0,
+          "vol": 0.25,
+          "T": 1.5
+        }
+      },
+      {
+        "name": "barrier_do_call",
+        "label": "Down-&-Out Call",
+        "kind": "barrier",
+        "params": {
+          "type": "call",
+          "direction": "down",
+          "style": "out",
+          "S": 100.0,
+          "K": 100.0,
+          "barrier": 90.0,
+          "rebate": 0.0,
+          "r": 0.02,
+          "q": 0.0,
+          "vol": 0.22,
+          "T": 1.0,
+          "space_nodes": 241,
+          "time_steps": 240,
+          "smax_mult": 4.0
+        }
+      },
+      {
+        "name": "american_put_psor",
+        "label": "American Put",
+        "kind": "american",
+        "params": {
+          "type": "put",
+          "S": 95.0,
+          "K": 100.0,
+          "r": 0.03,
+          "q": 0.01,
+          "vol": 0.2,
+          "T": 1.0,
+          "space_nodes": 181,
+          "time_steps": 180,
+          "smax_mult": 4.0,
+          "logspace": 1,
+          "neumann": 1,
+          "stretch": 2.0,
+          "omega": 1.4,
+          "max_iter": 6000,
+          "tol": 1e-08
+        }
+      }
+    ],
+    "fast_scenarios": [
+      "vanilla_call_atm",
+      "barrier_do_call",
+      "american_put_psor"
+    ]
+  }
+}

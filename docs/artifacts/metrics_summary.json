@@ -1,7 +1,7 @@
 {
   "artifacts_root": "docs/artifacts",
-  "generated_at": "2025-12-23T22:28:29.174703+00:00",
-  "manifest_git_sha": "eb8b83464526fd2f5a4a82dcfc044d488cfb1c9c",
+  "generated_at": "2025-12-25T22:36:56.011024+00:00",
+  "manifest_git_sha": "ed1afa725f908765c1b28b07fbc716127f7d0dab",
   "manifest_path": "docs/artifacts/manifest.json",
   "metrics": {
     "benchmarks": {
@@ -10,11 +10,11 @@
           "payoffs": {
             "Asian": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 0.9966104742170075
+              "time_scaled_error_ratio_prng_over_qmc": 0.694293578955948
             },
             "Barrier": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 1.2984041094513352
+              "time_scaled_error_ratio_prng_over_qmc": 1.463455684614657
             }
           }
         },
@@ -23,10 +23,10 @@
       },
       "mc_paths": {
         "metrics": {
-          "efficiency_max_threads": 0.146101055216006,
-          "paths_per_sec_1t": 11173434.04321882,
-          "paths_per_sec_max_threads": 13059604.032805713,
-          "speedup_max_threads": 1.168808441728048,
+          "efficiency_max_threads": 0.124930040815212,
+          "paths_per_sec_1t": 13658216.783216773,
+          "paths_per_sec_max_threads": 13650572.641522288,
+          "speedup_max_threads": 0.9994403265216968,
           "threads_max": 8
         },
         "source": "docs/artifacts/bench/bench_mc_paths.csv",
@@ -68,11 +68,11 @@
         },
         "max_abs_diff_cents_overall": 0.8615834347,
         "runtime_ratio_by_category": {
-          "american": 14.971543984,
-          "barrier": 17.2139341974,
-          "vanilla": 1.5759171681
+          "american": 17.4852874435,
+          "barrier": 16.5042687451,
+          "vanilla": 1.3179374817
         },
-        "runtime_ratio_median": 14.971543984
+        "runtime_ratio_median": 16.5042687451
       },
       "source": "docs/artifacts/ql_parity/ql_parity.csv",
       "status": "ok"
@@ -81,19 +81,19 @@
       "metrics": {
         "payoffs": {
           "asian": {
-            "rmse_ratio_max": 2.7145738749,
-            "rmse_ratio_median": 2.7145738749,
-            "rmse_ratio_min": 2.7145738749,
+            "rmse_ratio_max": 3.0536836751,
+            "rmse_ratio_median": 3.0536836751,
+            "rmse_ratio_min": 3.0536836751,
             "rows": 6
           },
           "call": {
-            "rmse_ratio_max": 8.1079389733,
-            "rmse_ratio_median": 8.1079389733,
-            "rmse_ratio_min": 8.1079389733,
+            "rmse_ratio_max": 8.4805769386,
+            "rmse_ratio_median": 8.4805769386,
+            "rmse_ratio_min": 8.4805769386,
             "rows": 6
           }
         },
-        "rmse_ratio_overall_median": 5.411256424099999
+        "rmse_ratio_overall_median": 5.76713030685
       },
       "source": "docs/artifacts/qmc_vs_prng_equal_time.csv",
       "status": "ok"
@@ -143,6 +143,22 @@
         "status": "ok"
       },
       "status": "ok"
+    }
+  },
+  "protocols": {
+    "synthetic_validation": {
+      "scenario_grid": {
+        "path": "configs/scenario_grids/synthetic_validation_v1.json",
+        "sha256": "ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf",
+        "size_bytes": 2827
+      },
+      "scenario_grid_id": "synthetic_validation_v1",
+      "tolerances": {
+        "path": "configs/tolerances/synthetic_validation_v1.json",
+        "sha256": "6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1",
+        "size_bytes": 421
+      },
+      "tolerances_id": "synthetic_tolerances_v1"
     }
   }
 }

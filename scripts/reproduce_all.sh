@@ -13,6 +13,8 @@ REPRO_FAST_FLAG="${REPRO_FAST:-0}"
 SKIP_SLOW_FLAG="${SKIP_SLOW:-0}"
 SKIP_WRDS_FLAG="${SKIP_WRDS:-0}"
 BENCH_MIN_TIME="${BENCH_MIN_TIME:-0.05s}"
+SCENARIO_GRID="${SCENARIO_GRID:-${ROOT}/configs/scenario_grids/synthetic_validation_v1.json}"
+TOLERANCES_CONFIG="${TOLERANCES_CONFIG:-${ROOT}/configs/tolerances/synthetic_validation_v1.json}"
 
 export PYTHONHASHSEED="${PYTHONHASHSEED:-0}"
 export QUANT_BUILD_DIR="${BUILD_DIR}"
@@ -22,11 +24,24 @@ if [[ "${REPRO_FAST_FLAG}" == "1" ]]; then
 fi
 
 maybe_clean_artifacts() {
+  local keep_dir=""
+  local summary_json="${ARTIFACT_DIR}/metrics_summary.json"
+  local summary_md="${ARTIFACT_DIR}/metrics_summary.md"
+  if [[ -f "${summary_json}" || -f "${summary_md}" ]]; then
+    keep_dir="$(mktemp -d)"
+    [[ -f "${summary_json}" ]] && cp "${summary_json}" "${keep_dir}/"
+    [[ -f "${summary_md}" ]] && cp "${summary_md}" "${keep_dir}/"
+  fi
   if [[ "${CLEAN_ARTIFACTS:-1}" == "1" ]]; then
     echo "[reproduce] cleaning ${ARTIFACT_DIR}"
     rm -rf "${ARTIFACT_DIR}"
   fi
   mkdir -p "${ARTIFACT_DIR}" "${LOG_DIR}" "${BENCH_DIR}" "${WRDS_DIR}"
+  if [[ -n "${keep_dir}" ]]; then
+    [[ -f "${keep_dir}/metrics_summary.json" ]] && cp "${keep_dir}/metrics_summary.json" "${summary_json}"
+    [[ -f "${keep_dir}/metrics_summary.md" ]] && cp "${keep_dir}/metrics_summary.md" "${summary_md}"
+    rm -rf "${keep_dir}"
+  fi
 }
 
 multi_config=0
@@ -97,15 +112,15 @@ run_py_fast() {
 generate_figures() {
   local quant_cli="$1"
   run_py_fast "${ROOT}/scripts/qmc_vs_prng_equal_time.py" --output "${ARTIFACT_DIR}/qmc_vs_prng_equal_time.png" --csv "${ARTIFACT_DIR}/qmc_vs_prng_equal_time.csv"
-  run_py_fast "${ROOT}/scripts/pde_order_slope.py" --skip-build --output "${ARTIFACT_DIR}/pde_order_slope.png" --csv "${ARTIFACT_DIR}/pde_order_slope.csv"
-  run_py_fast "${ROOT}/scripts/mc_greeks_ci.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/mc_greeks_ci.png" --csv "${ARTIFACT_DIR}/mc_greeks_ci.csv"
+  run_py_fast "${ROOT}/scripts/pde_order_slope.py" --skip-build --scenario-grid "${SCENARIO_GRID}" --tolerances "${TOLERANCES_CONFIG}" --output "${ARTIFACT_DIR}/pde_order_slope.png" --csv "${ARTIFACT_DIR}/pde_order_slope.csv"
+  run_py_fast "${ROOT}/scripts/mc_greeks_ci.py" --quant-cli "${quant_cli}" --scenario-grid "${SCENARIO_GRID}" --tolerances "${TOLERANCES_CONFIG}" --output "${ARTIFACT_DIR}/mc_greeks_ci.png" --csv "${ARTIFACT_DIR}/mc_greeks_ci.csv"
   run_py_fast "${ROOT}/scripts/heston_qe_vs_analytic.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/heston_qe_vs_analytic.png" --csv "${ARTIFACT_DIR}/heston_qe_vs_analytic.csv"
-  run_py_fast "${ROOT}/scripts/tri_engine_agreement.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/tri_engine_agreement.png" --csv "${ARTIFACT_DIR}/tri_engine_agreement.csv"
+  run_py_fast "${ROOT}/scripts/tri_engine_agreement.py" --quant-cli "${quant_cli}" --scenario-grid "${SCENARIO_GRID}" --tolerances "${TOLERANCES_CONFIG}" --output "${ARTIFACT_DIR}/tri_engine_agreement.png" --csv "${ARTIFACT_DIR}/tri_engine_agreement.csv"
 }
 
 run_ql_parity() {
   local quant_cli="$1"
-  run_py_fast "${ROOT}/scripts/ql_parity.py" --quant-cli "${quant_cli}" --output "${ARTIFACT_DIR}/ql_parity/ql_parity.png" --csv "${ARTIFACT_DIR}/ql_parity/ql_parity.csv"
+  run_py_fast "${ROOT}/scripts/ql_parity.py" --quant-cli "${quant_cli}" --scenario-grid "${SCENARIO_GRID}" --tolerances "${TOLERANCES_CONFIG}" --output "${ARTIFACT_DIR}/ql_parity/ql_parity.png" --csv "${ARTIFACT_DIR}/ql_parity/ql_parity.csv"
 }
 
 run_benchmarks() {

@@ -19,6 +19,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
+from protocol_utils import (
+    load_protocol_configs,
+    record_protocol_manifest,
+    select_grid_block,
+)
 
 
 def _bs_call(S: float, K: float, r: float, q: float, sigma: float, T: float) -> float:
@@ -199,6 +204,12 @@ def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quant-cli", required=True, help="Path to quant_cli executable")
     ap.add_argument(
+        "--scenario-grid", type=Path, help="Path to frozen scenario grid JSON"
+    )
+    ap.add_argument(
+        "--tolerances", type=Path, help="Path to frozen tolerance JSON"
+    )
+    ap.add_argument(
         "--output", type=Path, default=ARTIFACTS_ROOT / "tri_engine_agreement.png"
     )
     ap.add_argument(
@@ -207,12 +218,6 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument(
         "--fast", action="store_true", help="Reduce paths/grid for CI runtime"
     )
-    ap.add_argument("--spot", type=float, default=100.0)
-    ap.add_argument("--rate", type=float, default=0.02)
-    ap.add_argument("--div", type=float, default=0.0)
-    ap.add_argument("--vol", type=float, default=0.2)
-    ap.add_argument("--tenor", type=float, default=1.0)
-    ap.add_argument("--seed", type=int, default=1337)
     return ap.parse_args()
 
 
@@ -221,21 +226,35 @@ def main() -> None:
     if not Path(args.quant_cli).exists():
         raise FileNotFoundError(args.quant_cli)
 
-    strikes = [80, 90, 95, 100, 105, 110, 120] if not args.fast else [85, 95, 105, 115]
-    paths = 200_000 if not args.fast else 60_000
-    steps = 64 if not args.fast else 32
-    nodes = 601 if not args.fast else 301
+    scenario_config, tolerance_config, provenance = load_protocol_configs(
+        args.scenario_grid, args.tolerances
+    )
+    protocol_entry = record_protocol_manifest(
+        scenario_config, tolerance_config, provenance
+    )
+    grid = select_grid_block(scenario_config, "tri_engine_agreement", args.fast)
+
+    strikes = grid["strikes"]
+    spot = float(grid["spot"])
+    rate = float(grid["rate"])
+    dividend = float(grid["dividend"])
+    vol = float(grid["vol"])
+    tenor = float(grid["tenor"])
+    paths = int(grid["paths"])
+    seed = int(grid["seed"])
+    steps = int(grid["steps"])
+    nodes = int(grid["nodes"])
 
     df = build_dataset(
         args.quant_cli,
         strikes,
-        args.spot,
-        args.rate,
-        args.div,
-        args.vol,
-        args.tenor,
+        spot,
+        rate,
+        dividend,
+        vol,
+        tenor,
         paths,
-        args.seed,
+        seed,
         steps,
         nodes,
     )
@@ -244,23 +263,47 @@ def main() -> None:
     df.to_csv(args.csv, index=False, float_format="%.8f")
     plot(df, Path(args.output))
 
+    max_mc_abs_error = float(df["mc_abs_error"].max())
+    max_pde_abs_error = float(df["pde_abs_error"].max())
+
+    tol = tolerance_config.get("tri_engine_agreement", {})
+    tolerance_checks = {}
+    if "max_mc_abs_error" in tol:
+        tolerance_checks["max_mc_abs_error_ok"] = (
+            max_mc_abs_error <= float(tol["max_mc_abs_error"])
+        )
+    if "max_pde_abs_error" in tol:
+        tolerance_checks["max_pde_abs_error_ok"] = (
+            max_pde_abs_error <= float(tol["max_pde_abs_error"])
+        )
+    if "min_mc_ci_coverage" in tol and "mc_std_error" in df.columns:
+        ci_low = df["mc_price"] - 1.96 * df["mc_std_error"]
+        ci_high = df["mc_price"] + 1.96 * df["mc_std_error"]
+        coverage = ((df["bs_price"] >= ci_low) & (df["bs_price"] <= ci_high)).mean()
+        tolerance_checks["mc_ci_coverage_ok"] = (
+            float(coverage) >= float(tol["min_mc_ci_coverage"])
+        )
+
     payload = {
-        "spot": args.spot,
-        "rate": args.rate,
-        "dividend": args.div,
-        "vol": args.vol,
-        "tenor": args.tenor,
+        "spot": spot,
+        "rate": rate,
+        "dividend": dividend,
+        "vol": vol,
+        "tenor": tenor,
         "paths": paths,
-        "seed": args.seed,
+        "seed": seed,
         "steps": steps,
         "nodes": nodes,
         "fast": bool(args.fast),
         "csv": str(args.csv),
         "figure": str(args.output),
         "rows": len(df),
-        "max_mc_abs_error": float(df["mc_abs_error"].max()),
-        "max_pde_abs_error": float(df["pde_abs_error"].max()),
-        "inputs": describe_inputs([args.quant_cli]),
+        "max_mc_abs_error": max_mc_abs_error,
+        "max_pde_abs_error": max_pde_abs_error,
+        "protocol": protocol_entry,
+        "tolerances": tol,
+        "tolerance_checks": tolerance_checks,
+        "inputs": describe_inputs([args.quant_cli, args.scenario_grid, args.tolerances]),
     }
     update_run("tri_engine_agreement", payload)
     print(f"Wrote {args.output}")

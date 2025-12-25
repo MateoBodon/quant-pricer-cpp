@@ -246,6 +246,12 @@ add_test(
 set_tests_properties(metrics_snapshot_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME protocol_config_guard_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_protocol_config_guard_fast.py
+)
+set_tests_properties(protocol_config_guard_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME data_policy_guard_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_data_policy_fast.py
 )

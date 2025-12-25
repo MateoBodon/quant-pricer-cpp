@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- feat(protocol): freeze synthetic validation grid + tolerances; headline scripts now require `--scenario-grid` + `--tolerances` and record protocol hashes in the manifest/metrics snapshot
 - feat(heston,mc): Andersen QE variance paths, deterministic counter RNG, CLI/pybind confidence intervals for MC Greeks
 - ops(gpt-bundle): hard-gate empty run logs and include base commit diffs + commit lists in GPT bundles
 - ops(artifacts): reproduce_all now builds full QL parity/bench/WRDS sample evidence before metrics snapshot, and metrics generation hard-fails when required artifacts are missing; validation pack is emitted at the end of the run

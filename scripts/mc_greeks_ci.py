@@ -17,7 +17,12 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
-from manifest_utils import ARTIFACTS_ROOT, update_run
+from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
+from protocol_utils import (
+    load_protocol_configs,
+    record_protocol_manifest,
+    select_grid_block,
+)
 
 
 def _find_quant_cli(override: str | None) -> Path:
@@ -56,11 +61,14 @@ def _confidence_band(std_error: float) -> float:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quant-cli", help="Path to quant_cli executable")
-    ap.add_argument("--paths", type=int, default=200_000, help="Number of MC paths")
-    ap.add_argument("--seed", type=int, default=2025, help="RNG seed")
-    ap.add_argument("--steps", type=int, default=1, help="Time steps per path")
     ap.add_argument(
         "--fast", action="store_true", help="Halve the number of paths for CI pipelines"
+    )
+    ap.add_argument(
+        "--scenario-grid", type=Path, help="Path to frozen scenario grid JSON"
+    )
+    ap.add_argument(
+        "--tolerances", type=Path, help="Path to frozen tolerance JSON"
     )
     ap.add_argument(
         "--output",
@@ -74,17 +82,26 @@ def main() -> None:
     )
     args = ap.parse_args()
 
-    paths = max(10_000, args.paths // 2 if args.fast else args.paths)
-    steps = max(1, args.steps)
+    scenario_config, tolerance_config, provenance = load_protocol_configs(
+        args.scenario_grid, args.tolerances
+    )
+    protocol_entry = record_protocol_manifest(
+        scenario_config, tolerance_config, provenance
+    )
+    grid = select_grid_block(scenario_config, "mc_greeks_ci", args.fast)
+
+    paths = int(grid["paths"])
+    steps = int(grid["steps"])
+    seed = int(grid["seed"])
     cli = _find_quant_cli(args.quant_cli)
 
     market = {
-        "spot": 100.0,
-        "strike": 100.0,
-        "rate": 0.02,
-        "dividend": 0.0,
-        "vol": 0.20,
-        "tenor": 1.0,
+        "spot": float(grid["spot"]),
+        "strike": float(grid["strike"]),
+        "rate": float(grid["rate"]),
+        "dividend": float(grid["dividend"]),
+        "vol": float(grid["vol"]),
+        "tenor": float(grid["tenor"]),
     }
 
     cmd = [
@@ -96,7 +113,7 @@ def main() -> None:
         market["vol"],
         market["tenor"],
         paths,
-        args.seed,
+        seed,
         1,
         "none",
         "none",
@@ -150,16 +167,22 @@ def main() -> None:
     ax.bar(df["greek"], df["estimate"], yerr=ci, capsize=6, color="#1f77b4")
     ax.axhline(0.0, color="#444444", linewidth=0.8, linestyle="--", alpha=0.6)
     ax.set_ylabel("Estimate")
-    ax.set_title(f"MC Greeks ±95% CI (paths={paths:,}, seed={args.seed})")
+    ax.set_title(f"MC Greeks ±95% CI (paths={paths:,}, seed={seed})")
     ax.grid(True, axis="y", linestyle=":", alpha=0.5)
     fig.tight_layout()
     fig.savefig(fig_path, dpi=180)
     plt.close(fig)
 
+    tol = tolerance_config.get("mc_greeks_ci", {})
+    max_std_error = float(df["std_error"].max())
+    std_error_ok = None
+    if "max_std_error" in tol:
+        std_error_ok = max_std_error <= float(tol["max_std_error"])
+
     payload = {
         "command": shlex.join([str(cli), *[str(arg) for arg in cmd]]),
         "paths": paths,
-        "seed": args.seed,
+        "seed": seed,
         "steps": steps,
         "rng": "counter",
         "antithetic": True,
@@ -168,6 +191,11 @@ def main() -> None:
         "records": records,
         "price": float(result.get("price", math.nan)),
         "std_error": float(result.get("std_error", math.nan)),
+        "max_std_error": max_std_error,
+        "protocol": protocol_entry,
+        "tolerances": tol,
+        "tolerance_checks": {"max_std_error_ok": std_error_ok},
+        "inputs": describe_inputs([cli, args.scenario_grid, args.tolerances]),
     }
     update_run("mc_greeks_ci", payload)
 
