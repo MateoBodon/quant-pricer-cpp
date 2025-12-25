@@ -341,3 +341,6 @@ apply_patch <<'PATCH' (RESULTS.md update bundle path 20251225T213507Z)
 make gpt-bundle TICKET=ticket-03b RUN_NAME=20251223_220845_ticket-03b_current-results-sync TIMESTAMP=20251225T213507Z
 git status -sb
 git add docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/META.json docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/RESULTS.md
+git commit -m "ticket-03b: finalize run log bundle" -m "Tests: not run (run log/meta update only)" -m "Artifacts: none" -m "Run log: docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/"
+git status -sb
+git add docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md
