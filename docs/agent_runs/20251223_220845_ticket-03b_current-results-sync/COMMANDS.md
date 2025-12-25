@@ -327,3 +327,17 @@ git commit -m "ticket-03b: finalize run log meta" -m "Tests: not run (log/meta u
 make gpt-bundle TICKET=ticket-03b RUN_NAME=20251223_220845_ticket-03b_current-results-sync
 apply_patch <<'PATCH' (docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/RESULTS.md bundle update)
 git add docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/RESULTS.md
+git commit -m "ticket-03b: update run log bundle path" -m "Tests: not run (run log update only)" -m "Artifacts: none" -m "Run log: docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/"
+git status -sb
+rg -n "gpt-bundle" Makefile
+sed -n '1,80p' Makefile
+python3 - <<'PY'\nimport tests.test_metrics_snapshot_fast as t\nsummary = t.load_json(t.JSON_OUT)\nt.assert_current_results_matches_snapshot(summary)\nprint('CURRENT_RESULTS matches metrics_summary')\nPY
+git log --oneline -n 5
+rg -n "git_sha_after" docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/META.json
+git rev-parse eba9956
+apply_patch <<'PATCH' (META.json git_sha_after eba9956)
+date -u +%Y%m%dT%H%M%SZ
+apply_patch <<'PATCH' (RESULTS.md update bundle path 20251225T213507Z)
+make gpt-bundle TICKET=ticket-03b RUN_NAME=20251223_220845_ticket-03b_current-results-sync TIMESTAMP=20251225T213507Z
+git status -sb
+git add docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/META.json docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/RESULTS.md
