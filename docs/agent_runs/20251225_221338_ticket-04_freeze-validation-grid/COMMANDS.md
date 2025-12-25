@@ -69,3 +69,15 @@ sed -n '1,40p' docs/artifacts/metrics_summary.md
 git diff --stat
 cat docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/META.json
 git add configs scripts tests CMakeLists.txt CHANGELOG.md PROGRESS.md project_state/CONFIG_REFERENCE.md project_state/CURRENT_RESULTS.md docs/artifacts docs/validation_pack.zip docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid
+git restore --staged docs/artifacts/logs
+git status --short
+git commit -m "ticket-04: freeze scenario grid + tolerances with provenance" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast" -m "Artifacts: docs/artifacts/manifest.json, docs/artifacts/metrics_summary.json, docs/artifacts/metrics_summary.md, docs/validation_pack.zip" -m "Run log: docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/"
+rg -n "gpt-bundle" -n Makefile scripts/gpt_bundle.py
+sed -n '340,420p' scripts/gpt_bundle.py
+sed -n '300,360p' scripts/gpt_bundle.py
+cat Makefile
+git rev-parse HEAD
+cat > docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/META.json <<'EOF'
+date -u +%Y%m%dT%H%M%SZ
+git status --short
+git add docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/COMMANDS.md docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/META.json docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/RESULTS.md
