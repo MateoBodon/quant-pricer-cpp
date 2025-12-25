@@ -348,3 +348,17 @@ git commit -m "ticket-03b: update run log commands" -m "Tests: not run (run log 
 git status -sb
 git add docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md
 git commit -m "ticket-03b: log checklist commands" -m "Tests: not run (run log update only)" -m "Artifacts: none" -m "Run log: docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/"
+cat <<'EOF' >> docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md
+# NOTE: commands recorded after branch switch attempt for checklist completion
+# NOTE: git switch main failed due to local changes
+
+git switch main
+git add docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md
+git commit -m "ticket-03b: sync run log commands" -m "Tests: not run (run log update only)" -m "Artifacts: none" -m "Run log: docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/"
+git switch main
+git merge codex/ticket-03b-current-results-sync
+git push origin main
+cat <<'EOF' >> docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md
+# NOTE: final log commit after merge
+
+git commit -m "ticket-03b: record merge commands" -m "Tests: not run (run log update only)" -m "Artifacts: none" -m "Run log: docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/"
