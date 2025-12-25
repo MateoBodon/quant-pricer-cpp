@@ -362,3 +362,9 @@ cat <<'EOF' >> docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/C
 # NOTE: final log commit after merge
 
 git commit -m "ticket-03b: record merge commands" -m "Tests: not run (run log update only)" -m "Artifacts: none" -m "Run log: docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/"
+cat <<'EOF' >> docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md
+# NOTE: staging for final command log update on main
+
+git add docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/COMMANDS.md
+git commit -m "ticket-03b: finalize command log" -m "Tests: not run (run log update only)" -m "Artifacts: none" -m "Run log: docs/agent_runs/20251223_220845_ticket-03b_current-results-sync/"
+git push origin main
