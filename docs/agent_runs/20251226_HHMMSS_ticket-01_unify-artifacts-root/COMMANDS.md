@@ -223,6 +223,25 @@ PY
 131. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] make gpt-bundle TICKET=ticket-01 RUN_NAME=20251226_HHMMSS_ticket-01_unify-artifacts-root
 132. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/RESULTS.md) — update bundle path
 133. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append review + bundle commands
+134. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+135. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] date -u +%Y-%m-%dT%H:%M:%SZ
+136. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/META.json) — update finished_at_utc
+137. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/META.json docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/RESULTS.md
+138. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "ticket-01: canonicalize artifact root" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh" -m "Artifacts: docs/artifacts/*; docs/validation_pack.zip" -m "Run log: docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/"
+139. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git rev-parse HEAD
+140. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+141. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git branch --show-current
+142. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git checkout main
+143. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git merge --ff-only codex/ticket-01-unify-artifacts-root
+144. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git push origin main
+145. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git checkout codex/ticket-01-unify-artifacts-root
+146. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+147. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] make gpt-bundle TICKET=ticket-01 RUN_NAME=20251226_HHMMSS_ticket-01_unify-artifacts-root
+148. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] BASE_SHA=d4be0724a76d2cbd2aaa88e3387ed08694d6e02b make gpt-bundle TICKET=ticket-01 RUN_NAME=20251226_HHMMSS_ticket-01_unify-artifacts-root
+149. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/RESULTS.md) — update bundle path
+150. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] date -u +%Y-%m-%dT%H:%M:%SZ
+151. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/META.json) — update finished_at_utc
+152. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append post-merge bundle + meta updates
 109. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/RESULTS.md
 110. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m \"ticket-01: canonicalize artifact root\" -m \"Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh\" -m \"Artifacts: docs/artifacts/*; docs/validation_pack.zip\" -m \"Run log: docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/\"
 111. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short

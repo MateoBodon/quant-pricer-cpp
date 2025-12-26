@@ -21,4 +21,4 @@ Review checklist:
 - Run log integrity: `META.json` has git_sha_before `d4be0724a76d2cbd2aaa88e3387ed08694d6e02b` and git_sha_after `9f1d4d8476d5f94e52013fff1ba9e2d01a9693ca`.
 
 Bundle:
-- `docs/gpt_bundles/20251226T212655Z_ticket-01_20251226_HHMMSS_ticket-01_unify-artifacts-root.zip`
+- `docs/gpt_bundles/20251226T213025Z_ticket-01_20251226_HHMMSS_ticket-01_unify-artifacts-root.zip`

@@ -2,7 +2,7 @@
   "run_name": "20251226_HHMMSS_ticket-01_unify-artifacts-root",
   "ticket_id": "ticket-01",
   "started_at_utc": "2025-12-26T20:13:58Z",
-  "finished_at_utc": "2025-12-26T21:27:46Z",
+  "finished_at_utc": "2025-12-26T21:30:36Z",
   "git_sha_before": "d4be0724a76d2cbd2aaa88e3387ed08694d6e02b",
   "git_sha_after": "9f1d4d8476d5f94e52013fff1ba9e2d01a9693ca",
   "branch_name": "codex/ticket-01-unify-artifacts-root",
