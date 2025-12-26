@@ -74,3 +74,19 @@ git add -f docs/gpt_bundles/20251226T071045Z_ticket-04b_20251226_065320_ticket-0
 git commit -m "ticket-04b: add bundle + run log updates" -m "Tests: (not run)" -m "Artifacts: docs/gpt_bundles/20251226T071045Z_ticket-04b_20251226_065320_ticket-04b_bundle-diff-repair.zip" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
 git status -sb
 git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md
+git commit -m "ticket-04b: log command trail" -m "Tests: (not run)" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
+rg -n "ticket-13" -S docs project_state scripts
+rg -n "test-fast" -S Makefile scripts docs tests
+git status -sb
+git diff --stat origin/main..HEAD
+git ls-files | rg -i 'wrds|optionmetrics|raw'
+git diff origin/main..HEAD | rg -i 'unsafe'
+rm -f docs/agent_runs/.current_run
+ctest --test-dir build -L FAST --output-on-failure
+git status -sb
+git diff --stat docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md
+git diff docs/artifacts/manifest.json | head -n 80
+git restore docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md
+cat docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/TESTS.md
+git status -sb
+git add PROGRESS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/RESULTS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/TESTS.md

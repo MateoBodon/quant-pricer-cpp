@@ -13,3 +13,5 @@
   - Output:
     - `[gpt-bundle] using base SHA ed1afa725f908765c1b28b07fbc716127f7d0dab (explicit)`
     - `[gpt-bundle] wrote /Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp/docs/gpt_bundles/20251226T070044Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip`
+- `ctest --test-dir build -L FAST --output-on-failure`
+  - Output: `100% tests passed, 0 tests failed out of 59 (1 skipped: RngDeterminism.CounterRngThreadInvariant).`

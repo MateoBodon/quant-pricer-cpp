@@ -4,6 +4,7 @@
 - Updated sprint tickets and CHANGELOG to reflect ticket-04 failure and ticket-04b scope.
 - Regenerated the ticket-04 bundle with an explicit base (non-empty commit list + diff): `docs/gpt_bundles/20251226T070044Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip`.
 - Ticket-04b bundle: `docs/gpt_bundles/20251226T071045Z_ticket-04b_20251226_065320_ticket-04b_bundle-diff-repair.zip`.
+- Ran FAST tests (`ctest --test-dir build -L FAST --output-on-failure`); any transient artifact churn from tests was reverted so no official artifacts/manifest were updated.
 
 Human merge checklist:
 - Bundler fails on empty commit range unless explicitly overridden
