@@ -181,3 +181,12 @@ PY
 89. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat > docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/META.json <<'EOF'
 90. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat > docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md <<'EOF' (attempt failed due to zsh glob)
 91. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] cat > docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md <<'EOF' (this file)
+92. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] make gpt-bundle TICKET=ticket-01 RUN_NAME=20251226_HHMMSS_ticket-01_unify-artifacts-root
+93. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/RESULTS.md) — record bundle path
+94. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append gpt-bundle command
+95. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+96. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short --untracked-files=all | head -n 40
+97. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] ls -1 docs/gpt_bundles | tail -n 5
+98. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git ls-files docs/gpt_bundles | tail -n 5
+99. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] rg -n \"gpt_bundles\" .gitignore
+100. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append post-bundle commands

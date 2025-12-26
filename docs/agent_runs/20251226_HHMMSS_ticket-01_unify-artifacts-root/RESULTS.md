@@ -13,4 +13,4 @@ Caveats:
 - First reproduce_all attempt failed at `metrics_snapshot_fast` because CURRENT_RESULTS lagged the snapshot; fixed by updating CURRENT_RESULTS and rerunning.
 
 Bundle:
-- Pending: run `make gpt-bundle TICKET=ticket-01 RUN_NAME=20251226_HHMMSS_ticket-01_unify-artifacts-root` and record the output path here.
+- `docs/gpt_bundles/20251226T204700Z_ticket-01_20251226_HHMMSS_ticket-01_unify-artifacts-root.zip`
