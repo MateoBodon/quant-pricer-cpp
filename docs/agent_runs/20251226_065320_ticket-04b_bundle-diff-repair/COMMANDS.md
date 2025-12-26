@@ -132,3 +132,7 @@ apply_patch (update META.json finished_at_utc/git_sha_after)
 make gpt-bundle TICKET=ticket-04b RUN_NAME=20251226_065320_ticket-04b_bundle-diff-repair TIMESTAMP=20251226T082814Z
 git status -sb
 git add PROGRESS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/META.json docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/RESULTS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/TESTS.md
+git add -f docs/gpt_bundles/20251226T082814Z_ticket-04b_20251226_065320_ticket-04b_bundle-diff-repair.zip
+git commit -m "ticket-04b: refresh review bundle notes" -m "Tests: (not run)" -m "Artifacts: docs/gpt_bundles/20251226T082814Z_ticket-04b_20251226_065320_ticket-04b_bundle-diff-repair.zip" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
+git status -sb
+git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md
