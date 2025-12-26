@@ -2,9 +2,9 @@
   "run_name": "20251226_HHMMSS_ticket-05_ql-parity-grid-summary",
   "ticket_id": "ticket-05",
   "started_at_utc": "2025-12-26T08:45:00Z",
-  "finished_at_utc": "2025-12-26T09:34:13Z",
+  "finished_at_utc": "2025-12-26T09:43:29Z",
   "git_sha_before": "9e4006eb8bb02ff21faaccaf1ebef41c36914e4c",
-  "git_sha_after": "9e4006eb8bb02ff21faaccaf1ebef41c36914e4c",
+  "git_sha_after": "b553eb0ca84d41e6962d8cf993ce10a33f0d081f",
   "branch_name": "codex/ticket-05-ql-parity-grid-summary",
   "host_os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
   "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
@@ -20,5 +20,5 @@
     "codex_cli": "unknown",
     "cmake": "cmake version 4.1.2"
   },
-  "notes": "started_at_utc is approximate; FAST failed initially due to outdated ql_parity CSV and CURRENT_RESULTS mismatch. First reproduce_all run failed at metrics_snapshot_fast; reran after CURRENT_RESULTS update. REPRO_FAST=1 WRDS_USE_SAMPLE=1 reproduce_all ran FAST+SLOW; MARKET skipped. git_sha_after captured pre-commit HEAD before final commit."
+  "notes": "started_at_utc is approximate; FAST failed initially due to outdated ql_parity CSV and CURRENT_RESULTS mismatch. First reproduce_all run failed at metrics_snapshot_fast; reran after CURRENT_RESULTS update. REPRO_FAST=1 WRDS_USE_SAMPLE=1 reproduce_all ran FAST+SLOW; MARKET skipped."
 }

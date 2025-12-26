@@ -26,3 +26,6 @@ Artifacts updated (post reproduce_all):
 Notes:
 - Initial FAST test runs failed due to outdated parity CSV and CURRENT_RESULTS mismatch; fixed by regenerating artifacts and updating `project_state/CURRENT_RESULTS.md`.
 - `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` completed successfully (FAST + SLOW tests; MARKET skipped by default).
+
+Bundle:
+- `docs/gpt_bundles/20251226T094313Z_ticket-05_20251226_HHMMSS_ticket-05_ql-parity-grid-summary.zip`

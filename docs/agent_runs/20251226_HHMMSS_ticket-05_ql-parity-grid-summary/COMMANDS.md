@@ -64,3 +64,8 @@
 62. `python3 - <<'PY' ... PY` (check CURRENT_RESULTS for metrics_summary timestamp)
 63. `cat <<'EOF' > docs/agent_runs/20251226_HHMMSS_ticket-05_ql-parity-grid-summary/META.json ... EOF`
 64. `git status -sb`
+65. `git add PROGRESS.md docs/CODEX_SPRINT_TICKETS.md project_state/CURRENT_RESULTS.md scripts/ql_parity.py scripts/generate_metrics_summary.py docs/artifacts docs/validation_pack.zip docs/agent_runs/20251226_HHMMSS_ticket-05_ql-parity-grid-summary`
+66. `git status -sb`
+67. `git commit -m "ticket-05: QuantLib parity grid summary" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release" -m "Tests: cmake --build build -j" -m "Tests: ctest --test-dir build -L FAST --output-on-failure" -m "Tests: REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh" -m "Artifacts: docs/artifacts/ql_parity/ql_parity.csv, docs/artifacts/ql_parity/ql_parity_bucket_summary.csv, docs/artifacts/ql_parity/ql_parity_error_dist.png, docs/artifacts/ql_parity/ql_parity.png, docs/artifacts/metrics_summary.json, docs/artifacts/metrics_summary.md, docs/artifacts/manifest.json, docs/artifacts/bench/*, docs/artifacts/qmc_vs_prng_equal_time.csv, docs/artifacts/qmc_vs_prng_equal_time.png, docs/validation_pack.zip" -m "Run log: docs/agent_runs/20251226_HHMMSS_ticket-05_ql-parity-grid-summary/"`
+68. `make gpt-bundle TICKET=ticket-05 RUN_NAME=20251226_HHMMSS_ticket-05_ql-parity-grid-summary`
+69. `date -u +\"%Y-%m-%dT%H:%M:%SZ\"`
