@@ -197,3 +197,12 @@ PY
 105. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — fix gpt-bundle entries
 106. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] tail -n 6 docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md
 107. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append tail verification entries
+108. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+109. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/RESULTS.md
+110. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m \"ticket-01: canonicalize artifact root\" -m \"Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh\" -m \"Artifacts: docs/artifacts/*; docs/validation_pack.zip\" -m \"Run log: docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/\"
+111. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+112. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append final git commit entries
+113. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] tail -n 6 docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md
+114. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append final tail/commit commands
+115. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md
+116. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m \"ticket-01: canonicalize artifact root\" -m \"Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh\" -m \"Artifacts: docs/artifacts/*; docs/validation_pack.zip\" -m \"Run log: docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/\"
