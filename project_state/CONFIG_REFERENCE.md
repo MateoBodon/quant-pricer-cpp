@@ -48,7 +48,17 @@ commands:
   - `WRDS_CACHE_ROOT` to override cache location.
   - `WRDS_LOCAL_ROOT` to explicitly enable local OptionMetrics parquet mode.
   - `WRDS_SAMPLE_PATH` to override the WRDS sample CSV path (used by FAST poison tests).
-  - `WRDS_SYMBOL`, `WRDS_TRADE_DATE`, `WRDS_DATESET` for targeted runs.
+- `WRDS_SYMBOL`, `WRDS_TRADE_DATE`, `WRDS_DATESET` for targeted runs.
+
+## Synthetic validation protocol (headline scripts)
+- Scenario grid (frozen): `configs/scenario_grids/synthetic_validation_v1.json`
+- Tolerances (frozen): `configs/tolerances/synthetic_validation_v1.json`
+- Headline scripts require protocol inputs:
+  - `scripts/tri_engine_agreement.py --scenario-grid <path> --tolerances <path>`
+  - `scripts/pde_order_slope.py --scenario-grid <path> --tolerances <path>`
+  - `scripts/mc_greeks_ci.py --scenario-grid <path> --tolerances <path>`
+  - `scripts/ql_parity.py --scenario-grid <path> --tolerances <path>`
+- `scripts/reproduce_all.sh` honors `SCENARIO_GRID` + `TOLERANCES_CONFIG` overrides (defaults to the canonical paths above).
 
 ## Artifact reproduction configuration
 - `scripts/reproduce_all.sh` environment overrides:

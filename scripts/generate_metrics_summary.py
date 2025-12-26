@@ -549,6 +549,17 @@ def render_markdown(summary: Dict[str, Any]) -> str:
     lines.append(f"Artifacts root: {summary['artifacts_root']}")
     if summary.get("manifest_git_sha"):
         lines.append(f"Manifest git sha: {summary['manifest_git_sha']}")
+    protocols = summary.get("protocols") or {}
+    if protocols:
+        for name, record in protocols.items():
+            scenario = (record or {}).get("scenario_grid", {}) if isinstance(record, dict) else {}
+            tolerances = (record or {}).get("tolerances", {}) if isinstance(record, dict) else {}
+            scenario_sha = scenario.get("sha256")
+            tolerances_sha = tolerances.get("sha256")
+            lines.append(
+                f"Protocol {name}: scenario_grid sha256={scenario_sha}, "
+                f"tolerances sha256={tolerances_sha}"
+            )
     lines.append("")
 
     lines.append("## Status overview")
@@ -599,6 +610,7 @@ def build_summary(artifacts_root: Path, manifest_path: Path) -> Dict[str, Any]:
         git_sha = manifest_info.get("git", {}).get("sha")
     except Exception:
         git_sha = None
+    protocols = manifest_info.get("protocols", {}) if isinstance(manifest_info, dict) else {}
 
     tri_engine_path = _required_path("tri_engine_agreement", artifacts_root)
     qmc_path = _required_path("qmc_vs_prng_equal_time", artifacts_root)
@@ -619,6 +631,7 @@ def build_summary(artifacts_root: Path, manifest_path: Path) -> Dict[str, Any]:
         "artifacts_root": _rel_path(artifacts_root),
         "manifest_path": _rel_path(manifest_path),
         "manifest_git_sha": git_sha,
+        "protocols": protocols,
         "metrics": metrics,
     }
 

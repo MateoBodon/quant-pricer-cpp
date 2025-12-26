@@ -1,7 +1,7 @@
 ---
-generated_at: 2025-12-23T22:30:27Z
-git_sha: eb8b83464526fd2f5a4a82dcfc044d488cfb1c9c
-branch: codex/ticket-03b-current-results-sync
+generated_at: 2025-12-25T22:37:47Z
+git_sha: ed1afa725f908765c1b28b07fbc716127f7d0dab
+branch: codex/ticket-04-freeze-validation-grid
 commands:
   - REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
   - WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast
@@ -11,8 +11,8 @@ commands:
 # Current Results
 
 ## Metrics snapshot (latest committed)
-Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-23T22:28:29.174703+00:00**).
-Manifest git SHA recorded in snapshot: `eb8b83464526fd2f5a4a82dcfc044d488cfb1c9c`.
+Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-25T22:36:56.011024+00:00**).
+Manifest git SHA recorded in snapshot: `ed1afa725f908765c1b28b07fbc716127f7d0dab`.
 
 Status overview (from `docs/artifacts/metrics_summary.md`):
 - tri engine agreement: ok
@@ -24,10 +24,10 @@ Status overview (from `docs/artifacts/metrics_summary.md`):
 
 ## Highlight metrics (from snapshot)
 - Tri-engine agreement: max|MC-BS|=0.00754518, max|PDE-BS|=0.00058701, MC CI covers BS=True.
-- QMC vs PRNG: median RMSE ratio=5.41126 (asian median=2.71457; call median=8.10794).
+- QMC vs PRNG: median RMSE ratio=5.76713 (asian median=3.05368; call median=8.48058).
 - PDE order: slope=-2.0124, rmse_finest=0.00115728.
 - QL parity: max diff=0.861583 cents.
-- Benchmarks: MC paths/sec (1t)=1.11734e+07, eff@max=0.146101.
+- Benchmarks: MC paths/sec (1t)=1.36582e+07, eff@max=0.12493.
 - WRDS: median iv_rmse=0.00120828 (sample bundle regression harness).
 
 ## Key artifact locations

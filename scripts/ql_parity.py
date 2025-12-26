@@ -17,7 +17,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 from time import perf_counter
-from typing import Callable, Dict, List
+from typing import Any, Callable, Dict, List
 
 import matplotlib
 
@@ -25,7 +25,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 import QuantLib as ql
-from manifest_utils import ARTIFACTS_ROOT, update_run
+from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
+from protocol_utils import (
+    load_protocol_configs,
+    record_protocol_manifest,
+)
 
 
 def _find_quant_cli(override: str | None) -> Path:
@@ -77,74 +81,42 @@ class Scenario:
     params: Dict[str, float | int | str]
 
 
-def _scenarios(fast: bool) -> List[Scenario]:
-    vanilla = [
+def _parse_eval_date(value: str) -> ql.Date:
+    try:
+        year, month, day = (int(part) for part in value.split("-"))
+    except Exception as exc:
+        raise SystemExit(
+            f"invalid ql_parity eval_date '{value}' (expected YYYY-MM-DD)"
+        ) from exc
+    return ql.Date(day, month, year)
+
+
+def _scenarios_from_config(config: Dict[str, Any], fast: bool) -> List[Scenario]:
+    block = config.get("ql_parity")
+    if not isinstance(block, dict):
+        raise SystemExit("scenario grid missing 'ql_parity' block")
+    scenarios_raw = block.get("scenarios")
+    if not isinstance(scenarios_raw, list):
+        raise SystemExit("ql_parity.scenarios must be a list")
+    scenarios = [
         Scenario(
-            name="vanilla_call_atm",
-            label="Call ATM 6M",
-            kind="vanilla",
-            params=dict(
-                type="call", S=100.0, K=100.0, r=0.02, q=0.005, vol=0.20, T=0.5
-            ),
-        ),
-        Scenario(
-            name="vanilla_put_otm",
-            label="Put OTM 1.5y",
-            kind="vanilla",
-            params=dict(type="put", S=95.0, K=105.0, r=0.015, q=0.0, vol=0.25, T=1.5),
-        ),
-    ]
-    barrier = [
-        Scenario(
-            name="barrier_do_call",
-            label="Down-&-Out Call",
-            kind="barrier",
-            params=dict(
-                type="call",
-                direction="down",
-                style="out",
-                S=100.0,
-                K=100.0,
-                barrier=90.0,
-                rebate=0.0,
-                r=0.02,
-                q=0.0,
-                vol=0.22,
-                T=1.0,
-                space_nodes=241,
-                time_steps=240,
-                smax_mult=4.0,
-            ),
-        ),
-    ]
-    american = [
-        Scenario(
-            name="american_put_psor",
-            label="American Put",
-            kind="american",
-            params=dict(
-                type="put",
-                S=95.0,
-                K=100.0,
-                r=0.03,
-                q=0.01,
-                vol=0.20,
-                T=1.0,
-                space_nodes=181,
-                time_steps=180,
-                smax_mult=4.0,
-                logspace=1,
-                neumann=1,
-                stretch=2.0,
-                omega=1.4,
-                max_iter=6000,
-                tol=1e-8,
-            ),
-        ),
+            name=str(item.get("name")),
+            label=str(item.get("label")),
+            kind=str(item.get("kind")),
+            params=dict(item.get("params", {})),
+        )
+        for item in scenarios_raw
     ]
     if fast:
-        return [vanilla[0], barrier[0], american[0]]
-    return vanilla + barrier + american
+        fast_names = block.get("fast_scenarios", [])
+        if not fast_names:
+            raise SystemExit("ql_parity.fast_scenarios missing for --fast")
+        fast_set = {str(name) for name in fast_names}
+        scenarios = [scenario for scenario in scenarios if scenario.name in fast_set]
+        missing = fast_set - {scenario.name for scenario in scenarios}
+        if missing:
+            raise SystemExit(f"ql_parity.fast_scenarios not found: {sorted(missing)}")
+    return scenarios
 
 
 def _run_cli(quant_cli: Path, scenario: Scenario) -> tuple[float, float]:
@@ -333,16 +305,36 @@ def main() -> None:
         default=None,
         help="Path to quant_cli (defaults to build/quant_cli)",
     )
-    ap.add_argument("--output", default="docs/artifacts/ql_parity/ql_parity.png")
-    ap.add_argument("--csv", default="docs/artifacts/ql_parity/ql_parity.csv")
+    ap.add_argument(
+        "--scenario-grid", type=Path, help="Path to frozen scenario grid JSON"
+    )
+    ap.add_argument(
+        "--tolerances", type=Path, help="Path to frozen tolerance JSON"
+    )
+    ap.add_argument(
+        "--output",
+        default=str(ARTIFACTS_ROOT / "ql_parity" / "ql_parity.png"),
+    )
+    ap.add_argument(
+        "--csv",
+        default=str(ARTIFACTS_ROOT / "ql_parity" / "ql_parity.csv"),
+    )
     ap.add_argument(
         "--fast", action="store_true", help="Smaller scenario set for quicker iteration"
     )
     args = ap.parse_args()
 
+    scenario_config, tolerance_config, provenance = load_protocol_configs(
+        args.scenario_grid, args.tolerances
+    )
+    protocol_entry = record_protocol_manifest(
+        scenario_config, tolerance_config, provenance
+    )
+
     quant_cli = _find_quant_cli(args.quant_cli)
-    scenarios = _scenarios(args.fast)
-    eval_date = ql.Date(1, ql.January, 2024)
+    scenarios = _scenarios_from_config(scenario_config, args.fast)
+    eval_date_value = scenario_config.get("ql_parity", {}).get("eval_date", "2024-01-01")
+    eval_date = _parse_eval_date(str(eval_date_value))
 
     rows: List[Dict[str, float | str]] = []
     for scenario in scenarios:
@@ -371,6 +363,12 @@ def main() -> None:
     out_png = Path(args.output)
     _plot(df, out_png)
 
+    tol = tolerance_config.get("ql_parity", {})
+    max_abs_diff = float(df["abs_diff_cents"].max()) if not df.empty else math.nan
+    diff_ok = None
+    if "max_abs_diff_cents" in tol:
+        diff_ok = max_abs_diff <= float(tol["max_abs_diff_cents"])
+
     update_run(
         "ql_parity",
         {
@@ -379,6 +377,12 @@ def main() -> None:
             "quant_cli": str(quant_cli),
             "scenarios": [scenario.name for scenario in scenarios],
             "fast": bool(args.fast),
+            "eval_date": eval_date.ISO(),
+            "max_abs_diff_cents": max_abs_diff,
+            "protocol": protocol_entry,
+            "tolerances": tol,
+            "tolerance_checks": {"max_abs_diff_cents_ok": diff_ok},
+            "inputs": describe_inputs([quant_cli, args.scenario_grid, args.tolerances]),
         },
         append=True,
     )

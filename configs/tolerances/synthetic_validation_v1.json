@@ -1,0 +1,19 @@
+{
+  "id": "synthetic_tolerances_v1",
+  "description": "Frozen tolerance bands for headline synthetic validation scripts.",
+  "tri_engine_agreement": {
+    "max_mc_abs_error": 1.0,
+    "max_pde_abs_error": 0.5,
+    "min_mc_ci_coverage": 0.75
+  },
+  "pde_order_slope": {
+    "slope_min": 1.5,
+    "slope_max": 2.5
+  },
+  "mc_greeks_ci": {
+    "max_std_error": 1.0
+  },
+  "ql_parity": {
+    "max_abs_diff_cents": 10.0
+  }
+}
