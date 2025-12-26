@@ -101,3 +101,34 @@ git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.m
 git commit -m "ticket-04b: log command trail" -m "Tests: (not run)" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
 git status -sb
 git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md
+git commit -m "ticket-04b: log command trail" -m "Tests: (not run)" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
+git status -sb
+rg -n "Prompt-3|prompt-3|Prompt 3" -S docs scripts
+unzip -p docs/gpt_bundles/20251226T070044Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip COMMITS.txt
+unzip -p docs/gpt_bundles/20251226T070044Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip DIFF.patch | rg -n '^diff --git'
+unzip -p docs/gpt_bundles/20251226T070044Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip DIFF.patch | wc -l
+TEMP_RUN="_gpt_bundle_empty_range_20251226_082040"\nHEAD_SHA="1eb1089e4d59ff2a27d3ee351cd64a3967caf16b"\nRUN_DIR_TMP="docs/agent_runs/_gpt_bundle_empty_range_20251226_082040"\nTS="TESTEMPTY082040Z"\nmkdir -p ""\nprintf '%s\n' 'self-test content for empty diff range' > "/PROMPT.md"\nprintf '%s\n' 'self-test content for empty diff range' > "/COMMANDS.md"\nprintf '%s\n' 'self-test content for empty diff range' > "/RESULTS.md"\nprintf '%s\n' 'self-test content for empty diff range' > "/TESTS.md"\ncat <<EOF > "/META.json"\n{\n  "run_name": "_gpt_bundle_empty_range_20251226_082040",\n  "ticket_id": "ticket-04b",\n  "started_at_utc": "1970-01-01T00:00:00Z",\n  "finished_at_utc": "1970-01-01T00:00:01Z",\n  "git_sha_before": "1eb1089e4d59ff2a27d3ee351cd64a3967caf16b",\n  "git_sha_after": "1eb1089e4d59ff2a27d3ee351cd64a3967caf16b",\n  "branch_name": "codex/ticket-04b-bundle-diff-repair",\n  "host_os": "test",\n  "compiler": "test",\n  "python_version": "3.12.2",\n  "build_type": "Release",\n  "dataset_id": "TEST",\n  "config_hashes": {},\n  "tools": {"runner": "manual-negative-test-make"}\n}\nEOF\nBASE_SHA="1eb1089e4d59ff2a27d3ee351cd64a3967caf16b" make gpt-bundle TICKET=ticket-04b RUN_NAME="_gpt_bundle_empty_range_20251226_082040" TIMESTAMP="TESTEMPTY082040Z"\nrm -f "docs/gpt_bundles/TESTEMPTY082040Z_ticket-04b__gpt_bundle_empty_range_20251226_082040.zip"\nrm -rf ""
+unzip -p docs/gpt_bundles/20251226T070044Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip DIFF.patch | rg -n -i "(wrds|optionmetrics|password|secret|token|api_key|apikey|key=|begin private|akia|aws_access|wrds_username|wrds_password)"
+rg -n -i "(password|secret|token|api_key|apikey|begin private|akia|aws_access|wrds_username|wrds_password)" docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid
+rg -n "ticket-04\b\|ticket-04b" docs/CODEX_SPRINT_TICKETS.md
+sed -n '156,210p' docs/CODEX_SPRINT_TICKETS.md
+rg -n "ticket-04b" PROGRESS.md
+sed -n '1,200p' docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/RESULTS.md
+sed -n '1,200p' docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/TESTS.md
+sed -n '1,200p' tests/test_protocol_config_guard_fast.py
+git status -sb
+apply_patch (update RESULTS.md with ticket-04 bundle review)
+apply_patch (update TESTS.md with make gpt-bundle empty-range failure)
+git status -sb
+date -u +%Y%m%dT%H%M%SZ
+sed -n '1,200p' docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/RESULTS.md
+apply_patch (update RESULTS.md bundle path + remove PASS verdict)
+apply_patch (update PROGRESS.md bundle path)
+make gpt-bundle TICKET=ticket-04b RUN_NAME=20251226_065320_ticket-04b_bundle-diff-repair TIMESTAMP=20251226T082814Z
+cat docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/META.json
+date -u +%Y-%m-%dT%H:%M:%SZ
+git rev-parse HEAD
+apply_patch (update META.json finished_at_utc/git_sha_after)
+make gpt-bundle TICKET=ticket-04b RUN_NAME=20251226_065320_ticket-04b_bundle-diff-repair TIMESTAMP=20251226T082814Z
+git status -sb
+git add PROGRESS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/META.json docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/RESULTS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/TESTS.md
