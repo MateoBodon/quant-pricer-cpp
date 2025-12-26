@@ -242,6 +242,11 @@ PY
 150. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] date -u +%Y-%m-%dT%H:%M:%SZ
 151. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/META.json) — update finished_at_utc
 152. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append post-merge bundle + meta updates
+153. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+154. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/META.json docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/RESULTS.md
+155. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "ticket-01: canonicalize artifact root" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh" -m "Artifacts: docs/artifacts/*; docs/validation_pack.zip" -m "Run log: docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/"
+156. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+157. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append post-commit command log
 109. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/RESULTS.md
 110. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m \"ticket-01: canonicalize artifact root\" -m \"Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh\" -m \"Artifacts: docs/artifacts/*; docs/validation_pack.zip\" -m \"Run log: docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/\"
 111. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
