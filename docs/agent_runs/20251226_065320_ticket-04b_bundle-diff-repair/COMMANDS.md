@@ -136,3 +136,8 @@ git add -f docs/gpt_bundles/20251226T082814Z_ticket-04b_20251226_065320_ticket-0
 git commit -m "ticket-04b: refresh review bundle notes" -m "Tests: (not run)" -m "Artifacts: docs/gpt_bundles/20251226T082814Z_ticket-04b_20251226_065320_ticket-04b_bundle-diff-repair.zip" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
 git status -sb
 git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md
+git commit -m "ticket-04b: log command trail" -m "Tests: (not run)" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
+git status -sb
+git switch main
+git merge --no-ff codex/ticket-04b-bundle-diff-repair
+git push origin main
