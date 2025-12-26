@@ -98,3 +98,6 @@ git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.m
 git commit -m "ticket-04b: update run log metadata" -m "Tests: (not run)" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
 git status -sb
 git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md
+git commit -m "ticket-04b: log command trail" -m "Tests: (not run)" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
+git status -sb
+git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md
