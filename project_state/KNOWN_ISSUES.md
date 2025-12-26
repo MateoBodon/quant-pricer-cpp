@@ -22,6 +22,7 @@ commands:
 - Heston QE bias remains under investigation (see `ROADMAP (1).md` and `docs/Results.md` notes).
 - WRDS live runs are gated by environment variables (`WRDS_ENABLED=1` + credentials); MARKET tests skip without them (`wrds_pipeline/tests/test_wrds_pipeline.py`).
 - RESOLVED (2025-12-23): WRDS pipeline previously lacked explicit as-of guards for `quote_date` mismatches in calibration/OOS; hard checks and poison FAST tests added. Run log: `docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/`.
+- RESOLVED (2025-12-25): Headline synthetic scripts previously allowed implicit defaults; now require frozen protocol configs and record hashes in manifest/metrics snapshot. Run log: `docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/`.
 - Live/local WRDS outputs must not be committed; keep them outside the repo or under gitignored paths such as `docs/artifacts/wrds_local/` (data-policy guard enforces restricted-column rules).
 - Local WRDS runs update `docs/artifacts/manifest.json` by default; keep the canonical manifest sample-only and store local provenance in `docs/artifacts/wrds_local/manifest_local.json` (untracked).
 - Script defaults are split between `docs/artifacts/` and `artifacts/`, which can lead to confusion if the wrong artifact root is used in summaries.

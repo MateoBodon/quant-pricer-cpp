@@ -81,3 +81,36 @@ cat > docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/META.json
 date -u +%Y%m%dT%H%M%SZ
 git status --short
 git add docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/COMMANDS.md docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/META.json docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/RESULTS.md
+git commit -m "ticket-04: update run log metadata" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast" -m "Artifacts: docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/META.json, docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/RESULTS.md" -m "Run log: docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/"
+make gpt-bundle TICKET=ticket-04 RUN_NAME=20251225_221338_ticket-04_freeze-validation-grid TIMESTAMP=20251225T224843Z
+rg -n "diff" -n scripts/gpt_bundle.py | head
+git status --short
+date -u +%Y%m%dT%H%M%SZ
+make gpt-bundle TICKET=ticket-04 RUN_NAME=20251225_221338_ticket-04_freeze-validation-grid TIMESTAMP=20251225T225148Z
+sed -n '1,200p' scripts/check_data_policy.py
+ls -la docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid
+cat docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid/META.json
+cat docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid/COMMANDS.md
+sed -n '1,200p' project_state/KNOWN_ISSUES.md
+git ls-files scripts/check_data_policy.py tests/test_data_policy_fast.py
+python3 scripts/check_data_policy.py
+python3 - <<'PY'
+ctest --test-dir build -L FAST --output-on-failure
+head -n 5 wrds_pipeline/sample_data/spx_options_sample.csv
+git ls-files | rg '\.(csv|parquet|json)$'
+head -n 3 data/options_2023-06-01.csv
+head -n 3 data/options_synth.csv
+cat > docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid/COMMANDS.md <<'EOF'
+cat > docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid/RESULTS.md <<'EOF'
+cat > docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid/TESTS.md <<'EOF'
+cat > docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid/META.json <<'EOF'
+cat >> docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/TESTS.md <<'EOF'
+rg -n "git_sha_after" -n scripts/gpt_bundle.py
+sed -n '80,140p' scripts/gpt_bundle.py
+date -u +%Y-%m-%dT%H:%M:%SZ
+git rev-parse HEAD
+cat > docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/META.json <<'EOF'
+git status --short
+git restore docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md
+git status --short
+git add .gitignore PROGRESS.md project_state/KNOWN_ISSUES.md docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid

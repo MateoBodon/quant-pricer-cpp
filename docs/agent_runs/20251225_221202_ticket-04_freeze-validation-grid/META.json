@@ -1,0 +1,24 @@
+{
+  "run_name": "20251225_221202_ticket-04_freeze-validation-grid",
+  "ticket_id": "ticket-04",
+  "started_at_utc": "2025-12-25T22:12:02Z",
+  "finished_at_utc": "2025-12-25T22:12:02Z",
+  "git_sha_before": "ed1afa725f908765c1b28b07fbc716127f7d0dab",
+  "git_sha_after": "ed1afa725f908765c1b28b07fbc716127f7d0dab",
+  "branch_name": "main",
+  "host_os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "python_version": "Python 3.12.2",
+  "build_type": "unknown",
+  "dataset_id": "unknown",
+  "config_hashes": {
+    "scenario_grid": null,
+    "tolerances": null,
+    "wrds_panel": null
+  },
+  "tools": {
+    "codex_cli": "unknown",
+    "cmake": "cmake version 4.1.2"
+  },
+  "notes": "bootstrap run aborted before executing commands"
+}

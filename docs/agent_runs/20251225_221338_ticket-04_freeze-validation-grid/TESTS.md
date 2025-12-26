@@ -17,3 +17,10 @@
 
 ## Notes
 - `scripts/reproduce_all.sh` emitted the usual Heston MC deviation warnings during `heston_qe_vs_analytic.py`.
+
+## Data policy
+- `python3 scripts/check_data_policy.py` (ok)
+- Negative test: added temp `docs/artifacts/forbidden_sample.csv` with `strike,market_iv` pattern, ran `python3 scripts/check_data_policy.py` (expected fail), then removed file.
+
+## FAST re-run
+- `ctest --test-dir build -L FAST --output-on-failure` (pass; `RngDeterminism.CounterRngThreadInvariant` skipped because OpenMP is disabled)

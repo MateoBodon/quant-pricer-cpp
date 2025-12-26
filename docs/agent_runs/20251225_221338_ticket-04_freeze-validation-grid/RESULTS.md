@@ -15,7 +15,7 @@
 - Refreshed CSV/PNG artifacts under `docs/artifacts/` (tri-engine, PDE order, MC Greeks, QL parity, benchmarks, WRDS sample)
 
 ## Bundle
-- `docs/gpt_bundles/20251225T224843Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip`
+- `docs/gpt_bundles/20251225T225148Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip`
 
 ## Notes
 - The initial run log folder `docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid/` was created during a failed bootstrap and is not the primary log for this run.
