@@ -1,0 +1,22 @@
+{
+  "run_name": "20251226_HHMMSS_ticket-01_unify-artifacts-root",
+  "ticket_id": "ticket-01",
+  "started_at_utc": "2025-12-26T20:13:58Z",
+  "finished_at_utc": "2025-12-26T20:42:19Z",
+  "git_sha_before": "d4be0724a76d2cbd2aaa88e3387ed08694d6e02b",
+  "git_sha_after": "45581772b4f9953fc2ae8d4c501b918237097fc3",
+  "branch_name": "codex/ticket-01-unify-artifacts-root",
+  "host_os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "python_version": "Python 3.12.2",
+  "build_type": "Release",
+  "dataset_id": "WRDS_SAMPLE",
+  "config_hashes": {
+    "scenario_grid": "ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf",
+    "tolerances": "6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1",
+    "wrds_dateset": "af16ea93a04692590f532d223eab06866ddd0738d2c4b90b5783bce47fbcc71f"
+  },
+  "tools": {
+    "codex_cli": "unknown"
+  }
+}

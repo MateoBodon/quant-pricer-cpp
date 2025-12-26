@@ -1,0 +1,10 @@
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release` (pass)
+- `cmake --build build -j` (pass)
+- `ctest --test-dir build -L FAST --output-on-failure` (pass; RngDeterminism.CounterRngThreadInvariant skipped: OpenMP not enabled)
+- `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` (first attempt failed)
+  - Failure snippet:
+    - `metrics_snapshot_fast` -> `AssertionError: CURRENT_RESULTS missing metrics_summary generated_at`
+- `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` (second attempt pass)
+  - FAST: 100% passed, RngDeterminism.CounterRngThreadInvariant skipped
+  - SLOW: 100% passed
+  - MARKET: skipped (RUN_MARKET_TESTS=0)

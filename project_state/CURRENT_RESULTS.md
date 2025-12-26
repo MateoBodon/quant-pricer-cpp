@@ -1,13 +1,11 @@
 ---
-generated_at: 2025-12-26T09:34:49Z
-git_sha: 9e4006eb8bb02ff21faaccaf1ebef41c36914e4c
-branch: codex/ticket-05-ql-parity-grid-summary
+generated_at: 2025-12-26T20:18:01Z
+git_sha: 45581772b4f9953fc2ae8d4c501b918237097fc3
+branch: codex/ticket-01-unify-artifacts-root
 commands:
   - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
   - cmake --build build -j
   - ctest --test-dir build -L FAST --output-on-failure
-  - python3 scripts/ql_parity.py --scenario-grid configs/scenario_grids/synthetic_validation_v1.json --tolerances configs/tolerances/synthetic_validation_v1.json
-  - python3 scripts/generate_metrics_summary.py --artifacts docs/artifacts --manifest docs/artifacts/manifest.json
   - REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
 ---
 
