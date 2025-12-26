@@ -246,6 +246,12 @@ add_test(
 set_tests_properties(metrics_snapshot_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME gpt_bundle_empty_diff_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_gpt_bundle_empty_diff_fast.py
+)
+set_tests_properties(gpt_bundle_empty_diff_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME protocol_config_guard_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_protocol_config_guard_fast.py
 )

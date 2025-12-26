@@ -158,6 +158,8 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 
 ## ticket-04 — Freeze synthetic validation grid + tolerances (pre-registered protocol)
 
+**Status:** **FAIL** (bundle unreviewable: empty diff/commit range).
+
 **Goal (1 sentence):** Make all headline validation scripts consume a frozen scenario grid + tolerance config and record their hashes in the manifest.
 
 **Why (from Prompt-1 diagnosis):**
@@ -186,6 +188,27 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 - Config files committed under `configs/` (or a documented location)
 - Updated `docs/artifacts/manifest.json`
 - Run logs + PROGRESS.md update
+
+---
+
+## ticket-04b — Repair evidence for ticket-04 + prevent empty-diff bundles
+
+**Goal (1 sentence):** Make ticket-04 reviewable by generating a bundle with a real DIFF.patch/commit list and prevent gpt-bundle from silently emitting empty diffs on main.
+
+**Acceptance criteria (objective):**
+- Regenerated ticket-04 bundle has non-empty `COMMITS.txt` and a real `DIFF.patch` with ticket-04 changes.
+- `gpt-bundle` fails if the commit range is empty unless `--allow-empty-diff` is provided.
+- Regenerated ticket-04 bundle path is recorded in the run log RESULTS.
+
+**Minimal tests/commands to run:**
+- `python3 -m compileall scripts/gpt_bundle.py`
+- Negative test: run bundling with `BASE_SHA=<HEAD>` and confirm the empty-range error message.
+- `BASE_SHA=ed1afa725f908765c1b28b07fbc716127f7d0dab make gpt-bundle TICKET=ticket-04 RUN_NAME=20251225_221338_ticket-04_freeze-validation-grid`
+
+**Expected artifacts/logs to produce:**
+- New bundle for ticket-04 (reviewable) and ticket-04b (this run)
+- Run logs under `docs/agent_runs/<RUN_NAME>/`
+- Doc updates: `PROGRESS.md` + this sprint list
 
 ---
 
