@@ -2,7 +2,7 @@
   "run_name": "20251225_221338_ticket-04_freeze-validation-grid",
   "ticket_id": "ticket-04",
   "started_at_utc": "2025-12-25T22:13:38Z",
-  "finished_at_utc": "2025-12-26T02:10:15Z",
+  "finished_at_utc": "2025-12-26T02:18:18Z",
   "git_sha_before": "ed1afa725f908765c1b28b07fbc716127f7d0dab",
   "git_sha_after": "c354a719a2a3efdfdcc3f0fdb6da436a657eaa3b",
   "branch_name": "codex/ticket-04-freeze-validation-grid",
@@ -20,5 +20,5 @@
     "codex_cli": "unknown",
     "cmake": "cmake version 4.1.2"
   },
-  "notes": "reproduce_all first run failed at metrics_snapshot_fast after clean; reran after preserving metrics_summary in reproduce_all. Heston MC warnings emitted during heston_qe_vs_analytic. Checklist run: data-policy pass + negative forbidden CSV, FAST re-run, sample data SYNTHETIC marker verified."
+  "notes": "reproduce_all first run failed at metrics_snapshot_fast after clean; reran after preserving metrics_summary in reproduce_all. Heston MC warnings emitted during heston_qe_vs_analytic. Checklist run: data-policy pass + negative forbidden CSV, FAST re-run, sample data SYNTHETIC marker verified. Checklist verification 2025-12-26: data-policy guard pass + negative forbidden CSV, FAST green (OpenMP-skipped test), synthetic sample marker confirmed, tracked data spot-checked."
 }

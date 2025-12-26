@@ -6,6 +6,7 @@
 - Added FAST guardrails (`tests/test_protocol_config_guard_fast.py`) to fail closed without protocol provenance and to validate the canonical configs.
 - Updated `scripts/reproduce_all.sh` to pass protocol configs (and preserve metrics_summary during clean to keep FAST tests green).
 - Updated `project_state/CONFIG_REFERENCE.md`, `project_state/CURRENT_RESULTS.md`, and `CHANGELOG.md`.
+- Re-verified checklist items (data-policy guard pass + negative test, FAST green, synthetic sample marker, tracked data spot-checks, run log completeness).
 
 ## Artifacts updated
 - `docs/artifacts/manifest.json`
@@ -15,7 +16,7 @@
 - Refreshed CSV/PNG artifacts under `docs/artifacts/` (tri-engine, PDE order, MC Greeks, QL parity, benchmarks, WRDS sample)
 
 ## Bundle
-- `docs/gpt_bundles/20251225T225148Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip`
+- `docs/gpt_bundles/20251226T021704Z_ticket-04_20251225_221338_ticket-04_freeze-validation-grid.zip`
 
 ## Notes
 - The initial run log folder `docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid/` was created during a failed bootstrap and is not the primary log for this run.

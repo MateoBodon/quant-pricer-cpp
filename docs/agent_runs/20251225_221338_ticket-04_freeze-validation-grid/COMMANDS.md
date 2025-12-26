@@ -114,3 +114,42 @@ git status --short
 git restore docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md
 git status --short
 git add .gitignore PROGRESS.md project_state/KNOWN_ISSUES.md docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid docs/agent_runs/20251225_221202_ticket-04_freeze-validation-grid
+git commit -m "ticket-04: checklist hygiene and run logs" -m "Tests: python3 scripts/check_data_policy.py; ctest --test-dir build -L FAST --output-on-failure" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/"
+date -u +%Y%m%dT%H%M%SZ
+ls docs/agent_runs
+sed -n '1,120p' docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/COMMANDS.md
+git rev-parse --abbrev-ref HEAD
+git status --porcelain
+git ls-files scripts/check_data_policy.py tests/test_data_policy_fast.py
+python3 scripts/check_data_policy.py
+sed -n '1,200p' scripts/check_data_policy.py
+cat > docs/artifacts/forbidden_sample.csv <<'EOF'
+git add docs/artifacts/forbidden_sample.csv
+python3 scripts/check_data_policy.py
+git restore --staged docs/artifacts/forbidden_sample.csv
+rm docs/artifacts/forbidden_sample.csv
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j
+ctest --test-dir build -L FAST --output-on-failure
+head -n 5 wrds_pipeline/sample_data/spx_options_sample.csv
+git ls-files | rg '\.(csv|parquet|json)$'
+head -n 3 data/options_2023-06-01.csv
+head -n 3 data/options_synth.csv
+head -n 3 data/samples/spx_20240614_sample.csv
+head -n 3 wrds_pipeline/sample_data/spx_options_sample_poison_calib.csv
+tail -n 40 PROGRESS.md
+tail -n 80 project_state/KNOWN_ISSUES.md
+ls -la docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid
+cat docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/META.json
+cat docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/TESTS.md
+cat >> docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/TESTS.md <<'EOF'
+date -u +%Y%m%dT%H%M%SZ
+cat docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/RESULTS.md
+python3 - <<'PY'
+git status --porcelain
+git restore docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md
+git status --porcelain
+tail -n 60 docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/COMMANDS.md
+cat docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/META.json
+python3 - <<'PY'
+git diff --stat
