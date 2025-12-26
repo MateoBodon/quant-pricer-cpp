@@ -90,3 +90,8 @@ git restore docs/artifacts/manifest.json docs/artifacts/metrics_summary.json doc
 cat docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/TESTS.md
 git status -sb
 git add PROGRESS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/RESULTS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/TESTS.md
+git commit -m "ticket-04b: log FAST test run" -m "Tests: ctest --test-dir build -L FAST --output-on-failure" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
+date -u +%Y-%m-%dT%H:%M:%SZ
+git rev-parse HEAD
+git status -sb
+git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/META.json
