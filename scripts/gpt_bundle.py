@@ -57,6 +57,18 @@ def _check_git(args: List[str]) -> bool:
     return result.returncode == 0
 
 
+def _current_branch() -> str | None:
+    return _try_git(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+
+
+def _head_parents() -> List[str]:
+    output = _try_git(["git", "rev-list", "--parents", "-n", "1", "HEAD"])
+    if not output:
+        return []
+    parts = output.split()
+    return parts[1:]
+
+
 def _add_path(zf: zipfile.ZipFile, path: Path) -> None:
     if path.is_dir():
         for item in sorted(path.rglob("*")):
@@ -156,6 +168,11 @@ def _resolve_base_sha(ticket_id: str, explicit_base: str | None) -> Tuple[str | 
     if base:
         return base, "explicit"
 
+    branch = _current_branch()
+    parents = _head_parents()
+    if branch == "main" and len(parents) > 1:
+        return parents[0], "merge-parent:HEAD^1"
+
     for ref in ("main", "origin/main"):
         if _try_git(["git", "rev-parse", "--verify", ref]):
             merge_base = _try_git(["git", "merge-base", "HEAD", ref])
@@ -192,6 +209,18 @@ def _build_diff_payload(base_sha: str | None) -> Tuple[str, str]:
 
     diff_payload = "\n\n".join(sections) if sections else "No diff\n"
     return diff_payload, commit_log
+
+
+def _commit_range_empty(base_sha: str) -> bool:
+    result = subprocess.run(
+        ["git", "rev-list", f"{base_sha}..HEAD"],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return True
+    return not result.stdout.strip()
 
 
 def _run_self_test() -> int:
@@ -282,6 +311,11 @@ def main() -> None:
         help="Optional UTC timestamp for the bundle filename (e.g., 20251221T185600Z)",
     )
     parser.add_argument(
+        "--allow-empty-diff",
+        action="store_true",
+        help="Allow bundling when the git commit range is empty.",
+    )
+    parser.add_argument(
         "--verify",
         metavar="ZIP",
         help="Verify that an existing bundle contains the required files for this ticket/run.",
@@ -350,6 +384,13 @@ def main() -> None:
         sys.exit(1)
     if base_sha:
         print(f"[gpt-bundle] using base SHA {base_sha} ({base_source})")
+
+    if base_sha and _commit_range_empty(base_sha) and not args.allow_empty_diff:
+        print(
+            "[gpt-bundle] No commits in diff range. Provide BASE_SHA=<sha> or run bundling "
+            "from the feature branch. Pass --allow-empty-diff to override."
+        )
+        sys.exit(1)
 
     diff_payload, commit_log = _build_diff_payload(base_sha)
 
