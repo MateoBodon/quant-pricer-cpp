@@ -1,7 +1,7 @@
 {
   "artifacts_root": "docs/artifacts",
-  "generated_at": "2025-12-25T22:36:56.011024+00:00",
-  "manifest_git_sha": "ed1afa725f908765c1b28b07fbc716127f7d0dab",
+  "generated_at": "2025-12-26T09:29:16.141370+00:00",
+  "manifest_git_sha": "9e4006eb8bb02ff21faaccaf1ebef41c36914e4c",
   "manifest_path": "docs/artifacts/manifest.json",
   "metrics": {
     "benchmarks": {
@@ -10,11 +10,11 @@
           "payoffs": {
             "Asian": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 0.694293578955948
+              "time_scaled_error_ratio_prng_over_qmc": 1.0343750042261868
             },
             "Barrier": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 1.463455684614657
+              "time_scaled_error_ratio_prng_over_qmc": 1.2150704871897453
             }
           }
         },
@@ -23,10 +23,10 @@
       },
       "mc_paths": {
         "metrics": {
-          "efficiency_max_threads": 0.124930040815212,
-          "paths_per_sec_1t": 13658216.783216773,
-          "paths_per_sec_max_threads": 13650572.641522288,
-          "speedup_max_threads": 0.9994403265216968,
+          "efficiency_max_threads": 0.1123527096504391,
+          "paths_per_sec_1t": 13684383.381684816,
+          "paths_per_sec_max_threads": 12299820.422621831,
+          "speedup_max_threads": 0.8988216772035134,
           "threads_max": 8
         },
         "source": "docs/artifacts/bench/bench_mc_paths.csv",
@@ -55,24 +55,33 @@
         "by_category": {
           "american": {
             "max_abs_diff_cents": 0.79875157,
+            "median_abs_diff_cents": 0.79875157,
+            "p95_abs_diff_cents": 0.79875157,
             "rows": 1
           },
           "barrier": {
             "max_abs_diff_cents": 0.0410715241,
+            "median_abs_diff_cents": 0.0410715241,
+            "p95_abs_diff_cents": 0.0410715241,
             "rows": 1
           },
           "vanilla": {
             "max_abs_diff_cents": 0.8615834347,
+            "median_abs_diff_cents": 0.8615834347,
+            "p95_abs_diff_cents": 0.8615834347,
             "rows": 1
           }
         },
         "max_abs_diff_cents_overall": 0.8615834347,
+        "median_abs_diff_cents_overall": 0.79875157,
+        "p95_abs_diff_cents_overall": 0.85530024823,
+        "rows": 3,
         "runtime_ratio_by_category": {
-          "american": 17.4852874435,
-          "barrier": 16.5042687451,
-          "vanilla": 1.3179374817
+          "american": 12.0838808706,
+          "barrier": 18.8208631407,
+          "vanilla": 1.0650816951
         },
-        "runtime_ratio_median": 16.5042687451
+        "runtime_ratio_median": 12.0838808706
       },
       "source": "docs/artifacts/ql_parity/ql_parity.csv",
       "status": "ok"
@@ -81,19 +90,19 @@
       "metrics": {
         "payoffs": {
           "asian": {
-            "rmse_ratio_max": 3.0536836751,
-            "rmse_ratio_median": 3.0536836751,
-            "rmse_ratio_min": 3.0536836751,
+            "rmse_ratio_max": 3.4196740615,
+            "rmse_ratio_median": 3.4196740615,
+            "rmse_ratio_min": 3.4196740615,
             "rows": 6
           },
           "call": {
-            "rmse_ratio_max": 8.4805769386,
-            "rmse_ratio_median": 8.4805769386,
-            "rmse_ratio_min": 8.4805769386,
+            "rmse_ratio_max": 6.1362618664,
+            "rmse_ratio_median": 6.1362618664,
+            "rmse_ratio_min": 6.1362618664,
             "rows": 6
           }
         },
-        "rmse_ratio_overall_median": 5.76713030685
+        "rmse_ratio_overall_median": 4.77796796395
       },
       "source": "docs/artifacts/qmc_vs_prng_equal_time.csv",
       "status": "ok"

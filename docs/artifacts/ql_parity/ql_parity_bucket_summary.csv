@@ -1,0 +1,4 @@
+category,tenor_bucket,moneyness_bucket,vol_bucket,count,max_abs_diff_cents,median_abs_diff_cents,p95_abs_diff_cents
+american,mid_0p75_1p50y,lt_0p97,low_le_0p20,1,0.7987515700,0.7987515700,0.7987515700
+barrier,mid_0p75_1p50y,0p97_1p03,mid_0p20_0p25,1,0.0410715241,0.0410715241,0.0410715241
+vanilla,short_le_0p75y,0p97_1p03,low_le_0p20,1,0.8615834347,0.8615834347,0.8615834347
