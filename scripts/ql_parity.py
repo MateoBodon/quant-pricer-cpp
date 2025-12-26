@@ -32,6 +32,23 @@ from protocol_utils import (
 )
 
 
+MONEYNESS_BUCKETS = [
+    (0.0, 0.97, "lt_0p97"),
+    (0.97, 1.03, "0p97_1p03"),
+    (1.03, math.inf, "gt_1p03"),
+]
+TENOR_BUCKETS = [
+    (0.0, 0.75, "short_le_0p75y"),
+    (0.75, 1.5, "mid_0p75_1p50y"),
+    (1.5, math.inf, "long_gt_1p50y"),
+]
+VOL_BUCKETS = [
+    (0.0, 0.20, "low_le_0p20"),
+    (0.20, 0.25, "mid_0p20_0p25"),
+    (0.25, math.inf, "high_gt_0p25"),
+]
+
+
 def _find_quant_cli(override: str | None) -> Path:
     if override:
         path = Path(override).expanduser()
@@ -79,6 +96,28 @@ class Scenario:
     label: str
     kind: str  # vanilla, barrier, american
     params: Dict[str, float | int | str]
+
+
+def _bucket(value: float, buckets: List[tuple[float, float, str]]) -> str:
+    if not math.isfinite(value):
+        return "unknown"
+    for lower, upper, label in buckets:
+        if lower <= value <= upper:
+            return label
+    return "out_of_range"
+
+
+def _bucket_definitions() -> Dict[str, List[Dict[str, float | str]]]:
+    def _format(entries: List[tuple[float, float, str]]) -> List[Dict[str, float | str]]:
+        return [
+            {"lower": lower, "upper": upper, "label": label} for lower, upper, label in entries
+        ]
+
+    return {
+        "moneyness": _format(MONEYNESS_BUCKETS),
+        "tenor_years": _format(TENOR_BUCKETS),
+        "vol": _format(VOL_BUCKETS),
+    }
 
 
 def _parse_eval_date(value: str) -> ql.Date:
@@ -298,6 +337,23 @@ def _plot(df: pd.DataFrame, out_path: Path) -> None:
     plt.close(fig)
 
 
+def _plot_error_distribution(df: pd.DataFrame, out_path: Path) -> None:
+    fig, ax = plt.subplots(1, 1, figsize=(6.5, 4.5), constrained_layout=True)
+    values = df["abs_diff_cents"].dropna().to_numpy(dtype=float)
+    if len(values) == 0:
+        ax.text(0.5, 0.5, "no data", ha="center", va="center")
+    else:
+        bins = min(20, max(1, len(values)))
+        ax.hist(values, bins=bins, color="#4c72b0", edgecolor="white")
+    ax.set_xlabel("|Δprice| (cents)")
+    ax.set_ylabel("Count")
+    ax.set_title("QuantLib parity error distribution")
+    ax.grid(True, axis="y", linestyle=":", alpha=0.4)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=220)
+    plt.close(fig)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument(
@@ -320,6 +376,14 @@ def main() -> None:
         default=str(ARTIFACTS_ROOT / "ql_parity" / "ql_parity.csv"),
     )
     ap.add_argument(
+        "--bucket-summary",
+        default=str(ARTIFACTS_ROOT / "ql_parity" / "ql_parity_bucket_summary.csv"),
+    )
+    ap.add_argument(
+        "--error-dist",
+        default=str(ARTIFACTS_ROOT / "ql_parity" / "ql_parity_error_dist.png"),
+    )
+    ap.add_argument(
         "--fast", action="store_true", help="Smaller scenario set for quicker iteration"
     )
     args = ap.parse_args()
@@ -340,16 +404,39 @@ def main() -> None:
     for scenario in scenarios:
         price_cli, runtime_cli = _run_cli(quant_cli, scenario)
         price_ql, runtime_ql = _price_quantlib(scenario, eval_date)
-        diff_cents = abs(price_cli - price_ql) * 100.0
+        abs_diff = abs(price_cli - price_ql)
+        diff_cents = abs_diff * 100.0
+        rel_diff = abs_diff / price_ql if price_ql != 0 else math.nan
         runtime_ratio = runtime_cli / runtime_ql if runtime_ql > 0 else math.nan
+        p = scenario.params
+        spot = float(p["S"])
+        strike = float(p["K"])
+        tenor = float(p["T"])
+        vol = float(p["vol"])
+        moneyness = spot / strike if strike != 0 else math.nan
+        bucket_row = {
+            "moneyness_bucket": _bucket(moneyness, MONEYNESS_BUCKETS),
+            "tenor_bucket": _bucket(tenor, TENOR_BUCKETS),
+            "vol_bucket": _bucket(vol, VOL_BUCKETS),
+        }
         rows.append(
             {
                 "name": scenario.name,
                 "label": scenario.label,
                 "category": scenario.kind,
+                "spot": spot,
+                "strike": strike,
+                "tenor": tenor,
+                "vol": vol,
+                "rate": float(p["r"]),
+                "dividend": float(p["q"]),
+                "moneyness": moneyness,
+                **bucket_row,
                 "price_quant_pricer": price_cli,
                 "price_quantlib": price_ql,
+                "abs_diff": abs_diff,
                 "abs_diff_cents": diff_cents,
+                "rel_diff": rel_diff,
                 "runtime_ms_quant_pricer": runtime_cli,
                 "runtime_ms_quantlib": runtime_ql,
                 "runtime_ratio": runtime_ratio,
@@ -362,6 +449,31 @@ def main() -> None:
     df.to_csv(out_csv, index=False, float_format="%.10f")
     out_png = Path(args.output)
     _plot(df, out_png)
+    out_bucket = Path(args.bucket_summary)
+    bucket_cols = ["category", "tenor_bucket", "moneyness_bucket", "vol_bucket"]
+    bucket_metrics_cols = [
+        "count",
+        "max_abs_diff_cents",
+        "median_abs_diff_cents",
+        "p95_abs_diff_cents",
+    ]
+    if df.empty:
+        bucket_summary = pd.DataFrame(columns=bucket_cols + bucket_metrics_cols)
+    else:
+        bucket_summary = (
+            df.groupby(bucket_cols, dropna=False)["abs_diff_cents"]
+            .agg(
+                count="count",
+                max_abs_diff_cents="max",
+                median_abs_diff_cents="median",
+                p95_abs_diff_cents=lambda series: series.quantile(0.95),
+            )
+            .reset_index()
+        )
+    out_bucket.parent.mkdir(parents=True, exist_ok=True)
+    bucket_summary.to_csv(out_bucket, index=False, float_format="%.10f")
+    out_error_dist = Path(args.error_dist)
+    _plot_error_distribution(df, out_error_dist)
 
     tol = tolerance_config.get("ql_parity", {})
     max_abs_diff = float(df["abs_diff_cents"].max()) if not df.empty else math.nan
@@ -374,11 +486,14 @@ def main() -> None:
         {
             "csv": str(out_csv),
             "figure": str(out_png),
+            "bucket_summary_csv": str(out_bucket),
+            "error_distribution_figure": str(out_error_dist),
             "quant_cli": str(quant_cli),
             "scenarios": [scenario.name for scenario in scenarios],
             "fast": bool(args.fast),
             "eval_date": eval_date.ISO(),
             "max_abs_diff_cents": max_abs_diff,
+            "bucket_definitions": _bucket_definitions(),
             "protocol": protocol_entry,
             "tolerances": tol,
             "tolerance_checks": {"max_abs_diff_cents_ok": diff_ok},
@@ -388,6 +503,8 @@ def main() -> None:
     )
     print(f"Wrote {out_csv}")
     print(f"Wrote {out_png}")
+    print(f"Wrote {out_bucket}")
+    print(f"Wrote {out_error_dist}")
 
 
 if __name__ == "__main__":

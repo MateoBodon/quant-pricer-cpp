@@ -58,7 +58,13 @@ REQUIRED_ARTIFACTS: Tuple[RequiredArtifact, ...] = (
     RequiredArtifact(
         name="ql_parity",
         relative_path=Path("ql_parity") / "ql_parity.csv",
-        required_columns=("category", "abs_diff_cents"),
+        required_columns=(
+            "category",
+            "abs_diff_cents",
+            "tenor_bucket",
+            "moneyness_bucket",
+            "vol_bucket",
+        ),
     ),
     RequiredArtifact(
         name="bench_mc_paths",
@@ -314,15 +320,21 @@ def ql_parity_metrics(path: Path) -> Dict[str, Any]:
         missing = ",".join(sorted(required - set(df.columns)))
         return _status_block("parse_error", path, reason=f"missing columns: {missing}")
 
+    abs_diff = df["abs_diff_cents"].astype(float)
     by_cat = {}
     for cat, group in df.groupby("category"):
         by_cat[str(cat)] = {
             "max_abs_diff_cents": float(group["abs_diff_cents"].max()),
+            "median_abs_diff_cents": float(group["abs_diff_cents"].median()),
+            "p95_abs_diff_cents": float(group["abs_diff_cents"].quantile(0.95)),
             "rows": int(len(group)),
         }
 
     metrics: Dict[str, Any] = {
-        "max_abs_diff_cents_overall": float(df["abs_diff_cents"].max()),
+        "rows": int(len(df)),
+        "max_abs_diff_cents_overall": float(abs_diff.max()),
+        "median_abs_diff_cents_overall": float(abs_diff.median()),
+        "p95_abs_diff_cents_overall": float(abs_diff.quantile(0.95)),
         "by_category": by_cat,
     }
     if "runtime_ratio" in df.columns:
@@ -528,7 +540,11 @@ def _highlights(name: str, block: Dict[str, Any]) -> str:
             f"rmse_finest={_fmt(metrics.get('rmse_finest'))}"
         )
     if name == "ql_parity":
-        return f"max diff={_fmt(metrics.get('max_abs_diff_cents_overall'))} cents"
+        return (
+            f"max diff={_fmt(metrics.get('max_abs_diff_cents_overall'))} cents, "
+            f"median={_fmt(metrics.get('median_abs_diff_cents_overall'))} cents, "
+            f"p95={_fmt(metrics.get('p95_abs_diff_cents_overall'))} cents"
+        )
     if name == "benchmarks":
         mc_block = block.get("mc_paths", {})
         mc_metrics = mc_block.get("metrics", {}) if isinstance(mc_block, dict) else {}

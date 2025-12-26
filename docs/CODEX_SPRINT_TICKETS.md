@@ -214,6 +214,8 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 
 ## ticket-05 — QuantLib parity: grid summary (max/median/p95 by bucket)
 
+**Status:** **DONE**.
+
 **Goal (1 sentence):** Turn QuantLib parity into a resume-defensible grid table + distribution plot.
 
 **Why (from Prompt-1 diagnosis):**
