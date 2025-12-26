@@ -12,5 +12,13 @@ Caveats:
 - reproduce_all ran FAST + SLOW (MARKET skipped) and wrote SLOW logs under `docs/artifacts/logs/` (untracked).
 - First reproduce_all attempt failed at `metrics_snapshot_fast` because CURRENT_RESULTS lagged the snapshot; fixed by updating CURRENT_RESULTS and rerunning.
 
+Review checklist:
+- Scope: `git diff main...HEAD --stat` shows only ticket-01 changes (artifact defaults + artifacts refresh + run log/docs updates).
+- Secrets: skimmed text diff (`git diff main...HEAD --patch -- . ':!docs/artifacts' ':!docs/validation_pack.zip'`) and scanned run log for credential-like strings; only WRDS_SAMPLE references present.
+- Tests evidence: `docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/TESTS.md` contains FAST ctest pass and reproduce_all pass (second run).
+- Canonicalization: official outputs present under `docs/artifacts/` and `git status --short artifacts` returned empty.
+- Docs updates: `PROGRESS.md` entry includes tests + artifacts; `project_state/KNOWN_ISSUES.md` marks split-root issue resolved.
+- Run log integrity: `META.json` has git_sha_before `d4be0724a76d2cbd2aaa88e3387ed08694d6e02b` and git_sha_after `9f1d4d8476d5f94e52013fff1ba9e2d01a9693ca`.
+
 Bundle:
-- `docs/gpt_bundles/20251226T204916Z_ticket-01_20251226_HHMMSS_ticket-01_unify-artifacts-root.zip`
+- `docs/gpt_bundles/20251226T212655Z_ticket-01_20251226_HHMMSS_ticket-01_unify-artifacts-root.zip`
