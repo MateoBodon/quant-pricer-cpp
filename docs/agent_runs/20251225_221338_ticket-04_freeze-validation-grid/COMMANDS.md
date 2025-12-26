@@ -160,3 +160,7 @@ git switch main
 git merge --no-ff codex/ticket-04-freeze-validation-grid
 git push origin main
 make gpt-bundle TICKET=ticket-04 RUN_NAME=20251225_221338_ticket-04_freeze-validation-grid TIMESTAMP=20251226T021704Z
+git add docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/COMMANDS.md
+git commit -m "ticket-04: log remaining commands" -m "Tests: (not run)" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/"
+git add docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/COMMANDS.md
+git commit -m "ticket-04: log command trail" -m "Tests: (not run)" -m "Artifacts: (none)" -m "Run log: docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/"
