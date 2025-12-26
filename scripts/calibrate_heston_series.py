@@ -26,7 +26,7 @@ from calibrate_heston import (
     calibrate_surface,
     save_calibration_outputs,
 )
-from manifest_utils import describe_inputs, update_run
+from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
 
 
 def resolve_inputs(inputs: Iterable[str], pattern: str, input_dir: str) -> List[Path]:
@@ -64,12 +64,12 @@ def main() -> None:
     )
     ap.add_argument(
         "--output",
-        default="artifacts/heston/series_params.csv",
+        default=str(ARTIFACTS_ROOT / "heston" / "series_params.csv"),
         help="CSV collecting calibration parameters",
     )
     ap.add_argument(
         "--artifacts-dir",
-        default="artifacts/heston",
+        default=str(ARTIFACTS_ROOT / "heston"),
         help="Directory for per-date artifacts",
     )
     ap.add_argument("--metric", choices=["price", "vol"], default="price")

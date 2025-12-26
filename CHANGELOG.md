@@ -6,6 +6,7 @@
 - feat(heston,mc): Andersen QE variance paths, deterministic counter RNG, CLI/pybind confidence intervals for MC Greeks
 - ops(gpt-bundle): hard-gate empty run logs and include base commit diffs + commit lists in GPT bundles
 - ops(gpt-bundle): fail on empty commit ranges unless `--allow-empty-diff`, and prefer merge-parent base on main merge commits
+- ops(artifacts): default script output paths now point at `docs/artifacts/` to keep manifest entries canonical
 - ops(artifacts): reproduce_all now builds full QL parity/bench/WRDS sample evidence before metrics snapshot, and metrics generation hard-fails when required artifacts are missing; validation pack is emitted at the end of the run
 - ops(artifacts): enforce canonical manifest usage in metrics summaries and add a FAST guard against `artifacts/` writes (tests now emit to temp outputs)
 - ops(data-policy): enforce `# SYNTHETIC_DATA` markers for sample CSVs, regenerate synthetic WRDS sample data, and skip comment lines in sample loading

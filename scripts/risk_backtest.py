@@ -5,7 +5,7 @@ Backtest VaR exceptions with Kupiec test from a returns CSV.
 Inputs: CSV with columns date, ret (decimal), close
 
 Usage:
-  python scripts/risk_backtest.py --csv data/spy_returns.csv --alpha 0.99 --horizon 1 --out artifacts/var_backtest_99.json
+  python scripts/risk_backtest.py --csv data/spy_returns.csv --alpha 0.99 --horizon 1 --out docs/artifacts/var_backtest_99.json
 """
 import argparse
 import json

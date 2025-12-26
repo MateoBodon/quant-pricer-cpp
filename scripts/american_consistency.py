@@ -3,8 +3,8 @@
 Cross-check American put pricing consistency across PSOR, CRR, and LSMC solvers.
 
 Outputs:
-  * artifacts/american_consistency.csv
-  * artifacts/american_consistency.png
+  * docs/artifacts/american_consistency.csv
+  * docs/artifacts/american_consistency.png
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from manifest_utils import update_run
+from manifest_utils import ARTIFACTS_ROOT, update_run
 
 
 @dataclass
@@ -161,8 +161,12 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--fast", action="store_true", help="FAST mode for CI")
     ap.add_argument("--seed", type=int, default=2025)
-    ap.add_argument("--output", default="artifacts/american_consistency.png")
-    ap.add_argument("--csv", default="artifacts/american_consistency.csv")
+    ap.add_argument(
+        "--output", default=str(ARTIFACTS_ROOT / "american_consistency.png")
+    )
+    ap.add_argument(
+        "--csv", default=str(ARTIFACTS_ROOT / "american_consistency.csv")
+    )
     args = ap.parse_args()
 
     strike = 100.0

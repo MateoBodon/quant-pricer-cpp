@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-12-26T09:29:22.359740+00:00",
+  "generated_at": "2025-12-26T20:16:23.008129+00:00",
   "git": {
-    "branch": "codex/ticket-05-ql-parity-grid-summary",
+    "branch": "codex/ticket-01-unify-artifacts-root",
     "dirty": true,
-    "sha": "9e4006eb8bb02ff21faaccaf1ebef41c36914e4c"
+    "sha": "d4be0724a76d2cbd2aaa88e3387ed08694d6e02b"
   },
   "omp_threads": 11,
   "protocols": {
@@ -53,12 +53,12 @@
         ],
         "mc_json": "docs/artifacts/bench/bench_mc.json",
         "pde_json": "docs/artifacts/bench/bench_pde.json",
-        "timestamp": "2025-12-26T09:26:29.500175+00:00"
+        "timestamp": "2025-12-26T20:14:35.171715+00:00"
       }
     ],
     "heston": [
       {
-        "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpm07jdveb",
+        "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/calibrate_heston.py --input data/samples/spx_20240614_sample.csv --fast --metric price --weight vega --param-transform exp --feller-warn --seed 19 --retries 2 --output-dir /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp48mrcne0",
         "cost": 0.10009447672986851,
         "csv_rows": 12,
         "date": "2024-06-14",
@@ -88,7 +88,7 @@
         },
         "fast": true,
         "feller": -0.005343760505443038,
-        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpm07jdveb/fit_20240614.png",
+        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp48mrcne0/fit_20240614.png",
         "input": "data/samples/spx_20240614_sample.csv",
         "inputs": [
           {
@@ -111,7 +111,7 @@
           "theta": 0.0005,
           "v0": 0.0005
         },
-        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpm07jdveb/params_20240614.json",
+        "params_json": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp48mrcne0/params_20240614.json",
         "retries": 2,
         "rmse_price": 159.96845408718906,
         "rmse_vol": 0.11992444527012011,
@@ -120,7 +120,7 @@
         "rmspe_vol": 0.5456505978852593,
         "rmspe_vol_pct": 54.56505978852593,
         "seed": 19,
-        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpm07jdveb/fit_20240614.csv",
+        "table": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmp48mrcne0/fit_20240614.csv",
         "warnings": [
           "WARNING: Feller condition violated (-0.0053) for 2024-06-14"
         ],
@@ -609,8 +609,8 @@
     "mc_greeks_ci": {
       "antithetic": true,
       "command": "build/quant_cli mc 100.0 100.0 0.02 0.0 0.2 1.0 100000 2025 1 none none 1 --greeks --ci --rng=counter --json",
-      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/greeks.csv",
-      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/greeks.png",
+      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/greeks.csv",
+      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/greeks.png",
       "inputs": [
         {
           "path": "build/quant_cli",
@@ -695,7 +695,7 @@
     },
     "metrics_snapshot": {
       "artifacts_root": "docs/artifacts",
-      "generated_at": "2025-12-26T09:29:16.141370+00:00",
+      "generated_at": "2025-12-26T20:16:23.004584+00:00",
       "inputs": [
         {
           "path": "docs/artifacts/tri_engine_agreement.csv",
@@ -704,8 +704,8 @@
         },
         {
           "path": "docs/artifacts/qmc_vs_prng_equal_time.csv",
-          "sha256": "a34f521e46cc89c762dea45a2753e1fe3f3c5a816ecb62b4e962fea927e16d52",
-          "size_bytes": 1125
+          "sha256": "7cc082e8346dfc99b343aa72954f7905edf8605c73cc55fd57fc2a223081d1fe",
+          "size_bytes": 1124
         },
         {
           "path": "docs/artifacts/pde_order_slope.csv",
@@ -714,18 +714,18 @@
         },
         {
           "path": "docs/artifacts/ql_parity/ql_parity.csv",
-          "sha256": "af489829c226e15f6b10c4c7a7248f5d8304d81663f81bc176af205be2df5da6",
+          "sha256": "76c91032689ad75f3539b13b8946eef10c3d812c0766757d70ac3354248f7683",
           "size_bytes": 1059
         },
         {
           "path": "docs/artifacts/bench/bench_mc_paths.csv",
-          "sha256": "d89f170aae25db3a052a1d8b503ca58d6de2ccb36fc14c80675980fede0db573",
+          "sha256": "59775d6e8fa842bfc6bd96d5629d136f13afc733def79f40b683a0105b6860a5",
           "size_bytes": 248
         },
         {
           "path": "docs/artifacts/bench/bench_mc_equal_time.csv",
-          "sha256": "88d16e0e9f689f8451aa3eb0e68addc0d63fed7d500cf9f7d939f2c2cdebae81",
-          "size_bytes": 340
+          "sha256": "f0f307110beb41d2563a3869e8023c6db7d9f199f7f4d7a4ab895ebd4b91b975",
+          "size_bytes": 339
         },
         {
           "path": "docs/artifacts/wrds/wrds_agg_pricing.csv",
@@ -756,11 +756,11 @@
     },
     "pde_order_slope": {
       "analytic": 8.916037278572539,
-      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/pde_order_slope.py --skip-build --scenario-grid configs/scenario_grids/synthetic_validation_v1.json --tolerances configs/tolerances/synthetic_validation_v1.json --fast --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/pde.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/pde.csv",
-      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/pde.csv",
+      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/pde_order_slope.py --skip-build --scenario-grid configs/scenario_grids/synthetic_validation_v1.json --tolerances configs/tolerances/synthetic_validation_v1.json --fast --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/pde.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/pde.csv",
+      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/pde.csv",
       "dividend": 0.0,
       "fast": true,
-      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/pde.png",
+      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/pde.png",
       "inputs": [
         {
           "path": "build/quant_cli",
@@ -996,116 +996,11 @@
           ]
         },
         "bucket_summary_csv": "docs/artifacts/ql_parity/ql_parity_bucket_summary.csv",
-        "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpyrhs8jsx/ql.csv",
+        "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/ql.csv",
         "error_distribution_figure": "docs/artifacts/ql_parity/ql_parity_error_dist.png",
         "eval_date": "2024-01-01",
         "fast": true,
-        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpyrhs8jsx/ql.png",
-        "inputs": [
-          {
-            "path": "build/quant_cli",
-            "sha256": "2b63041bc901afa30e77fe6464fb40a18fe8ff82f66808bd6280aa5300b4b115",
-            "size_bytes": 168328
-          },
-          {
-            "path": "configs/scenario_grids/synthetic_validation_v1.json",
-            "sha256": "ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf",
-            "size_bytes": 2827
-          },
-          {
-            "path": "configs/tolerances/synthetic_validation_v1.json",
-            "sha256": "6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1",
-            "size_bytes": 421
-          }
-        ],
-        "max_abs_diff_cents": 0.8615834347456719,
-        "protocol": {
-          "scenario_grid": {
-            "path": "configs/scenario_grids/synthetic_validation_v1.json",
-            "sha256": "ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf",
-            "size_bytes": 2827
-          },
-          "scenario_grid_id": "synthetic_validation_v1",
-          "tolerances": {
-            "path": "configs/tolerances/synthetic_validation_v1.json",
-            "sha256": "6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1",
-            "size_bytes": 421
-          },
-          "tolerances_id": "synthetic_tolerances_v1"
-        },
-        "quant_cli": "build/quant_cli",
-        "scenarios": [
-          "vanilla_call_atm",
-          "barrier_do_call",
-          "american_put_psor"
-        ],
-        "tolerance_checks": {
-          "max_abs_diff_cents_ok": true
-        },
-        "tolerances": {
-          "max_abs_diff_cents": 10.0
-        }
-      },
-      {
-        "bucket_definitions": {
-          "moneyness": [
-            {
-              "label": "lt_0p97",
-              "lower": 0.0,
-              "upper": 0.97
-            },
-            {
-              "label": "0p97_1p03",
-              "lower": 0.97,
-              "upper": 1.03
-            },
-            {
-              "label": "gt_1p03",
-              "lower": 1.03,
-              "upper": Infinity
-            }
-          ],
-          "tenor_years": [
-            {
-              "label": "short_le_0p75y",
-              "lower": 0.0,
-              "upper": 0.75
-            },
-            {
-              "label": "mid_0p75_1p50y",
-              "lower": 0.75,
-              "upper": 1.5
-            },
-            {
-              "label": "long_gt_1p50y",
-              "lower": 1.5,
-              "upper": Infinity
-            }
-          ],
-          "vol": [
-            {
-              "label": "low_le_0p20",
-              "lower": 0.0,
-              "upper": 0.2
-            },
-            {
-              "label": "mid_0p20_0p25",
-              "lower": 0.2,
-              "upper": 0.25
-            },
-            {
-              "label": "high_gt_0p25",
-              "lower": 0.25,
-              "upper": Infinity
-            }
-          ]
-        },
-        "bucket_summary_csv": "docs/artifacts/ql_parity/ql_parity_bucket_summary.csv",
-        "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/ql.csv",
-        "error_distribution_figure": "docs/artifacts/ql_parity/ql_parity_error_dist.png",
-        "eval_date": "2024-01-01",
-        "fast": true,
-        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/ql.png",
+        "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/ql.png",
         "inputs": [
           {
             "path": "build/quant_cli",
@@ -1154,12 +1049,12 @@
     ],
     "qmc_vs_prng_equal_time": {
       "budget_count": 6,
-      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpu46he1af/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpu46he1af/qmc_summary.csv",
-      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpu46he1af/qmc_summary.csv",
+      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3 scripts/qmc_vs_prng_equal_time.py --fast --seed 101 --output /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpd3x494qc/qmc_plot.png --csv /var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpd3x494qc/qmc_summary.csv",
+      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpd3x494qc/qmc_summary.csv",
       "csv_rows": 12,
       "fast": true,
-      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpu46he1af/qmc_plot.png",
-      "generated_at": "2025-12-26T09:29:07.323157+00:00",
+      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpd3x494qc/qmc_plot.png",
+      "generated_at": "2025-12-26T20:15:45.072086+00:00",
       "inputs": [],
       "paths": [
         256,
@@ -1191,140 +1086,140 @@
       },
       "summary_rows": [
         {
-          "paths_prng": 338.3492774666967,
-          "paths_qmc": 16.078947433114173,
+          "paths_prng": 106.30197419334624,
+          "paths_qmc": 25.95813935512798,
           "payoff": "call",
-          "rmse_prng": 0.7999882782102401,
-          "rmse_qmc": 0.10234427812580667,
-          "rmse_ratio": 7.816639023305775,
-          "time_seconds": 1.9201334604683023e-05
+          "rmse_prng": 1.4272353215897768,
+          "rmse_qmc": 0.08054815460557012,
+          "rmse_ratio": 17.719031908039266,
+          "time_seconds": 3.638883451155076e-05
         },
         {
-          "paths_prng": 761.6737773282377,
-          "paths_qmc": 36.19606555254929,
+          "paths_prng": 217.91761225303898,
+          "paths_qmc": 53.213835300108684,
           "payoff": "call",
-          "rmse_prng": 0.533189696269511,
-          "rmse_qmc": 0.06821214267152084,
-          "rmse_ratio": 7.816639023305776,
-          "time_seconds": 4.322501637241373e-05
+          "rmse_prng": 0.9968276694999243,
+          "rmse_qmc": 0.05625745665301589,
+          "rmse_ratio": 17.719031908039263,
+          "time_seconds": 7.459661957928595e-05
         },
         {
-          "paths_prng": 1714.6392255162148,
-          "paths_qmc": 81.48264473992988,
+          "paths_prng": 446.72816370929,
+          "paths_qmc": 109.08764409524973,
           "payoff": "call",
-          "rmse_prng": 0.3553692722148362,
-          "rmse_qmc": 0.04546318067845803,
-          "rmse_ratio": 7.816639023305776,
-          "time_seconds": 9.730584247720758e-05
+          "rmse_prng": 0.6962169360927952,
+          "rmse_qmc": 0.03929204144482161,
+          "rmse_ratio": 17.719031908039263,
+          "time_seconds": 0.0001529220632469102
         },
         {
-          "paths_prng": 3859.90401821576,
-          "paths_qmc": 183.42936704472842,
+          "paths_prng": 915.7867057543933,
+          "paths_qmc": 223.62819795151174,
           "payoff": "call",
-          "rmse_prng": 0.23685251331388835,
-          "rmse_qmc": 0.030301068350182023,
-          "rmse_ratio": 7.816639023305775,
-          "time_seconds": 0.00021904970257551797
+          "rmse_prng": 0.48626060143937117,
+          "rmse_qmc": 0.027442842473733055,
+          "rmse_ratio": 17.719031908039263,
+          "time_seconds": 0.0003134881655439728
         },
         {
-          "paths_prng": 8689.209256456077,
-          "paths_qmc": 412.92636980328155,
+          "paths_prng": 1877.3503856861132,
+          "paths_qmc": 458.43478731078636,
           "payoff": "call",
-          "rmse_prng": 0.15786146256672215,
-          "rmse_qmc": 0.020195567698092335,
-          "rmse_ratio": 7.816639023305776,
-          "time_seconds": 0.0004931129619443162
+          "rmse_prng": 0.3396202537662251,
+          "rmse_qmc": 0.019166975686303538,
+          "rmse_ratio": 17.719031908039263,
+          "time_seconds": 0.00064264650796301
         },
         {
-          "paths_prng": 19560.682635156012,
-          "paths_qmc": 929.5577345438843,
+          "paths_prng": 3848.542950547074,
+          "paths_qmc": 939.785126123739,
           "payoff": "call",
-          "rmse_prng": 0.10521417322128697,
-          "rmse_qmc": 0.01346028298192927,
-          "rmse_ratio": 7.816639023305776,
-          "time_seconds": 0.0011100694973720238
+          "rmse_prng": 0.23720185519207937,
+          "rmse_qmc": 0.013386840569120428,
+          "rmse_ratio": 17.719031908039263,
+          "time_seconds": 0.0013174166670069098
         },
         {
-          "paths_prng": 324.9212492759831,
-          "paths_qmc": 56.49511935189211,
+          "paths_prng": 228.31907465369315,
+          "paths_qmc": 53.24605548312738,
           "payoff": "asian",
-          "rmse_prng": 0.36144223907011597,
-          "rmse_qmc": 0.1441904775283336,
-          "rmse_ratio": 2.5066997853522754,
-          "time_seconds": 5.1367998821660876e-05
+          "rmse_prng": 0.43117826765949263,
+          "rmse_qmc": 0.1485245773428787,
+          "rmse_ratio": 2.9030768871611694,
+          "time_seconds": 5.439583522578081e-05
         },
         {
-          "paths_prng": 566.7809149476578,
-          "paths_qmc": 98.54804974341626,
+          "paths_prng": 425.92878580595595,
+          "paths_qmc": 99.33041203536678,
           "payoff": "asian",
-          "rmse_prng": 0.2736656898058832,
-          "rmse_qmc": 0.10917369978049606,
-          "rmse_ratio": 2.506699785352275,
-          "time_seconds": 8.960448550547655e-05
+          "rmse_prng": 0.31568901133960786,
+          "rmse_qmc": 0.10874290403252478,
+          "rmse_ratio": 2.90307688716117,
+          "time_seconds": 0.00010147532388942652
         },
         {
-          "paths_prng": 988.6721975393108,
-          "paths_qmc": 171.90366565542257,
+          "paths_prng": 794.5693142515623,
+          "paths_qmc": 185.30068876636813,
           "payoff": "asian",
-          "rmse_prng": 0.20720574875146627,
-          "rmse_qmc": 0.08266077571883901,
-          "rmse_ratio": 2.506699785352275,
-          "time_seconds": 0.000156302834583377
+          "rmse_prng": 0.2311330587729933,
+          "rmse_qmc": 0.07961658190838042,
+          "rmse_ratio": 2.9030768871611694,
+          "time_seconds": 0.00018930201762181378
         },
         {
-          "paths_prng": 1724.6041431678755,
-          "paths_qmc": 299.86255783560574,
+          "paths_prng": 1482.2674967965715,
+          "paths_qmc": 345.6780713349389,
           "payoff": "asian",
-          "rmse_prng": 0.15688565982133132,
-          "rmse_qmc": 0.06258653738197198,
-          "rmse_ratio": 2.5066997853522754,
-          "time_seconds": 0.0002726490304696335
+          "rmse_prng": 0.1692250567451328,
+          "rmse_qmc": 0.05829162069166305,
+          "rmse_ratio": 2.90307688716117,
+          "time_seconds": 0.00035314254246419214
         },
         {
-          "paths_prng": 3008.3373013162322,
-          "paths_qmc": 523.0694368783842,
+          "paths_prng": 2765.1671070750217,
+          "paths_qmc": 644.8617638572489,
           "payoff": "asian",
-          "rmse_prng": 0.11878584646363645,
-          "rmse_qmc": 0.04738734457063955,
-          "rmse_ratio": 2.506699785352275,
-          "time_seconds": 0.0004755991406948992
+          "rmse_prng": 0.12389884849193844,
+          "rmse_qmc": 0.042678459203020054,
+          "rmse_ratio": 2.90307688716117,
+          "time_seconds": 0.000658786720103628
         },
         {
-          "paths_prng": 5247.635148241492,
-          "paths_qmc": 912.423470843157,
+          "paths_prng": 5158.4138130089505,
+          "paths_qmc": 1202.988355261199,
           "payoff": "asian",
-          "rmse_prng": 0.08993860456176692,
-          "rmse_qmc": 0.03587928841232479,
-          "rmse_ratio": 2.506699785352275,
-          "time_seconds": 0.0008296179973209897
+          "rmse_prng": 0.0907130714144071,
+          "rmse_qmc": 0.031247216295091872,
+          "rmse_ratio": 2.90307688716117,
+          "time_seconds": 0.0012289653338181477
         }
       ],
       "time_grid": {
         "asian": [
-          5.1367998821660876e-05,
-          8.960448550547655e-05,
-          0.000156302834583377,
-          0.0002726490304696335,
-          0.0004755991406948992,
-          0.0008296179973209897
+          5.439583522578081e-05,
+          0.00010147532388942652,
+          0.00018930201762181378,
+          0.00035314254246419214,
+          0.000658786720103628,
+          0.0012289653338181477
         ],
         "call": [
-          1.9201334604683023e-05,
-          4.322501637241373e-05,
-          9.730584247720758e-05,
-          0.00021904970257551797,
-          0.0004931129619443162,
-          0.0011100694973720238
+          3.638883451155076e-05,
+          7.459661957928595e-05,
+          0.0001529220632469102,
+          0.0003134881655439728,
+          0.00064264650796301,
+          0.0013174166670069098
         ]
       },
       "time_per_path": {
         "asian": {
-          "prng": 1.5809368865878543e-07,
-          "qmc": 9.092466643304912e-07
+          "prng": 2.3824481291493765e-07,
+          "qmc": 1.0215937074065096e-06
         },
         "call": {
-          "prng": 5.675003874235548e-08,
-          "qmc": 1.194191018072388e-06
+          "prng": 3.4231569815782825e-07,
+          "qmc": 1.401827535237506e-06
         }
       }
     },
@@ -1335,13 +1230,13 @@
       "fast": true,
       "skip_slow": false,
       "skip_wrds": false,
-      "timestamp": "20251226T092601Z"
+      "timestamp": "20251226T201358Z"
     },
     "tri_engine_agreement": {
-      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/tri.csv",
+      "csv": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/tri.csv",
       "dividend": 0.0,
       "fast": true,
-      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpzx88ebld/tri.png",
+      "figure": "/var/folders/vl/qxd4t5nd2r77b5w5xdgxmj7c0000gn/T/tmpatzz6o24/tri.png",
       "inputs": [
         {
           "path": "build/quant_cli",
@@ -1417,7 +1312,7 @@
         "pricing_csv": "docs/artifacts/wrds/wrds_agg_pricing.csv",
         "summary_fig": "docs/artifacts/wrds/wrds_multi_date_summary.png",
         "symbol": "SPX",
-        "timestamp": "2025-12-26T09:27:08.409782+00:00"
+        "timestamp": "2025-12-26T20:15:23.887617+00:00"
       }
     ],
     "wrds_heston": [
@@ -1554,7 +1449,7 @@
         "surface_next": "docs/artifacts/wrds/spx_2024-06-17_surface.csv",
         "surface_today": "docs/artifacts/wrds/spx_2024-06-14_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-26T09:26:37.049530+00:00",
+        "timestamp": "2025-12-26T20:14:45.176924+00:00",
         "trade_date": "2024-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/bs_oos_summary.csv",
@@ -1582,7 +1477,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2020-03-16/spx_2020-03-17_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2020-03-16/spx_2020-03-16_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-26T09:26:44.212228+00:00",
+        "timestamp": "2025-12-26T20:14:55.168614+00:00",
         "trade_date": "2020-03-16",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2020-03-16/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2020-03-16/bs_oos_summary.csv",
@@ -1610,7 +1505,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2020-03-17/spx_2020-03-18_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2020-03-17/spx_2020-03-17_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-26T09:26:49.895377+00:00",
+        "timestamp": "2025-12-26T20:15:02.254652+00:00",
         "trade_date": "2020-03-17",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2020-03-17/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2020-03-17/bs_oos_summary.csv",
@@ -1638,7 +1533,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2022-06-13/spx_2022-06-14_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2022-06-13/spx_2022-06-13_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-26T09:26:55.712984+00:00",
+        "timestamp": "2025-12-26T20:15:08.991876+00:00",
         "trade_date": "2022-06-13",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2022-06-13/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2022-06-13/bs_oos_summary.csv",
@@ -1666,7 +1561,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2022-06-14/spx_2022-06-15_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2022-06-14/spx_2022-06-14_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-26T09:27:01.856828+00:00",
+        "timestamp": "2025-12-26T20:15:15.991290+00:00",
         "trade_date": "2022-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2022-06-14/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2022-06-14/bs_oos_summary.csv",
@@ -1694,7 +1589,7 @@
         "surface_next": "docs/artifacts/wrds/per_date/2024-06-14/spx_2024-06-17_surface.csv",
         "surface_today": "docs/artifacts/wrds/per_date/2024-06-14/spx_2024-06-14_surface.csv",
         "symbol": "SPX",
-        "timestamp": "2025-12-26T09:27:07.729939+00:00",
+        "timestamp": "2025-12-26T20:15:23.031326+00:00",
         "trade_date": "2024-06-14",
         "wrds_bs_fit_csv": "docs/artifacts/wrds/per_date/2024-06-14/bs_fit_table.csv",
         "wrds_bs_oos_csv": "docs/artifacts/wrds/per_date/2024-06-14/bs_oos_summary.csv",

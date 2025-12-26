@@ -2,7 +2,7 @@
 """
 Generate figures and a PDF report from options CSV, calibration JSON, Heston series CSV, and returns CSV.
 
-Outputs to artifacts/ by default:
+Outputs to docs/artifacts/ by default:
   - heston_error_heatmap.png (price error in bps across moneyness×tenor)
   - iv_surface.png (market IV scatter by moneyness×tenor)
   - heston_params.png (parameter time series)
@@ -12,10 +12,10 @@ Outputs to artifacts/ by default:
 Usage:
   python scripts/report.py \
     --options_csv data/options.csv \
-    --calib_json artifacts/heston_calib.json \
+    --calib_json docs/artifacts/heston_calib.json \
     --returns_csv data/returns.csv \
-    --series_csv artifacts/heston_series.csv \
-    --artifacts_dir artifacts
+    --series_csv docs/artifacts/heston_series.csv \
+    --artifacts_dir docs/artifacts
 """
 import argparse
 import json
@@ -23,6 +23,8 @@ import math
 import os
 import subprocess
 import sys
+
+from manifest_utils import ARTIFACTS_ROOT
 
 
 def ensure_matplotlib():
@@ -302,7 +304,7 @@ def main():
     ap.add_argument("--options_csv", required=True)
     ap.add_argument("--calib_json", required=True)
     ap.add_argument("--returns_csv", required=True)
-    ap.add_argument("--artifacts_dir", default="artifacts")
+    ap.add_argument("--artifacts_dir", default=str(ARTIFACTS_ROOT))
     ap.add_argument("--cli", default=os.path.join("build", "quant_cli"))
     ap.add_argument("--series_csv", required=False)
     args = ap.parse_args()

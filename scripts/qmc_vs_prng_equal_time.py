@@ -24,7 +24,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from manifest_utils import update_run
+from manifest_utils import ARTIFACTS_ROOT, update_run
 from scipy.stats import norm, qmc
 
 
@@ -138,12 +138,12 @@ def main() -> None:
     ap.add_argument("--fast", action="store_true", help="Use fewer paths for CI")
     ap.add_argument(
         "--output",
-        default="artifacts/qmc_vs_prng_equal_time.png",
+        default=str(ARTIFACTS_ROOT / "qmc_vs_prng_equal_time.png"),
         help="Output figure path",
     )
     ap.add_argument(
         "--csv",
-        default="artifacts/qmc_vs_prng_equal_time.csv",
+        default=str(ARTIFACTS_ROOT / "qmc_vs_prng_equal_time.csv"),
         help="CSV output path for summary table",
     )
     ap.add_argument("--seed", type=int, default=4242)

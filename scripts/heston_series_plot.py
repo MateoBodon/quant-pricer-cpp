@@ -5,8 +5,8 @@ Generate a compact Heston parameter time-series plot over multiple trade dates.
 The script calibrates each normalized surface (see `scripts/data/schema.md`) in
 FAST mode by default, captures the fitted parameters, and writes two artifacts:
 
-  * artifacts/heston/params_series.csv — per-date parameters and fit quality
-  * artifacts/heston/params_series.png — line plot showing parameter stability
+  * docs/artifacts/heston/params_series.csv — per-date parameters and fit quality
+  * docs/artifacts/heston/params_series.png — line plot showing parameter stability
 
 Example usage:
   ./scripts/heston_series_plot.py --inputs data/normalized/spy_20230601.csv data/samples/spx_20240614_sample.csv --fast
@@ -32,7 +32,7 @@ from calibrate_heston import (
     save_calibration_outputs,
 )
 from calibrate_heston_series import resolve_inputs
-from manifest_utils import describe_inputs, update_run
+from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
 
 
 def _parse_args() -> argparse.Namespace:
@@ -57,12 +57,12 @@ def _parse_args() -> argparse.Namespace:
     )
     ap.add_argument(
         "--output-csv",
-        default="artifacts/heston/params_series.csv",
+        default=str(ARTIFACTS_ROOT / "heston" / "params_series.csv"),
         help="Destination CSV collecting per-date parameters.",
     )
     ap.add_argument(
         "--output-png",
-        default="artifacts/heston/params_series.png",
+        default=str(ARTIFACTS_ROOT / "heston" / "params_series.png"),
         help="Destination PNG summarising the parameter series.",
     )
     ap.add_argument(

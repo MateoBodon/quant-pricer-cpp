@@ -5,8 +5,8 @@ Assess Monte Carlo Greek estimator reliability under GBM.
 Compares pathwise, likelihood-ratio, and finite-difference estimators for Delta
 and Gamma over an increasing number of simulated paths. Outputs:
 
-  * artifacts/greeks_reliability.csv — table with estimates and standard errors
-  * artifacts/greeks_reliability.png — micro-figure (StdErr vs N, log axes)
+  * docs/artifacts/greeks_reliability.csv — table with estimates and standard errors
+  * docs/artifacts/greeks_reliability.png — micro-figure (StdErr vs N, log axes)
 """
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from manifest_utils import describe_inputs, update_run
+from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
 
 
 @dataclass(frozen=True)
@@ -166,8 +166,12 @@ def _parse_args() -> argparse.Namespace:
     ap.add_argument(
         "--seed", type=int, default=2024, help="RNG seed for reproducibility."
     )
-    ap.add_argument("--output-csv", default="artifacts/greeks_reliability.csv")
-    ap.add_argument("--output-png", default="artifacts/greeks_reliability.png")
+    ap.add_argument(
+        "--output-csv", default=str(ARTIFACTS_ROOT / "greeks_reliability.csv")
+    )
+    ap.add_argument(
+        "--output-png", default=str(ARTIFACTS_ROOT / "greeks_reliability.png")
+    )
     ap.add_argument(
         "--skip-manifest", action="store_true", help="Suppress manifest logging."
     )

@@ -5,7 +5,7 @@ Calibrate SABR parameters for a single maturity slice using Hagan's formula.
 Input CSV: call_put, strike, mid, rate, q, spot, maturity_years
 
 Usage:
-  python scripts/sabr_slice_calibration.py --csv data/options.csv --target_T 0.5 --out artifacts/sabr_slice_T0.5.json
+  python scripts/sabr_slice_calibration.py --csv data/options.csv --target_T 0.5 --out docs/artifacts/sabr_slice_T0.5.json
 """
 import argparse
 import json

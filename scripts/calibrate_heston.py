@@ -3,9 +3,9 @@
 Calibrate the Heston model to a single-day options surface in normalized schema.
 
 The input CSV must follow `scripts/data/schema.md`. Outputs:
-  * artifacts/heston/params_<date>.json  - fitted parameters and metrics
-  * artifacts/heston/fit_<date>.png     - market vs model implied vol smiles
-  * artifacts/heston/fit_<date>.csv     - table backing the figure (strike, ttm, market_iv, model_iv, abs_error)
+  * docs/artifacts/heston/params_<date>.json  - fitted parameters and metrics
+  * docs/artifacts/heston/fit_<date>.png     - market vs model implied vol smiles
+  * docs/artifacts/heston/fit_<date>.csv     - table backing the figure (strike, ttm, market_iv, model_iv, abs_error)
 
 Usage:
   ./scripts/calibrate_heston.py --input data/normalized/spx_20240614.csv
@@ -28,7 +28,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from manifest_utils import describe_inputs, update_run
+from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
 from scipy.optimize import brentq, least_squares
 
 Params = Tuple[float, float, float, float, float]  # kappa, theta, sigma, rho, v0
@@ -541,7 +541,7 @@ def main() -> None:
     ap.add_argument("--input", required=True, help="Normalized option surface CSV")
     ap.add_argument(
         "--output-dir",
-        default="artifacts/heston",
+        default=str(ARTIFACTS_ROOT / "heston"),
         help="Directory for calibration artifacts",
     )
     ap.add_argument(

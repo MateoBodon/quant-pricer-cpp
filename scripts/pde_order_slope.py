@@ -3,8 +3,8 @@
 Generate PDE grid convergence diagnostics (second-order slope) for a vanilla call.
 
 Outputs:
-  * artifacts/pde_order_slope.csv
-  * artifacts/pde_order_slope.png
+  * docs/artifacts/pde_order_slope.csv
+  * docs/artifacts/pde_order_slope.png
 """
 from __future__ import annotations
 
