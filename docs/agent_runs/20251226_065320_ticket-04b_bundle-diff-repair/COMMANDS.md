@@ -70,3 +70,7 @@ make gpt-bundle TICKET=ticket-04b RUN_NAME=20251226_065320_ticket-04b_bundle-dif
 date -u +%Y-%m-%dT%H:%M:%SZ
 unzip -p docs/gpt_bundles/20251226T071045Z_ticket-04b_20251226_065320_ticket-04b_bundle-diff-repair.zip COMMITS.txt
 git add PROGRESS.md docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair
+git add -f docs/gpt_bundles/20251226T071045Z_ticket-04b_20251226_065320_ticket-04b_bundle-diff-repair.zip
+git commit -m "ticket-04b: add bundle + run log updates" -m "Tests: (not run)" -m "Artifacts: docs/gpt_bundles/20251226T071045Z_ticket-04b_20251226_065320_ticket-04b_bundle-diff-repair.zip" -m "Run log: docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/"
+git status -sb
+git add docs/agent_runs/20251226_065320_ticket-04b_bundle-diff-repair/COMMANDS.md
