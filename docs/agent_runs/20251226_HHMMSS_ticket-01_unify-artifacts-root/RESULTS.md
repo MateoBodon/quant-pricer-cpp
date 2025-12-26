@@ -13,4 +13,4 @@ Caveats:
 - First reproduce_all attempt failed at `metrics_snapshot_fast` because CURRENT_RESULTS lagged the snapshot; fixed by updating CURRENT_RESULTS and rerunning.
 
 Bundle:
-- `docs/gpt_bundles/20251226T204700Z_ticket-01_20251226_HHMMSS_ticket-01_unify-artifacts-root.zip`
+- `docs/gpt_bundles/20251226T204916Z_ticket-01_20251226_HHMMSS_ticket-01_unify-artifacts-root.zip`

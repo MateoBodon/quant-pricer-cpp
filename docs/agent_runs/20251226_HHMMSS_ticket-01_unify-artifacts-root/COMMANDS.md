@@ -190,3 +190,10 @@ PY
 98. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git ls-files docs/gpt_bundles | tail -n 5
 99. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] rg -n \"gpt_bundles\" .gitignore
 100. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append post-bundle commands
+101. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] make gpt-bundle TICKET=ticket-01 RUN_NAME=20251226_HHMMSS_ticket-01_unify-artifacts-root
+102. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/RESULTS.md) — update bundle path to latest zip
+103. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append final bundle command
+104. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] tail -n 10 docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md
+105. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — fix gpt-bundle entries
+106. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] tail -n 6 docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md
+107. apply_patch (docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/COMMANDS.md) — append tail verification entries
