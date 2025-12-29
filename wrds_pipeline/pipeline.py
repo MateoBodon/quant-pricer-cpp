@@ -262,15 +262,26 @@ def _local_root_from_payload(payload: Dict[str, object]) -> Path | None:
 
 
 def _panel_id_from_payload(payload: Dict[str, object], path: Path) -> str:
-    panel_id = payload.get("panel_id") or payload.get("dataset_id")
-    if panel_id:
+    panel_id = payload.get("panel_id")
+    if panel_id is not None and str(panel_id).strip():
         return str(panel_id)
-    fallback = path.stem
-    print(
-        "[wrds_pipeline] WARNING: dateset missing panel_id; "
-        f"using fallback {fallback}"
+    if "dataset_id" in payload:
+        raise RuntimeError(
+            f"{path} uses legacy 'dataset_id'; rename it to 'panel_id'. "
+            "Canonical config: wrds_pipeline_dates_panel.yaml"
+        )
+    raise RuntimeError(
+        f"{path} missing required 'panel_id'. "
+        "Use wrds_pipeline_dates_panel.yaml or add panel_id to your dateset."
     )
-    return fallback
+
+
+def _data_mode(use_sample: bool, local_root: Path | None) -> str:
+    if use_sample:
+        return "sample"
+    if local_root is not None:
+        return "local"
+    return "live"
 
 
 def run(
@@ -285,6 +296,7 @@ def run(
     regime: str | None = None,
     wrds_root: Path | None = None,
     local_root: Path | None = None,
+    panel_id: str | None = None,
 ) -> Dict[str, object]:
     if wrds_root is None:
         if local_root is not None and not use_sample:
@@ -338,11 +350,20 @@ def run(
         "price_rmse_ticks",
     )
     fit_metrics = {key: float(calib[key]) for key in metric_keys}
+    data_mode = _data_mode(use_sample, local_root)
     summary_payload = {
         "trade_date": trade_date,
         "next_trade_date": next_trade_date,
         "label": label,
         "regime": regime,
+        "panel_id": panel_id,
+        "use_sample": use_sample,
+        "data_mode": data_mode,
+        "trade_date_range": {"start": trade_date, "end": trade_date},
+        "next_trade_date_range": {
+            "start": next_trade_date,
+            "end": next_trade_date,
+        },
         "params": calib["params"],
         **fit_metrics,
         "bootstrap_ci": {k: list(v) for k, v in ci.items()},
@@ -457,6 +478,14 @@ def run(
             "next_trade_date": next_trade_date,
             "label": label,
             "regime": regime,
+            "panel_id": panel_id,
+            "use_sample": use_sample,
+            "data_mode": data_mode,
+            "trade_date_range": {"start": trade_date, "end": trade_date},
+            "next_trade_date_range": {
+                "start": next_trade_date,
+                "end": next_trade_date,
+            },
             "source_today": source_today,
             "source_next": source_next,
             "surface_today": str(today_csv),
@@ -531,6 +560,18 @@ def run_dateset(
     agg_dir = wrds_root
     agg_dir.mkdir(parents=True, exist_ok=True)
 
+    data_mode = _data_mode(use_sample, local_root)
+    trade_dates = [entry["trade_date"] for entry in entries]
+    next_trade_dates = [
+        entry.get("next_trade_date") or _next_business_day(entry["trade_date"])
+        for entry in entries
+    ]
+    trade_date_range = {"start": min(trade_dates), "end": max(trade_dates)}
+    next_trade_date_range = {
+        "start": min(next_trade_dates),
+        "end": max(next_trade_dates),
+    }
+
     pricing_rows = []
     oos_rows = []
     pnl_rows = []
@@ -552,13 +593,14 @@ def run_dateset(
                 trade_date,
                 next_trade_date,
                 use_sample,
-                fast,
-                output_dir=per_date_dir,
-                label=label,
-                regime=regime,
-                wrds_root=wrds_root,
-                local_root=local_root,
-            )
+            fast,
+            output_dir=per_date_dir,
+            label=label,
+            regime=regime,
+            wrds_root=wrds_root,
+            local_root=local_root,
+            panel_id=panel_id,
+        )
         except Exception as exc:  # pragma: no cover
             print(f"[wrds_pipeline] {trade_date} failed: {exc}")
             pricing_rows.append(
@@ -720,6 +762,10 @@ def run_dateset(
             "dateset": str(dateset_path),
             "panel_id": panel_id,
             "dateset_inputs": describe_inputs([dateset_path]),
+            "use_sample": use_sample,
+            "data_mode": data_mode,
+            "trade_date_range": trade_date_range,
+            "next_trade_date_range": next_trade_date_range,
             "pricing_csv": str(pricing_csv),
             "pricing_bs_csv": str(bs_pricing_csv),
             "oos_csv": str(oos_csv),

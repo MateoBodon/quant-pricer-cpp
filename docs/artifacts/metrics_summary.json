@@ -1,7 +1,7 @@
 {
   "artifacts_root": "docs/artifacts",
-  "generated_at": "2025-12-26T20:16:23.004584+00:00",
-  "manifest_git_sha": "d4be0724a76d2cbd2aaa88e3387ed08694d6e02b",
+  "generated_at": "2025-12-29T10:40:40.037202+00:00",
+  "manifest_git_sha": "2f98798eb30ca76082e277c66a9bbc523cf36f58",
   "manifest_path": "docs/artifacts/manifest.json",
   "metrics": {
     "benchmarks": {
@@ -10,11 +10,11 @@
           "payoffs": {
             "Asian": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 1.0554301360027973
+              "time_scaled_error_ratio_prng_over_qmc": 1.1524674847809118
             },
             "Barrier": {
               "rows": 2,
-              "time_scaled_error_ratio_prng_over_qmc": 1.2364999102995846
+              "time_scaled_error_ratio_prng_over_qmc": 1.1952768709689725
             }
           }
         },
@@ -23,10 +23,10 @@
       },
       "mc_paths": {
         "metrics": {
-          "efficiency_max_threads": 0.1202711062177936,
-          "paths_per_sec_1t": 11796765.326947335,
-          "paths_per_sec_max_threads": 11350480.125309344,
-          "speedup_max_threads": 0.9621688497423488,
+          "efficiency_max_threads": 0.1181529633531077,
+          "paths_per_sec_1t": 9775744.422937809,
+          "paths_per_sec_max_threads": 9240265.38042174,
+          "speedup_max_threads": 0.9452237068248616,
           "threads_max": 8
         },
         "source": "docs/artifacts/bench/bench_mc_paths.csv",
@@ -55,33 +55,24 @@
         "by_category": {
           "american": {
             "max_abs_diff_cents": 0.79875157,
-            "median_abs_diff_cents": 0.79875157,
-            "p95_abs_diff_cents": 0.79875157,
             "rows": 1
           },
           "barrier": {
             "max_abs_diff_cents": 0.0410715241,
-            "median_abs_diff_cents": 0.0410715241,
-            "p95_abs_diff_cents": 0.0410715241,
             "rows": 1
           },
           "vanilla": {
             "max_abs_diff_cents": 0.8615834347,
-            "median_abs_diff_cents": 0.8615834347,
-            "p95_abs_diff_cents": 0.8615834347,
             "rows": 1
           }
         },
         "max_abs_diff_cents_overall": 0.8615834347,
-        "median_abs_diff_cents_overall": 0.79875157,
-        "p95_abs_diff_cents_overall": 0.85530024823,
-        "rows": 3,
         "runtime_ratio_by_category": {
-          "american": 14.1239517798,
-          "barrier": 10.8535501125,
-          "vanilla": 1.6064514241
+          "american": 9.8653358419,
+          "barrier": 14.0417606339,
+          "vanilla": 1.5644249825
         },
-        "runtime_ratio_median": 10.8535501125
+        "runtime_ratio_median": 9.8653358419
       },
       "source": "docs/artifacts/ql_parity/ql_parity.csv",
       "status": "ok"
@@ -90,19 +81,19 @@
       "metrics": {
         "payoffs": {
           "asian": {
-            "rmse_ratio_max": 2.2700411007,
-            "rmse_ratio_median": 2.2700411007,
-            "rmse_ratio_min": 2.2700411007,
+            "rmse_ratio_max": 1.5918021176,
+            "rmse_ratio_median": 1.5918021176,
+            "rmse_ratio_min": 1.5918021176,
             "rows": 6
           },
           "call": {
-            "rmse_ratio_max": 7.5429281698,
-            "rmse_ratio_median": 7.5429281698,
-            "rmse_ratio_min": 7.5429281698,
+            "rmse_ratio_max": 6.7544169679,
+            "rmse_ratio_median": 6.7544169679,
+            "rmse_ratio_min": 6.7544169679,
             "rows": 6
           }
         },
-        "rmse_ratio_overall_median": 4.90648463525
+        "rmse_ratio_overall_median": 4.17310954275
       },
       "source": "docs/artifacts/qmc_vs_prng_equal_time.csv",
       "status": "ok"
@@ -152,22 +143,6 @@
         "status": "ok"
       },
       "status": "ok"
-    }
-  },
-  "protocols": {
-    "synthetic_validation": {
-      "scenario_grid": {
-        "path": "configs/scenario_grids/synthetic_validation_v1.json",
-        "sha256": "ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf",
-        "size_bytes": 2827
-      },
-      "scenario_grid_id": "synthetic_validation_v1",
-      "tolerances": {
-        "path": "configs/tolerances/synthetic_validation_v1.json",
-        "sha256": "6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1",
-        "size_bytes": 421
-      },
-      "tolerances_id": "synthetic_tolerances_v1"
     }
   }
 }

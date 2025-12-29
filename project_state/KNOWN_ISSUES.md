@@ -23,6 +23,7 @@ commands:
 - WRDS live runs are gated by environment variables (`WRDS_ENABLED=1` + credentials); MARKET tests skip without them (`wrds_pipeline/tests/test_wrds_pipeline.py`).
 - RESOLVED (2025-12-23): WRDS pipeline previously lacked explicit as-of guards for `quote_date` mismatches in calibration/OOS; hard checks and poison FAST tests added. Run log: `docs/agent_runs/20251223_183500_ticket-02_wrds-asof-checks/`.
 - RESOLVED (2025-12-25): Headline synthetic scripts previously allowed implicit defaults; now require frozen protocol configs and record hashes in manifest/metrics snapshot. Run log: `docs/agent_runs/20251225_221338_ticket-04_freeze-validation-grid/`.
+- RESOLVED (2025-12-29): Removed WRDS dateset schema drift by requiring `panel_id` and recording sample/live mode + date ranges in WRDS provenance. Run log: `docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/`.
 - Live/local WRDS outputs must not be committed; keep them outside the repo or under gitignored paths such as `docs/artifacts/wrds_local/` (data-policy guard enforces restricted-column rules).
 - Local WRDS runs update `docs/artifacts/manifest.json` by default; keep the canonical manifest sample-only and store local provenance in `docs/artifacts/wrds_local/manifest_local.json` (untracked).
 - RESOLVED (2025-12-26): Script defaults are now canonicalized under `docs/artifacts/` (eliminating the split-root confusion). Commit: `45581772b4f9953fc2ae8d4c501b918237097fc3`. Run log: `docs/agent_runs/20251226_HHMMSS_ticket-01_unify-artifacts-root/`.
