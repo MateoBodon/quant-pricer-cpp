@@ -36,11 +36,16 @@ commands:
 - `requirements-artifacts.txt`, `requirements-dev.txt` (artifact/test deps; includes matplotlib, scipy, QuantLib).
 
 ## WRDS pipeline configuration
-- `wrds_pipeline_dates_panel.yaml` — canonical multi-date panel (includes `panel_id` + optional `wrds_local_root`).
+- `wrds_pipeline_dates_panel.yaml` — canonical multi-date panel (must include `panel_id`; optional `wrds_local_root`).
 - Override the dateset path:
   - CLI: `python -m wrds_pipeline.pipeline --dateset <path>`
   - `scripts/reproduce_all.sh`: `WRDS_DATESET=<path>` (defaults to `wrds_pipeline_dates_panel.yaml`).
-- `panel_id` is the human-readable identifier for the dateset panel. It is logged at WRDS pipeline start and recorded in `docs/artifacts/manifest.json` under `runs.wrds_dateset[].panel_id`.
+- `panel_id` is required; legacy `dataset_id` fields hard-error to avoid protocol drift.
+- Provenance (manifest):
+  - `runs.wrds_dateset[].panel_id`
+  - `runs.wrds_dateset[].dateset_inputs` (config hash + size)
+  - `runs.wrds_dateset[].use_sample` + `runs.wrds_dateset[].data_mode` (sample/local/live)
+  - `runs.wrds_dateset[].trade_date_range` + `runs.wrds_dateset[].next_trade_date_range`
 - Environment variables (see `AGENTS.md`, `wrds_pipeline/tests/test_wrds_pipeline.py`):
   - `WRDS_ENABLED=1` to enable live IvyDB pulls.
   - `WRDS_USERNAME`, `WRDS_PASSWORD` for credentials.
