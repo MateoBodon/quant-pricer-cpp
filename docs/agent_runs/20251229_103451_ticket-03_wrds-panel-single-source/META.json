@@ -1,0 +1,24 @@
+{
+  "run_name": "20251229_103451_ticket-03_wrds-panel-single-source",
+  "ticket_id": "ticket-03",
+  "started_at_utc": "2025-12-29T10:34:51Z",
+  "finished_at_utc": "2025-12-29T10:57:22Z",
+  "git_sha_before": "2f98798eb30ca76082e277c66a9bbc523cf36f58",
+  "git_sha_after": "576a6a3c098ac5abd453096aee60579f4bec5969",
+  "branch_name": "codex/ticket-03-wrds-panel-single-source",
+  "host_os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "python_version": "Python 3.12.2",
+  "build_type": "Release",
+  "dataset_id": "WRDS_SAMPLE_wrds_panel_calm_stress_v1",
+  "config_hashes": {
+    "scenario_grid": null,
+    "tolerances": null,
+    "wrds_panel": "af16ea93a04692590f532d223eab06866ddd0738d2c4b90b5783bce47fbcc71f"
+  },
+  "tools": {
+    "codex_cli": "unknown",
+    "cmake": "cmake version 4.1.2"
+  },
+  "notes": "WRDS sample smoke required python3 because python was not on PATH; scenario/tolerance config files were not present in this checkout. git_sha_after points to the substantive artifact commit."
+}
