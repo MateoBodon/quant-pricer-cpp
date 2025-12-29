@@ -108,6 +108,9 @@ def _run_log_issues(required: List[Tuple[str, Path]], run_name: str) -> List[str
 
 def _meta_issues(meta_path: Path) -> List[str]:
     issues: List[str] = []
+    if not meta_path.exists():
+        issues.append("META.json missing")
+        return issues
     try:
         with meta_path.open("r", encoding="utf-8") as fh:
             meta = json.load(fh)
@@ -126,8 +129,14 @@ def _meta_issues(meta_path: Path) -> List[str]:
     if not _check_git(["git", "cat-file", "-e", f"{sha}^{{commit}}"]):
         issues.append(f"META.json git_sha_after not found in repo: {sha}")
         return issues
-    if not _check_git(["git", "merge-base", "--is-ancestor", sha, "HEAD"]):
-        issues.append(f"META.json git_sha_after not in HEAD history: {sha}")
+    head_sha = _try_git(["git", "rev-parse", "HEAD"])
+    if not head_sha:
+        issues.append("Unable to resolve HEAD SHA for META.json validation")
+        return issues
+    if sha != head_sha:
+        issues.append(
+            f"META.json git_sha_after ({sha}) does not match HEAD ({head_sha})"
+        )
     return issues
 
 

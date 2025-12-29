@@ -80,11 +80,26 @@ def assert_current_results_matches_snapshot(summary: Dict) -> None:
     generated_at = summary.get("generated_at")
     manifest_sha = summary.get("manifest_git_sha")
     if not generated_at or generated_at not in text:
-        raise AssertionError("CURRENT_RESULTS missing metrics_summary generated_at")
+        raise AssertionError(
+            f"CURRENT_RESULTS missing metrics_summary generated_at ({generated_at})"
+        )
     if not manifest_sha or manifest_sha not in text:
-        raise AssertionError("CURRENT_RESULTS missing manifest git SHA")
+        raise AssertionError(
+            f"CURRENT_RESULTS missing manifest git SHA ({manifest_sha})"
+        )
     if "docs/artifacts/metrics_summary.md" not in text:
         raise AssertionError("CURRENT_RESULTS missing metrics_summary path reference")
+
+    tri_match = re.search(
+        rf"Tri-engine agreement: max\|MC-BS\|=({FLOAT_RE}), "
+        rf"max\|PDE-BS\|=({FLOAT_RE}), MC CI covers BS=(True|False)",
+        text,
+    )
+    if not tri_match:
+        raise AssertionError("CURRENT_RESULTS missing tri-engine highlight metrics")
+    tri_mc = float(tri_match.group(1))
+    tri_pde = float(tri_match.group(2))
+    tri_covers = tri_match.group(3) == "True"
 
     qmc_match = re.search(
         rf"QMC vs PRNG: median RMSE ratio=({FLOAT_RE}) "
@@ -111,12 +126,50 @@ def assert_current_results_matches_snapshot(summary: Dict) -> None:
         raise AssertionError("CURRENT_RESULTS missing WRDS highlight metrics")
     wrds_iv_rmse = float(wrds_match.group(1))
 
+    pde_match = re.search(
+        rf"PDE order: slope=({FLOAT_RE}), rmse_finest=({FLOAT_RE})", text
+    )
+    if not pde_match:
+        raise AssertionError("CURRENT_RESULTS missing PDE order highlight metrics")
+    pde_slope = float(pde_match.group(1))
+    pde_rmse = float(pde_match.group(2))
+
+    ql_match = re.search(
+        rf"QL parity: max diff=({FLOAT_RE}) cents, median=({FLOAT_RE}) cents, "
+        rf"p95=({FLOAT_RE}) cents",
+        text,
+    )
+    if not ql_match:
+        raise AssertionError("CURRENT_RESULTS missing QL parity highlight metrics")
+    ql_max = float(ql_match.group(1))
+    ql_median = float(ql_match.group(2))
+    ql_p95 = float(ql_match.group(3))
+
     try:
+        tri_metrics = summary["metrics"]["tri_engine_agreement"]["metrics"]
+        pde_metrics = summary["metrics"]["pde_order"]["metrics"]
+        ql_metrics = summary["metrics"]["ql_parity"]["metrics"]
         qmc_metrics = summary["metrics"]["qmc_vs_prng_equal_time"]["metrics"]
         bench_metrics = summary["metrics"]["benchmarks"]["mc_paths"]["metrics"]
         wrds_metrics = summary["metrics"]["wrds"]["pricing"]["metrics"]
     except KeyError as exc:
         raise AssertionError(f"metrics_summary missing expected keys: {exc}") from exc
+
+    _assert_close(
+        "tri_engine.max_abs_error_mc",
+        tri_mc,
+        float(tri_metrics["max_abs_error_mc"]),
+    )
+    _assert_close(
+        "tri_engine.max_abs_error_pde",
+        tri_pde,
+        float(tri_metrics["max_abs_error_pde"]),
+    )
+    if tri_covers != bool(tri_metrics["mc_ci_covers_bs"]):
+        raise AssertionError(
+            "tri_engine.mc_ci_covers_bs mismatch: "
+            f"current_results={tri_covers} expected={tri_metrics['mc_ci_covers_bs']}"
+        )
 
     _assert_close(
         "qmc_vs_prng.rmse_ratio_overall_median",
@@ -147,6 +200,25 @@ def assert_current_results_matches_snapshot(summary: Dict) -> None:
         "wrds.median_iv_rmse_volpts_vega_wt",
         wrds_iv_rmse,
         float(wrds_metrics["median_iv_rmse_volpts_vega_wt"]),
+    )
+    _assert_close("pde_order.slope", pde_slope, float(pde_metrics["slope"]))
+    _assert_close(
+        "pde_order.rmse_finest", pde_rmse, float(pde_metrics["rmse_finest"])
+    )
+    _assert_close(
+        "ql_parity.max_abs_diff_cents_overall",
+        ql_max,
+        float(ql_metrics["max_abs_diff_cents_overall"]),
+    )
+    _assert_close(
+        "ql_parity.median_abs_diff_cents_overall",
+        ql_median,
+        float(ql_metrics["median_abs_diff_cents_overall"]),
+    )
+    _assert_close(
+        "ql_parity.p95_abs_diff_cents_overall",
+        ql_p95,
+        float(ql_metrics["p95_abs_diff_cents_overall"]),
     )
 
 
