@@ -1,17 +1,17 @@
 # Metrics Snapshot
 
-Generated at: 2025-12-23T20:45:47.766341+00:00
+Generated at: 2025-12-29T10:40:40.037202+00:00
 Artifacts root: docs/artifacts
-Manifest git sha: 231f765438570c3bf35a9062290d5d0213b74ad9
+Manifest git sha: 2f98798eb30ca76082e277c66a9bbc523cf36f58
 
 ## Status overview
 | Block | Status | Highlights |
 | --- | --- | --- |
 | tri engine agreement | ok | max|MC-BS|=0.00754518, max|PDE-BS|=0.00058701, MC CI covers BS=True |
-| qmc vs prng equal time | ok | median PRNG/QMC RMSE ratio=5.41126 (asian: med=2.71457; call: med=8.10794) |
+| qmc vs prng equal time | ok | median PRNG/QMC RMSE ratio=4.17311 (asian: med=1.5918; call: med=6.75442) |
 | pde order | ok | slope=-2.0124, rmse_finest=0.00115728 |
 | ql parity | ok | max diff=0.861583 cents |
-| benchmarks | ok | MC paths/sec (1t)=1.11734e+07, eff@max=0.146101 |
+| benchmarks | ok | MC paths/sec (1t)=9.77574e+06, eff@max=0.118153 |
 | wrds | ok | median iv_rmse=0.00120828 (sample bundle regression harness) |
 
 ### Tri Engine Agreement
@@ -30,8 +30,8 @@ Status: ok
 
 | Metric | Value |
 | --- | --- |
-| rmse_ratio_overall_median | 5.41126 |
-| payoffs | asian={'rows': 6, 'rmse_ratio_median': 2.7145738749, 'rmse_ratio_min': 2.7145738749, 'rmse_ratio_max': 2.7145738749}, call={'rows': 6, 'rmse_ratio_median': 8.1079389733, 'rmse_ratio_min': 8.1079389733, 'rmse_ratio_max': 8.1079389733} |
+| rmse_ratio_overall_median | 4.17311 |
+| payoffs | asian={'rows': 6, 'rmse_ratio_median': 1.5918021176, 'rmse_ratio_min': 1.5918021176, 'rmse_ratio_max': 1.5918021176}, call={'rows': 6, 'rmse_ratio_median': 6.7544169679, 'rmse_ratio_min': 6.7544169679, 'rmse_ratio_max': 6.7544169679} |
 
 ### Pde Order
 Status: ok
@@ -52,8 +52,8 @@ Status: ok
 | --- | --- |
 | max_abs_diff_cents_overall | 0.861583 |
 | by_category | american={'max_abs_diff_cents': 0.79875157, 'rows': 1}, barrier={'max_abs_diff_cents': 0.0410715241, 'rows': 1}, vanilla={'max_abs_diff_cents': 0.8615834347, 'rows': 1} |
-| runtime_ratio_median | 14.9715 |
-| runtime_ratio_by_category | american=14.9715, barrier=17.2139, vanilla=1.57592 |
+| runtime_ratio_median | 9.86534 |
+| runtime_ratio_by_category | american=9.86534, barrier=14.0418, vanilla=1.56442 |
 
 ### Benchmarks
 Status: ok
