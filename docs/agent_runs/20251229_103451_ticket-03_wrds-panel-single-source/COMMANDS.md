@@ -313,3 +313,19 @@ PY
 104. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
 105. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/RESULTS.md
 106. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "ticket-03: update bundle record" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast; export PATH=\"$PWD/.agent/bin:$PATH\"; WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh; if [ -d artifacts ]; then (find artifacts -type f | head -n 50; exit 1); fi" -m "Artifacts: docs/artifacts/manifest.json" -m "Run log: docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/"
+107. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] date -u +%Y-%m-%dT%H:%M:%SZ
+108. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] python3 - <<'PY'
+import json
+from pathlib import Path
+path = Path('docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/META.json')
+meta = json.loads(path.read_text())
+meta['finished_at_utc'] = '2025-12-29T11:26:32Z'
+meta['git_sha_after'] = 'ea894ea57bfab1cad8a4c8d6ecf2bb589dbb9596'
+meta['notes'] = (
+    'WRDS sample smoke required python3 because python was not on PATH; '
+    'added a local shim under .agent/bin to run the python command. '
+    'Scenario/tolerance config files were not present in this checkout. '
+    'git_sha_after points to the final pre-META commit containing all changes.'
+)
+path.write_text(json.dumps(meta, indent=2) + '\n')
+PY

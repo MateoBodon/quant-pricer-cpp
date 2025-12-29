@@ -2,9 +2,9 @@
   "run_name": "20251229_103451_ticket-03_wrds-panel-single-source",
   "ticket_id": "ticket-03",
   "started_at_utc": "2025-12-29T10:34:51Z",
-  "finished_at_utc": "2025-12-29T10:57:22Z",
+  "finished_at_utc": "2025-12-29T11:26:32Z",
   "git_sha_before": "2f98798eb30ca76082e277c66a9bbc523cf36f58",
-  "git_sha_after": "576a6a3c098ac5abd453096aee60579f4bec5969",
+  "git_sha_after": "ea894ea57bfab1cad8a4c8d6ecf2bb589dbb9596",
   "branch_name": "codex/ticket-03-wrds-panel-single-source",
   "host_os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
   "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
@@ -20,5 +20,5 @@
     "codex_cli": "unknown",
     "cmake": "cmake version 4.1.2"
   },
-  "notes": "WRDS sample smoke required python3 because python was not on PATH; scenario/tolerance config files were not present in this checkout. git_sha_after points to the substantive artifact commit."
+  "notes": "WRDS sample smoke required python3 because python was not on PATH; added a local shim under .agent/bin to run the python command. Scenario/tolerance config files were not present in this checkout. git_sha_after points to the final pre-META commit containing all changes."
 }
