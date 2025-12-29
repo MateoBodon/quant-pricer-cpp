@@ -286,3 +286,16 @@ PY
 94. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch (update TESTS.md to mark python command pass)
 95. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] export PATH="$PWD/.agent/bin:$PATH"; WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast
 96. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch (update TESTS.md to record python command pass)
+97. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] make gpt-bundle TICKET=ticket-03 RUN_NAME=20251229_103451_ticket-03_wrds-panel-single-source
+98. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] python3 - <<'PY'
+from pathlib import Path
+results = Path('docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/RESULTS.md')
+text = results.read_text()
+old_line = [line for line in text.splitlines() if line.startswith('- docs/gpt_bundles/')]
+new_bundle = 'docs/gpt_bundles/20251229T112143Z_ticket-03_20251229_103451_ticket-03_wrds-panel-single-source.zip'
+if old_line:
+    text = text.replace(old_line[0], f'- {new_bundle}')
+else:
+    text += f"\n- {new_bundle}\n"
+results.write_text(text)
+PY

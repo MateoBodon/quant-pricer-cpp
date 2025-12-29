@@ -17,4 +17,4 @@ Artifacts updated:
 - WRDS/bench/parity outputs under `docs/artifacts/`
 
 Bundle:
-- docs/gpt_bundles/20251229T110129Z_ticket-03_20251229_103451_ticket-03_wrds-panel-single-source.zip
+- docs/gpt_bundles/20251229T112143Z_ticket-03_20251229_103451_ticket-03_wrds-panel-single-source.zip
