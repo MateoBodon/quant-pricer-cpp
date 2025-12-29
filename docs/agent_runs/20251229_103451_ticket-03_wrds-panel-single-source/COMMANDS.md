@@ -299,3 +299,17 @@ else:
     text += f"\n- {new_bundle}\n"
 results.write_text(text)
 PY
+99. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] (retroactive) git add docs/CODEX_SPRINT_TICKETS.md docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/TESTS.md docs/artifacts/manifest.json
+100. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] (retroactive) git commit -m "ticket-03: finalize checklist updates" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast; export PATH=\"$PWD/.agent/bin:$PATH\"; WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh; if [ -d artifacts ]; then (find artifacts -type f | head -n 50; exit 1); fi" -m "Artifacts: docs/artifacts/manifest.json" -m "Run log: docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/"
+101. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] (retroactive) git rev-parse HEAD
+102. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] BUNDLE=docs/gpt_bundles/20251229T112143Z_ticket-03_20251229_103451_ticket-03_wrds-panel-single-source.zip
+    TMPDIR=$(mktemp -d)
+    unzip -q "$BUNDLE" -d "$TMPDIR"
+    ls "$TMPDIR" | head -n 20
+    rg -n "wrds_pipeline_dates_panel.yaml|dateset.yaml|dataset_id" "$TMPDIR/DIFF.patch"
+    rg -n "WRDS_PASSWORD|WRDS_USERNAME|PASSWORD|SECRET|OptionMetrics" "$TMPDIR/DIFF.patch" || true
+    rm -rf "$TMPDIR"
+103. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] rg -n "WRDS_PASSWORD|WRDS_USERNAME|PASSWORD|SECRET" docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source || true
+104. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+105. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/COMMANDS.md docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/RESULTS.md
+106. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "ticket-03: update bundle record" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast; export PATH=\"$PWD/.agent/bin:$PATH\"; WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh; if [ -d artifacts ]; then (find artifacts -type f | head -n 50; exit 1); fi" -m "Artifacts: docs/artifacts/manifest.json" -m "Run log: docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/"
