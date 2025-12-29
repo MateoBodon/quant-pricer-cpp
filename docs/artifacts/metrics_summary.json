@@ -1,7 +1,7 @@
 {
   "artifacts_root": "docs/artifacts",
-  "generated_at": "2025-12-29T10:40:40.037202+00:00",
-  "manifest_git_sha": "2f98798eb30ca76082e277c66a9bbc523cf36f58",
+  "generated_at": "2025-12-29T17:49:04.557055+00:00",
+  "manifest_git_sha": "21eeba68923846a4c6015f697b741f4f22ef0f25",
   "manifest_path": "docs/artifacts/manifest.json",
   "metrics": {
     "benchmarks": {
@@ -55,24 +55,33 @@
         "by_category": {
           "american": {
             "max_abs_diff_cents": 0.79875157,
+            "median_abs_diff_cents": 0.79875157,
+            "p95_abs_diff_cents": 0.79875157,
             "rows": 1
           },
           "barrier": {
             "max_abs_diff_cents": 0.0410715241,
+            "median_abs_diff_cents": 0.0410715241,
+            "p95_abs_diff_cents": 0.0410715241,
             "rows": 1
           },
           "vanilla": {
             "max_abs_diff_cents": 0.8615834347,
+            "median_abs_diff_cents": 0.8615834347,
+            "p95_abs_diff_cents": 0.8615834347,
             "rows": 1
           }
         },
         "max_abs_diff_cents_overall": 0.8615834347,
+        "median_abs_diff_cents_overall": 0.79875157,
+        "p95_abs_diff_cents_overall": 0.85530024823,
+        "rows": 3,
         "runtime_ratio_by_category": {
-          "american": 9.8653358419,
-          "barrier": 14.0417606339,
-          "vanilla": 1.5644249825
+          "american": 14.6883746065,
+          "barrier": 9.0578534652,
+          "vanilla": 2.5746266178
         },
-        "runtime_ratio_median": 9.8653358419
+        "runtime_ratio_median": 9.0578534652
       },
       "source": "docs/artifacts/ql_parity/ql_parity.csv",
       "status": "ok"
@@ -143,6 +152,22 @@
         "status": "ok"
       },
       "status": "ok"
+    }
+  },
+  "protocols": {
+    "synthetic_validation": {
+      "scenario_grid": {
+        "path": "configs/scenario_grids/synthetic_validation_v1.json",
+        "sha256": "ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf",
+        "size_bytes": 2827
+      },
+      "scenario_grid_id": "synthetic_validation_v1",
+      "tolerances": {
+        "path": "configs/tolerances/synthetic_validation_v1.json",
+        "sha256": "6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1",
+        "size_bytes": 421
+      },
+      "tolerances_id": "synthetic_tolerances_v1"
     }
   }
 }

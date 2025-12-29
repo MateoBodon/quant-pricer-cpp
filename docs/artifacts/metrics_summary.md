@@ -1,8 +1,9 @@
 # Metrics Snapshot
 
-Generated at: 2025-12-29T10:40:40.037202+00:00
+Generated at: 2025-12-29T17:49:04.557055+00:00
 Artifacts root: docs/artifacts
-Manifest git sha: 2f98798eb30ca76082e277c66a9bbc523cf36f58
+Manifest git sha: 21eeba68923846a4c6015f697b741f4f22ef0f25
+Protocol synthetic_validation: scenario_grid sha256=ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf, tolerances sha256=6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1
 
 ## Status overview
 | Block | Status | Highlights |
@@ -10,7 +11,7 @@ Manifest git sha: 2f98798eb30ca76082e277c66a9bbc523cf36f58
 | tri engine agreement | ok | max|MC-BS|=0.00754518, max|PDE-BS|=0.00058701, MC CI covers BS=True |
 | qmc vs prng equal time | ok | median PRNG/QMC RMSE ratio=4.17311 (asian: med=1.5918; call: med=6.75442) |
 | pde order | ok | slope=-2.0124, rmse_finest=0.00115728 |
-| ql parity | ok | max diff=0.861583 cents |
+| ql parity | ok | max diff=0.861583 cents, median=0.798752 cents, p95=0.8553 cents |
 | benchmarks | ok | MC paths/sec (1t)=9.77574e+06, eff@max=0.118153 |
 | wrds | ok | median iv_rmse=0.00120828 (sample bundle regression harness) |
 
@@ -50,10 +51,13 @@ Status: ok
 
 | Metric | Value |
 | --- | --- |
+| rows | 3 |
 | max_abs_diff_cents_overall | 0.861583 |
-| by_category | american={'max_abs_diff_cents': 0.79875157, 'rows': 1}, barrier={'max_abs_diff_cents': 0.0410715241, 'rows': 1}, vanilla={'max_abs_diff_cents': 0.8615834347, 'rows': 1} |
-| runtime_ratio_median | 9.86534 |
-| runtime_ratio_by_category | american=9.86534, barrier=14.0418, vanilla=1.56442 |
+| median_abs_diff_cents_overall | 0.798752 |
+| p95_abs_diff_cents_overall | 0.8553 |
+| by_category | american={'max_abs_diff_cents': 0.79875157, 'median_abs_diff_cents': 0.79875157, 'p95_abs_diff_cents': 0.79875157, 'rows': 1}, barrier={'max_abs_diff_cents': 0.0410715241, 'median_abs_diff_cents': 0.0410715241, 'p95_abs_diff_cents': 0.0410715241, 'rows': 1}, vanilla={'max_abs_diff_cents': 0.8615834347, 'median_abs_diff_cents': 0.8615834347, 'p95_abs_diff_cents': 0.8615834347, 'rows': 1} |
+| runtime_ratio_median | 9.05785 |
+| runtime_ratio_by_category | american=14.6884, barrier=9.05785, vanilla=2.57463 |
 
 ### Benchmarks
 Status: ok
