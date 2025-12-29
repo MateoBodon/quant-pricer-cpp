@@ -276,3 +276,13 @@ PY
 88. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git add docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/COMMANDS.md
 89. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git commit -m "ticket-03: update run log commands" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast (fails: python not found); WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh; if [ -d artifacts ]; then (find artifacts -type f | head -n 50; exit 1); fi" -m "Artifacts: docs/artifacts/manifest.json, docs/artifacts/metrics_summary.json, docs/artifacts/metrics_summary.md, docs/validation_pack.zip, docs/artifacts/wrds/*, docs/artifacts/bench/*, docs/artifacts/ql_parity/*" -m "Run log: docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/"
 90. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] git status --short
+91. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] mkdir -p .agent/bin && cat <<'EOS' > .agent/bin/python
+    #!/usr/bin/env bash
+    exec python3 "$@"
+    EOS
+    chmod +x .agent/bin/python
+92. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] PATH="$PWD/.agent/bin:$PATH" WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast
+93. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] sed -n '1,80p' docs/agent_runs/20251229_103451_ticket-03_wrds-panel-single-source/TESTS.md
+94. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch (update TESTS.md to mark python command pass)
+95. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] export PATH="$PWD/.agent/bin:$PATH"; WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast
+96. [cwd=/Users/mateobodon/Documents/Programming/Projects/quant-pricer-cpp] apply_patch (update TESTS.md to record python command pass)

@@ -102,6 +102,8 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 
 ## ticket-03 — Eliminate dual WRDS panel configs (single source of truth)
 
+**Status:** **DONE**.
+
 **Goal (1 sentence):** Choose one WRDS date-panel config and remove/deprecate the other to prevent protocol drift.
 
 **Why (from Prompt-1 diagnosis):**
