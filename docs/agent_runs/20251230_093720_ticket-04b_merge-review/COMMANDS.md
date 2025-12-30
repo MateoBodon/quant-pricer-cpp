@@ -27,3 +27,10 @@
 27. git commit -m "Merge branch 'codex/ticket-04b-bundle-diff-repair'" # finish merge
 28. git push origin main # push merged main to origin
 29. cat <<'EOF' >> docs/agent_runs/20251230_093720_ticket-04b_merge-review/RESULTS.md # note merge/push in results
+30. git status --short # check status after merge
+31. git add docs/agent_runs/20251230_093720_ticket-04b_merge-review/COMMANDS.md docs/agent_runs/20251230_093720_ticket-04b_merge-review/RESULTS.md # stage run log updates
+32. git commit -m "ticket-04b: finalize merge review log" -m "Tests: not run (log update only)" -m "Artifacts: (none; run log update only)" -m "Run log: docs/agent_runs/20251230_093720_ticket-04b_merge-review/" # commit log update
+33. git push origin main # push log update commit
+34. git add docs/agent_runs/20251230_093720_ticket-04b_merge-review/COMMANDS.md # stage final command log update
+35. git commit -m "ticket-04b: finalize command log" -m "Tests: not run (log update only)" -m "Artifacts: (none; run log update only)" -m "Run log: docs/agent_runs/20251230_093720_ticket-04b_merge-review/" # commit final log update
+36. git push origin main # push final log update
