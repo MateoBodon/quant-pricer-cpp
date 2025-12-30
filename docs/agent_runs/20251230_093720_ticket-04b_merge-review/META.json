@@ -1,0 +1,21 @@
+{
+  "run_name": "20251230_093720_ticket-04b_merge-review",
+  "ticket_id": "ticket-04b",
+  "started_at_utc": "2025-12-30T09:37:20Z",
+  "finished_at_utc": "2025-12-30T09:41:37Z",
+  "git_sha_before": "a175aec1041d117496cd31d38a56301c12ce12e5",
+  "git_sha_after": "a175aec1041d117496cd31d38a56301c12ce12e5",
+  "branch_name": "codex/ticket-04b-bundle-diff-repair",
+  "host_os": "Darwin 25.0.0",
+  "compiler": "unknown (/usr/bin/c++)",
+  "python_version": "3.12.2",
+  "build_type": "Release",
+  "dataset_id": "N/A",
+  "config_hashes": {
+    "scenario_grid": "ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf",
+    "tolerances": "6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1"
+  },
+  "tools": {
+    "codex_cli": "unknown"
+  }
+}
