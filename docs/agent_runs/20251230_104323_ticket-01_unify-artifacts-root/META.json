@@ -1,0 +1,16 @@
+{
+  "run_name": "20251230_104323_ticket-01_unify-artifacts-root",
+  "ticket_id": "ticket-01",
+  "started_at_utc": "",
+  "finished_at_utc": "",
+  "git_sha_before": "",
+  "git_sha_after": "",
+  "branch_name": "codex/ticket-01_unify-artifacts-root",
+  "host_os": "",
+  "compiler": "",
+  "python_version": "",
+  "build_type": "Release",
+  "dataset_id": "",
+  "config_hashes": {},
+  "tools": {}
+}
