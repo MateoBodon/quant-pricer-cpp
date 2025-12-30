@@ -17,3 +17,13 @@
 17. cat <<'EOF' > docs/agent_runs/20251230_093720_ticket-04b_merge-review/RESULTS.md # write results log
 18. date -u +%Y-%m-%dT%H:%M:%SZ # capture finished_at_utc
 19. cat <<'EOF' > docs/agent_runs/20251230_093720_ticket-04b_merge-review/META.json # write run metadata
+20. git status --short # check status before merge
+21. git switch main # switch to main
+22. git merge codex/ticket-04b-bundle-diff-repair # merge ticket-04b branch (conflict)
+23. git status --short # check merge conflict status
+24. sed -n '70,120p' PROGRESS.md # inspect merge conflict
+25. apply_patch <<'PATCH' (resolve PROGRESS.md conflict) # keep 2025-12-29 + 2025-12-30 entries
+26. git add PROGRESS.md docs/agent_runs/20251230_093720_ticket-04b_merge-review # stage merge resolution
+27. git commit -m "Merge branch 'codex/ticket-04b-bundle-diff-repair'" # finish merge
+28. git push origin main # push merged main to origin
+29. cat <<'EOF' >> docs/agent_runs/20251230_093720_ticket-04b_merge-review/RESULTS.md # note merge/push in results

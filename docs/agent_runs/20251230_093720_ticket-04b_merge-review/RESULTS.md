@@ -8,3 +8,6 @@ Checklist verification (ticket-04b merge readiness):
 
 Recommended bundle for GPT upload (ticket-04b):
 - `docs/gpt_bundles/20251226T082814Z_ticket-04b_20251226_065320_ticket-04b_bundle-diff-repair.zip`
+
+Merge status:
+- Merged `codex/ticket-04b-bundle-diff-repair` into `main` and pushed to `origin/main`.
