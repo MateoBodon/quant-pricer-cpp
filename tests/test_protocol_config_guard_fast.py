@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -29,8 +30,8 @@ def _find_quant_cli() -> Path:
     raise FileNotFoundError("quant_cli not found; build the project first")
 
 
-def _expect_missing_provenance(cmd: list[str]) -> None:
-    proc = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)
+def _expect_missing_provenance(cmd: list[str], env: dict[str, str]) -> None:
+    proc = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True, env=env)
     if proc.returncode == 0:
         raise AssertionError("expected failure without protocol configs")
     output = f"{proc.stdout}\n{proc.stderr}".lower()
@@ -40,8 +41,8 @@ def _expect_missing_provenance(cmd: list[str]) -> None:
         )
 
 
-def _expect_success(cmd: list[str], outputs: list[Path]) -> None:
-    subprocess.check_call(cmd, cwd=REPO_ROOT)
+def _expect_success(cmd: list[str], outputs: list[Path], env: dict[str, str]) -> None:
+    subprocess.check_call(cmd, cwd=REPO_ROOT, env=env)
     for path in outputs:
         if not path.exists():
             raise AssertionError(f"expected output {path} to exist")
@@ -61,6 +62,8 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp_dir = Path(tmp)
+        env = dict(os.environ)
+        env["QUANT_MANIFEST_PATH"] = str(tmp_dir / "manifest.json")
         tri_png = tmp_dir / "tri.png"
         tri_csv = tmp_dir / "tri.csv"
         pde_png = tmp_dir / "pde.png"
@@ -81,7 +84,8 @@ def main() -> None:
                 str(tri_png),
                 "--csv",
                 str(tri_csv),
-            ]
+            ],
+            env,
         )
         _expect_missing_provenance(
             [
@@ -93,7 +97,8 @@ def main() -> None:
                 str(pde_png),
                 "--csv",
                 str(pde_csv),
-            ]
+            ],
+            env,
         )
         _expect_missing_provenance(
             [
@@ -106,7 +111,8 @@ def main() -> None:
                 str(greek_png),
                 "--csv",
                 str(greek_csv),
-            ]
+            ],
+            env,
         )
         _expect_missing_provenance(
             [
@@ -117,7 +123,8 @@ def main() -> None:
                 str(ql_png),
                 "--csv",
                 str(ql_csv),
-            ]
+            ],
+            env,
         )
 
         _expect_success(
@@ -137,6 +144,7 @@ def main() -> None:
                 str(tri_csv),
             ],
             [tri_png, tri_csv],
+            env,
         )
         _expect_success(
             [
@@ -154,6 +162,7 @@ def main() -> None:
                 str(pde_csv),
             ],
             [pde_png, pde_csv],
+            env,
         )
         _expect_success(
             [
@@ -172,6 +181,7 @@ def main() -> None:
                 str(greek_csv),
             ],
             [greek_png, greek_csv],
+            env,
         )
         _expect_success(
             [
@@ -188,6 +198,7 @@ def main() -> None:
                 str(ql_csv),
             ],
             [ql_png, ql_csv],
+            env,
         )
 
 

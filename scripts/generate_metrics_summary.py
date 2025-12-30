@@ -666,6 +666,15 @@ def main() -> None:
     md_out = (args.output_md or artifacts_root / "metrics_summary.md").resolve()
 
     summary = build_summary(artifacts_root, manifest_path)
+    if json_out.exists():
+        try:
+            prior = json.loads(json_out.read_text())
+            prior_core = {k: v for k, v in prior.items() if k != "generated_at"}
+            current_core = {k: v for k, v in summary.items() if k != "generated_at"}
+            if prior_core == current_core and prior.get("generated_at"):
+                summary["generated_at"] = prior["generated_at"]
+        except Exception:
+            pass
 
     json_out.parent.mkdir(parents=True, exist_ok=True)
     md_out.parent.mkdir(parents=True, exist_ok=True)

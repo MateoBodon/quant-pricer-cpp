@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -16,6 +17,9 @@ def main() -> None:
         tmp_dir = Path(tmp)
         png_path = tmp_dir / "qmc_plot.png"
         csv_path = tmp_dir / "qmc_summary.csv"
+        manifest_path = tmp_dir / "manifest.json"
+        env = dict(os.environ)
+        env["QUANT_MANIFEST_PATH"] = str(manifest_path)
         cmd = [
             sys.executable,
             str(repo_root / "scripts" / "qmc_vs_prng_equal_time.py"),
@@ -27,7 +31,7 @@ def main() -> None:
             "--csv",
             str(csv_path),
         ]
-        subprocess.check_call(cmd, cwd=repo_root)
+        subprocess.check_call(cmd, cwd=repo_root, env=env)
 
         if not csv_path.exists():
             raise AssertionError("QMC vs PRNG CSV was not created")
@@ -50,20 +54,21 @@ def main() -> None:
                 f"Missing columns in QMC vs PRNG CSV: {sorted(missing)}"
             )
 
-    manifest_path = repo_root / "docs" / "artifacts" / "manifest.json"
-    manifest = json.loads(manifest_path.read_text())
-    qmc_entry = manifest["runs"].get("qmc_vs_prng_equal_time")
-    if not qmc_entry:
-        raise AssertionError("Manifest missing qmc_vs_prng_equal_time entry")
-    seed = qmc_entry.get("seed")
-    if seed != 101:
-        raise AssertionError(f"Expected qmc_vs_prng_equal_time seed 101, found {seed}")
-    if qmc_entry.get("csv_rows", 0) <= 5:
-        raise AssertionError(
-            "Manifest qmc_vs_prng_equal_time entry reports insufficient csv_rows"
-        )
-    if "command" not in qmc_entry:
-        raise AssertionError("Manifest qmc_vs_prng_equal_time entry missing command")
+        manifest = json.loads(manifest_path.read_text())
+        qmc_entry = manifest["runs"].get("qmc_vs_prng_equal_time")
+        if not qmc_entry:
+            raise AssertionError("Manifest missing qmc_vs_prng_equal_time entry")
+        seed = qmc_entry.get("seed")
+        if seed != 101:
+            raise AssertionError(
+                f"Expected qmc_vs_prng_equal_time seed 101, found {seed}"
+            )
+        if qmc_entry.get("csv_rows", 0) <= 5:
+            raise AssertionError(
+                "Manifest qmc_vs_prng_equal_time entry reports insufficient csv_rows"
+            )
+        if "command" not in qmc_entry:
+            raise AssertionError("Manifest qmc_vs_prng_equal_time entry missing command")
 
 
 if __name__ == "__main__":

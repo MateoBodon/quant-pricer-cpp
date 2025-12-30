@@ -11,7 +11,55 @@ from typing import Any, Dict, Iterable, List
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS_ROOT = REPO_ROOT / "docs" / "artifacts"
-MANIFEST_PATH = ARTIFACTS_ROOT / "manifest.json"
+
+
+def _resolve_manifest_path() -> Path:
+    override = os.environ.get("QUANT_MANIFEST_PATH")
+    if override:
+        path = Path(override)
+        if not path.is_absolute():
+            return (REPO_ROOT / path).resolve()
+        return path
+    return ARTIFACTS_ROOT / "manifest.json"
+
+
+MANIFEST_PATH = _resolve_manifest_path()
+
+_ABS_PATH_ALLOWLIST = {"command", "compiler_path"}
+_DROP = object()
+
+
+def _is_canonical_manifest(path: Path) -> bool:
+    return path.resolve() == (ARTIFACTS_ROOT / "manifest.json").resolve()
+
+
+def _scrub_manifest(value: Any, key_path: List[str] | None = None) -> Any:
+    if key_path is None:
+        key_path = []
+    if isinstance(value, dict):
+        cleaned: Dict[str, Any] = {}
+        for key, val in value.items():
+            updated = _scrub_manifest(val, key_path + [key])
+            if updated is _DROP:
+                continue
+            cleaned[key] = updated
+        return cleaned
+    if isinstance(value, list):
+        cleaned_list: List[Any] = []
+        for idx, item in enumerate(value):
+            updated = _scrub_manifest(item, key_path + [f"[{idx}]"])
+            if updated is _DROP:
+                continue
+            cleaned_list.append(updated)
+        return cleaned_list
+    if isinstance(value, str):
+        last_key = key_path[-1] if key_path else ""
+        if last_key not in _ABS_PATH_ALLOWLIST:
+            candidate = Path(value)
+            if candidate.is_absolute() and not str(candidate).startswith(str(REPO_ROOT)):
+                return _DROP
+        return value
+    return value
 
 
 def _rel_path(path: Path) -> str:
@@ -173,6 +221,8 @@ def ensure_metadata(manifest: Dict[str, Any]) -> Dict[str, Any]:
 def save_manifest(manifest: Dict[str, Any]) -> None:
     manifest = ensure_metadata(manifest)
     manifest = _relativize_value(manifest)
+    if _is_canonical_manifest(MANIFEST_PATH):
+        manifest = _scrub_manifest(manifest)
     MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST_PATH.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 

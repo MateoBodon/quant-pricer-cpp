@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -16,6 +17,9 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory() as tmp:
         out_dir = Path(tmp)
+        manifest_path = out_dir / "manifest.json"
+        env = dict(os.environ)
+        env["QUANT_MANIFEST_PATH"] = str(manifest_path)
         cmd = [
             sys.executable,
             str(repo_root / "scripts" / "calibrate_heston.py"),
@@ -36,23 +40,22 @@ def main() -> None:
             "--output-dir",
             str(out_dir),
         ]
-        subprocess.check_call(cmd, cwd=repo_root)
+        subprocess.check_call(cmd, cwd=repo_root, env=env)
 
-    manifest_path = repo_root / "docs" / "artifacts" / "manifest.json"
-    manifest = json.loads(manifest_path.read_text())
-    runs = manifest.get("runs", {}).get("heston")
-    if not runs:
-        raise AssertionError("Manifest missing heston runs after safety test")
-    latest = runs[-1]
-    if latest.get("param_transform") != "exp":
-        raise AssertionError("Safety test expected param_transform 'exp'")
-    if latest.get("weight_mode") != "vega":
-        raise AssertionError("Safety test expected weight_mode 'vega'")
-    diagnostics = latest.get("diagnostics", {})
-    if "retry_failures" not in diagnostics:
-        raise AssertionError("Diagnostics missing retry_failures")
-    if "warnings" not in latest:
-        raise AssertionError("Manifest entry missing warnings field")
+        manifest = json.loads(manifest_path.read_text())
+        runs = manifest.get("runs", {}).get("heston")
+        if not runs:
+            raise AssertionError("Manifest missing heston runs after safety test")
+        latest = runs[-1]
+        if latest.get("param_transform") != "exp":
+            raise AssertionError("Safety test expected param_transform 'exp'")
+        if latest.get("weight_mode") != "vega":
+            raise AssertionError("Safety test expected weight_mode 'vega'")
+        diagnostics = latest.get("diagnostics", {})
+        if "retry_failures" not in diagnostics:
+            raise AssertionError("Diagnostics missing retry_failures")
+        if "warnings" not in latest:
+            raise AssertionError("Manifest entry missing warnings field")
 
 
 if __name__ == "__main__":

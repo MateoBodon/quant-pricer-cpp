@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""FAST guard: ensure reproduce_all inputs don't emit files under artifacts/."""
+"""FAST guard: keep artifacts root canonical and manifest paths portable."""
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 import tempfile
@@ -20,6 +21,28 @@ def _snapshot_files(root: Path) -> set[str]:
 
 def _run(cmd: list[str], cwd: Path) -> None:
     subprocess.check_call(cmd, cwd=cwd)
+
+
+def _find_abs_manifest_paths(manifest: dict, repo_root: Path) -> list[str]:
+    allow_keys = {"command", "compiler_path"}
+    hits: list[str] = []
+
+    def walk(obj: object, path: list[str]) -> None:
+        if isinstance(obj, dict):
+            for key, val in obj.items():
+                walk(val, path + [key])
+        elif isinstance(obj, list):
+            for idx, val in enumerate(obj):
+                walk(val, path + [f"[{idx}]"])
+        elif isinstance(obj, str):
+            if Path(obj).is_absolute() and not obj.startswith(str(repo_root)):
+                last_key = path[-1] if path else ""
+                if last_key in allow_keys:
+                    return
+                hits.append(f"{'.'.join(path)} -> {obj}")
+
+    walk(manifest, [])
+    return hits
 
 
 def main() -> None:
@@ -99,6 +122,19 @@ def main() -> None:
         suffix = "" if len(new_files) <= 10 else f" (+{len(new_files) - 10} more)"
         raise AssertionError(
             f"Artifacts guard failed: new files under artifacts/: {sample}{suffix}"
+        )
+
+    manifest_path = repo_root / "docs" / "artifacts" / "manifest.json"
+    if not manifest_path.exists():
+        raise AssertionError("Manifest missing under docs/artifacts/manifest.json")
+    manifest = json.loads(manifest_path.read_text())
+    abs_hits = _find_abs_manifest_paths(manifest, repo_root)
+    if abs_hits:
+        sample = "; ".join(abs_hits[:5])
+        suffix = "" if len(abs_hits) <= 5 else f" (+{len(abs_hits) - 5} more)"
+        raise AssertionError(
+            "Manifest contains absolute paths outside repo "
+            f"(allowlisted: command, compiler_path): {sample}{suffix}"
         )
 
 
