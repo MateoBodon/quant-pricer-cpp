@@ -1,16 +1,22 @@
 {
   "run_name": "20251230_104323_ticket-01_unify-artifacts-root",
   "ticket_id": "ticket-01",
-  "started_at_utc": "",
-  "finished_at_utc": "",
-  "git_sha_before": "",
-  "git_sha_after": "",
+  "started_at_utc": "2025-12-30T10:43:23Z",
+  "finished_at_utc": "2025-12-30T11:17:26Z",
+  "git_sha_before": "8b260859ab74faf2aff148493780e25281c9ce29",
+  "git_sha_after": "849c3a478067e62fc8b16bf0a491cdaf76b4bb77",
   "branch_name": "codex/ticket-01_unify-artifacts-root",
-  "host_os": "",
-  "compiler": "",
-  "python_version": "",
+  "host_os": "macOS 26.0.1",
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "python_version": "3.12.2",
   "build_type": "Release",
-  "dataset_id": "",
-  "config_hashes": {},
-  "tools": {}
+  "dataset_id": "WRDS_SAMPLE",
+  "config_hashes": {
+    "scenario_grid": "ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf",
+    "tolerances": "6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1",
+    "wrds_dateset": "af16ea93a04692590f532d223eab06866ddd0738d2c4b90b5783bce47fbcc71f"
+  },
+  "tools": {
+    "codex_cli": "unknown"
+  }
 }
