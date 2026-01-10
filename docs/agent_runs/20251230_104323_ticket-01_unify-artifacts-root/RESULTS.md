@@ -15,6 +15,7 @@
 - Metrics summary: `docs/artifacts/metrics_summary.json`, `docs/artifacts/metrics_summary.md`.
 - Validation pack: `docs/validation_pack.zip`.
 - Run log: `docs/agent_runs/20251230_104323_ticket-01_unify-artifacts-root/`.
+- GPT bundle: `docs/gpt_bundles/20251230T112050Z_ticket-01_20251230_104323_ticket-01_unify-artifacts-root.zip`.
 
 ## Human merge checklist
 - [ ] FAST tests pass

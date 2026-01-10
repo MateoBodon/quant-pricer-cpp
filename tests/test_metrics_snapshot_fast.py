@@ -87,6 +87,24 @@ def assert_current_results_matches_snapshot(summary: Dict) -> None:
         raise AssertionError(
             f"CURRENT_RESULTS missing manifest git SHA ({manifest_sha})"
         )
+    results_sha_match = re.search(r"results_commit_sha:\s*([0-9a-f]{7,40})", text)
+    manifest_sha_match = re.search(r"manifest_git_sha:\s*([0-9a-f]{7,40})", text)
+    if not results_sha_match:
+        raise AssertionError("CURRENT_RESULTS missing results_commit_sha")
+    if not manifest_sha_match:
+        raise AssertionError("CURRENT_RESULTS missing manifest_git_sha")
+    results_sha = results_sha_match.group(1)
+    manifest_sha_field = manifest_sha_match.group(1)
+    if manifest_sha and manifest_sha_field != manifest_sha:
+        raise AssertionError(
+            "CURRENT_RESULTS manifest_git_sha does not match metrics_summary "
+            f"manifest_git_sha ({manifest_sha_field} != {manifest_sha})"
+        )
+    if manifest_sha and results_sha != manifest_sha:
+        raise AssertionError(
+            "CURRENT_RESULTS results_commit_sha does not match metrics_summary "
+            f"manifest_git_sha ({results_sha} != {manifest_sha})"
+        )
     if "docs/artifacts/metrics_summary.md" not in text:
         raise AssertionError("CURRENT_RESULTS missing metrics_summary path reference")
 

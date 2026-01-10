@@ -171,3 +171,15 @@ git rev-parse HEAD (post-commit)
 apply_patch (docs/agent_runs/20251230_104323_ticket-01_unify-artifacts-root/META.json) fill run metadata
 git add docs/agent_runs/20251230_104323_ticket-01_unify-artifacts-root/COMMANDS.md docs/agent_runs/20251230_104323_ticket-01_unify-artifacts-root/META.json
 git commit -m "ticket-01: finalize run log metadata" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build -j; ctest --test-dir build -L FAST --output-on-failure; REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh; WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast" -m "Artifacts: none"
+date -u +%Y-%m-%dT%H:%M:%SZ
+apply_patch (docs/agent_runs/20251230_104323_ticket-01_unify-artifacts-root/META.json) update git_sha_after + finished_at_utc for bundling
+apply_patch (docs/agent_runs/20251230_104323_ticket-01_unify-artifacts-root/RESULTS.md) add gpt-bundle path
+make gpt-bundle TICKET=ticket-01 RUN_NAME=20251230_104323_ticket-01_unify-artifacts-root
+make gpt-bundle TICKET=ticket-01 RUN_NAME=20251230_104323_ticket-01_unify-artifacts-root (failed: META git_sha_after mismatch)
+apply_patch (project_state/CURRENT_RESULTS.md) add results_commit_sha + manifest_git_sha
+apply_patch (tests/test_metrics_snapshot_fast.py) enforce results_commit_sha + manifest_git_sha invariants
+ctest --test-dir build -L FAST --output-on-failure (after CURRENT_RESULTS/test updates)
+append TESTS.md with FAST rerun after CURRENT_RESULTS/test invariants update
+rg -n "WRDS_PASSWORD|WRDS_USERNAME|password" docs/agent_runs/20251230_104323_ticket-01_unify-artifacts-root docs/artifacts | head -n 20
+apply_patch (PROGRESS.md) add CURRENT_RESULTS semantics note
+python3 - <<"PY" (check metrics_summary generated_at/manifest_git_sha)

@@ -6,3 +6,4 @@
 - `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` — PASS (FAST + SLOW ran; MARKET skipped; validation pack written).
 - `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast` — PASS.
 - `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` — PASS (rerun after protocol_config_guard manifest isolation; FAST + SLOW ran; MARKET skipped; validation pack written).
+- `ctest --test-dir build -L FAST --output-on-failure` — PASS (post CURRENT_RESULTS/test invariants update; RngDeterminism skipped: OpenMP not enabled).

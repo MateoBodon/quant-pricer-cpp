@@ -1,6 +1,8 @@
 ---
 generated_at: 2025-12-30T11:10:31.082595+00:00
 git_sha: 8b260859ab74faf2aff148493780e25281c9ce29
+results_commit_sha: 8b260859ab74faf2aff148493780e25281c9ce29
+manifest_git_sha: 8b260859ab74faf2aff148493780e25281c9ce29
 branch: codex/ticket-01_unify-artifacts-root
 commands:
   - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -14,6 +16,7 @@ commands:
 
 ## Metrics snapshot (latest committed)
 Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-30T11:10:31.082595+00:00**).
+Results commit SHA: `8b260859ab74faf2aff148493780e25281c9ce29`.
 Manifest git SHA recorded in snapshot: `8b260859ab74faf2aff148493780e25281c9ce29` (code SHA captured in `docs/artifacts/manifest.json` at snapshot time).
 
 Status overview (from `docs/artifacts/metrics_summary.md`):

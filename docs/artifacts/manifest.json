@@ -9,11 +9,11 @@
     "cxx_flags_release": "-O3 -DNDEBUG",
     "generator": "Unix Makefiles"
   },
-  "generated_at": "2025-12-30T11:10:49.467172+00:00",
+  "generated_at": "2026-01-10T10:28:36.800396+00:00",
   "git": {
     "branch": "codex/ticket-01_unify-artifacts-root",
     "dirty": true,
-    "sha": "8b260859ab74faf2aff148493780e25281c9ce29"
+    "sha": "02eeb967604c9d78777718ae24475518f0ffde5a"
   },
   "omp_threads": 11,
   "protocols": {
