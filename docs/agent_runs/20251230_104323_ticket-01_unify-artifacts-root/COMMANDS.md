@@ -183,3 +183,4 @@ append TESTS.md with FAST rerun after CURRENT_RESULTS/test invariants update
 rg -n "WRDS_PASSWORD|WRDS_USERNAME|password" docs/agent_runs/20251230_104323_ticket-01_unify-artifacts-root docs/artifacts | head -n 20
 apply_patch (PROGRESS.md) add CURRENT_RESULTS semantics note
 python3 - <<"PY" (check metrics_summary generated_at/manifest_git_sha)
+git add PROGRESS.md project_state/CURRENT_RESULTS.md tests/test_metrics_snapshot_fast.py docs/artifacts/manifest.json docs/agent_runs/20251230_104323_ticket-01_unify-artifacts-root/{COMMANDS.md,RESULTS.md,TESTS.md,META.json}
