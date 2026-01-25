@@ -46,3 +46,23 @@
 - python3 scripts/gpt_bundle.py --ticket ticket-08c --run-name 20260125_201700_ticket-08c_land-docs-sanity-guard --timestamp 20260125T192827Z
 - ls docs/gpt_bundles/20260125T192827Z_ticket-08c_20260125_201700_ticket-08c_land-docs-sanity-guard.zip
 - git status --porcelain
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- rm -rf build
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- python3 -m pip install -r requirements-dev.txt
+- python3 -m venv /tmp/quant-pricer-venv
+- /tmp/quant-pricer-venv/bin/pip install -r requirements-dev.txt
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/tmp/quant-pricer-venv/bin/python3 && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/tmp/quant-pricer-venv/bin/python3 && cmake --build build -j && PATH=/tmp/quant-pricer-venv/bin:$PATH ctest --test-dir build -L FAST --output-on-failure && PATH=/tmp/quant-pricer-venv/bin:$PATH ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- cmake --version | head -n 1
+- c++ --version | head -n 1
+- /tmp/quant-pricer-venv/bin/python3 --version
+- date -u +%Y-%m-%dT%H:%M:%SZ
+- git rev-parse HEAD
+- git restore docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md docs/artifacts/ql_parity/ql_parity_error_dist.png
+- git status --porcelain
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/TESTS.md
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/RESULTS.md
+- date -u +%Y-%m-%dT%H:%M:%SZ
+- python3 scripts/gpt_bundle.py --ticket ticket-08c --run-name 20260125_201700_ticket-08c_land-docs-sanity-guard --timestamp 20260125T192827Z
+- git status --porcelain

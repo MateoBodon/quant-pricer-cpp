@@ -249,7 +249,7 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 
 ## ticket-08c — Land docs sanity guard (ticket-08b cleanup)
 
-**Status:** IN PROGRESS.
+**Status:** DONE.
 
 **Goal (1 sentence):** Land ticket-08b docs sanity guard + runbooks/backlog/runlog
 with artifacts unchanged and FAST tests green.
