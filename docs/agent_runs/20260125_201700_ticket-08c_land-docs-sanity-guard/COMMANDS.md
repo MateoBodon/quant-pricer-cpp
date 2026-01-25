@@ -66,3 +66,6 @@
 - date -u +%Y-%m-%dT%H:%M:%SZ
 - python3 scripts/gpt_bundle.py --ticket ticket-08c --run-name 20260125_201700_ticket-08c_land-docs-sanity-guard --timestamp 20260125T192827Z
 - git status --porcelain
+- git add PROGRESS.md docs/CODEX_SPRINT_TICKETS.md docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/COMMANDS.md docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/META.json docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/RESULTS.md docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/TESTS.md
+- git add -f docs/gpt_bundles/20260125T192827Z_ticket-08c_20260125_201700_ticket-08c_land-docs-sanity-guard.zip
+- git commit -m "ticket-08c: finish FAST run log" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/tmp/quant-pricer-venv/bin/python3 && cmake --build build -j && PATH=/tmp/quant-pricer-venv/bin:$PATH ctest --test-dir build -L FAST --output-on-failure && PATH=/tmp/quant-pricer-venv/bin:$PATH ctest --test-dir build -R docs_sanity_fast --output-on-failure" -m "Artifacts: docs/gpt_bundles/20260125T192827Z_ticket-08c_20260125_201700_ticket-08c_land-docs-sanity-guard.zip"
