@@ -1,0 +1,13 @@
+{
+  "run_name": "20260125_000055_ticket-08b_finish-docs-sanity-guard",
+  "ticket_id": "ticket-08b",
+  "started_at_utc": "2026-01-25T00:00:55Z",
+  "finished_at_utc": "2026-01-25T00:37:43Z",
+  "git_sha_before": "51dbe318dd9133dc3e1b4ba9a85f9e787f0e7e96",
+  "git_sha_after": "",
+  "branch_name": "codex/ticket-08b-finish-docs-sanity-guard",
+  "build_type": "Release",
+  "tools": {
+    "codex_cli": "unknown"
+  }
+}

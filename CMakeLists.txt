@@ -264,6 +264,12 @@ add_test(
 set_tests_properties(data_policy_guard_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME docs_sanity_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_docs_sanity_fast.py
+)
+set_tests_properties(docs_sanity_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME wrds_asof_poison_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_wrds_asof_poison_fast.py
 )
