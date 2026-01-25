@@ -1,0 +1,37 @@
+# Commands
+
+- ls
+- cat AGENTS.md
+- cat PROJECT.md
+- cat PROGRESS.md
+- rg --files -g 'AGENTS.md'
+- git status --porcelain
+- ls docs
+- ls project_state
+- rg --files -g 'test_docs_sanity_fast.py'
+- rg -n "docs_sanity_fast" CMakeLists.txt tests
+- sed -n '1,160p' docs/RUNBOOK.md
+- sed -n '1,200p' project_state/RUNBOOK.md
+- sed -n '1,200p' project_state/BACKLOG.md
+- sed -n '1,200p' docs/tickets/ticket-08b_finish-docs-sanity-guard.md
+- git branch --show-current
+- ls docs/agent_runs/20260125_000055_ticket-08b_finish-docs-sanity-guard
+- git ls-files docs/agent_runs/20260125_000055_ticket-08b_finish-docs-sanity-guard
+- git --no-pager log -5 --oneline
+- cat /home/codex/.codex/skills/gpt-bundle/SKILL.md
+- date +%Y%m%d_%H%M%S
+- git checkout -b codex/ticket-08c-land-docs-sanity-guard
+- cat <<'EOF' > docs/tickets/ticket-08c_land-docs-sanity-guard.md
+- mkdir -p docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard
+- git rev-parse HEAD
+- date -u +%Y-%m-%dT%H:%M:%SZ
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/PROMPT.md
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- cat <<'EOF' >> docs/CODEX_SPRINT_TICKETS.md
+- python3 scripts/gpt_bundle.py --help
+- uname -a
+- c++ --version
+- g++ --version
+- python3 --version
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/RESULTS.md
+- git status --porcelain

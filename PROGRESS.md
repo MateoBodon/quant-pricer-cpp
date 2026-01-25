@@ -82,3 +82,4 @@ Added explicit `results_commit_sha` + `manifest_git_sha` fields to `project_stat
 
 ### Done
 - ticket-08b: finalized docs sanity guard + runbooks/backlog; run log at `docs/agent_runs/20260125_000055_ticket-08b_finish-docs-sanity-guard/`.
+- ticket-08c: landed ticket-08b docs sanity guard + runbooks/backlog/runlog cleanly; added ticket file and run log, FAST tests blocked (cmake missing).

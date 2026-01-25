@@ -244,3 +244,17 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 - Doc updates: `PROGRESS.md` and `project_state/CURRENT_RESULTS.md` if metrics change
 
 ---
+
+---
+
+## ticket-08c — Land docs sanity guard (ticket-08b cleanup)
+
+**Status:** IN PROGRESS.
+
+**Goal (1 sentence):** Land ticket-08b docs sanity guard + runbooks/backlog/runlog
+with artifacts unchanged and FAST tests green.
+
+**Acceptance criteria (objective):**
+- No changes under `docs/artifacts/`.
+- `docs_sanity_fast` remains registered as a FAST test and passes.
+- Ticket file + run log for ticket-08c are present.
