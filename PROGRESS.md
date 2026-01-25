@@ -83,3 +83,4 @@ Added explicit `results_commit_sha` + `manifest_git_sha` fields to `project_stat
 ### Done
 - ticket-08b: finalized docs sanity guard + runbooks/backlog; run log at `docs/agent_runs/20260125_000055_ticket-08b_finish-docs-sanity-guard/`.
 - ticket-08c: landed ticket-08b docs sanity guard + runbooks/backlog/runlog cleanly; added ticket file/run log and made FAST tests pass using a local venv.
+- ticket-09_refresh-metrics-ax162s: refreshed AX162-S metrics snapshot (generated_at 2026-01-25T21:13:43.226947+00:00, manifest sha 653b9e8e07364e5c682dabed5bae856a850c1136); tri-engine max|MC-BS|=0.00754518/max|PDE-BS|=0.00058701; QMC median RMSE ratio=4.76346 (asian 3.06425; call 6.46267); PDE slope=-2.0124 rmse=0.00115728; QL parity max diff=0.861583 cents; benchmarks MC paths/sec(1t)=1.27500e+07 eff@max=0.953402; WRDS median iv_rmse=0.00120828. Run log: `docs/agent_runs/20260125_205850_ticket-09_refresh-metrics-ax162s/`.

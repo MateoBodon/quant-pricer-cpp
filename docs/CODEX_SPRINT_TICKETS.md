@@ -258,3 +258,16 @@ with artifacts unchanged and FAST tests green.
 - No changes under `docs/artifacts/`.
 - `docs_sanity_fast` remains registered as a FAST test and passes.
 - Ticket file + run log for ticket-08c are present.
+
+---
+
+## ticket-09_refresh-metrics-ax162s — Refresh metrics (Hetzner AX162-S)
+
+**Status:** IN PROGRESS.
+
+**Goal (1 sentence):** Refresh resume-credible metrics on the Hetzner AX162-S via the official reproducible pipeline.
+
+**Acceptance criteria (objective):**
+- `ctest --test-dir build -L FAST --output-on-failure` passes with the repo-local `.venv`.
+- `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` updates `docs/artifacts/manifest.json`, `docs/artifacts/metrics_summary.{md,json}`, and `docs/validation_pack.zip`.
+- Run logs + `project_state/CURRENT_RESULTS.md` + `PROGRESS.md` updated; GPT bundle created under `docs/gpt_bundles/`.
