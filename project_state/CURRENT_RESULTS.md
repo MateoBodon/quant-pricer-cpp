@@ -1,23 +1,24 @@
 ---
-generated_at: 2025-12-30T11:10:31.082595+00:00
-git_sha: 8b260859ab74faf2aff148493780e25281c9ce29
-results_commit_sha: 8b260859ab74faf2aff148493780e25281c9ce29
-manifest_git_sha: 8b260859ab74faf2aff148493780e25281c9ce29
-branch: codex/ticket-01_unify-artifacts-root
+generated_at: 2026-01-25T21:13:43.226947+00:00
+git_sha: 653b9e8e07364e5c682dabed5bae856a850c1136
+results_commit_sha: 653b9e8e07364e5c682dabed5bae856a850c1136
+manifest_git_sha: 653b9e8e07364e5c682dabed5bae856a850c1136
+branch: codex/ticket-09-refresh-metrics-ax162s
 commands:
-  - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+  - python3 -m venv .venv
+  - . .venv/bin/activate && python -m pip install -r requirements-dev.txt
+  - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=$PWD/.venv/bin/python3
   - cmake --build build -j
-  - ctest --test-dir build -L FAST --output-on-failure
-  - REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
-  - WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast
+  - PATH=$PWD/.venv/bin:$PATH ctest --test-dir build -L FAST --output-on-failure
+  - PATH=$PWD/.venv/bin:$PATH REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
 ---
 
 # Current Results
 
 ## Metrics snapshot (latest committed)
-Source: `docs/artifacts/metrics_summary.md` (generated at **2025-12-30T11:10:31.082595+00:00**).
-Results commit SHA: `8b260859ab74faf2aff148493780e25281c9ce29`.
-Manifest git SHA recorded in snapshot: `8b260859ab74faf2aff148493780e25281c9ce29` (code SHA captured in `docs/artifacts/manifest.json` at snapshot time).
+Source: `docs/artifacts/metrics_summary.md` (generated at **2026-01-25T21:13:43.226947+00:00**).
+Results commit SHA: `653b9e8e07364e5c682dabed5bae856a850c1136`.
+Manifest git SHA recorded in snapshot: `653b9e8e07364e5c682dabed5bae856a850c1136` (code SHA captured in `docs/artifacts/manifest.json` at snapshot time).
 
 Status overview (from `docs/artifacts/metrics_summary.md`):
 - tri engine agreement: ok
@@ -29,10 +30,10 @@ Status overview (from `docs/artifacts/metrics_summary.md`):
 
 ## Highlight metrics (from snapshot)
 - Tri-engine agreement: max|MC-BS|=0.00754518, max|PDE-BS|=0.00058701, MC CI covers BS=True.
-- QMC vs PRNG: median RMSE ratio=5.50480 (asian median=3.19824; call median=7.81137).
+- QMC vs PRNG: median RMSE ratio=4.76346 (asian median=3.06425; call median=6.46267).
 - PDE order: slope=-2.0124, rmse_finest=0.00115728.
 - QL parity: max diff=0.861583 cents, median=0.798752 cents, p95=0.855300 cents.
-- Benchmarks: MC paths/sec (1t)=1.26987e+07, eff@max=0.127424.
+- Benchmarks: MC paths/sec (1t)=1.27500e+07, eff@max=0.953402.
 - WRDS: median iv_rmse=0.00120828 (sample bundle regression harness).
 
 ## Key artifact locations

@@ -1,0 +1,13 @@
+{
+  "ticket_id": "ticket-09d_closeout-metrics-ax162s",
+  "run_name": "20260125_234515_ticket-09d_closeout-metrics-ax162s",
+  "start_time": "2026-01-25T23:45:15",
+  "end_time": "2026-01-25T23:49:30",
+  "environment": {
+    "os": "Linux codex-worker 6.8.0-90-generic #91-Ubuntu SMP PREEMPT_DYNAMIC Tue Nov 18 14:14:30 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux",
+    "python": "Python 3.12.3",
+    "cmake": "cmake version 3.28.3",
+    "compiler": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0"
+  },
+  "notes": "project_state_refresh.py and gpt_bundle.py emitted DeprecationWarning for datetime.utcnow()."
+}

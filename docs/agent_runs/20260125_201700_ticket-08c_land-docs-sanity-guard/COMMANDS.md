@@ -1,0 +1,71 @@
+# Commands
+
+- ls
+- cat AGENTS.md
+- cat PROJECT.md
+- cat PROGRESS.md
+- rg --files -g 'AGENTS.md'
+- git status --porcelain
+- ls docs
+- ls project_state
+- rg --files -g 'test_docs_sanity_fast.py'
+- rg -n "docs_sanity_fast" CMakeLists.txt tests
+- sed -n '1,160p' docs/RUNBOOK.md
+- sed -n '1,200p' project_state/RUNBOOK.md
+- sed -n '1,200p' project_state/BACKLOG.md
+- sed -n '1,200p' docs/tickets/ticket-08b_finish-docs-sanity-guard.md
+- git branch --show-current
+- ls docs/agent_runs/20260125_000055_ticket-08b_finish-docs-sanity-guard
+- git ls-files docs/agent_runs/20260125_000055_ticket-08b_finish-docs-sanity-guard
+- git --no-pager log -5 --oneline
+- cat /home/codex/.codex/skills/gpt-bundle/SKILL.md
+- date +%Y%m%d_%H%M%S
+- git checkout -b codex/ticket-08c-land-docs-sanity-guard
+- cat <<'EOF' > docs/tickets/ticket-08c_land-docs-sanity-guard.md
+- mkdir -p docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard
+- git rev-parse HEAD
+- date -u +%Y-%m-%dT%H:%M:%SZ
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/PROMPT.md
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- cat <<'EOF' >> docs/CODEX_SPRINT_TICKETS.md
+- python3 scripts/gpt_bundle.py --help
+- uname -a
+- c++ --version
+- g++ --version
+- python3 --version
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/RESULTS.md
+- git status --porcelain
+- git add PROGRESS.md docs/CODEX_SPRINT_TICKETS.md docs/tickets/ticket-08c_land-docs-sanity-guard.md docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard
+- git config user.email "codex@example.com"
+- git config user.name "Codex"
+- git commit -m "ticket-08c: add ticket + run log" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure (fails: cmake not found)" -m "Artifacts: none"
+- git rev-parse HEAD
+- date -u +%Y-%m-%dT%H:%M:%SZ
+- date -u +%Y%m%dT%H%M%SZ
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/RESULTS.md
+- python3 scripts/gpt_bundle.py --ticket ticket-08c --run-name 20260125_201700_ticket-08c_land-docs-sanity-guard --timestamp 20260125T192827Z
+- ls docs/gpt_bundles/20260125T192827Z_ticket-08c_20260125_201700_ticket-08c_land-docs-sanity-guard.zip
+- git status --porcelain
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- rm -rf build
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- python3 -m pip install -r requirements-dev.txt
+- python3 -m venv /tmp/quant-pricer-venv
+- /tmp/quant-pricer-venv/bin/pip install -r requirements-dev.txt
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/tmp/quant-pricer-venv/bin/python3 && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/tmp/quant-pricer-venv/bin/python3 && cmake --build build -j && PATH=/tmp/quant-pricer-venv/bin:$PATH ctest --test-dir build -L FAST --output-on-failure && PATH=/tmp/quant-pricer-venv/bin:$PATH ctest --test-dir build -R docs_sanity_fast --output-on-failure
+- cmake --version | head -n 1
+- c++ --version | head -n 1
+- /tmp/quant-pricer-venv/bin/python3 --version
+- date -u +%Y-%m-%dT%H:%M:%SZ
+- git rev-parse HEAD
+- git restore docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md docs/artifacts/ql_parity/ql_parity_error_dist.png
+- git status --porcelain
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/TESTS.md
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/RESULTS.md
+- date -u +%Y-%m-%dT%H:%M:%SZ
+- python3 scripts/gpt_bundle.py --ticket ticket-08c --run-name 20260125_201700_ticket-08c_land-docs-sanity-guard --timestamp 20260125T192827Z
+- git status --porcelain
+- git add PROGRESS.md docs/CODEX_SPRINT_TICKETS.md docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/COMMANDS.md docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/META.json docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/RESULTS.md docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/TESTS.md
+- git add -f docs/gpt_bundles/20260125T192827Z_ticket-08c_20260125_201700_ticket-08c_land-docs-sanity-guard.zip
+- git commit -m "ticket-08c: finish FAST run log" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/tmp/quant-pricer-venv/bin/python3 && cmake --build build -j && PATH=/tmp/quant-pricer-venv/bin:$PATH ctest --test-dir build -L FAST --output-on-failure && PATH=/tmp/quant-pricer-venv/bin:$PATH ctest --test-dir build -R docs_sanity_fast --output-on-failure" -m "Artifacts: docs/gpt_bundles/20260125T192827Z_ticket-08c_20260125_201700_ticket-08c_land-docs-sanity-guard.zip"
