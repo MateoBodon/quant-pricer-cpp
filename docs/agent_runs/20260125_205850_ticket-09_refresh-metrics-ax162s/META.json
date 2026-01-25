@@ -1,0 +1,23 @@
+{
+  "run_name": "20260125_205850_ticket-09_refresh-metrics-ax162s",
+  "ticket_id": "ticket-09_refresh-metrics-ax162s",
+  "started_at_utc": "2026-01-25T20:59:49Z",
+  "finished_at_utc": "2026-01-25T21:26:08Z",
+  "git_sha_before": "653b9e8e07364e5c682dabed5bae856a850c1136",
+  "git_sha_after": "56545f2696b7005e472392bfac7975f4cb6c3d13",
+  "branch_name": "codex/ticket-09-refresh-metrics-ax162s",
+  "host_os": "Linux codex-worker 6.8.0-90-generic #91-Ubuntu SMP PREEMPT_DYNAMIC Tue Nov 18 14:14:30 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux",
+  "compiler": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "python_version": "Python 3.12.3",
+  "build_type": "Release",
+  "dataset_id": "wrds_panel_calm_stress_v1 (sample)",
+  "config_hashes": {
+    "scenario_grid": "ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf",
+    "tolerances": "6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1",
+    "wrds_panel": "wrds_panel_calm_stress_v1"
+  },
+  "tools": {
+    "codex_cli": "unknown",
+    "cmake": "cmake version 3.28.3"
+  }
+}

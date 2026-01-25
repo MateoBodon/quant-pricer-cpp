@@ -263,7 +263,7 @@ with artifacts unchanged and FAST tests green.
 
 ## ticket-09_refresh-metrics-ax162s — Refresh metrics (Hetzner AX162-S)
 
-**Status:** IN PROGRESS.
+**Status:** DONE.
 
 **Goal (1 sentence):** Refresh resume-credible metrics on the Hetzner AX162-S via the official reproducible pipeline.
 
