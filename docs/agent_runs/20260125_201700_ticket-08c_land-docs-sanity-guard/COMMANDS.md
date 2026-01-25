@@ -35,3 +35,14 @@
 - python3 --version
 - cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/RESULTS.md
 - git status --porcelain
+- git add PROGRESS.md docs/CODEX_SPRINT_TICKETS.md docs/tickets/ticket-08c_land-docs-sanity-guard.md docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard
+- git config user.email "codex@example.com"
+- git config user.name "Codex"
+- git commit -m "ticket-08c: add ticket + run log" -m "Tests: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j && ctest --test-dir build -L FAST --output-on-failure && ctest --test-dir build -R docs_sanity_fast --output-on-failure (fails: cmake not found)" -m "Artifacts: none"
+- git rev-parse HEAD
+- date -u +%Y-%m-%dT%H:%M:%SZ
+- date -u +%Y%m%dT%H%M%SZ
+- cat <<'EOF' > docs/agent_runs/20260125_201700_ticket-08c_land-docs-sanity-guard/RESULTS.md
+- python3 scripts/gpt_bundle.py --ticket ticket-08c --run-name 20260125_201700_ticket-08c_land-docs-sanity-guard --timestamp 20260125T192827Z
+- ls docs/gpt_bundles/20260125T192827Z_ticket-08c_20260125_201700_ticket-08c_land-docs-sanity-guard.zip
+- git status --porcelain
