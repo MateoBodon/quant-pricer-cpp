@@ -1,0 +1,7 @@
+{
+  "git_sha_after": "df1f27a768c03658f50973f6e35c354842c5a870",
+  "git_sha_before": "df1f27a768c03658f50973f6e35c354842c5a870",
+  "notes": "Local WRDS run required pyarrow + explicit dateset wrds_local_root to ensure data_mode=local; see RESULTS.",
+  "run_name": "20260126_040139_ticket-10b_generate-realdata-metrics",
+  "ticket_id": "ticket-10b_generate-realdata-metrics-and-resume-snippet"
+}

@@ -1,0 +1,31 @@
+# Commands
+
+- ls
+- cat PROJECT.md
+- cat AGENTS.md
+- rg --files -g 'AGENTS.md'
+- cat PROGRESS.md
+- ls docs
+- ls docs/tickets
+- rg --files -g 'wrds_*'
+- ls wrds_pipeline
+- rg -n "output-root|output_root|wrds_root|wrds-root|artifact" scripts wrds_pipeline
+- sed -n '520,900p' wrds_pipeline/pipeline.py
+- rg -n "WRDS_LOCAL_ROOT|local_root|_local_root_from_payload" wrds_pipeline
+- sed -n '1,220p' wrds_pipeline/ingest_sppx_surface.py
+- rg -n "wrds_local" .gitignore
+- ls tests
+- sed -n '1,200p' tests/test_data_policy_fast.py
+- sed -n '1,200p' tests/test_heston_fast.py
+- for f in docs/artifacts/wrds/wrds_agg_pricing.csv docs/artifacts/wrds/wrds_agg_oos.csv docs/artifacts/wrds/wrds_agg_pnl.csv docs/artifacts/wrds/wrds_bs_heston_comparison.csv; do head -n 5 "$f"; done
+- python3 - <<'PY' (inspect manifest wrds_dateset entry)
+- sed -n '1,220p' scripts/manifest_utils.py
+- rg -n "def wrds_metrics|wrds_agg" -n scripts/generate_metrics_summary.py
+- sed -n '430,520p' scripts/generate_metrics_summary.py
+- sed -n '1,220p' docs/RUNBOOK.md
+- rg -n "add_test\(|FAST" CMakeLists.txt
+- sed -n '150,310p' CMakeLists.txt
+- cat /home/codex/.codex/skills/gpt-bundle/SKILL.md
+- bash -lc 'python3 -m venv .venv && . .venv/bin/activate && python -m pip install -r requirements-dev.txt && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=$PWD/.venv/bin/python3 && cmake --build build -j && PATH=$PWD/.venv/bin:$PATH ctest --test-dir build -L FAST --output-on-failure && PATH=$PWD/.venv/bin:$PATH REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh && PATH=$PWD/.venv/bin:$PATH python3 scripts/wrds_realdata_metrics_export.py --wrds-root docs/artifacts/wrds --use-sample --out docs/artifacts/wrds_local/metrics_export_sample.json --out-md docs/artifacts/wrds_local/metrics_export_sample.md'
+- git status --short
+- git rev-parse HEAD

@@ -1,0 +1,50 @@
+# Commands
+
+- ls
+- cat PROJECT.md
+- cat PROGRESS.md
+- rg --files -g 'AGENTS.md'
+- git status --porcelain
+- cat .git/info/exclude
+- cat .gitignore
+- for f in docs/tickets/README.md docs/agent_runs/README.md docs/artifacts/README.md; do if [ -f "$f" ]; then echo "--- $f"; cat "$f"; fi; done
+- mkdir -p docs/tickets docs/agent_runs docs/artifacts reports/_runs artifacts/_local data/samples data/schema configs/local .cache tmp
+- apply_patch (update .gitignore)
+- cat > .git/info/exclude
+- git diff -- PROGRESS.md
+- git diff --name-only
+- git diff --cached --name-only
+- git ls-files | grep -E 'docs/gpt_bundles/|docs/validation_pack\.zip' || true
+- git rm --cached docs/validation_pack.zip docs/gpt_bundles/*.zip 2>/dev/null || true
+- git restore --staged CMakeLists.txt PROGRESS.md docs/DECISIONS.md docs/RUNBOOK.md docs/tickets/ticket-10_wrds-local-realdata-metrics.md docs/tickets/ticket-10a_finish-wrds-exporter-tracked.md docs/tickets/ticket-10b_finish_track_runlog_and_clean_manifest.md docs/tickets/ticket-10b_generate-realdata-metrics-and-resume-snippet.md scripts/wrds_realdata_metrics_export.py tests/test_wrds_realdata_export_fast.py
+- git diff --cached --name-only
+- git status --porcelain
+- git ls-files docs/validation_pack.zip docs/gpt_bundles/*.zip
+- ls docs/gpt_bundles | head -n 20
+- git ls-files docs/gpt_bundles/*.zip docs/validation_pack.zip | xargs -r git rm --cached
+- git diff --cached --name-only
+- for d in docs/agent_runs/20251221_010900_wrds_local_data_integration docs/agent_runs/20260126_001100_ticket-00_project-state-refresh; do echo "--- $d"; ls -la "$d"; done
+- cat docs/agent_runs/20260126_001100_ticket-00_project-state-refresh/META.json
+- cat docs/agent_runs/20260126_021900_ticket-10_wrds-local-realdata-metrics/PROMPT.md
+- cat docs/agent_runs/20260126_021900_ticket-10_wrds-local-realdata-metrics/COMMANDS.md
+- cat docs/agent_runs/20260126_021900_ticket-10_wrds-local-realdata-metrics/RESULTS.md
+- cat docs/agent_runs/20260126_021900_ticket-10_wrds-local-realdata-metrics/TESTS.md
+- date +"%Y%m%d_%H%M%S"
+- git rev-parse HEAD
+- uname -a
+- python3 --version
+- git rev-parse --abbrev-ref HEAD
+- date -u +"%Y-%m-%dT%H:%M:%SZ"
+- cat > docs/agent_runs/20260126_192914_ticket-00_tracking-policy-normalization/{PROMPT.md,COMMANDS.md,RESULTS.md,TESTS.md,META.json}
+- apply_patch (update PROGRESS.md)
+- git count-objects -vH
+- git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | awk '$1=="blob"{print $3" " $2" " $4}' | sort -nr | head -n 20
+- cat > docs/history_cleanup_plan.md
+- git status --porcelain
+- git add -p PROGRESS.md
+- git add TRACKING_POLICY.md .gitignore docs/tickets/README.md docs/agent_runs/README.md docs/artifacts/README.md docs/history_cleanup_plan.md
+- git add docs/agent_runs/**
+- git diff --cached --name-only
+- git diff --cached -- PROGRESS.md
+- git diff --cached -- .gitignore
+- git show HEAD:.gitignore | head -n 120

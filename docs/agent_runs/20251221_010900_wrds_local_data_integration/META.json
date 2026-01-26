@@ -1,0 +1,21 @@
+{
+  "run_name": "20251221_010900_wrds_local_data_integration",
+  "repo": "quant-pricer-cpp",
+  "git_sha_before": "30002fe1a2fd69644b54a36237b8d820da8743f0",
+  "git_sha_after": "30002fe1a2fd69644b54a36237b8d820da8743f0",
+  "branch": "feature/ticket-01-artifact-completeness",
+  "timestamp_utc": "2025-12-21T06:09:48Z",
+  "os": "Darwin Mateos-MacBook-Pro-7.local 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:50 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6030 arm64",
+  "toolchain": {
+    "cmake": "4.1.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "python": "3.12.2"
+  },
+  "dataset": {
+    "mode": "wrds_local_raw",
+    "dataset_id": "wrds_pipeline_dates_panel.yaml",
+    "config_path": "wrds_pipeline_dates_panel.yaml",
+    "config_hash": "af79ff1ee0770a0ac491797058d4820c6e64f0c317a06146d9f90588506cd694"
+  },
+  "notes": "Local WRDS OptionMetrics parquet stash at /Volumes/Storage/Data/wrds documented; panel dates verified as local."
+}

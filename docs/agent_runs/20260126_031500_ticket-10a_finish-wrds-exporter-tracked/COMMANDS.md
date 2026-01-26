@@ -1,0 +1,9 @@
+# Commands
+
+- rg --files -g 'AGENTS.md'
+- cat PROJECT.md
+- cat PROGRESS.md
+- git status -sb
+- python3 - <<'PY' (restore unrelated artifacts from HEAD)
+- python3 - <<'PY' (restore docs/artifacts/manifest.json from HEAD after tests)
+- bash -lc 'python3 -m venv .venv && . .venv/bin/activate && python -m pip install -r requirements-dev.txt && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=$PWD/.venv/bin/python3 && cmake --build build -j && PATH=$PWD/.venv/bin:$PATH ctest --test-dir build -L FAST --output-on-failure && PATH=$PWD/.venv/bin:$PATH WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast --dateset wrds_pipeline_dates_panel.yaml --output-root docs/artifacts/wrds_local && PATH=$PWD/.venv/bin:$PATH QUANT_MACHINE_LABEL=AX162-S python3 scripts/wrds_realdata_metrics_export.py --wrds-root docs/artifacts/wrds_local --use-sample --out docs/artifacts/wrds_local/metrics_export_sample.json --out-md docs/artifacts/wrds_local/metrics_export_sample.md && python3 -c "import json; j=json.load(open(\\"docs/artifacts/wrds_local/metrics_export_sample.json\\")); assert \\\"provenance\\\" in j and \\\"metrics\\\" in j"'

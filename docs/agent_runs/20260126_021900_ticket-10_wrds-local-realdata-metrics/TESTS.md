@@ -1,0 +1,3 @@
+# Tests
+
+- bash -lc 'python3 -m venv .venv && . .venv/bin/activate && python -m pip install -r requirements-dev.txt && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=$PWD/.venv/bin/python3 && cmake --build build -j && PATH=$PWD/.venv/bin:$PATH ctest --test-dir build -L FAST --output-on-failure && PATH=$PWD/.venv/bin:$PATH REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh && PATH=$PWD/.venv/bin:$PATH python3 scripts/wrds_realdata_metrics_export.py --wrds-root docs/artifacts/wrds --use-sample --out docs/artifacts/wrds_local/metrics_export_sample.json --out-md docs/artifacts/wrds_local/metrics_export_sample.md' (pass)
