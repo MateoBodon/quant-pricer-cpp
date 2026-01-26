@@ -9,11 +9,12 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import uuid
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import Dict, Iterable, List, Tuple
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -55,6 +56,64 @@ def _try_git(args: List[str]) -> str | None:
 def _check_git(args: List[str]) -> bool:
     result = subprocess.run(args, cwd=REPO_ROOT, text=True, capture_output=True)
     return result.returncode == 0
+
+
+def _status_porcelain() -> str:
+    result = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True, capture_output=True
+    )
+    if result.returncode != 0:
+        return ""
+    return result.stdout
+
+
+def _stash_push(message: str) -> str | None:
+    result = subprocess.run(
+        ["git", "stash", "push", "-u", "-m", message],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        output = (result.stdout or "") + (result.stderr or "")
+        print("[gpt-bundle] stash failed:")
+        print(output.rstrip())
+        return None
+    ref = _try_git(["git", "stash", "list", "-n", "1", "--format=%H"])
+    return ref.strip() if ref else None
+
+
+def _stash_apply(ref: str) -> Tuple[bool, str]:
+    result = subprocess.run(
+        ["git", "stash", "apply", "--index", ref],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+    )
+    output = (result.stdout or "") + (result.stderr or "")
+    return result.returncode == 0, output
+
+
+def _stash_drop(ref: str) -> None:
+    subprocess.run(["git", "stash", "drop", ref], cwd=REPO_ROOT, text=True)
+
+
+def _capture_required_files(
+    required: List[Tuple[str, Path]],
+) -> Tuple[Path, Dict[str, Path]]:
+    temp_root = Path(tempfile.mkdtemp(prefix="gpt_bundle_required_"))
+    saved: Dict[str, Path] = {}
+    for label, path in required:
+        if not path.exists() or not path.is_file():
+            continue
+        dest = temp_root / label
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            dest.write_bytes(path.read_bytes())
+        except OSError:
+            continue
+        saved[label] = dest
+    return temp_root, saved
 
 
 def _current_branch() -> str | None:
@@ -334,18 +393,38 @@ def main() -> None:
         action="store_true",
         help="Run negative tests to prove missing-file and missing-ticket failures.",
     )
+    parser.add_argument(
+        "--no-stash",
+        action="store_true",
+        help="Disable automatic stashing when the repo is dirty.",
+    )
+    parser.add_argument(
+        "--self-check",
+        action="store_true",
+        help="Print the bundle output path and dirty-tree strategy, then exit.",
+    )
     args = parser.parse_args()
 
     if args.self_test:
         sys.exit(_run_self_test())
 
+    timestamp = args.timestamp or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    output_dir = REPO_ROOT / "artifacts" / "_local" / "gpt_bundles"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    ticket_for_path = args.ticket or "ticket-unknown"
+    run_for_path = args.run_name or "run-unknown"
+    output_path = output_dir / f"{timestamp}_{ticket_for_path}_{run_for_path}.zip"
+
+    status_before = _status_porcelain()
+    dirty = bool(status_before.strip())
+    if args.self_check:
+        print(f"[gpt-bundle] dirty: {'yes' if dirty else 'no'}")
+        print(f"[gpt-bundle] stash: {'no' if args.no_stash else ('yes' if dirty else 'no')}")
+        print(f"[gpt-bundle] output: {output_path}")
+        return
+
     if not args.ticket or not args.run_name:
         parser.error("--ticket and --run-name are required unless --self-test is used")
-
-    timestamp = args.timestamp or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    output_dir = REPO_ROOT / "docs" / "gpt_bundles"
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / f"{timestamp}_{args.ticket}_{args.run_name}.zip"
 
     required = _required_items(args.run_name)
     required_labels = [label for label, _ in required]
@@ -413,16 +492,52 @@ def main() -> None:
     else:
         commit_payload = "Base SHA: (not set)\n"
 
-    with zipfile.ZipFile(
-        output_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
-    ) as zf:
-        for _, path in required:
-            _add_path(zf, path)
+    stash_used = False
+    stash_ref: str | None = None
+    temp_root: Path | None = None
+    saved_required: Dict[str, Path] = {}
+    try:
+        if dirty and not args.no_stash:
+            temp_root, saved_required = _capture_required_files(required)
+            stash_ref = _stash_push(f"temp: gpt_bundle {args.ticket or timestamp}")
+            if not stash_ref:
+                sys.exit(1)
+            stash_used = True
+            if _status_porcelain().strip():
+                print("[gpt-bundle] stash did not clean the working tree.")
+                sys.exit(1)
 
-        zf.writestr("DIFF.patch", diff_payload)
-        zf.writestr("COMMITS.txt", commit_payload)
-        zf.writestr("LAST_COMMIT.txt", last_commit)
+        with zipfile.ZipFile(
+            output_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+        ) as zf:
+            for label, path in required:
+                if stash_used and label in saved_required:
+                    zf.write(saved_required[label], arcname=label)
+                else:
+                    _add_path(zf, path)
 
+            zf.writestr("DIFF.patch", diff_payload)
+            zf.writestr("COMMITS.txt", commit_payload)
+            zf.writestr("LAST_COMMIT.txt", last_commit)
+    finally:
+        if stash_used and stash_ref:
+            applied, out = _stash_apply(stash_ref)
+            if not applied:
+                print("[gpt-bundle] stash apply failed; resolve manually:")
+                print(out.rstrip())
+                print(f"[gpt-bundle] stash ref preserved: {stash_ref}")
+                sys.exit(1)
+            status_after = _status_porcelain()
+            if status_after != status_before:
+                print("[gpt-bundle] stash restore mismatch; resolve before dropping stash.")
+                print(f"[gpt-bundle] stash ref preserved: {stash_ref}")
+                sys.exit(1)
+            _stash_drop(stash_ref)
+        if temp_root:
+            shutil.rmtree(temp_root, ignore_errors=True)
+
+    print(f"[gpt-bundle] dirty: {'yes' if dirty else 'no'}")
+    print(f"[gpt-bundle] stash: {'yes' if stash_used else 'no'}")
     print(f"[gpt-bundle] wrote {output_path}")
 
 

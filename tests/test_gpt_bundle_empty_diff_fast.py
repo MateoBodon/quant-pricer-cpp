@@ -63,7 +63,8 @@ def main() -> None:
     timestamp = f"TEST{uuid.uuid4().hex[:6].upper()}Z"
     output_path = (
         REPO_ROOT
-        / "docs"
+        / "artifacts"
+        / "_local"
         / "gpt_bundles"
         / f"{timestamp}_{ticket_id}_{run_name}.zip"
     )
