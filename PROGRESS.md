@@ -12,15 +12,15 @@ Hardened artifact completeness for metrics snapshots (QL parity, benchmarks, WRD
 ## 2025-12-21
 Built a real-data WRDS cache for SPX (2010-01-04 → 2025-08-29 available) under `/Volumes/Storage/Data/wrds_cache` and added cache support + builder script. Run log: `docs/agent_runs/20251221_003701_wrds_cache_build/`.
 
-Documented the local WRDS raw data stash under `/Volumes/Storage/Data/wrds`, verified panel-date coverage, and bundled `docs/artifacts/wrds_local_manifest.json` into the validation pack. Run log: `docs/agent_runs/20251221_010900_wrds_local_data_integration/`.
+Documented the local WRDS raw data stash under `/Volumes/Storage/Data/wrds`, verified panel-date coverage, and bundled the legacy local WRDS manifest (now `artifacts/_local/wrds_local/manifest_local.json`) into the validation pack. Run log: `docs/agent_runs/20251221_010900_wrds_local_data_integration/`.
 
-Enforced explicit-only WRDS local mode, defaulted local outputs to `docs/artifacts/wrds_local/`, and regenerated the sample-only artifact bundle (with repo-relative paths) via `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`. Run log: `docs/agent_runs/20251221_202201_ticket-06_wrds-local-guardrails/`.
+Enforced explicit-only WRDS local mode, defaulted local outputs to the legacy local path (now `artifacts/_local/wrds_local/`), and regenerated the sample-only artifact bundle (with repo-relative paths) via `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`. Run log: `docs/agent_runs/20251221_202201_ticket-06_wrds-local-guardrails/`.
 
-Generated a local WRDS artifacts bundle under `docs/artifacts/wrds_local/` using `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds` and `wrds_pipeline_dates_panel.yaml`. Run log: `docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle/`.
+Generated a local WRDS artifacts bundle under the legacy local path (now `artifacts/_local/wrds_local/`) using `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds` and `wrds_pipeline_dates_panel.yaml`. Run log: `docs/agent_runs/20251221_205619_ticket-06_wrds-local-bundle/`.
 
 Completed the Ticket-06 checklist: reran `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`, `ctest --test-dir build -L FAST --output-on-failure`, and `WRDS_USE_SAMPLE=1 python -m wrds_pipeline.pipeline --fast` (via python shim), verified sample bundle labeling/no absolute paths, and generated a new GPT bundle. Run log: `docs/agent_runs/20251221_213044_ticket-06_checklist-merge/`. Bundle: `docs/gpt_bundles/20251221T213754Z_ticket-06_20251221_213044_ticket-06_checklist-merge.zip`.
 
-Cleaned tracked `.venv` from git history, added `docs/artifacts/wrds_local/` to `.gitignore`, and preserved the local manifest at `docs/artifacts/wrds_local/manifest_local.json` (untracked). Run log: `docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/`.
+Cleaned tracked `.venv` from git history, added the legacy local WRDS path to `.gitignore`, and preserved the local manifest at `artifacts/_local/wrds_local/manifest_local.json` (untracked). Run log: `docs/agent_runs/20251221_230023_ticket-06_venv-cleanup/`.
 
 ## 2025-12-22
 
@@ -42,7 +42,7 @@ Canonicalized artifact-root usage in the FAST pipeline by routing parity/greeks/
 
 ## 2025-12-23
 
-Ran a local WRDS single-date smoke using `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds` with `--trade-date 2024-06-14` and `--fast`, writing outputs to the gitignored `docs/artifacts/wrds_local/`. Run log: `docs/agent_runs/20251223_030719_ticket-01_wrds-local-smoke/`.
+Ran a local WRDS single-date smoke using `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds` with `--trade-date 2024-06-14` and `--fast`, writing outputs to the legacy local path (now `artifacts/_local/wrds_local/`). Run log: `docs/agent_runs/20251223_030719_ticket-01_wrds-local-smoke/`.
 
 Documented canonical-manifest handling for local WRDS runs in `project_state/KNOWN_ISSUES.md`. Run log: `docs/agent_runs/20251223_044441_ticket-01_wrds-manifest-note/`.
 
@@ -89,3 +89,10 @@ Added explicit `results_commit_sha` + `manifest_git_sha` fields to `project_stat
 - ticket-08c: landed ticket-08b docs sanity guard + runbooks/backlog/runlog cleanly; added ticket file/run log and made FAST tests pass using a local venv.
 - ticket-09_refresh-metrics-ax162s: refreshed AX162-S metrics snapshot (generated_at 2026-01-25T21:13:43.226947+00:00, manifest sha 653b9e8e07364e5c682dabed5bae856a850c1136); tri-engine max|MC-BS|=0.00754518/max|PDE-BS|=0.00058701; QMC median RMSE ratio=4.76346 (asian 3.06425; call 6.46267); PDE slope=-2.0124 rmse=0.00115728; QL parity max diff=0.861583 cents; benchmarks MC paths/sec(1t)=1.27500e+07 eff@max=0.953402; WRDS median iv_rmse=0.00120828. Run log: `docs/agent_runs/20260125_205850_ticket-09_refresh-metrics-ax162s/`.
 - 2026-01-25: ticket-09d_closeout-metrics-ax162s: logged closeout run, verified ticket-09 run log + GPT bundle tracking, generated review bundle, and ran FAST tests. Run log: `docs/agent_runs/20260125_234515_ticket-09d_closeout-metrics-ax162s/`.
+- ticket-10_wrds-local-realdata-metrics: added WRDS real-data metrics exporter + FAST guard, updated runbook commands for sample/local AX162-S runs, and ran full repro/test pipeline. Run log: `docs/agent_runs/20260126_021900_ticket-10_wrds-local-realdata-metrics/`.
+- ticket-10a_finish-wrds-exporter-tracked: tightened WRDS real-data exporter safety checks, added FAST negative guard, and de-noised unrelated artifacts. Run log: `docs/agent_runs/20260126_031500_ticket-10a_finish-wrds-exporter-tracked/`.
+- ticket-10b_generate-realdata-metrics-and-resume-snippet: ran local WRDS pipeline with pyarrow + explicit local dateset, exported metrics + resume snippet under the legacy local path (now `artifacts/_local/wrds_local/wrds_local_20260126_040817`); run log at docs/agent_runs/20260126_040139_ticket-10b_generate-realdata-metrics/.
+- 2026-01-26: added `pyarrow` to `requirements-dev.txt` and clarified WRDS local root + parquet dependency in `docs/RUNBOOK.md`.
+- ticket-10b_finish_track_runlog_and_clean_manifest: tracked the ticket-10b run log + dateset clone, reran FAST/local WRDS export to the legacy local path (now `artifacts/_local/wrds_local/wrds_local_20260126_051959`), updated RUNBOOK guidance for AX162-S/worker_default, and generated bundle `docs/_bundles/gpt_bundle_20260126_043248_ticket-10b_finish_track_runlog_and_clean_manifest.zip`.
+- ticket-10c_tracking-policy-wrds-local: routed WRDS local defaults + manifests to `artifacts/_local/wrds_local`, updated RUNBOOK/README/WRDS_Results/KNOWN_ISSUES + ticket-10b docs, moved the legacy local output folder into scratch, and kept `docs/artifacts/manifest.json` clean. Run log: `docs/agent_runs/20260126_204606_ticket-10c_tracking-policy-wrds-local/`.
+- 2026-01-26: ticket-10c_tracking-policy-wrds-local finalized: removed legacy local ignore, tracked WRDS exporter + FAST test + ticket files, refreshed WRDS docs to `artifacts/_local`, ran FAST tests, and generated GPT bundle `artifacts/_local/gpt_bundles/gpt_bundle_20260126_221408_ticket-10c_tracking-policy-wrds-local.zip`.

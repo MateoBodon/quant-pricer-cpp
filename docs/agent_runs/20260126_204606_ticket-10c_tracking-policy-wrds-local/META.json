@@ -1,0 +1,7 @@
+{
+  "git_sha_before": "f1e60770beb65c75e3aa5c1685a20e3d2ea07d36",
+  "git_sha_after": "f1e60770beb65c75e3aa5c1685a20e3d2ea07d36",
+  "run_name": "20260126_204606_ticket-10c_tracking-policy-wrds-local",
+  "ticket_id": "ticket-10c_tracking-policy-wrds-local",
+  "notes": "FAST tests ran; restored docs/artifacts/manifest.json after tests; bundle under artifacts/_local/gpt_bundles."
+}

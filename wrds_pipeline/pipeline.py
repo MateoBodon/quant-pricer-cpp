@@ -19,10 +19,13 @@ import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = REPO_ROOT / "scripts"
+LOCAL_ARTIFACTS_ROOT = REPO_ROOT / "artifacts" / "_local"
+LOCAL_WRDS_ROOT = LOCAL_ARTIFACTS_ROOT / "wrds_local"
 for path in (REPO_ROOT, SCRIPTS_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
+import manifest_utils
 from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
 
 from . import (
@@ -284,6 +287,23 @@ def _data_mode(use_sample: bool, local_root: Path | None) -> str:
     return "live"
 
 
+def _local_manifest_path(wrds_root: Path) -> Path:
+    return wrds_root / "manifest_local.json"
+
+
+def _ensure_local_manifest(
+    wrds_root: Path, use_sample: bool, local_root: Path | None
+) -> None:
+    if use_sample or local_root is None:
+        return
+    if os.environ.get("QUANT_MANIFEST_PATH"):
+        return
+    canonical = (ARTIFACTS_ROOT / "manifest.json").resolve()
+    if manifest_utils.MANIFEST_PATH.resolve() != canonical:
+        return
+    manifest_utils.MANIFEST_PATH = _local_manifest_path(wrds_root)
+
+
 def run(
     symbol: str,
     trade_date: str,
@@ -300,9 +320,10 @@ def run(
 ) -> Dict[str, object]:
     if wrds_root is None:
         if local_root is not None and not use_sample:
-            wrds_root = ARTIFACTS_ROOT / "wrds_local"
+            wrds_root = LOCAL_WRDS_ROOT
         else:
             wrds_root = ARTIFACTS_ROOT / "wrds"
+    _ensure_local_manifest(wrds_root, use_sample, local_root)
     out_dir = output_dir or wrds_root
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -552,9 +573,10 @@ def run_dateset(
         f"entries={len(entries)}"
     )
     if output_root is None and local_root is not None and not use_sample:
-        wrds_root = ARTIFACTS_ROOT / "wrds_local"
+        wrds_root = LOCAL_WRDS_ROOT
     else:
         wrds_root = output_root or (ARTIFACTS_ROOT / "wrds")
+    _ensure_local_manifest(wrds_root, use_sample, local_root)
     per_date_root = wrds_root / "per_date"
     per_date_root.mkdir(parents=True, exist_ok=True)
     agg_dir = wrds_root
@@ -804,7 +826,10 @@ def main() -> None:
     ap.add_argument(
         "--output-root",
         default=None,
-        help="Optional output root for artifacts (defaults to docs/artifacts/wrds)",
+        help=(
+            "Optional output root for artifacts "
+            "(defaults to docs/artifacts/wrds or artifacts/_local/wrds_local for local runs)"
+        ),
     )
     args = ap.parse_args()
     next_trade = args.next_trade_date or _next_business_day(args.trade_date)

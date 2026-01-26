@@ -1,0 +1,23 @@
+# Commands
+
+- rg --files -g 'AGENTS.md'
+- cat AGENTS.md
+- cat PROJECT.md
+- ls -la docs/agent_runs | sed -n '1,200p'
+- ls -la docs/agent_runs/20260126_040139_ticket-10b_generate-realdata-metrics
+- git ls-files docs/agent_runs/20260126_040139_ticket-10b_generate-realdata-metrics
+- rg -n "docs/artifacts/wrds_local" -S .
+- sed -n '1,220p' wrds_pipeline/pipeline.py
+- sed -n '380,520p' scripts/wrds_realdata_metrics_export.py
+- sed -n '1,220p' tests/test_wrds_realdata_export_fast.py
+- sed -n '1,220p' docs/RUNBOOK.md
+- sed -n '1,120p' docs/WRDS_Results.md
+- sed -n '1,120p' README.md
+- apply_patch (.gitignore: remove legacy docs/artifacts local ignore)
+- apply_patch (docs/tickets/ticket-10*_*.md: update local path guidance)
+- apply_patch (docs/DECISIONS.md, PROGRESS.md: remove legacy path mentions)
+- apply_patch (docs/tickets/ticket-10c_tracking-policy-wrds-local.md: plan with files)
+- git switch -c codex/ticket-10c-tracking-policy-wrds-local
+- python3 -m venv .venv && . .venv/bin/activate && python -m pip install -r requirements-dev.txt && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=$PWD/.venv/bin/python3 && cmake --build build -j && PATH=$PWD/.venv/bin:$PATH ctest --test-dir build -L FAST --output-on-failure
+- git show HEAD:docs/artifacts/manifest.json > docs/artifacts/manifest.json
+- python3 tools/agentic/gpt_bundle.py --zip --ticket ticket-10c_tracking-policy-wrds-local

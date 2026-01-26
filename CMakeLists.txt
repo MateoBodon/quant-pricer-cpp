@@ -276,6 +276,12 @@ add_test(
 set_tests_properties(wrds_asof_poison_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME wrds_realdata_export_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_wrds_realdata_export_fast.py
+)
+set_tests_properties(wrds_realdata_export_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME market_wrds_pipeline
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/wrds_pipeline/tests/test_wrds_pipeline.py
 )
