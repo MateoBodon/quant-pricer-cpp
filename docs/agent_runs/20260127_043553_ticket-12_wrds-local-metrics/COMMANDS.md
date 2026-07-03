@@ -1,0 +1,104 @@
+# Commands
+
+- `rg --files -g 'AGENTS.md'`
+  - Locate repo instructions.
+- `cat /home/codex/.codex/skills/runlog-init/SKILL.md`
+  - Load required runlog-init skill.
+- `ls tools/agentic`
+  - Confirm runlog tooling.
+- `python3 tools/agentic/runlog_init.py --ticket "12" --summary "One-command WRDS local metrics export"`
+  - Initialize run log (renamed to include slug).
+- `mv docs/agent_runs/20260127_043553_ticket-12 docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics`
+  - Conform to run-name format.
+- `rg --files -g 'wrds*'`
+  - Locate WRDS scripts/docs.
+- `ls tests`
+  - Inventory tests.
+- `sed -n '1,200p' tests/test_wrds_realdata_export_fast.py`
+  - Review exporter FAST test.
+- `sed -n '1,200p' tests/test_artifacts_root_guard_fast.py`
+  - Review artifact guard patterns.
+- `rg -n "QUANT_MANIFEST_PATH" -S`
+  - Find manifest override usage.
+- `sed -n '240,360p' wrds_pipeline/pipeline.py`
+- `sed -n '760,860p' wrds_pipeline/pipeline.py`
+- `sed -n '860,940p' wrds_pipeline/pipeline.py`
+  - Inspect pipeline output-root + manifest handling.
+- `sed -n '1,200p' scripts/manifest_utils.py`
+  - Confirm manifest override semantics.
+- `rg -n "WRDS real-data export|WRDS" docs/RUNBOOK.md`
+- `sed -n '1,120p' docs/RUNBOOK.md`
+  - Review runbook context.
+- `sed -n '1,200p' scripts/reproduce_all.sh`
+  - Check scripting conventions.
+- `sed -n '1,200p' docs/DOCS_AND_LOGGING_SYSTEM.md`
+  - Confirm logging requirements.
+- `rg -n "WRDS_LOCAL_ROOT" -S wrds_pipeline`
+- `sed -n '1,120p' wrds_pipeline/ingest_sppx_surface.py`
+  - Verify local root behavior.
+- `cat wrds_pipeline_dates_panel.yaml`
+  - Inspect default dateset.
+- `rg -n "wrds_realdata_export_fast" -S CMakeLists.txt tests`
+- `sed -n '240,320p' CMakeLists.txt`
+  - Locate FAST test registrations.
+- `sed -n '1,120p' CHANGELOG.md`
+- `sed -n '1,200p' PROGRESS.md`
+  - Review doc formats.
+- `apply_patch` (add `scripts/reproduce_wrds_local_metrics.sh`)
+- `chmod +x scripts/reproduce_wrds_local_metrics.sh`
+- `apply_patch` (add `tests/test_wrds_local_metrics_one_command_fast.py`)
+- `apply_patch` (update `CMakeLists.txt`)
+- `apply_patch` (update `docs/RUNBOOK.md`)
+- `apply_patch` (update `CHANGELOG.md`)
+- `apply_patch` (update `PROGRESS.md`)
+- `apply_patch` (update `scripts/reproduce_wrds_local_metrics.sh` resolve_path)
+- `sed -n '1,120p' scripts/reproduce_wrds_local_metrics.sh`
+  - Verify script content.
+- `git status --short`
+  - Check working tree state.
+- `cat docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/META.json`
+- `cat docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/PROMPT.md`
+- `cat docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/RESULTS.md`
+- `cat docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/TESTS.md`
+- `cat docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/COMMANDS.md`
+  - Review runlog stubs.
+- `WRDS_USE_SAMPLE=1 python3 tests/test_wrds_local_metrics_one_command_fast.py`
+  - Failed: missing matplotlib.
+- `WRDS_USE_SAMPLE=1 ./scripts/reproduce_wrds_local_metrics.sh --dateset wrds_pipeline_dates_panel.yaml --run-id wrds_local_ci_smoke`
+  - Failed: missing matplotlib.
+- `date -u +"%Y-%m-%dT%H:%M:%SZ"`
+- `git rev-parse HEAD`
+- `git rev-parse --abbrev-ref HEAD`
+- `uname -srm`
+- `python3 -V`
+- `c++ --version | head -n 1`
+- `python3 - <<'PY' ... PY`
+  - Capture dateset hash for META.
+- `cat <<'EOF' > docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/PROMPT.md`
+- `cat <<'EOF' > docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/META.json`
+- `cat <<'EOF' > docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/RESULTS.md`
+- `cat <<'EOF' > docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/TESTS.md`
+- `cat <<'EOF' > docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/COMMANDS.md`
+- `pip install -r requirements-dev.txt`
+  - Failed: externally-managed environment.
+- `if [ ! -x .venv/bin/python ]; then python3 -m venv .venv; fi && .venv/bin/pip install -r requirements-dev.txt`
+  - Installed dev deps in `.venv`.
+- `WRDS_USE_SAMPLE=1 .venv/bin/python tests/test_wrds_local_metrics_one_command_fast.py`
+  - Failed: script invoked system python missing matplotlib.
+- `PATH="$PWD/.venv/bin:$PATH" WRDS_USE_SAMPLE=1 .venv/bin/python tests/test_wrds_local_metrics_one_command_fast.py`
+  - Passed.
+- `PATH="$PWD/.venv/bin:$PATH" cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && PATH="$PWD/.venv/bin:$PATH" cmake --build build -j`
+  - Build succeeded.
+- `PATH="$PWD/.venv/bin:$PATH" ctest --test-dir build -L FAST --output-on-failure`
+  - Failed: docs_sanity_fast (HHMMSS placeholder).
+- `apply_patch` (docs/RUNBOOK.md remove HHMMSS placeholder wording)
+- `PATH="$PWD/.venv/bin:$PATH" ctest --test-dir build -L FAST --output-on-failure`
+  - Passed.
+- `git diff -- docs/artifacts/manifest.json docs/artifacts/metrics_summary.json docs/artifacts/metrics_summary.md`
+  - Inspect snapshot metadata changes.
+- `rg -n "generated_at|manifest_git_sha|results_commit_sha" project_state/CURRENT_RESULTS.md`
+  - Check CURRENT_RESULTS sync state.
+- `sed -n '1,80p' project_state/CURRENT_RESULTS.md`
+  - Review CURRENT_RESULTS content.
+- `apply_patch` (update `project_state/CURRENT_RESULTS.md`)
+- `apply_patch` (update `PROGRESS.md` with snapshot sync)

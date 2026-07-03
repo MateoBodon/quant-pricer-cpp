@@ -18,7 +18,25 @@ How to run, test, and debug this repo.
 ## WRDS sample pipeline
 - `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast`
 
-## WRDS real-data export (AX162-S / worker_default)
+## WRDS local metrics (one-command)
+- Sample (CI-friendly):
+  - `WRDS_USE_SAMPLE=1 ./scripts/reproduce_wrds_local_metrics.sh --dateset wrds_pipeline_dates_panel.yaml`
+- Local parquet:
+  - `WRDS_LOCAL_ROOT=/srv/data/wrds/wrds QUANT_MACHINE_LABEL=<label> ./scripts/reproduce_wrds_local_metrics.sh --dateset <local_dateset>.yaml`
+- Optional: `--run-id <id>` to control the output folder (defaults to `wrds_local_<UTC timestamp>`).
+- The script prints the metrics Markdown path under `artifacts/_local/wrds_local/<run_id>/`.
+
+## Update resume from WRDS export
+- Generate sample snippet (CI-safe):
+  - `WRDS_USE_SAMPLE=1 ./scripts/reproduce_wrds_local_metrics.sh --dateset wrds_pipeline_dates_panel.yaml --run-id wrds_local_ci_snippet`
+  - `python3 scripts/generate_wrds_resume_snippet.py --metrics-json artifacts/_local/wrds_local/wrds_local_ci_snippet/metrics_export_sample.json`
+- Generate local parquet snippet:
+  - `WRDS_LOCAL_ROOT=/srv/data/wrds/wrds QUANT_MACHINE_LABEL=<label> ./scripts/reproduce_wrds_local_metrics.sh --dateset <local_dateset>.yaml --run-id wrds_local_resume`
+  - `python3 scripts/generate_wrds_resume_snippet.py --metrics-json artifacts/_local/wrds_local/wrds_local_resume/metrics_export_local.json`
+- Default output is `artifacts/_local/wrds_local/<run_id>/resume_snippet_wrds_{sample,local}.md`.
+- The snippet is aggregate-only by construction and hard-fails sanitization if banned tokens appear (`/srv/data/wrds`, `.parquet`, `.csv`).
+
+## WRDS real-data export (manual mode / debugging only; AX162-S / worker_default)
 - Sample run (aggregates only):
   - `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast --dateset wrds_pipeline_dates_panel.yaml`
   - `WRDS_USE_SAMPLE=1 QUANT_MACHINE_LABEL=AX162-S python3 scripts/wrds_realdata_metrics_export.py --wrds-root docs/artifacts/wrds --use-sample --out artifacts/_local/wrds_local/metrics_export_sample.json --out-md artifacts/_local/wrds_local/metrics_export_sample.md`

@@ -8,9 +8,10 @@ Outputs:
   artifacts/_local/gpt_bundles/gpt_bundle_<timestamp>[_<ticket>].zip
 
 The bundle includes:
-- docs/_generated/repo_snapshot.md (auto-generated)
-- git status, log, diffs
+- docs/_generated/repo_snapshot.md (auto-generated / refreshed)
+- git status, log, base..HEAD diff evidence
 - ticket file (if present)
+- run-log files (if --run-name is provided)
 - selected small changed files (best-effort)
 """
 from __future__ import annotations
@@ -42,30 +43,74 @@ def git_root(start: Path) -> Optional[Path]:
     return Path(out.strip())
 
 
-def ensure_repo_snapshot(repo: Path) -> Optional[Path]:
+RUNLOG_FILES = ("PROMPT.md", "COMMANDS.md", "RESULTS.md", "TESTS.md", "META.json")
+
+
+def ensure_repo_snapshot(repo: Path, refresh: bool = True) -> Optional[Path]:
     snap = repo / "docs" / "_generated" / "repo_snapshot.md"
-    if snap.exists():
-        return snap
     tool = repo / "tools" / "agentic" / "repo_snapshot.py"
-    if tool.exists():
+    if refresh and tool.exists():
         code, out = run([sys.executable, str(tool)], cwd=repo)
         if code == 0:
-            p = Path(out.strip().splitlines()[-1])
+            p = Path(out.strip().splitlines()[-1]).resolve()
             if p.exists():
                 return p
+    if snap.exists():
+        return snap
     return None
 
 
-def list_changed_files(repo: Path) -> list[str]:
-    # Prefer git diff names for working tree
+def _append_unique_paths(target: list[str], raw: str) -> None:
+    for line in raw.splitlines():
+        rel = line.strip()
+        if rel and rel not in target:
+            target.append(rel)
+
+
+def _ref_exists(repo: Path, ref: str) -> bool:
+    code, _ = run(["git", "-C", str(repo), "rev-parse", "--verify", ref])
+    return code == 0
+
+
+def resolve_base_sha(repo: Path, explicit_base: Optional[str], base_ref: str) -> Tuple[Optional[str], Optional[str]]:
+    candidate = (explicit_base or os.getenv("BASE_SHA") or "").strip()
+    if candidate:
+        code, out = run(["git", "-C", str(repo), "rev-parse", "--verify", candidate])
+        if code == 0:
+            return out.strip(), "explicit"
+        return None, f"invalid:{candidate}"
+
+    for ref in (base_ref, "main", "origin/main"):
+        if not ref:
+            continue
+        if not _ref_exists(repo, ref):
+            continue
+        code, out = run(["git", "-C", str(repo), "merge-base", "HEAD", ref])
+        if code == 0 and out.strip():
+            return out.strip(), f"merge-base:{ref}"
+    return None, None
+
+
+def list_changed_files(repo: Path, base_sha: Optional[str]) -> list[str]:
+    changed: list[str] = []
+
+    if base_sha:
+        _, out = run(["git", "-C", str(repo), "diff", "--name-only", f"{base_sha}..HEAD"])
+        _append_unique_paths(changed, out)
+
     _, out = run(["git", "-C", str(repo), "diff", "--name-only"])
-    changed = [l.strip() for l in out.splitlines() if l.strip()]
-    # Include staged
+    _append_unique_paths(changed, out)
+
     _, out2 = run(["git", "-C", str(repo), "diff", "--cached", "--name-only"])
-    for l in out2.splitlines():
-        l = l.strip()
-        if l and l not in changed:
-            changed.append(l)
+    _append_unique_paths(changed, out2)
+
+    _, out3 = run(["git", "-C", str(repo), "status", "--porcelain"])
+    for line in out3.splitlines():
+        if not line.startswith("?? "):
+            continue
+        rel = line[3:].strip()
+        if rel and rel not in changed:
+            changed.append(rel)
     return changed
 
 
@@ -92,7 +137,25 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--zip", action="store_true", help="Create zip bundle (default behavior).")
     ap.add_argument("--ticket", type=str, default=None, help="Ticket id to include (optional).")
+    ap.add_argument("--run-name", type=str, default=None, help="Run log name under docs/agent_runs/ to include.")
     ap.add_argument("--out", type=str, default=None, help="Output zip path (optional).")
+    ap.add_argument(
+        "--base-sha",
+        type=str,
+        default=None,
+        help="Optional base commit for commit-range diff evidence (defaults to merge-base with --base-ref).",
+    )
+    ap.add_argument(
+        "--base-ref",
+        type=str,
+        default="main",
+        help="Reference branch/ref for merge-base when --base-sha is not provided (default: main).",
+    )
+    ap.add_argument(
+        "--allow-empty-diff",
+        action="store_true",
+        help="Allow writing a bundle when no commit-range/working/staged diff exists.",
+    )
     ap.add_argument("--include-files", action="store_true", help="Include small changed files in addition to diffs.")
     ap.add_argument(
         "--no-stash",
@@ -146,16 +209,58 @@ def main() -> int:
         print(f"[gpt-bundle] output: {out_zip}")
         return 0
 
-    # Ensure snapshot exists
-    snap = ensure_repo_snapshot(repo)
+    # Refresh snapshot on every run to avoid stale review context.
+    snap = ensure_repo_snapshot(repo, refresh=True)
 
-    # Collect git info (capture before any stash)
+    base_sha, base_source = resolve_base_sha(repo, args.base_sha, args.base_ref)
+    if base_source and base_source.startswith("invalid:"):
+        print(f"[gpt-bundle] base SHA not found: {base_source.split(':', 1)[1]}")
+        return 1
+    if base_sha:
+        print(f"[gpt-bundle] using base SHA {base_sha} ({base_source})")
+
+    # Collect git info (capture before any stash).
     _, status = run(["git", "-C", str(repo), "status", "--porcelain=v1", "-b"])
     _, log = run(["git", "-C", str(repo), "log", "-n", "50", "--oneline", "--decorate"])
-    _, diff = run(["git", "-C", str(repo), "diff"])
-    _, diff_cached = run(["git", "-C", str(repo), "diff", "--cached"])
-    _, diff_stat = run(["git", "-C", str(repo), "diff", "--stat"])
-    changed = list_changed_files(repo)
+    _, diff_work = run(["git", "-C", str(repo), "diff", "--patch"])
+    _, diff_cached = run(["git", "-C", str(repo), "diff", "--cached", "--patch"])
+    _, diff_range = run(
+        ["git", "-C", str(repo), "diff", "--patch", f"{base_sha}..HEAD"]
+    ) if base_sha else (0, "")
+    _, diff_stat = run(
+        ["git", "-C", str(repo), "diff", "--stat", f"{base_sha}..HEAD"]
+    ) if base_sha else run(["git", "-C", str(repo), "diff", "--stat"])
+    _, commit_log = run(
+        ["git", "-C", str(repo), "log", "--oneline", f"{base_sha}..HEAD"]
+    ) if base_sha else (0, "")
+    changed = list_changed_files(repo, base_sha)
+
+    diff_sections: list[str] = []
+    if base_sha:
+        if diff_range.strip():
+            diff_sections.append(f"### git diff --patch {base_sha}..HEAD\n{diff_range}")
+    if diff_work.strip():
+        diff_sections.append("### git diff --patch (working tree)\n" + diff_work)
+    if diff_cached.strip():
+        diff_sections.append("### git diff --cached --patch (staged)\n" + diff_cached)
+
+    if not diff_sections and not args.allow_empty_diff:
+        print(
+            "[gpt-bundle] No diff evidence found in base..HEAD, working tree, or staged index. "
+            "Pass --allow-empty-diff to override."
+        )
+        return 1
+
+    diff_payload = "\n\n".join(diff_sections) if diff_sections else "No diff\n"
+    commit_payload = []
+    if base_sha:
+        commit_payload.append(f"Base SHA: {base_sha}")
+        commit_payload.append(f"Base source: {base_source}")
+        commit_payload.append("")
+        commit_payload.append(commit_log.strip() or "No commits in range")
+    else:
+        commit_payload.append("Base SHA: (not set)")
+    commits_txt = "\n".join(commit_payload).rstrip() + "\n"
 
     ticket_content = None
     if ticket:
@@ -173,6 +278,16 @@ def main() -> int:
         except OSError:
             snap_content = None
 
+    runlog_files: list[Path] = []
+    if args.run_name:
+        runlog_dir = repo / "docs" / "agent_runs" / args.run_name
+        for name in RUNLOG_FILES:
+            candidate = runlog_dir / name
+            if candidate.exists() and candidate.is_file():
+                runlog_files.append(candidate)
+            else:
+                print(f"[gpt-bundle] warning: missing run log file {candidate}")
+
     stash_used = False
     stash_ref: Optional[str] = None
     temp_dir = None
@@ -183,15 +298,21 @@ def main() -> int:
 Generated: {ts}Z
 Repo: {repo}
 Ticket: {ticket or "(none)"}
+Run name: {args.run_name or "(none)"}
+Base SHA: {base_sha or "(not set)"}
+Base source: {base_source or "(not set)"}
 
 Contents:
 - docs/_generated/repo_snapshot.md (if available)
 - git_status.txt
 - git_log.txt
-- git_diff.patch (working tree)
+- DIFF.patch (base..HEAD + working tree + staged)
+- git_diff.patch (compat: commit-range diff when available)
 - git_diff_cached.patch (staged)
 - git_diff_stat.txt
 - changed_files.txt
+- COMMITS.txt
+- docs/agent_runs/<run_name>/* (if --run-name was provided)
 - ticket file (if present)
 - small changed files (optional)
 """
@@ -224,7 +345,9 @@ Contents:
             z.writestr("README.txt", readme)
             z.writestr("git_status.txt", status)
             z.writestr("git_log.txt", log)
-            z.writestr("git_diff.patch", diff)
+            z.writestr("DIFF.patch", diff_payload)
+            z.writestr("COMMITS.txt", commits_txt)
+            z.writestr("git_diff.patch", diff_range if diff_range.strip() else diff_work)
             z.writestr("git_diff_cached.patch", diff_cached)
             z.writestr("git_diff_stat.txt", diff_stat)
             z.writestr("changed_files.txt", "\n".join(changed) + ("\n" if changed else ""))
@@ -240,6 +363,9 @@ Contents:
                 tf = repo / "docs" / "tickets" / f"{ticket}.md"
                 if tf.exists():
                     z.write(tf, arcname=str(tf.relative_to(repo)))
+
+            for runlog_path in runlog_files:
+                z.write(runlog_path, arcname=str(runlog_path.relative_to(repo)))
 
             if args.include_files:
                 for rel in changed:

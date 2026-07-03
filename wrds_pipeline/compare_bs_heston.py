@@ -37,6 +37,14 @@ def _concat_csv(files: Iterable[Path]) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
+def _normalize_tenor_bucket(df: pd.DataFrame) -> pd.DataFrame:
+    if "tenor_bucket" not in df.columns:
+        return df
+    out = df.copy()
+    out["tenor_bucket"] = out["tenor_bucket"].astype(str)
+    return out
+
+
 def _bucket_rmse(
     df: pd.DataFrame, error_col: str, weight_col: str | None = None
 ) -> pd.Series:
@@ -67,11 +75,11 @@ def _bucket_mae(
     return pd.Series(np.average(np.abs(errors), weights=weights), index=["value"])
 
 
-def _load_insample(model: str) -> pd.DataFrame:
+def _load_insample(model: str, per_date_root: Path = PER_DATE_ROOT) -> pd.DataFrame:
     """Load per-row insample surfaces across all dates for a model."""
     filename = "wrds_heston_insample.csv" if model == "heston" else "bs_fit_table.csv"
-    files = [p / filename for p in PER_DATE_ROOT.glob("*") if (p / filename).exists()]
-    df = _concat_csv(files)
+    files = [p / filename for p in per_date_root.glob("*") if (p / filename).exists()]
+    df = _normalize_tenor_bucket(_concat_csv(files))
     if df.empty:
         return df
     if "iv_error_vol" not in df.columns and "iv_error_bps" in df.columns:
@@ -79,31 +87,31 @@ def _load_insample(model: str) -> pd.DataFrame:
     return df
 
 
-def _load_oos(model: str) -> pd.DataFrame:
+def _load_oos(model: str, per_date_root: Path = PER_DATE_ROOT) -> pd.DataFrame:
     """Load per-row OOS surfaces across all dates for a model."""
     if model == "heston":
         filename = "oos_pricing_detail.csv"
     else:
         filename = "bs_oos_summary.csv"
-    files = [p / filename for p in PER_DATE_ROOT.glob("*") if (p / filename).exists()]
-    return _concat_csv(files)
+    files = [p / filename for p in per_date_root.glob("*") if (p / filename).exists()]
+    return _normalize_tenor_bucket(_concat_csv(files))
 
 
-def _load_pnl() -> pd.DataFrame:
+def _load_pnl(per_date_root: Path = PER_DATE_ROOT) -> pd.DataFrame:
     files = [
-        p / "delta_hedge_pnl_summary.csv" for p in PER_DATE_ROOT.glob("*")
+        p / "delta_hedge_pnl_summary.csv" for p in per_date_root.glob("*")
     ]
-    return _concat_csv(files)
+    return _normalize_tenor_bucket(_concat_csv(files))
 
 
-def _aggregate_buckets() -> Dict[str, pd.DataFrame]:
-    heston_insample = _load_insample("heston")
-    bs_insample = _load_insample("bs")
+def _aggregate_buckets(per_date_root: Path = PER_DATE_ROOT) -> Dict[str, pd.DataFrame]:
+    heston_insample = _load_insample("heston", per_date_root)
+    bs_insample = _load_insample("bs", per_date_root)
 
-    heston_oos = _load_oos("heston")
-    bs_oos = _load_oos("bs")
+    heston_oos = _load_oos("heston", per_date_root)
+    bs_oos = _load_oos("bs", per_date_root)
 
-    pnl = _load_pnl()
+    pnl = _load_pnl(per_date_root)
 
     def insample_bucket(df: pd.DataFrame) -> pd.DataFrame:
         if df.empty:
@@ -160,7 +168,9 @@ def _aggregate_buckets() -> Dict[str, pd.DataFrame]:
     heston_oos_buckets = oos_bucket(heston_oos)
     bs_oos_buckets = oos_bucket(bs_oos)
 
-    pnl_bucket = pd.DataFrame()
+    pnl_bucket = pd.DataFrame(
+        columns=["tenor_bucket", "pnl_sigma", "count", "mean_ticks"]
+    )
     if not pnl.empty:
         pnl_bucket = (
             pnl.groupby("tenor_bucket", observed=True)
@@ -182,7 +192,8 @@ def _aggregate_buckets() -> Dict[str, pd.DataFrame]:
 
 
 def _merge_comparison(buckets: Dict[str, pd.DataFrame]) -> pd.DataFrame:
-    base = pd.DataFrame({"tenor_bucket": sorted(set(
+    buckets = {name: _normalize_tenor_bucket(df) for name, df in buckets.items()}
+    base = pd.DataFrame({"tenor_bucket": pd.Series(sorted(set(
         pd.concat(
             [
                 buckets.get("heston_insample", pd.DataFrame(columns=["tenor_bucket"])),
@@ -193,7 +204,7 @@ def _merge_comparison(buckets: Dict[str, pd.DataFrame]) -> pd.DataFrame:
             ],
             ignore_index=True,
         )["tenor_bucket"].dropna().unique()
-    ))})
+    )), dtype=object)})
 
     insample = base.merge(
         buckets["heston_insample"], on="tenor_bucket", how="left", suffixes=("", "")
@@ -360,7 +371,7 @@ def generate_comparison_artifacts(
     artifacts_root: Path = WRDS_ROOT,
     per_date_root: Path = PER_DATE_ROOT,
 ) -> Dict[str, Path]:
-    buckets = _aggregate_buckets()
+    buckets = _aggregate_buckets(per_date_root)
     comp = _merge_comparison(buckets)
     comp_csv = artifacts_root / "wrds_bs_heston_comparison.csv"
     comp.to_csv(comp_csv, index=False)

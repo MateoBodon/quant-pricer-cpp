@@ -1,0 +1,7 @@
+run_name=20260216_024908_ticket-16
+run_id=wrds_local_20260216_024926_ticket16
+wrds_local_root=/srv/data/wrds/wrds
+dateset_path=wrds_pipeline_dates_panel.yaml
+machine_label=codex-worker
+git_sha=ed30ff7a5ea9a36e8aca18f9d7687340c2c5b950
+utc_started=2026-02-16T02:49:27Z

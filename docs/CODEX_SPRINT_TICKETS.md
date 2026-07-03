@@ -4,6 +4,14 @@ Sprint intent: **validity first**, then “resume-credible” artifacts.
 
 ---
 
+## ticket-16 — WRDS resume snippet percent-improvement text
+
+**Status:** **IN PROGRESS** (local run evidence in progress log + run log).
+
+**Goal (1 sentence):** Add computed Heston-vs-BS percent improvement text to the WRDS resume snippet generator and enforce it in FAST test output checks.
+
+---
+
 ## ticket-01 — Canonicalize artifact root + manifest (single source of truth)
 
 **Status:** **FAIL** (evidence missing in bundle; run log evidence not included).

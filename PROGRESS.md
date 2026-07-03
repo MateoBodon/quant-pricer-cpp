@@ -1,5 +1,37 @@
 # Progress Log
 
+## 2026-02-17
+Updated WRDS resume snippet generation to include computed Heston-vs-BS percent improvement in the aggregate bullet (`~66.5% lower` for the current sample export), with fail-closed validation when `median_bs_iv_rmse_volpts <= 0`. Extended FAST test `wrds_resume_snippet_from_sample_export_fast` to derive and assert the same formatted percent value from export JSON medians. Verified via `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`, `cmake --build build -j`, `ctest --test-dir build -L FAST --output-on-failure` (64/64 pass), plus manual sample smoke in venv. Run log: `docs/agent_runs/20260217_010017_ticket-16_wrds-resume-improvement-pct/`.
+
+## 2026-02-16
+Ran WRDS bigger-panel local metrics refresh for resume with a pre-committed deterministic panel config `wrds_pipeline_dates_panel_resume_v2.yaml` (`panel_id=wrds_panel_resume_v2`, 14 entries: v1 stress dates + Q1/Q3 anchors for 2020-2025). Executed sample smoke and licensed local parquet export to `artifacts/_local/wrds_local/wrds_local_resume_v2/`, generated `resume_snippet_wrds_local.md`, and logged metrics in `docs/agent_runs/20260216_212054_ticket-16_wrds-bigger-panel-resume-v2/` including derived Heston-vs-BS median IV RMSE improvement `66.5183%`. Tracking check confirms only dateset + run log + `PROGRESS.md` are tracked changes.
+
+Closed ticket-16 FAIL remediation and landed a WRDS resume-snippet workflow:
+- added `scripts/generate_wrds_resume_snippet.py` (aggregate-only snippet generator for `metrics_export_{sample,local}.json` with sanitization guard against `/srv/data/wrds`, `.parquet`, `.csv`, and row-level dumps),
+- added FAST test `tests/test_wrds_resume_snippet_from_sample_export_fast.py` and CMake registration (`wrds_resume_snippet_from_sample_export_fast`),
+- updated `docs/RUNBOOK.md` with explicit sample/local commands for generating resume snippets,
+- added ticket spec `docs/tickets/ticket-16_wrds-local-parquet-metrics-resume-refresh.md`.
+
+Tracked and repaired run evidence under `docs/agent_runs/20260216_024908_ticket-16/`: replaced non-reproducible `python3 - <<'PY' ...` placeholders with full snippets, recorded key aggregate metrics from `artifacts/_local/wrds_local/wrds_local_20260216_024926_ticket16/metrics_export_local.json` (including median iv_rmse metrics), and preserved local-only outputs under `artifacts/_local/wrds_local/`. Validation commands: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`, `cmake --build build -j`, `ctest --test-dir build -L FAST --output-on-failure`, sample one-command export, and sample/local snippet generation. Also replaced placeholder bullets in `docs/NOW.md` to satisfy `docs_sanity_fast` during FAST verification.
+
+## 2026-02-12
+Repaired ticket-12 review-bundle evidence by hardening `tools/agentic/gpt_bundle.py` to refresh `docs/_generated/repo_snapshot.md` on every run, emit commit-range evidence (`DIFF.patch` + `COMMITS.txt` from `main..HEAD`), and include run-log files via `--run-name`. Generated bundle: `artifacts/_local/gpt_bundles/gpt_bundle_20260212_230128_ticket-12.zip`. Validation: `python3 -m compileall tools/agentic/gpt_bundle.py` plus zip checks (`unzip -l`, `unzip -p ... changed_files.txt`, and `unzip -p ... DIFF.patch | rg ...`). Run log: `docs/agent_runs/20260212_225813_ticket-12_bundle-evidence-repair/`.
+Split commits for auditability: `chore: make runlog_init idempotent for existing run-name` (idempotent rerun fix) and `ticket-12: repair bundle evidence packaging` (bundle evidence + logging updates).
+
+## 2026-01-28
+Committed the remaining ticket-12 deliverables (RUNBOOK/CMake/CHANGELOG + prior run logs) and regenerated the review bundle. Bundle: `artifacts/_local/gpt_bundles/gpt_bundle_20260128_000746_ticket-ticket-12.zip`. Run log: `docs/agent_runs/20260128_000449_ticket-ticket-12/`. Tests: not run (bundle/logging-only).
+
+Tracked the agentic-kit scaffolding docs/scripts (NOW/TICKETS + helper tools) and added `.agent/` to `.gitignore` to keep scratch output out of git. Run log: `docs/agent_runs/20260128_014241_ticket-12_agentic-scaffold/`. Tests: not run (docs/housekeeping-only).
+
+Generated an updated GPT bundle for ticket-12. Bundle: `artifacts/_local/gpt_bundles/gpt_bundle_20260128_005635_ticket-12.zip`. Run log: `docs/agent_runs/20260128_005626_ticket-ticket-12/`. Tests: not run (bundle/logging-only).
+
+## 2026-01-27
+Generated project-state bundle via `python3 tools/agentic/project_state_refresh.py --zip`. Bundle: `artifacts/_local/project_state_bundles/project_state_20260127_014247.zip`.
+
+Added a one-command WRDS local metrics export script with safe local-manifest routing, documented the workflow in the RUNBOOK, and added a FAST smoke test + changelog entry. Synced `project_state/CURRENT_RESULTS.md` to the latest metrics snapshot metadata generated during FAST tests (generated at 2026-01-27T15:04:38.959450+00:00; manifest sha `0318d95d12a947cef2fde2d8932fffd969998bb5`). Run log: `docs/agent_runs/20260127_043553_ticket-12_wrds-local-metrics/`. Tests: `PATH=\"$PWD/.venv/bin:$PATH\" WRDS_USE_SAMPLE=1 .venv/bin/python tests/test_wrds_local_metrics_one_command_fast.py`, `PATH=\"$PWD/.venv/bin:$PATH\" cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`, `PATH=\"$PWD/.venv/bin:$PATH\" cmake --build build -j`, `PATH=\"$PWD/.venv/bin:$PATH\" ctest --test-dir build -L FAST --output-on-failure`.
+
+Tracked the ticket-12 deliverables (script, FAST test, run log) and regenerated the review bundle for verification. Bundle: `artifacts/_local/gpt_bundles/gpt_bundle_20260127_213237_ticket-ticket-12-wrds-local-metrics.zip`. Run log: `docs/agent_runs/20260127_210235_ticket-ticket-12/`. Tests: not run (staging/bundle-only).
+
 ## 2026-01-26
 Normalized tracking policy: moved local-only ignores into `.gitignore`, cleared `.git/info/exclude`, ensured scaffold dirs/READMEs, tracked missing agent run logs, and untracked zip bundles from the index. Run log: `docs/agent_runs/20260126_192914_ticket-00_tracking-policy-normalization/`.
 gpt-bundle now outputs to `artifacts/_local/gpt_bundles/` and supports dirty-tree-safe bundling via stash wrapper with `--no-stash` override; docs note added for the scratch bundle path.
