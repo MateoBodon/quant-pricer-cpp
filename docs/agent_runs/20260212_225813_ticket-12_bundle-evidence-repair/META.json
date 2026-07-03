@@ -1,0 +1,12 @@
+{
+  "created_at_utc": "2026-02-12T22:58:31Z",
+  "git_branch": "codex/ticket-12-wrds-local-metrics",
+  "git_head": "5d8c67ca61d2f5bc85fbcfef18a5c1ee094dba98",
+  "hostname": "codex-worker",
+  "python": "3.12.3 (main, Jan 22 2026, 20:57:42) [GCC 13.3.0]",
+  "repo_root": "/home/codex/repos/quant-pricer-cpp",
+  "run_name": "20260212_225813_ticket-12_bundle-evidence-repair",
+  "summary": "Repair ticket-12 review bundle evidence (base..HEAD diff + snapshot + runlog inclusion)",
+  "ticket": "ticket-12",
+  "user": "codex"
+}

@@ -1,0 +1,45 @@
+{
+  "created_at_utc": "2026-02-16T02:49:08Z",
+  "completed_at_utc": "2026-02-16T04:10:02Z",
+  "ticket": "16",
+  "run_name": "20260216_024908_ticket-16",
+  "summary": "WRDS local parquet metrics resume refresh",
+  "repo_root": "/home/codex/repos/quant-pricer-cpp",
+  "git_branch": "codex/ticket-12-wrds-local-metrics",
+  "git_head": "ed30ff7a5ea9a36e8aca18f9d7687340c2c5b950",
+  "hostname": "codex-worker",
+  "machine_label": "codex-worker",
+  "python": "3.12.3",
+  "python_venv": "/home/codex/repos/quant-pricer-cpp/.venv/bin/python3",
+  "pyarrow": "23.0.0",
+  "os": "Linux-6.8.0-90-generic-x86_64-with-glibc2.39",
+  "workflow": {
+    "local_export_script": "scripts/reproduce_wrds_local_metrics.sh",
+    "resume_snippet_script": "scripts/generate_wrds_resume_snippet.py",
+    "dateset_path": "wrds_pipeline_dates_panel.yaml",
+    "wrds_local_root": "/srv/data/wrds/wrds",
+    "run_id_local": "wrds_local_20260216_024926_ticket16",
+    "run_id_sample": "wrds_local_ci_snippet"
+  },
+  "outputs": {
+    "local_metrics_md": "artifacts/_local/wrds_local/wrds_local_20260216_024926_ticket16/metrics_export_local.md",
+    "local_metrics_json": "artifacts/_local/wrds_local/wrds_local_20260216_024926_ticket16/metrics_export_local.json",
+    "sample_metrics_json": "artifacts/_local/wrds_local/wrds_local_ci_snippet/metrics_export_sample.json",
+    "sample_resume_snippet": "artifacts/_local/wrds_local/wrds_local_ci_snippet/resume_snippet_wrds_sample.md",
+    "local_resume_snippet": "artifacts/_local/wrds_local/wrds_local_20260216_024926_ticket16/resume_snippet_wrds_local.md",
+    "command_log": "docs/agent_runs/20260216_024908_ticket-16/local_run_output.log"
+  },
+  "tests": {
+    "build_configure": "PATH=\"$PWD/.venv/bin:$PATH\" cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+    "build": "PATH=\"$PWD/.venv/bin:$PATH\" cmake --build build -j",
+    "ctest_fast": "PATH=\"$PWD/.venv/bin:$PATH\" ctest --test-dir build -L FAST --output-on-failure",
+    "sample_export": "PATH=\"$PWD/.venv/bin:$PATH\" WRDS_USE_SAMPLE=1 ./scripts/reproduce_wrds_local_metrics.sh --run-id wrds_local_ci_snippet --dateset wrds_pipeline_dates_panel.yaml",
+    "sample_snippet": "PATH=\"$PWD/.venv/bin:$PATH\" python3 scripts/generate_wrds_resume_snippet.py --metrics-json artifacts/_local/wrds_local/wrds_local_ci_snippet/metrics_export_sample.json",
+    "local_snippet": "PATH=\"$PWD/.venv/bin:$PATH\" python3 scripts/generate_wrds_resume_snippet.py --metrics-json artifacts/_local/wrds_local/wrds_local_20260216_024926_ticket16/metrics_export_local.json"
+  },
+  "checks": {
+    "markdown_safety": "{'has_csv_filename': False, 'has_raw_root': False, 'has_per_date': False}",
+    "git_status_porcelain": " M CMakeLists.txt |  M PROGRESS.md |  M docs/NOW.md |  M docs/RUNBOOK.md | ?? docs/agent_runs/20260216_024908_ticket-16/ | ?? docs/tickets/ticket-16_wrds-local-parquet-metrics-resume-refresh.md | ?? scripts/generate_wrds_resume_snippet.py | ?? tests/test_wrds_resume_snippet_from_sample_export_fast.py"
+  },
+  "notes": "Ticket file was added in this remediation run; run log now includes fully reproducible Python snippets with no ellipsis placeholders."
+}

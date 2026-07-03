@@ -282,6 +282,18 @@ add_test(
 set_tests_properties(wrds_realdata_export_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME wrds_local_metrics_one_command_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_wrds_local_metrics_one_command_fast.py
+)
+set_tests_properties(wrds_local_metrics_one_command_fast PROPERTIES LABELS "FAST")
+
+add_test(
+  NAME wrds_resume_snippet_from_sample_export_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_wrds_resume_snippet_from_sample_export_fast.py
+)
+set_tests_properties(wrds_resume_snippet_from_sample_export_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME market_wrds_pipeline
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/wrds_pipeline/tests/test_wrds_pipeline.py
 )

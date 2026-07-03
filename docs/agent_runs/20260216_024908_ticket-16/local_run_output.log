@@ -1,0 +1,13 @@
+[wrds_pipeline] dateset=/home/codex/repos/quant-pricer-cpp/wrds_pipeline_dates_panel.yaml panel_id=wrds_panel_calm_stress_v1 entries=5
+[wrds_pipeline] SPX 2020-03-16 source_today=local source_next=local
+[wrds_pipeline] SPX 2020-03-17 source_today=local source_next=local
+[wrds_pipeline] SPX 2022-06-13 source_today=local source_next=local
+[wrds_pipeline] SPX 2022-06-14 source_today=local source_next=local
+[wrds_pipeline] SPX 2024-06-14 source_today=local source_next=local
+[wrds_export] wrote /home/codex/repos/quant-pricer-cpp/artifacts/_local/wrds_local/wrds_local_20260216_024926_ticket16/metrics_export_local.json
+[wrds_export] wrote /home/codex/repos/quant-pricer-cpp/artifacts/_local/wrds_local/wrds_local_20260216_024926_ticket16/metrics_export_local.md
+/home/codex/repos/quant-pricer-cpp/artifacts/_local/wrds_local/wrds_local_20260216_024926_ticket16/metrics_export_local.md
+RUN_ID=wrds_local_20260216_024926_ticket16
+MACHINE_LABEL=codex-worker
+WRDS_LOCAL_ROOT=/srv/data/wrds/wrds
+DATESET_PATH=wrds_pipeline_dates_panel.yaml
