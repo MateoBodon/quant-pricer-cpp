@@ -83,3 +83,7 @@ docs/_generated/
 docs/_bundles/
 project_state/_generated/
 # <<< agentic-system-kit
+
+# PROJECT-OS-V3:GENERATED-IGNORE:START
+/STATE.md
+# PROJECT-OS-V3:GENERATED-IGNORE:END

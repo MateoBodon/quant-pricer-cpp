@@ -1,0 +1,14 @@
+# PROJECT-OS:VALIDATION-IGNORE:START
+# Raw combined logs are local/ephemeral. Durable verification summaries,
+# exact result metadata, and log hashes remain in events.jsonl.
+/validation/
+/transaction.lock
+# PROJECT-OS:VALIDATION-IGNORE:END
+
+# PROJECT-OS-V3:RUNTIME-IGNORE:START
+/cache/
+/runs/
+/temporary/
+/event-segment-orphans/
+/*.lock
+# PROJECT-OS-V3:RUNTIME-IGNORE:END

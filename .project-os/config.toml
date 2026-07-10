@@ -1,0 +1,79 @@
+# Project OS configuration. This is policy, not a per-run prompt.
+schema_version = 3
+project_name = "quant-pricer-cpp"
+# 0 disables age-only churn. Event/Git/body changes still invalidate instantly;
+# adapters with expiring external observations should set their own freshness.
+state_stale_after_hours = 0
+default_risk = "medium"
+
+[authority]
+# This local prototype records the full taxonomy but enforces only local
+# lifecycle/validation rules. It has no connected-action policy evaluator.
+# A0 read-only; A1 local reversible; A2 bounded external under a standing rule;
+# A3 external/public under a standing rule or confirmation; A4 irreversible or
+# high-impact under focused confirmation/current capped standing authorization.
+standing_tier = "A1"
+standing_rule_refs = []
+
+[validation]
+default_profile = "standard"
+minimum_success_gate_risk = "medium"
+env_allowlist = ["CMAKE_PREFIX_PATH", "PATH", "PYTHONDONTWRITEBYTECODE"]
+max_output_bytes = 1000000
+input_files = ["PROJECT.md", "AGENTS.md", ".gitignore", ".gitmodules", "CMakeLists.txt", "Makefile", "pyproject.toml", "requirements-dev.txt", "TRACKING_POLICY.md", "wrds_pipeline_dates_panel.yaml", "wrds_pipeline_dates_panel_resume_v2.yaml", "docs/strategy/GOAL_CONTEXT.md", "docs/strategy/PLAN_OF_RECORD.md", "project_state/CLAIMS_AND_EVIDENCE.md", "project_state/CURRENT_RESULTS.md", "project_state/WRDS_DATA_REQUIREMENTS.md", "project_state/NON_WRDS_DATA_REQUIREMENTS.md", "docs/artifacts/manifest.json", "docs/artifacts/metrics_summary.json", "docs/artifacts/metrics_summary.md"]
+# Optional bounded content roots for projects whose material source/config/test
+# files cannot be represented by at most 100 individual input_files entries.
+# Example: input_trees = [{path = "src", suffixes = [".py"]}]
+input_trees = [
+  {path = "include", suffixes = [".h", ".hpp"]},
+  {path = "src", suffixes = [".c", ".cc", ".cpp", ".cxx", ".h", ".hpp"]},
+  {path = "tests", suffixes = [".cpp", ".py"]},
+  {path = "wrds_pipeline", suffixes = [".csv", ".py", ".yaml", ".yml"]},
+  {path = "scripts", suffixes = [".py", ".sh", ".yaml", ".yml"]},
+  {path = "configs", suffixes = [".json", ".toml", ".yaml", ".yml"]},
+  {path = "cmake", suffixes = [".cmake", ".txt"]},
+]
+
+[validation.risk_map]
+low = "quick"
+medium = "standard"
+high = "strict"
+critical = "strict"
+
+# Built-in integrity checks always run. Add project-native commands once here;
+# agents then use them automatically without rewriting prompts.
+# `supervised` permits only the initial executable family plus listed child
+# basenames and tracks them across process groups/sessions. `forbid` requires an
+# available OS no-fork backend (currently macOS sandbox-exec).
+[validation.profiles.quick]
+risk_level = "low"
+timeout_seconds = 120
+stop_on_failure = true
+trusted_shell = false
+descendant_policy = "supervised"
+allowed_descendant_executables = ["same-executable", "env", "sh", "bash", "cmake", "make", "gmake", "clang", "clang++", "cc", "c++", "ld", "ar", "ranlib", "strip", "ctest", "unit_tests", "quant_cli", "python", "python3", "python3.12", "git", "ps", "sleep", "sw_vers", "sysctl", "<defunct>"]
+commands = [["/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3", "scripts/check_data_policy.py"], ["/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3", "tests/test_docs_sanity_fast.py"]]
+proves = ["Project OS integrity, tracked-data policy, and documentation sanity at the recorded input fingerprint"]
+limits = ["No compile, C++ tests, official reproduction, or live-data claims are proved"]
+
+[validation.profiles.standard]
+risk_level = "medium"
+timeout_seconds = 900
+stop_on_failure = true
+trusted_shell = false
+descendant_policy = "supervised"
+allowed_descendant_executables = ["same-executable", "env", "sh", "bash", "cmake", "make", "gmake", "clang", "clang++", "cc", "c++", "ld", "ar", "ranlib", "strip", "ctest", "unit_tests", "quant_cli", "python", "python3", "python3.12", "git", "ps", "sleep", "sw_vers", "sysctl", "<defunct>"]
+commands = [["/opt/homebrew/bin/cmake", "-S", ".", "-B", "build", "-DCMAKE_BUILD_TYPE=Release", "-DPython3_EXECUTABLE=/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3"], ["/opt/homebrew/bin/cmake", "--build", "build", "-j", "4", "--target", "unit_tests"], ["/opt/homebrew/bin/ctest", "--test-dir", "build", "-L", "FAST", "-E", "^(metrics_snapshot_fast|protocol_config_guard_fast)$", "--output-on-failure"]]
+proves = ["Project OS integrity, Release configure, unit-test build, and the artifact-stable FAST subset at the recorded input fingerprint"]
+limits = ["Excludes metrics_snapshot_fast and protocol_config_guard_fast until pilot artifact-purity fixes are reconciled; does not prove official reproduction or live-data claims"]
+
+[validation.profiles.strict]
+risk_level = "critical"
+timeout_seconds = 1800
+stop_on_failure = false
+trusted_shell = false
+descendant_policy = "supervised"
+allowed_descendant_executables = ["same-executable", "env", "sh", "bash", "cmake", "make", "gmake", "clang", "clang++", "cc", "c++", "ld", "ar", "ranlib", "strip", "ctest", "unit_tests", "quant_cli", "python", "python3", "python3.12", "git", "ps", "sleep", "sw_vers", "sysctl", "<defunct>"]
+commands = [["/opt/homebrew/bin/cmake", "-S", ".", "-B", "build", "-DCMAKE_BUILD_TYPE=Release", "-DPython3_EXECUTABLE=/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3"], ["/opt/homebrew/bin/cmake", "--build", "build", "-j", "4"], ["/opt/homebrew/bin/ctest", "--test-dir", "build", "-L", "FAST", "-E", "^(metrics_snapshot_fast|protocol_config_guard_fast)$", "--output-on-failure"], ["/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3", "scripts/check_data_policy.py"], ["/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3", "tests/test_docs_sanity_fast.py"]]
+proves = ["Project OS integrity, full Release build, artifact-stable FAST coverage, tracked-data policy, and documentation sanity at the recorded input fingerprint"]
+limits = ["Excludes two known artifact-mutating FAST tests until the successful pilot is reconciled; does not prove official reproduction, vault compatibility, empirical results, or public claims"]
