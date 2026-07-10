@@ -11,6 +11,7 @@ import json
 import math
 import re
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Dict
 
@@ -34,7 +35,7 @@ REQUIRED_KEYS = [
 FLOAT_RE = r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?"
 
 
-def run_snapshot() -> None:
+def run_snapshot(json_out: Path, md_out: Path) -> None:
     cmd = [
         "python3",
         str(REPO_ROOT / "scripts" / "generate_metrics_summary.py"),
@@ -42,6 +43,11 @@ def run_snapshot() -> None:
         str(ARTIFACTS),
         "--manifest",
         str(ARTIFACTS / "manifest.json"),
+        "--output-json",
+        str(json_out),
+        "--output-md",
+        str(md_out),
+        "--skip-manifest",
     ]
     subprocess.run(cmd, check=True, cwd=REPO_ROOT)
 
@@ -245,13 +251,17 @@ def test_snapshot_outputs_exist_and_parse() -> None:
         raise AssertionError("metrics_summary.* missing; run reproduce_all to regenerate")
     committed_summary = load_json(JSON_OUT)
     assert_current_results_matches_snapshot(committed_summary)
-    run_snapshot()
-    if not JSON_OUT.exists():
-        raise AssertionError("metrics_summary.json not created")
-    if not MD_OUT.exists():
-        raise AssertionError("metrics_summary.md not created")
-    summary = load_json(JSON_OUT)
-    assert_status_blocks(summary)
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_dir = Path(tmp)
+        json_out = tmp_dir / "metrics_summary.json"
+        md_out = tmp_dir / "metrics_summary.md"
+        run_snapshot(json_out, md_out)
+        if not json_out.exists():
+            raise AssertionError("metrics_summary.json not created")
+        if not md_out.exists():
+            raise AssertionError("metrics_summary.md not created")
+        summary = load_json(json_out)
+        assert_status_blocks(summary)
 
 
 if __name__ == "__main__":

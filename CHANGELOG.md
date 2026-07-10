@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(risk): use the VaR exception probability `1-alpha` in Kupiec POF, correct Christoffersen transition likelihood counts, and reject invalid backtest inputs
+- test(artifacts): keep metrics-snapshot and QuantLib protocol guards in temporary outputs so FAST validation does not rewrite canonical artifacts
 - feat(protocol): freeze synthetic validation grid + tolerances; headline scripts now require `--scenario-grid` + `--tolerances` and record protocol hashes in the manifest/metrics snapshot
 - feat(heston,mc): Andersen QE variance paths, deterministic counter RNG, CLI/pybind confidence intervals for MC Greeks
 - ops(gpt-bundle): hard-gate empty run logs and include base commit diffs + commit lists in GPT bundles

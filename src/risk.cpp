@@ -5,7 +5,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <random>
+#include <stdexcept>
 #include <vector>
 
 namespace quant::risk {
@@ -109,23 +111,46 @@ static inline double chi2_cdf_complement(double x, double k) {
     const double tail = std::exp(-0.5 * x);
     return std::clamp(tail, 0.0, 1.0);
 }
+
+double bernoulli_log_likelihood(unsigned long successes, unsigned long failures, double probability) {
+    double value = 0.0;
+    if (successes > 0) {
+        if (probability <= 0.0)
+            return -std::numeric_limits<double>::infinity();
+        value += static_cast<double>(successes) * std::log(probability);
+    }
+    if (failures > 0) {
+        if (probability >= 1.0)
+            return -std::numeric_limits<double>::infinity();
+        value += static_cast<double>(failures) * std::log1p(-probability);
+    }
+    return value;
+}
 } // namespace
 
 BacktestStats kupiec_christoffersen(const std::vector<int>& exceptions, double alpha) {
+    if (!std::isfinite(alpha) || alpha <= 0.0 || alpha >= 1.0)
+        throw std::invalid_argument("VaR confidence alpha must be finite and in (0,1)");
+    if (exceptions.empty())
+        throw std::invalid_argument("VaR exception sequence must be non-empty");
+
     BacktestStats out{};
     out.alpha = alpha;
     const unsigned long T = static_cast<unsigned long>(exceptions.size());
     out.T = T;
     unsigned long N = 0;
-    for (int e : exceptions)
-        if (e)
+    for (int e : exceptions) {
+        if (e != 0 && e != 1)
+            throw std::invalid_argument("VaR exception sequence values must be 0 or 1");
+        if (e == 1)
             ++N;
+    }
     out.N = N;
     const double pi = static_cast<double>(N) / std::max(1UL, T);
-    // Kupiec POF LR = -2 log( ((1-alpha)^{T-N} alpha^N) / ((1-pi)^{T-N} pi^N) )
-    const double term1 = (T - N) * (std::log(1.0 - alpha) - std::log(std::max(1e-12, 1.0 - pi)));
-    const double term2 = N * (std::log(std::max(1e-12, alpha)) - std::log(std::max(1e-12, pi)));
-    out.lr_pof = -2.0 * (term1 + term2);
+    const double expected_exception_probability = 1.0 - alpha;
+    const double ll_pof_null = bernoulli_log_likelihood(N, T - N, expected_exception_probability);
+    const double ll_pof_mle = bernoulli_log_likelihood(N, T - N, pi);
+    out.lr_pof = std::max(0.0, 2.0 * (ll_pof_mle - ll_pof_null));
     out.p_pof = chi2_cdf_complement(out.lr_pof, 1.0);
 
     // Christoffersen independence: build transition counts
@@ -142,15 +167,20 @@ BacktestStats kupiec_christoffersen(const std::vector<int>& exceptions, double a
         else
             ++n11;
     }
+    const unsigned long transitions = n00 + n01 + n10 + n11;
+    if (transitions == 0) {
+        out.lr_ind = 0.0;
+        out.p_ind = 1.0;
+        out.lr_cc = out.lr_pof;
+        out.p_cc = chi2_cdf_complement(out.lr_cc, 2.0);
+        return out;
+    }
     const double pi0 = (n00 + n01) ? static_cast<double>(n01) / static_cast<double>(n00 + n01) : 0.0;
     const double pi1 = (n10 + n11) ? static_cast<double>(n11) / static_cast<double>(n10 + n11) : 0.0;
-    const double pi_bar =
-        (n01 + n11) ? static_cast<double>(n01 + n11) / static_cast<double>(n00 + n01 + n10 + n11) : 0.0;
-    auto safe_log = [](double x) { return std::log(std::max(1e-12, x)); };
-    const double ll_ind = (n00 + n01) * safe_log(1.0 - pi0) + n01 * safe_log(pi0) +
-                          (n10 + n11) * safe_log(1.0 - pi1) + n11 * safe_log(pi1);
-    const double ll_null = (n00 + n01 + n10 + n11) * safe_log(1.0 - pi_bar) + (n01 + n11) * safe_log(pi_bar);
-    out.lr_ind = -2.0 * (ll_null - ll_ind);
+    const double pi_bar = static_cast<double>(n01 + n11) / static_cast<double>(transitions);
+    const double ll_ind = bernoulli_log_likelihood(n01, n00, pi0) + bernoulli_log_likelihood(n11, n10, pi1);
+    const double ll_null = bernoulli_log_likelihood(n01 + n11, n00 + n10, pi_bar);
+    out.lr_ind = std::max(0.0, 2.0 * (ll_ind - ll_null));
     out.p_ind = chi2_cdf_complement(out.lr_ind, 1.0);
 
     out.lr_cc = out.lr_pof + out.lr_ind;

@@ -44,3 +44,10 @@ Template:
   Options considered: Keep using the legacy docs artifacts local path; rely on manual manifest cleanup; redirect defaults to scratch with a local manifest.
   Why: Aligns local WRDS workflows with the tracking policy and avoids mutating tracked manifests by default.
   Consequences: Local runs now write to `artifacts/_local/wrds_local` with `manifest_local.json`; docs and runbook guidance updated.
+
+- Date: 2026-07-10
+  Decision: Interpret risk-backtest `alpha` as VaR confidence and use `1-alpha` as the Bernoulli exception probability.
+  Context: The public API documents values such as `alpha=0.95` as 95% VaR, but the Kupiec likelihood had assigned `alpha` to exceptions and `1-alpha` to non-exceptions. The Christoffersen likelihood also multiplied failure terms by total transitions from each state.
+  Options considered: Preserve the implementation and rename the parameter; correct the likelihoods to match the documented API and standard tests.
+  Why: The documented confidence convention is already used by the rest of the risk API and by callers.
+  Consequences: On-target exception rates now produce high POF p-values, excess rates fail, clustering is tested independently, and empty/non-binary/non-finite inputs fail explicitly.

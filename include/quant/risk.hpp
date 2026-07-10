@@ -38,7 +38,9 @@ struct BacktestStats {
     double p_cc;     // p-value for combined
 };
 
-// Compute Kupiec (POF) and Christoffersen (independence) tests from exception sequence (0/1)
+// Compute Kupiec (POF) and Christoffersen (independence) tests from a non-empty
+// exception sequence (0/1). alpha is the VaR confidence, so the expected
+// exception probability is 1-alpha. Invalid inputs throw std::invalid_argument.
 BacktestStats kupiec_christoffersen(const std::vector<int>& exceptions, double alpha);
 
 // t-Student VaR/CVaR for a single asset P&L over a horizon

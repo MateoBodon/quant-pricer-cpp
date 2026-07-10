@@ -72,6 +72,8 @@ def main() -> None:
         greek_csv = tmp_dir / "greeks.csv"
         ql_png = tmp_dir / "ql.png"
         ql_csv = tmp_dir / "ql.csv"
+        ql_bucket = tmp_dir / "ql_bucket.csv"
+        ql_error_dist = tmp_dir / "ql_error_dist.png"
 
         _expect_missing_provenance(
             [
@@ -123,6 +125,10 @@ def main() -> None:
                 str(ql_png),
                 "--csv",
                 str(ql_csv),
+                "--bucket-summary",
+                str(ql_bucket),
+                "--error-dist",
+                str(ql_error_dist),
             ],
             env,
         )
@@ -196,8 +202,12 @@ def main() -> None:
                 str(ql_png),
                 "--csv",
                 str(ql_csv),
+                "--bucket-summary",
+                str(ql_bucket),
+                "--error-dist",
+                str(ql_error_dist),
             ],
-            [ql_png, ql_csv],
+            [ql_png, ql_csv, ql_bucket, ql_error_dist],
             env,
         )
 
