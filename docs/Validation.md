@@ -8,10 +8,10 @@
 - **American Consistency**: Binomial, PSOR, and LSMC agree within PSOR tolerance / LSMC SE for American puts with dividends.
 
 ## Validation Artifacts (see `./scripts/reproduce_all.sh`)
-- `qmc_vs_prng_equal_time.png`: RMSE vs wall-clock comparing PRNG and Sobol+Brownian bridge; Sobol maintains ~1.4–1.5× lower error at the same runtime.
+- `qmc_vs_prng_equal_time.png`: RMSE vs wall-clock comparing PRNG and Sobol+Brownian bridge; the committed metrics snapshot reports a median PRNG/QMC RMSE ratio of 4.76346 for the tested scenarios.
 - `pde_order_slope.png`: Price error vs grid nodes validating ≈2nd order slope and Rannacher smoothing.
-- `american_convergence.png`: PSOR versus binomial convergence plus LSMC scatter overlay (3σ band) for early-exercise options.
-- `barrier_validation.png`: Log-scale absolute error comparison for barrier MC/PDE vs Reiner–Rubinstein benchmarks.
+- American option consistency is covered by FAST tests comparing PSOR, binomial, and LSMC paths.
+- Barrier pricing consistency is covered by FAST tests comparing MC/PDE paths against Reiner-Rubinstein benchmarks.
 
 `docs/artifacts/manifest.json` accompanies every run. It captures the compiler, build flags,
 platform details, all CLI invocations issued by the script, and the seeds/paths used
@@ -20,7 +20,7 @@ sizes, and basis condition numbers per exercise date).
 
 ### Barrier MC accuracy notes
 - The Brownian-bridge crossing correction greatly reduces time-discretization bias for continuously-monitored single barriers. Residual error is dominated by Monte Carlo variance; increase `num_steps` (e.g., 64–256) and `paths` to tighten agreement with RR analytics. Prefer `--sampler=sobol --bridge=bb` for faster convergence on multi-step paths.
-- `onepager.pdf`: Single-page summary combining the above plots, a Greeks variance table, and benchmark stats for quick reviewer digestion.
+- Reviewer summaries should be regenerated from the current tracked artifacts; no committed `onepager.pdf` is part of the current curated artifact set.
 
 ## Benchmarks
 - **MC Throughput**: `bench_mc` reports paths/s vs thread count and standard error comparison between PRNG and Sobol+BB at equal wall-time.

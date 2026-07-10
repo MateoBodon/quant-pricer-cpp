@@ -1,7 +1,6 @@
-# Validation Highlights (current `scripts/reproduce_all.sh` bundle)
+# Validation Highlights
 
-This document distills the highest-leverage outputs emitted by `scripts/reproduce_all.sh`.
-Regenerate it after significant algorithmic changes:
+This document distills the highest-leverage committed artifacts under `docs/artifacts/`. The latest committed metrics snapshot was generated on 2026-01-25; the 2026-07-03 T-001/T-101 current-HEAD reproduction attempt failed during FAST and did not promote regenerated artifacts. Regenerate after significant algorithmic changes:
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -9,70 +8,48 @@ cmake --build build -j
 ./scripts/reproduce_all.sh
 ```
 
-All raw CSVs/PNGs/PDFs live in `docs/artifacts/`, while `docs/artifacts/manifest.json`
-records the git SHA, compiler, build flags, platform details, every CLI
-command executed by the reproduction script, and the seeds/resolutions used for each
-pricing sweep.
+Tracked CSV/PNG/JSON artifacts live in `docs/artifacts/`, while `docs/artifacts/manifest.json` records the git SHA, compiler, build flags, platform details, commands, and seeds/resolutions used for each pricing sweep. Ignored WRDS detail files are not current public evidence.
 
 ## Highlights at a glance
 
 - **Deterministic Monte Carlo:** Counter-based RNG (`rng: "counter"`) makes
   serial and parallel executions bitwise-identical. `tests/test_rng_repro.cpp`
   enforces this across {1,4,8} threads.
-- **Heston Andersen QE:** `artifacts/heston_qe_convergence.csv` and
-  `heston_qe_convergence.png` compare QE vs Euler against the analytic
-  characteristic-function price across 16–128 time steps.
-- **Greeks with Confidence Bands:** `artifacts/greeks_ci.csv` records Delta,
+- **Heston Andersen QE:** `docs/artifacts/heston_qe_vs_analytic.csv` and
+  `docs/artifacts/heston_qe_vs_analytic.png` compare QE/Euler Monte Carlo against the analytic
+  characteristic-function price; QE remains caveated by known bias.
+- **Greeks with Confidence Bands:** `docs/artifacts/mc_greeks_ci.csv` records Delta,
   Vega, Gamma (LR + mixed), and Theta (LR) with standard errors and 95 % CIs.
   The companion PNG visualises the bands and spotlights estimator stability.
 - **Offline-safe artifacts:** The reproduction script never `pip install`s matplotlib.
   If plotting libraries are absent it still writes every CSV, logging which PNG/
   PDF outputs were skipped.
 
-## Vanilla cross-checks
-
-- `artifacts/black_scholes.csv` confirms the ATM 100/100 call and put match
-  analytic values to machine precision.
-- `artifacts/monte_carlo.csv` captures the GBM control-variate run (counter RNG,
-  antithetic) together with standard errors and confidence intervals.
-
 ## Sobol vs PRNG (equal time)
 
-`artifacts/qmc_vs_prng_equal_time.csv` shows Sobol + Brownian bridge delivering
-≈1.4× lower RMSE than pseudorandom paths when both spend the same wall-clock
-budget. The manifest’s `qmc_vs_prng_equal_time` section records the time grid,
-per-method RMSE curves, and seeds.
+`docs/artifacts/qmc_vs_prng_equal_time.csv` shows Sobol + Brownian bridge delivering lower RMSE than pseudorandom paths in the tested scenarios. The committed metrics snapshot reports the metric as a PRNG/QMC RMSE ratio: 4.76346 median overall. The manifest's `qmc_vs_prng_equal_time` section records the time grid, per-method RMSE curves, and seeds.
 
 ## PDE convergence
 
-`artifacts/pde_order_slope.csv` reports Crank–Nicolson + Rannacher error slopes
+`docs/artifacts/pde_order_slope.csv` reports Crank–Nicolson + Rannacher error slopes
 (≈−2.0 on recent runs). Δ/Γ remain within ≈2×10⁻⁵ of Black–Scholes once the grid
 exceeds 201×200; 801×400 pushes price errors below 1e-4.
 
 ## Barrier validation
 
-`artifacts/barrier_validation.csv` documents Monte Carlo (no terminal-stock
-control variate) versus Reiner–Rubinstein closed forms. The PNG provides the
-log-scale comparison against the PDE benchmark.
+Barrier validation is covered by FAST tests against Reiner-Rubinstein closed forms. No current tracked `barrier_validation.*` artifact is part of the curated artifact set.
 
 ## American option validation
 
-`artifacts/american_validation.csv` logs PSOR residuals/iteration counts,
-binomial convergence, and LSMC standard errors. The manifest mirrors the run
-metadata (paths, steps, seed) alongside the per-exercise ITM counts and basis
-condition numbers produced by the new diagnostics—handy for regression testing
-and resume-ready plots.
+American option consistency is covered by FAST tests for PSOR, binomial, and LSMC agreement. No current tracked `american_validation.*` artifact is part of the curated artifact set.
 
 ## Heston QE
 
-`artifacts/heston_qe_convergence.csv` compares Andersen QE and Euler schemes
-for a representative parameter set (80 000 paths, counter RNG). Expect QE to sit
-inside the analytic confidence band as steps increase, while Euler converges
-noticeably slower.
+`docs/artifacts/heston_qe_vs_analytic.csv` compares Andersen QE and Euler schemes against analytic Heston prices across representative parameter sets (80,000 paths, counter RNG). Treat QE as experimental/caveated until a dedicated Heston credibility ticket resolves the known bias.
 
 ## Greeks (CI aware)
 
-`artifacts/greeks_ci.csv` + `.png` detail Delta/Vega/Gamma/Theta estimates,
+`docs/artifacts/mc_greeks_ci.csv` + `.png` detail Delta/Vega/Gamma/Theta estimates,
 their standard errors, and 95 % confidence intervals, enabling direct
 comparison with Black–Scholes analytics.
 
@@ -80,12 +57,12 @@ comparison with Black–Scholes analytics.
 
 - `docs/artifacts/manifest.json` – reproducibility metadata (compiler, flags,
   platform, executed commands, MC/Heston/Greeks/American seeds & summaries).
-- `qmc_vs_prng_equal_time.csv` / `.png` – equal-time MC RMSE comparison.
-- `heston_qe_convergence.csv` / `.png` – Andersen QE vs Euler convergence.
-- `greeks_ci.csv` / `.png` – LR/pathwise Greeks with confidence bands.
-- `pde_order_slope.csv` / `.png` – log–log error slopes for Crank–Nicolson.
-- `american_convergence.csv` / `.png` – PSOR/binomial/LSMC agreement.
-- `barrier_validation.csv` / `.png` – MC + PDE vs Reiner–Rubinstein.
+- `qmc_vs_prng_equal_time.csv` / `.png` - equal-time MC RMSE comparison.
+- `heston_qe_vs_analytic.csv` / `.png` - QE/Euler Monte Carlo vs analytic Heston.
+- `mc_greeks_ci.csv` / `.png` - LR/pathwise Greeks with confidence bands.
+- `pde_order_slope.csv` / `.png` - log-log error slopes for Crank-Nicolson.
+- `tri_engine_agreement.csv` / `.png` - analytic/MC/PDE agreement.
+- `ql_parity/ql_parity.csv` / `.png` - QuantLib parity.
 
 > Regenerate with `./scripts/reproduce_all.sh` whenever pricing engines or RNGs change
 > so recruiters and reviewers always see current evidence.

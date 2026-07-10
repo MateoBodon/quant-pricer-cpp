@@ -1,6 +1,6 @@
 # Results
 
-`./scripts/reproduce_all.sh` builds the Release target, runs both FAST and SLOW labels, and regenerates deterministic CSV/PNG artifacts under `docs/artifacts/`. Use `REPRO_FAST=1` to trim runtime when iterating locally. Every generator updates [`docs/artifacts/manifest.json`](docs/artifacts/manifest.json) with the command, seeds, compiler info, and hardware snapshot.
+`./scripts/reproduce_all.sh` is the intended Release/sample reproduction path for deterministic CSV/PNG artifacts under `docs/artifacts/`. Use `REPRO_FAST=1` to trim runtime when iterating locally. Every successful promotion should update [`docs/artifacts/manifest.json`](docs/artifacts/manifest.json) with the command, seeds, compiler info, and hardware snapshot. The 2026-07-03 T-001/T-101 current-HEAD attempt failed in FAST after partial artifact regeneration, so the committed 2026-01-25 metrics snapshot remains historical evidence until repaired and promoted.
 
 ## Units & Metric Legend
 
@@ -26,7 +26,7 @@ Analytic Black–Scholes, deterministic Monte Carlo (counter RNG + control varia
 
 ## QMC vs PRNG (equal wall-clock)
 
-Sobol + Brownian bridge delivers ≈1.4× tighter RMSE than pseudorandom paths when both spend the same time budget (European + Asian calls). The CSV tabulates the matched time grid, implied path counts, and RMSE ratio so reviewers can re-derive the advantage.
+Sobol + Brownian bridge delivers lower RMSE than pseudorandom paths in the committed artifact scenario. `docs/artifacts/metrics_summary.md` reports the metric as a PRNG/QMC RMSE ratio: median 4.76346 overall, with payoff-specific medians for European calls and Asian calls. Treat this as protocol-specific evidence, not universal QMC dominance.
 
 ![QMC vs PRNG equal time](artifacts/qmc_vs_prng_equal_time.png)
 
@@ -105,19 +105,19 @@ QuantLib serves as an industry reference point. The parity harness exercises `qu
 
 ## WRDS OptionMetrics Snapshot (Opt-in)
 
-The refreshed WRDS pipeline ingests SPX from OptionMetrics IvyDB, resolves `secid` via `optionm.secnmd`, pulls the year-partitioned `optionm.opprcdYYYY` table, filters stale quotes, recomputes implied vols with the project’s solver, and bins by tenor/moneyness. A vega-weighted Heston calibration (least-squares in IV space) and bootstrap CIs are emitted alongside next-day OOS errors and delta-hedged one-day PnL histograms. Only aggregated CSV/PNGs under `docs/artifacts/wrds/` are committed.
+The WRDS pipeline can ingest SPX from OptionMetrics IvyDB in explicitly enabled live/local modes, but the committed public bundle is deterministic sample/regression evidence. It exercises the same aggregate pipeline without promoting live-market performance claims. Only selected aggregate CSV/PNGs under `docs/artifacts/wrds/` are tracked as curated evidence.
 
 - Scalar metrics per trade date live in [artifacts/wrds/wrds_agg_pricing.csv](artifacts/wrds/wrds_agg_pricing.csv) with the renamed columns:
   - `iv_rmse_volpts_vega_wt`, `iv_mae_volpts_vega_wt` (vol pts, vega-weighted)
   - `iv_p90_bps` (90th percentile IV error, basis points)
   - `price_rmse_ticks` (RMSE vs market prices, ticks)
-- BS baseline (one σ per tenor bucket) lives in [artifacts/wrds/wrds_agg_pricing_bs.csv](artifacts/wrds/wrds_agg_pricing_bs.csv) and OOS in [artifacts/wrds/wrds_agg_oos_bs.csv](artifacts/wrds/wrds_agg_oos_bs.csv) for quick Heston vs BS comparisons.
+- The tracked BS-vs-Heston sample comparison lives in [artifacts/wrds/wrds_bs_heston_comparison.csv](artifacts/wrds/wrds_bs_heston_comparison.csv). Detail BS CSVs may be generated during sample runs, but they are ignored and are not curated public artifacts by default.
 - Next-day diagnostics per tenor bucket live in [artifacts/wrds/wrds_agg_oos.csv](artifacts/wrds/wrds_agg_oos.csv):
   - `iv_mae_bps` (quotes-weighted IV MAE), `price_mae_ticks` (quotes-weighted price MAE)
 - Δ-hedged distributions per bucket are stored in [artifacts/wrds/wrds_agg_pnl.csv](artifacts/wrds/wrds_agg_pnl.csv) with `mean_ticks` and `pnl_sigma` (tick σ).
 - Overview figure: [artifacts/wrds/wrds_multi_date_summary.png](artifacts/wrds/wrds_multi_date_summary.png); detailed narrative lives in [`docs/WRDS_Results.md`](WRDS_Results.md).
 
-Regenerate the bundled sample snapshot with `./scripts/reproduce_all.sh` (the pipeline runs even without credentials) or explicitly via `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample`. To hit the live WRDS database export `WRDS_ENABLED=1`, `WRDS_USERNAME`, `WRDS_PASSWORD`, then run the same command without `--use-sample`. The panel identifier (`panel_id` in the YAML) is logged at run start and recorded in `docs/artifacts/manifest.json` under `runs.wrds_dateset`. MARKET tests (`ctest -L MARKET`) remain opt-in and skip automatically when the env vars are absent.
+Regenerate the bundled sample snapshot with `./scripts/reproduce_all.sh` (the pipeline runs even without credentials) or explicitly via `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample`. To hit the live WRDS database, export `WRDS_ENABLED=1`, `WRDS_USERNAME`, and `WRDS_PASSWORD`, then run the same command without `--use-sample`; keep live/local outputs scratch until a reviewed promotion. The panel identifier (`panel_id` in the YAML) is logged at run start and recorded in `docs/artifacts/manifest.json` under `runs.wrds_dateset`. MARKET tests (`ctest -L MARKET`) remain opt-in and skip automatically when the env vars are absent.
 
 ## Manifest & determinism
 

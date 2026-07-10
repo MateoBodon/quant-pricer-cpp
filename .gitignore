@@ -5,6 +5,7 @@
 
 # Canonical scratch zones (never commit)
 reports/_runs/
+reports/_bundles/*.zip
 artifacts/_local/
 artifacts/_local/gpt_bundles/
 .cache/

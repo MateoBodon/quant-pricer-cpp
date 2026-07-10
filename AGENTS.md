@@ -1,108 +1,96 @@
-# AGENTS.md — quant-pricer-cpp (Repository instructions for Codex + contributors)
+# AGENTS.md - quant-pricer-cpp
 
-This file defines hard rules and the execution protocol for agent-assisted work in this repo.
+This file is the repo-specific operating contract for Codex, Heavy, Pro, and human contributors.
 
----
+## Non-Negotiable Rules
 
-## 1) Stop-the-line rules (non-negotiable)
+- No fabricated results. Do not claim a build, test, benchmark, reproduction run, plot, or bundle exists unless it actually ran or was generated in this workspace and is logged.
+- Validity beats nicer metrics. Any lookahead, leakage, survivorship, mutable-grid, or silent-default risk must be fixed or explicitly documented before treating a result as evidence.
+- No p-hacking. Scenario grids, tolerances, filters, date panels, seeds, and claim boundaries must not be tuned to improve a story without a documented protocol change.
+- No raw WRDS/OptionMetrics data in git, bundles, logs, prompts, or public docs. Commit only license-safe tiny samples and aggregate artifacts that pass the data-policy guard.
+- Curated official artifacts live under `docs/artifacts/` with provenance. Local/live/scratch outputs live under ignored paths such as `artifacts/_local/`.
+- Product behavior should not change during documentation/infrastructure tickets unless the work order explicitly calls for it.
 
-- **No fabricated results.** Never claim a test passed, a benchmark ran, or a plot was generated unless it actually ran in this workspace and is logged.
-- **Validity > metrics.** If there is any sign of:
-  - lookahead / leakage / survivorship bias (WRDS),
-  - mutable/cherry-picked grids (synthetic),
-  - silent defaults that change evaluation,
-  you must fix it or clearly document the limitation before proceeding.
-- **No p-hacking.** Do not tune scenario grids, tolerances, filters, or date panels to make numbers look better. Any change to evaluation protocol must:
-  - update config version/hash,
-  - regenerate artifacts,
-  - be documented in PROGRESS and (if relevant) CURRENT_RESULTS.
-- **No raw WRDS/OptionMetrics data committed.** Ever. Only license-safe derived tiny samples may be committed, and must pass the repo data policy guard.
-- **Artifacts must be reproducible.** Official results must live under `docs/artifacts/` with provenance (`manifest.json` + `metrics_summary.*`).
+## AI Project OS v2 Sources Of Truth
 
----
+- `PROJECT.md` - project identity, scope, audience, and layout.
+- `docs/strategy/GOAL_CONTEXT.md` - durable goals and non-goals; initially pre-Pro.
+- `docs/strategy/STRATEGIC_OVERVIEW.md` - current strategic understanding.
+- `docs/strategy/PLAN_OF_RECORD.md` - active execution plan and recenter triggers.
+- `docs/strategy/DECISIONS.md` - durable decisions.
+- `docs/strategy/RISK_REGISTER.md` - risks that matter beyond a single bug.
+- `docs/strategy/TICKET_LEDGER.md` - ticket inventory and review status.
+- `docs/strategy/CODEX_GOALS.md` - future goal-level Codex work candidates.
+- `docs/strategy/CONTEXT_CARRYOVER.md` - compact context for fresh sessions.
+- `project_state/STATE_INDEX.md` - factual repo map and state.
+- `project_state/RUNBOOK.md` - setup/build/test/repro/bundle commands.
+- `project_state/VALIDATION_MATRIX.md` - what each check proves.
+- `project_state/CLAIMS_AND_EVIDENCE.md` - claim/evidence boundaries.
 
-## 2) How to build and test (default commands)
+Pre-v2 planning docs remain accessible in `docs/_archive/pre_ai_os_v2/20260703/`. Do not treat archived docs or copied pre-v2 files as current truth unless a canonical doc points to them.
 
-### Build (Release)
-- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`
-- `cmake --build build -j`
+## Default Validation Commands
 
-### Fast unit tests
-- `ctest --test-dir build -L FAST --output-on-failure`
+Use the lightest checks that prove the ticket, but do not invent commands.
 
-### WRDS / market-data tests (only when enabled)
-- `ctest --test-dir build -L MARKET --output-on-failure`
-- Or Python test entrypoints as documented by the repo (prefer `--fast` modes)
+Typical fast path:
 
----
+```bash
+git status --short
+python3 -m compileall tools/agentic/ai_os_bundle.py
+python3 scripts/check_data_policy.py
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j
+ctest --test-dir build -L FAST --output-on-failure
+```
 
-## 3) Official reproduction run (the only pipeline allowed for headline results)
+Official sample reproduction, when claims/artifacts change:
 
-Run (fast + sample mode):
-- `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`
+```bash
+REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
+python3 scripts/package_validation.py --artifacts docs/artifacts --output docs/validation_pack.zip
+```
 
-This run must:
-- generate/update `docs/artifacts/manifest.json`
-- generate/update `docs/artifacts/metrics_summary.md` + `metrics_summary.json`
-- generate/update `docs/validation_pack.zip` (if configured)
+WRDS/live validation is opt-in and environment-gated. Do not run or claim it unless credentials/local data are explicitly available and the command is logged.
 
-If anything writes to `artifacts/` during the official pipeline, treat as a failure.
+## Data And Artifact Policy
 
----
+- Never print credentials or raw restricted paths in logs.
+- Never include raw data, `.env`, `.venv`, `build/`, `external/`, `docs/coverage/`, or `artifacts/_local/` payloads in model bundles unless explicitly required and sanitized.
+- State bundles may include manifest/hash/size entries for large artifacts instead of raw files.
+- If a local WRDS run mutates `docs/artifacts/manifest.json`, document and revert or intentionally promote the change with evidence.
 
-## 4) Documentation + run logging protocol (required)
+## Run Logging
 
-### Where things go
-- Prompts: `docs/prompts/`
-- GPT analysis outputs: `docs/gpt_outputs/`
-- Codex run logs: `docs/agent_runs/<RUN_NAME>/`
-- Artifacts: `docs/artifacts/`
+For T-000 and future v2 work, generated run logs go under:
 
-### Run naming convention
-- `YYYYMMDD_HHMMSS_ticket-XX_<slug>`
+```text
+reports/_runs/<timestamp>_<ticket_slug>/
+```
 
-### Required files per run
-Inside `docs/agent_runs/<RUN_NAME>/`:
+Each substantial run log should include:
+
 - `PROMPT.md`
 - `COMMANDS.md`
 - `RESULTS.md`
-- `TESTS.md`
-- `META.json`
-- `SOURCES.md` (only if web research used)
+- `VALIDATION.md` or `VALIDATION.json`
+- `SUMMARY.md`
 
-### Living docs update rules
-- Always: `PROGRESS.md`
-- If results change: `project_state/CURRENT_RESULTS.md`
-- If risks/bugs change: `project_state/KNOWN_ISSUES.md`
-- If user-visible behavior changes: `CHANGELOG.md`
+Existing pre-v2 run logs under `docs/agent_runs/` are preserved as history and may still be useful when reconstructing past decisions.
 
----
+## Bundle Policy
 
-## 5) Data policy (WRDS handling)
+Use `reports/_bundles/` for generated AI OS v2 bundles:
 
-- WRDS credentials must never be printed in logs.
-- Raw WRDS extracts must never be committed.
-- Any cache must live in gitignored directories.
-- Run the repo’s data policy guard (or its FAST test) after touching any data scripts.
+- Project State Audit Bundle: for Pro strategy/reset work.
+- Review Bundle: for Heavy ticket review.
 
----
+Do not bundle dependency folders, build trees, virtual environments, raw datasets, old bundle zips, huge logs, or local scratch outputs. Include indexes, manifests, hashes, and reasons for exclusion instead.
 
-## 6) Branch + commit policy
+## Editing Discipline
 
-- Create a feature branch per ticket: `codex/ticket-XX-<slug>`
-- Commit message starts with `ticket-XX: ...`
-- Commit body must include:
-  - `Tests: <exact commands>`
-  - `Artifacts: <paths updated>`
-- Do not use destructive git commands (`reset --hard`, `clean -fdx`) unless explicitly asked and logged.
-
----
-
-## 7) If uncertain policy (don’t spam questions)
-
-- Make assumptions explicit in `docs/agent_runs/<RUN_NAME>/RESULTS.md`.
-- Prefer minimal safe changes.
-- If blocked, implement the smallest diagnostic to unblock (e.g., a failing test that demonstrates the issue).
-- Ask a question only if progress is impossible without it.
-
----
+- Keep changes scoped to the ticket.
+- Prefer existing repo patterns and command surfaces.
+- Update canonical docs only when durable state changes.
+- Update `PROGRESS.md` for completed tickets or meaningful strategy/release/review events.
+- Do not use destructive git commands unless explicitly requested and logged.

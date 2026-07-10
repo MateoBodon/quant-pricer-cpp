@@ -31,6 +31,7 @@ Rules:
 ### Scratch (ignored)
 These are allowed to be messy and are never committed.
 - reports/_runs/             (timestamped run dumps)
+- reports/_bundles/*.zip     (generated AI/context/review bundle deliverables)
 - artifacts/_local/          (scratch artifacts)
 - .cache/                    (local caches)
 - tmp/                       (temporary)
@@ -38,6 +39,7 @@ These are allowed to be messy and are never committed.
 Rules:
 - If an agent/tool produces lots of files, direct it here.
 - If something in scratch becomes important, promote it by copying a summary into docs/artifacts/.
+- Keep bundle manifests/indexes inside the zip and durable state in canonical docs.
 
 ## Data policy
 Default: do NOT commit raw or derived datasets.
@@ -58,6 +60,7 @@ If you need large data:
 - Do not create new top-level directories.
 - Any generated output MUST go under one of:
   - reports/_runs/
+  - reports/_bundles/
   - artifacts/_local/
   - docs/agent_runs/  (small, structured logs only)
   - docs/artifacts/   (curated output only)

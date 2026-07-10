@@ -22,6 +22,8 @@
 pip install pyquant-pricer
 ```
 
+Package availability/installability was not audited in the 2026-07-03 T-001/T-101 evidence pass. Until T-106 verifies the wheel path, the source build instructions below are the authoritative local setup route.
+
 ```python
 import pyquant_pricer as qp
 
@@ -44,7 +46,7 @@ See [`python/examples/quickstart.py`](python/examples/quickstart.py) for a fulle
 
 ## Validation Pack
 
-Each tagged release ships a `validation_pack.zip` asset containing every committed CSV/PNG plus `docs/artifacts/manifest.json`, so you can diff the published numbers without rebuilding. You can regenerate the same bundle locally (using the sample WRDS dateset) with:
+The repo can generate a `validation_pack.zip` containing committed CSV/PNG/JSON artifacts plus `docs/artifacts/manifest.json`, so reviewers can diff published numbers without rebuilding. The T-001/T-101 evidence pass did not verify current release-asset availability; regenerate locally with:
 
 ```bash
 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh
@@ -59,20 +61,20 @@ Upload the resulting `docs/validation_pack.zip` when drafting a GitHub release t
 
 Curated figures (plus precise reproduction commands) live on the [Results page](https://mateobodon.github.io/quant-pricer-cpp/Results.html).
 
-- **Metrics snapshot (single source of truth):**
+- **Metrics snapshot (latest committed artifact snapshot):**
   - Generate: `WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh && python scripts/generate_metrics_summary.py --artifacts docs/artifacts --manifest docs/artifacts/manifest.json`
-  - Browse: `docs/artifacts/metrics_summary.md` (artifact-derived; no hand-edits)
+  - Browse: `docs/artifacts/metrics_summary.md` (artifact-derived; current committed snapshot is historical until current-HEAD reproduction is repaired)
 
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#tri-engine-agreement"><img src="docs/artifacts/tri_engine_agreement.png" alt="Tri-engine agreement" width="230"></a><br>
   **Tri-Engine Agreement (BS / MC / PDE)** – Analytic, deterministic MC, and Crank–Nicolson agree to <5 bps across strikes; MC CI is shown.<br>
   Reproduce: `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output docs/artifacts/tri_engine_agreement.png --csv docs/artifacts/tri_engine_agreement.csv`
   Data: [tri_engine_agreement.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/tri_engine_agreement.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#qmc-vs-prng-equal-wall-clock"><img src="docs/artifacts/qmc_vs_prng_equal_time.png" alt="QMC vs PRNG equal-time RMSE" width="230"></a><br>
-  **QMC vs PRNG (equal wall-clock)** – Sobol + Brownian bridge delivers ≈1.4× lower RMSE than PRNG at matched runtime for European + Asian calls.<br>
+  **QMC vs PRNG (equal wall-clock)** – In the committed artifact snapshot, the median PRNG/QMC RMSE ratio is 4.76346 for the tested European + Asian scenarios; this is scenario/protocol-specific, not a universal QMC claim.<br>
   Reproduce: `python scripts/qmc_vs_prng_equal_time.py --output docs/artifacts/qmc_vs_prng_equal_time.png --csv docs/artifacts/qmc_vs_prng_equal_time.csv --fast`
   Data: [qmc_vs_prng_equal_time.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/qmc_vs_prng_equal_time.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_multi_date_summary.png" alt="WRDS panel summary" width="230"></a><br>
-  **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated over ≥5 calm/stress dates with vega×quote-weighted IV/OOS errors (DTE ≥21d, 0.75–1.25 wings with soft taper) and Δ-hedged 1d buckets; snapshot values live in `docs/artifacts/metrics_summary.md` (bundle is deterministic sample; live WRDS remains source of truth). BS baseline (one σ per tenor) lives in `wrds_agg_pricing_bs.csv` / `wrds_agg_oos_bs.csv` for comparison.<br>
+  **WRDS Heston (multi-date Vega + Δ-hedge)** – Aggregated deterministic sample/regression bundle with vega×quote-weighted IV/OOS errors (DTE ≥21d, 0.75–1.25 wings with soft taper) and Δ-hedged 1d buckets; snapshot values live in `docs/artifacts/metrics_summary.md`. Live/local WRDS evidence is gated and is not promoted by the sample bundle.<br>
   Reproduce (sample): `python wrds_pipeline/pipeline.py --dateset wrds_pipeline_dates_panel.yaml --use-sample`
   Data: [wrds_agg_pricing.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pricing.csv), [wrds_agg_oos.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_oos.csv), [wrds_agg_pnl.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pnl.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_bs_heston_ivrmse.png" alt="BS vs Heston IV RMSE by tenor" width="230"></a><br>
@@ -84,7 +86,7 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
   | 60d | 0.0157 | 0.0158 | 122.5 | 121.1 | 64.2 |
   | 90d | 0.0146 | 0.0146 | 126.3 | 128.8 | 47.0 |
   
-  See `docs/WRDS_Results.md` for narrative, heatmaps, and the full `wrds_bs_heston_comparison.csv`.
+  See `docs/WRDS_Results.md` for narrative, heatmaps, and the tracked `docs/artifacts/wrds/wrds_bs_heston_comparison.csv`.
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#quantlib-parity"><img src="docs/artifacts/ql_parity/ql_parity.png" alt="QuantLib parity" width="230"></a><br>
   **QuantLib Parity (vanilla/barrier/American)** – quant-pricer-cpp prices match QuantLib within ≈1¢ while exposing runtime deltas for each product.<br>
   Reproduce: `python scripts/ql_parity.py --output docs/artifacts/ql_parity/ql_parity.png --csv docs/artifacts/ql_parity/ql_parity.csv`
@@ -119,7 +121,7 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
 - **Monte Carlo Engine**: High-performance GBM simulation with deterministic counter-based RNG (thread-invariant), optional PCG/MT streams, and OpenMP parallelization
 - **PDE Solver**: Crank–Nicolson with Rannacher start-up, optional tanh-stretched grids around the strike, and direct Δ/Γ/Θ extraction
 - **Barrier Options**: Continuous single-barrier (up/down, in/out) pricing via Reiner–Rubinstein closed-form, Brownian-bridge Monte Carlo, and absorbing-boundary PDE
-- **American Options**: PSOR (finite-difference LCP) and Longstaff–Schwartz Monte Carlo with polynomial basis; see `artifacts/american_convergence.png` for agreement and grid/path convergence.
+- **American Options**: PSOR (finite-difference LCP) and Longstaff–Schwartz Monte Carlo with polynomial basis, covered by FAST consistency checks.
 - **Exotics**: Arithmetic Asian MC with geometric CV, lookback MC (fixed/floating), digitals (analytic and MC hooks)
 - **Heston**: Analytic European call via characteristic-function Gauss–Laguerre **plus Andersen QE Monte Carlo** with deterministic counter-based RNG for variance paths
 - **Risk**: VaR/CVaR via MC and historical backtesting with Kupiec test
@@ -744,19 +746,19 @@ The mixed gamma estimator trims the standard error by ~4× versus the pure LRM e
 
 ### Convergence Analysis
 
-**Monte Carlo Convergence:** `docs/artifacts/qmc_vs_prng_equal_time.csv` shows Sobol + Brownian bridge cutting RMSE to 0.02398 (vs 0.03435) under the same time budget—roughly a 1.4× gain once the budget allows ≥8k paths.
+**Monte Carlo Convergence:** `docs/artifacts/qmc_vs_prng_equal_time.csv` is summarized by `docs/artifacts/metrics_summary.md`; the committed snapshot reports a median PRNG/QMC RMSE ratio of 4.76346 across the tested European + Asian scenarios.
 
-**Heston QE vs Euler:** `docs/artifacts/heston_qe_vs_analytic.csv` captures Andersen's QE scheme against the legacy Euler discretisation across 16–128 steps (80k paths). QE tracks the analytic price within ~1.3 e-4 at 64 steps while Euler lags by >2×, and the PNG shows logarithmic convergence with the counter-based RNG keeping dispersion stable across threads.
+**Heston QE vs analytic:** `docs/artifacts/heston_qe_vs_analytic.csv` captures QE and Euler Monte Carlo against the analytic characteristic-function benchmark. QE remains caveated by known bias and should not be used as a public superiority headline.
 
 **PDE Convergence:** `docs/artifacts/pde_order_slope.csv` confirms ≈second-order behaviour (slope −2.0). Price errors shrink from 4.98×10⁻³ on a 101×100 grid to 8.0×10⁻⁵ on an 801×400 grid while Δ/Γ stay within 10⁻⁵ of Black–Scholes.
 
 The reproduction script also writes plots—`docs/artifacts/qmc_vs_prng_equal_time.png` compares equal-time RMSE reductions, `docs/artifacts/heston_qe_vs_analytic.png` visualises QE vs Euler convergence, and `docs/artifacts/mc_greeks_ci.png` overlays MC Greeks with 95 % confidence bands.
 
-Barrier validation is captured via `artifacts/barrier_validation.csv` and `artifacts/barrier_validation.png`, comparing Monte Carlo and PDE prices against Reiner–Rubinstein closed-form benchmarks for representative up/down knock-out cases.
+Barrier validation is covered by FAST tests against Reiner-Rubinstein closed-form benchmarks for representative knock-out cases.
 
 `artifacts/pde_order_slope.csv` and `artifacts/pde_order_slope.png` record log–log error curves versus grid size, demonstrating the expected ≈ second-order slope once the two Rannacher start-up steps have smoothed the payoff kink.
 
-`artifacts/greeks_ci.csv` tabulates Delta/Vega/Gamma/Theta alongside their standard errors and 95 % confidence limits (likelihood-ratio Theta, mixed Gamma). These match Black–Scholes within the CI width and feed directly into downstream dashboards.
+`docs/artifacts/mc_greeks_ci.csv` tabulates Delta/Vega/Gamma/Theta alongside their standard errors and 95% confidence limits (likelihood-ratio Theta, mixed Gamma). These are artifact-backed for the committed snapshot.
 
 ### Edge Case Validation
 
@@ -786,7 +788,7 @@ Run `./scripts/reproduce_all.sh` to build Release, execute the FAST + SLOW test 
 
 - Looking for quick links? Browse [docs/Results.md](docs/Results.md) or open the PNG/CSV pairs directly inside `docs/artifacts/`.
 - Need to rerun one plot? Each helper in `scripts/` (e.g., `qmc_vs_prng_equal_time.py`, `pde_order_slope.py`) accepts `--output/--csv` so you can regenerate a single artifact in isolation.
-- Legacy `scripts/demo.sh` remains for the broader PDF deck (`artifacts/onepager.pdf`, `artifacts/twopager.pdf`) if you still need that resume-ready snapshot.
+- Legacy `scripts/demo.sh` can create broader PDF decks under ignored `artifacts/` scratch space, but those PDFs are not part of the current curated artifact set.
 
 ### Artifact index
 File | What it shows
@@ -879,7 +881,7 @@ TEST(PDE, BoundaryConditions) { /* Dirichlet vs Neumann */ }
 - **Sanitizers**: AddressSanitizer, UBSanitizer
 - **Static Analysis**: clang-tidy
 
-Wheels for Python bindings are built on tag pushes via cibuildwheel (Linux/macOS/Windows).
+The repository includes cibuildwheel workflow configuration for Python bindings on tag pushes (Linux/macOS/Windows); T-106 should verify the current wheel/install path before public package claims are strengthened.
 
 **Code Quality:**
 - **Formatting**: clang-format with LLVM style
@@ -948,7 +950,7 @@ pde_params.upper_boundary = quant::pde::PdeParams::UpperBoundary::Neumann;
 
 ### WRDS (OptionMetrics) Pipeline
 
-Opt-in MARKET tests under `wrds_pipeline/` pull (or fall back to deterministic samples), aggregate the SPX surface, run a vega-weighted Heston calibration, and emit anonymised CSV/PNG bundles under `docs/artifacts/wrds/`. Set `WRDS_ENABLED=1` together with `WRDS_USERNAME` / `WRDS_PASSWORD` to enable `ctest -L MARKET`; otherwise the tests are skipped. Key artifacts (all aggregated / anonymised):
+Opt-in MARKET tests under `wrds_pipeline/` pull live WRDS data only when explicitly enabled; deterministic sample mode is a regression harness. Sample aggregate CSV/PNG artifacts live under `docs/artifacts/wrds/`; live/local outputs must remain scratch unless separately sanitized and promoted. Set `WRDS_ENABLED=1` together with `WRDS_USERNAME` / `WRDS_PASSWORD` to enable `ctest -L MARKET`; otherwise the tests are skipped. Key tracked sample artifacts:
 
 - Local WRDS parquet mode is **explicit-only**: set `WRDS_LOCAL_ROOT` (env) or `wrds_local_root` in the dateset config to read OptionMetrics parquet (`opprcd`, `secprd`, `secnmd`) before cache/live WRDS. Local runs default to `artifacts/_local/wrds_local/` (scratch) so the sample bundle under `docs/artifacts/wrds/` remains reproducible. Local-run provenance is recorded in `artifacts/_local/wrds_local/manifest_local.json` (ignored); raw WRDS tables are never committed.
 
