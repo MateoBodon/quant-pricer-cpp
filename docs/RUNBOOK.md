@@ -21,8 +21,8 @@ How to run, test, and debug this repo.
 ## WRDS local metrics (one-command)
 - Sample (CI-friendly):
   - `WRDS_USE_SAMPLE=1 ./scripts/reproduce_wrds_local_metrics.sh --dateset wrds_pipeline_dates_panel.yaml`
-- Local parquet:
-  - `WRDS_LOCAL_ROOT=/srv/data/wrds/wrds QUANT_MACHINE_LABEL=<label> ./scripts/reproduce_wrds_local_metrics.sh --dateset <local_dateset>.yaml`
+- Local partitioned vault:
+  - `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds QUANT_MACHINE_LABEL=<label> ./scripts/reproduce_wrds_local_metrics.sh --dateset <locked_dateset>.yaml`
 - Optional: `--run-id <id>` to control the output folder (defaults to `wrds_local_<UTC timestamp>`).
 - The script prints the metrics Markdown path under `artifacts/_local/wrds_local/<run_id>/`.
 
@@ -30,8 +30,8 @@ How to run, test, and debug this repo.
 - Generate sample snippet (CI-safe):
   - `WRDS_USE_SAMPLE=1 ./scripts/reproduce_wrds_local_metrics.sh --dateset wrds_pipeline_dates_panel.yaml --run-id wrds_local_ci_snippet`
   - `python3 scripts/generate_wrds_resume_snippet.py --metrics-json artifacts/_local/wrds_local/wrds_local_ci_snippet/metrics_export_sample.json`
-- Generate local parquet snippet:
-  - `WRDS_LOCAL_ROOT=/srv/data/wrds/wrds QUANT_MACHINE_LABEL=<label> ./scripts/reproduce_wrds_local_metrics.sh --dateset <local_dateset>.yaml --run-id wrds_local_resume`
+- Generate local-vault snippet:
+  - `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds QUANT_MACHINE_LABEL=<label> ./scripts/reproduce_wrds_local_metrics.sh --dateset <locked_dateset>.yaml --run-id wrds_local_resume`
   - `python3 scripts/generate_wrds_resume_snippet.py --metrics-json artifacts/_local/wrds_local/wrds_local_resume/metrics_export_local.json`
 - Default output is `artifacts/_local/wrds_local/<run_id>/resume_snippet_wrds_{sample,local}.md`.
 - The snippet is aggregate-only by construction and hard-fails sanitization if banned tokens appear (`/srv/data/wrds`, `.parquet`, `.csv`).
@@ -40,19 +40,18 @@ How to run, test, and debug this repo.
 - Sample run (aggregates only):
   - `WRDS_USE_SAMPLE=1 python3 -m wrds_pipeline.pipeline --fast --dateset wrds_pipeline_dates_panel.yaml`
   - `WRDS_USE_SAMPLE=1 QUANT_MACHINE_LABEL=AX162-S python3 scripts/wrds_realdata_metrics_export.py --wrds-root docs/artifacts/wrds --use-sample --out artifacts/_local/wrds_local/metrics_export_sample.json --out-md artifacts/_local/wrds_local/metrics_export_sample.md`
-- Local parquet run (writes to gitignored root):
-  - AX162-S (parquet root at `/srv/data/wrds/wrds`):
-    - `RUN_ID=wrds_local_$(date +%Y%m%d_%H%M%S)`
-    - `WRDS_LOCAL_ROOT=/srv/data/wrds/wrds python3 -m wrds_pipeline.pipeline --fast --dateset wrds_pipeline_dates_panel.yaml --output-root artifacts/_local/wrds_local/$RUN_ID`
-    - `WRDS_LOCAL_ROOT=/srv/data/wrds/wrds QUANT_MACHINE_LABEL=AX162-S python3 scripts/wrds_realdata_metrics_export.py --wrds-root artifacts/_local/wrds_local/$RUN_ID --out artifacts/_local/wrds_local/$RUN_ID/metrics_export_local.json --out-md artifacts/_local/wrds_local/$RUN_ID/metrics_export_local.md`
-  - worker_default (WRDS_LOCAL_ROOT allowlist is `/srv/data/wrds`; parquet root nested at `/srv/data/wrds/wrds`):
-    - Clone `wrds_pipeline_dates_panel.yaml` with `wrds_local_root: /srv/data/wrds/wrds`.
-    - `RUN_ID=wrds_local_$(date +%Y%m%d_%H%M%S)`
-    - `WRDS_LOCAL_ROOT=/srv/data/wrds python3 -m wrds_pipeline.pipeline --fast --dateset <local_dateset>.yaml --output-root artifacts/_local/wrds_local/$RUN_ID`
-    - `WRDS_LOCAL_ROOT=/srv/data/wrds QUANT_MACHINE_LABEL=worker_default python3 scripts/wrds_realdata_metrics_export.py --wrds-root artifacts/_local/wrds_local/$RUN_ID --out artifacts/_local/wrds_local/$RUN_ID/metrics_export_local.json --out-md artifacts/_local/wrds_local/$RUN_ID/metrics_export_local.md`
-  - Local runs write provenance to `artifacts/_local/wrds_local/<run_id>/manifest_local.json` unless `QUANT_MANIFEST_PATH` is set.
-  - Note: `WRDS_LOCAL_ROOT` must resolve to a directory that contains `raw/optionm` parquet directories (often `/srv/data/wrds/wrds`). If your data lives elsewhere, set `wrds_local_root` in a dateset clone.
-  - Parquet reads require `pyarrow` (or `fastparquet`) installed in the venv.
+- Local partitioned-vault run (writes to a gitignored root):
+  - The authoritative root is `/Volumes/Storage/Data/wrds`; the adapter is
+    pinned to snapshot `20260707_045553_global_project_priority`.
+  - `RUN_ID=wrds_local_$(date +%Y%m%d_%H%M%S)`
+  - `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds python3 -m wrds_pipeline.pipeline --fast --dateset <locked_dateset>.yaml --output-root artifacts/_local/wrds_local/$RUN_ID`
+  - `WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds QUANT_MACHINE_LABEL=<label> python3 scripts/wrds_realdata_metrics_export.py --wrds-root artifacts/_local/wrds_local/$RUN_ID --out artifacts/_local/wrds_local/$RUN_ID/metrics_export_local.json --out-md artifacts/_local/wrds_local/$RUN_ID/metrics_export_local.md`
+  - Every per-date directory must contain `source_receipt.json`, binding the
+    exact compressed inputs and acquisition manifests. Local runs also write
+    `manifest_local.json` unless `QUANT_MANIFEST_PATH` is set.
+  - Missing/multiple SPX identity, spot, curve, dividend, partition, or
+    manifest bindings are hard failures. Do not bypass them with constants or
+    sample data. Legacy monolithic parquet is not eligible for the flagship.
 
 ## Common troubleshooting
 - If CMake cache is stale, remove the build directory and reconfigure.

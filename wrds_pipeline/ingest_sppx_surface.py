@@ -2,9 +2,12 @@
 """OptionMetrics SPX ingestion + aggregation helpers.
 
 If WRDS_LOCAL_ROOT is explicitly set (or a dateset config provides a local
-root), local OptionMetrics parquet is read before cache/live WRDS. If
-WRDS_CACHE_ROOT is set (or /Volumes/Storage/Data/wrds_cache exists), raw WRDS
-slices are cached as parquet and reused on subsequent runs.
+root), the local source is authoritative and failures propagate rather than
+silently downgrading to cache/sample data.  The shared partitioned CSV.GZ vault
+is read through :mod:`wrds_pipeline.vault_adapter`; legacy parquet discovery is
+retained only to return an explicit migration error.  If WRDS_CACHE_ROOT is set
+(or /Volumes/Storage/Data/wrds_cache exists), raw live-WRDS slices are cached as
+parquet and reused on subsequent runs.
 """
 from __future__ import annotations
 
@@ -12,12 +15,13 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Tuple
+from typing import Iterable, Tuple
 
 import numpy as np
 import pandas as pd
 
 from .bs_utils import bs_vega, implied_vol_from_price
+from . import vault_adapter
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_PATH_ENV = "WRDS_SAMPLE_PATH"
@@ -48,19 +52,33 @@ def _cache_root() -> Path | None:
     return None
 
 
-def _local_root(explicit_root: Path | str | None = None) -> Path | None:
+def resolve_local_root(explicit_root: Path | str | None = None) -> Path | None:
+    """Resolve an explicitly configured local root or fail on unsupported layout."""
+
     root = explicit_root or os.environ.get(LOCAL_ROOT_ENV)
     if not root:
         return None
     candidate = Path(root).expanduser()
+    if not candidate.is_absolute():
+        candidate = (REPO_ROOT / candidate).resolve()
     optionm_root = candidate / "raw" / "optionm"
+    if vault_adapter.is_vault_root(candidate):
+        return candidate
     if (
         (optionm_root / "opprcd").exists()
         and (optionm_root / "secprd").exists()
         and (optionm_root / "secnmd.parquet").exists()
     ):
         return candidate
-    return None
+    raise RuntimeError(
+        f"Explicit {LOCAL_ROOT_ENV} does not contain the required partitioned "
+        "OptionMetrics vault snapshot or recognized legacy parquet layout: "
+        f"{candidate}"
+    )
+
+
+def _local_root(explicit_root: Path | str | None = None) -> Path | None:
+    return resolve_local_root(explicit_root)
 
 
 def _local_optionm_root(local_root: Path | None) -> Path | None:
@@ -121,6 +139,14 @@ def _resolve_secid_local(symbol: str, trade_date: str, local_root: Path | None) 
 def _fetch_from_local(
     symbol: str, trade_date: str, local_root: Path | None
 ) -> pd.DataFrame:
+    if local_root is not None and vault_adapter.is_vault_root(local_root):
+        frame, _ = vault_adapter.load_surface(local_root, symbol, trade_date)
+        return frame
+    if local_root is not None:
+        raise RuntimeError(
+            "Legacy local parquet mode lacks exact zerocd/idxdvd provenance and "
+            "is not eligible for a real-data result; use the partitioned vault"
+        )
     opprcd_path = _local_opprcd_path(trade_date, local_root)
     secprd_path = _local_secprd_path(trade_date, local_root)
     if opprcd_path is None or secprd_path is None:
@@ -395,14 +421,12 @@ def load_surface(
     if not force_sample:
         resolved_local = _local_root(local_root)
         if resolved_local is not None:
-            try:
-                local_df = _fetch_from_local(symbol, str(trade_date), resolved_local)
-                if not local_df.empty:
-                    local_df["trade_date"] = pd.to_datetime(local_df["date"])
-                    local_df.drop(columns=["date"], inplace=True)
-                    return _standardize_quote_date(local_df), "local"
-            except Exception as exc:
-                print(f"[wrds_pipeline] local WRDS fetch failed ({exc}); falling back")
+            local_df = _fetch_from_local(symbol, str(trade_date), resolved_local)
+            if local_df.empty:
+                raise RuntimeError(f"Local WRDS returned no rows for {trade_date}")
+            local_df["trade_date"] = pd.to_datetime(local_df["date"])
+            local_df.drop(columns=["date"], inplace=True)
+            return _standardize_quote_date(local_df), "local"
         cached = _load_cache(symbol, str(trade_date))
         if cached is not None and not cached.empty:
             return _standardize_quote_date(cached), "cache"
@@ -423,16 +447,19 @@ def load_surface(
 
 
 def _standardize_quote_date(df: pd.DataFrame) -> pd.DataFrame:
+    attrs = dict(df.attrs)
     df = df.copy()
     df["trade_date"] = pd.to_datetime(df["trade_date"])
     if "quote_date" in df.columns:
         df["quote_date"] = pd.to_datetime(df["quote_date"])
     else:
         df["quote_date"] = df["trade_date"]
+    df.attrs.update(attrs)
     return df
 
 
 def _prepare_quotes(df: pd.DataFrame) -> pd.DataFrame:
+    attrs = dict(df.attrs)
     df = df.copy()
     df["trade_date"] = pd.to_datetime(df["trade_date"])
     df["quote_date"] = pd.to_datetime(df.get("quote_date", df["trade_date"]))
@@ -442,18 +469,46 @@ def _prepare_quotes(df: pd.DataFrame) -> pd.DataFrame:
     df["ttm_years"] = df["days_to_expiration"] / 365.0
     df["option_mid"] = 0.5 * (df["best_bid"] + df["best_offer"])
     df = df[(df["option_mid"] > 0.01)]
-    if "underlying_bid" in df.columns and "underlying_ask" in df.columns:
-        underlying_mid = 0.5 * (df["underlying_bid"] + df["underlying_ask"])
+    fail_closed = bool(attrs.get("fail_closed_real_data"))
+    if fail_closed:
+        required = ("spot", "rate", "divyield")
+        missing = [column for column in required if column not in df.columns]
+        if missing:
+            raise RuntimeError(
+                "Fail-closed real-data surface missing exact inputs: "
+                + ", ".join(missing)
+            )
+        for column in required:
+            values = pd.to_numeric(df[column], errors="coerce")
+            if values.isna().any() or not np.isfinite(values.to_numpy(dtype=float)).all():
+                raise RuntimeError(
+                    f"Fail-closed real-data surface has invalid {column} values"
+                )
+            df[column] = values
+        if (df["spot"] <= 0).any():
+            raise RuntimeError("Fail-closed real-data surface has non-positive spot")
+        df["dividend"] = df["divyield"]
     else:
-        underlying_mid = pd.Series(np.nan, index=df.index)
-    base_spot = df["spot"] if "spot" in df.columns else pd.Series(np.nan, index=df.index)
-    forward = df["forward_price"] if "forward_price" in df.columns else pd.Series(np.nan, index=df.index)
-    df["spot"] = (
-        base_spot.fillna(underlying_mid).fillna(forward).fillna(SPOT_FALLBACK)
-    )
-    df["spot"] = np.clip(df["spot"], 1000.0, 20000.0)
-    df["rate"] = df.get("rate", 0.015).fillna(0.015)
-    df["dividend"] = df.get("dividend", df.get("divyield", 0.01)).fillna(0.01)
+        if "underlying_bid" in df.columns and "underlying_ask" in df.columns:
+            underlying_mid = 0.5 * (df["underlying_bid"] + df["underlying_ask"])
+        else:
+            underlying_mid = pd.Series(np.nan, index=df.index)
+        base_spot = (
+            df["spot"]
+            if "spot" in df.columns
+            else pd.Series(np.nan, index=df.index)
+        )
+        forward = (
+            df["forward_price"]
+            if "forward_price" in df.columns
+            else pd.Series(np.nan, index=df.index)
+        )
+        df["spot"] = (
+            base_spot.fillna(underlying_mid).fillna(forward).fillna(SPOT_FALLBACK)
+        )
+        df["spot"] = np.clip(df["spot"], 1000.0, 20000.0)
+        df["rate"] = df.get("rate", 0.015).fillna(0.015)
+        df["dividend"] = df.get("dividend", df.get("divyield", 0.01)).fillna(0.01)
     df["strike"] = df["strike"].fillna(df.get("strike_price", df["spot"]))
     df = df[df["strike"] > 0]
     df["moneyness"] = df["strike"] / df["spot"]
@@ -567,6 +622,12 @@ def has_wrds_credentials(local_root: Path | None = None) -> bool:
     if cache_root is None:
         return False
     return (cache_root / "cache_manifest.json").exists()
+
+
+def write_source_receipts(path: Path, frames: Iterable[pd.DataFrame]) -> Path | None:
+    """Persist receipts attached by the partitioned-vault adapter."""
+
+    return vault_adapter.write_surface_receipts(path, frames)
 
 
 if __name__ == "__main__":  # pragma: no cover

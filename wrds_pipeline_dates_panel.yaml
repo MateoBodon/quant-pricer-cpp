@@ -1,4 +1,4 @@
-# Optional: set to a local OptionMetrics parquet root to enable explicit local mode.
+# Optional: set to a local partitioned OptionMetrics vault root for explicit mode.
 panel_id: "wrds_panel_calm_stress_v1"
 wrds_local_root: null
 dates:

@@ -51,3 +51,10 @@ Template:
   Options considered: Preserve the implementation and rename the parameter; correct the likelihoods to match the documented API and standard tests.
   Why: The documented confidence convention is already used by the rest of the risk API and by callers.
   Consequences: On-target exception rates now produce high POF p-values, excess rates fail, clustering is tested independently, and empty/non-binary/non-finite inputs fail explicitly.
+
+- Date: 2026-07-10
+  Decision: Bind local OptionMetrics research to the explicit partitioned-vault snapshot and fail closed on provenance or market-input gaps.
+  Context: The canonical loader expected monolithic parquet, silently downgraded local failures to sample data, and filled missing spot/rate/dividend values with constants; the authoritative shared vault is partitioned CSV.GZ with acquisition manifests.
+  Options considered: Repack the restricted vault into repo-specific parquet; retain fallback constants and label them; adapt the canonical pipeline directly to the manifest-bound vault.
+  Why: Direct adaptation preserves one restricted-data authority and makes a claimed real-data run mechanically distinguishable from a sample/proxy run.
+  Consequences: Local loads require snapshot `20260707_045553_global_project_priority`, exact as-of SPX identity, exact spot/dividend rows, an interpolable exact-date zero curve, and ok source-manifest items. Every successful date pair writes an ignored source receipt; legacy parquet is not eligible for a new headline run.

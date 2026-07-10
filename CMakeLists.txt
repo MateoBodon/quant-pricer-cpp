@@ -288,6 +288,12 @@ add_test(
 set_tests_properties(wrds_local_metrics_one_command_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME wrds_vault_adapter_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_wrds_vault_adapter_fast.py
+)
+set_tests_properties(wrds_vault_adapter_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME wrds_resume_snippet_from_sample_export_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_wrds_resume_snippet_from_sample_export_fast.py
 )

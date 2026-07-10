@@ -318,6 +318,8 @@ def run(
     local_root: Path | None = None,
     panel_id: str | None = None,
 ) -> Dict[str, object]:
+    if not use_sample:
+        local_root = ingest_sppx_surface.resolve_local_root(local_root)
     if wrds_root is None:
         if local_root is not None and not use_sample:
             wrds_root = LOCAL_WRDS_ROOT
@@ -332,6 +334,9 @@ def run(
     )
     raw_next, source_next = ingest_sppx_surface.load_surface(
         symbol, next_trade_date, force_sample=use_sample, local_root=local_root
+    )
+    source_receipt = ingest_sppx_surface.write_source_receipts(
+        out_dir / "source_receipt.json", (raw_today, raw_next)
     )
     print(
         f"[wrds_pipeline] {symbol} {trade_date} "
@@ -390,6 +395,7 @@ def run(
         "bootstrap_ci": {k: list(v) for k, v in ci.items()},
         "source_today": source_today,
         "source_next": source_next,
+        "source_receipt": str(source_receipt) if source_receipt else None,
     }
 
     oos_detail_csv = out_dir / "oos_pricing_detail.csv"
@@ -509,6 +515,7 @@ def run(
             },
             "source_today": source_today,
             "source_next": source_next,
+            "source_receipt": str(source_receipt) if source_receipt else None,
             "surface_today": str(today_csv),
             "surface_next": str(next_csv),
             "fit_table": str(fit_csv),
@@ -565,6 +572,8 @@ def run_dateset(
     panel_id = _panel_id_from_payload(payload, dateset_path)
     if local_root is None:
         local_root = _local_root_from_payload(payload)
+    if not use_sample:
+        local_root = ingest_sppx_surface.resolve_local_root(local_root)
     entries = payload.get("dates", [])
     if not entries:
         raise RuntimeError(f"{dateset_path} does not contain any dates")
@@ -625,6 +634,10 @@ def run_dateset(
         )
         except Exception as exc:  # pragma: no cover
             print(f"[wrds_pipeline] {trade_date} failed: {exc}")
+            if local_root is not None and not use_sample:
+                raise RuntimeError(
+                    f"Fail-closed local-vault dateset aborted at {trade_date}"
+                ) from exc
             pricing_rows.append(
                 {
                     "trade_date": trade_date,
@@ -842,10 +855,11 @@ def main() -> None:
         payload = _load_dateset_payload(dateset_path)
         local_root = _local_root_from_payload(payload)
     env_use_sample = os.environ.get("WRDS_USE_SAMPLE") == "1"
-    use_sample = (
-        args.use_sample
-        or env_use_sample
-        or not ingest_sppx_surface.has_wrds_credentials(local_root=local_root)
+    explicitly_sample = args.use_sample or env_use_sample
+    if not explicitly_sample:
+        local_root = ingest_sppx_surface.resolve_local_root(local_root)
+    use_sample = explicitly_sample or not ingest_sppx_surface.has_wrds_credentials(
+        local_root=local_root
     )
     output_root = None
     if args.output_root:

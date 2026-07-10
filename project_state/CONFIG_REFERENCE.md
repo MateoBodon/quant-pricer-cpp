@@ -51,7 +51,17 @@ commands:
   - `WRDS_USERNAME`, `WRDS_PASSWORD` for credentials.
   - `WRDS_USE_SAMPLE=1` for deterministic sample bundle.
   - `WRDS_CACHE_ROOT` to override cache location.
-  - `WRDS_LOCAL_ROOT` to explicitly enable local OptionMetrics parquet mode.
+  - `WRDS_LOCAL_ROOT` to explicitly enable fail-closed local OptionMetrics mode.
+    The current shared-vault adapter requires partitioned CSV.GZ inputs at
+    snapshot `20260707_045553_global_project_priority`: `opprcdYYYY` by day,
+    `secprdYYYY` by month, plus `secnmd`, `zerocd`, and `idxdvd` table
+    partitions. Missing or ambiguous spot/rate/dividend inputs abort the run;
+    explicit local mode never falls back to cache, live WRDS, constants, or
+    sample data.
+  - Each local-vault date pair writes an ignored `source_receipt.json` beside
+    its run outputs. The receipt binds exact absolute/relative input paths,
+    compressed-file SHA-256/bytes, acquisition manifests, snapshot, dates,
+    resolved universe, filter counts, and rate/dividend transformations.
   - `WRDS_SAMPLE_PATH` to override the WRDS sample CSV path (used by FAST poison tests).
 - `WRDS_SYMBOL`, `WRDS_TRADE_DATE`, `WRDS_DATESET` for targeted runs.
 
