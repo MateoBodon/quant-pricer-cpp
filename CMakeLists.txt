@@ -288,6 +288,12 @@ add_test(
 set_tests_properties(wrds_local_metrics_one_command_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME ssvi_surface_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_ssvi_surface_fast.py
+)
+set_tests_properties(ssvi_surface_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME wrds_vault_adapter_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_wrds_vault_adapter_fast.py
 )
