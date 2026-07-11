@@ -62,7 +62,7 @@ timeout_seconds = 900
 stop_on_failure = true
 trusted_shell = false
 descendant_policy = "supervised"
-allowed_descendant_executables = ["same-executable", "env", "sh", "bash", "cmake", "make", "gmake", "clang", "clang++", "cc", "c++", "ld", "ar", "ranlib", "strip", "xcrun", "ctest", "unit_tests", "quant_cli", "python", "python3", "python3.12", "git", "mkdir", "ps", "sleep", "sw_vers", "sysctl", "<defunct>"]
+allowed_descendant_executables = ["same-executable", "env", "sh", "bash", "cmake", "make", "gmake", "clang", "clang++", "cc", "c++", "ld", "ar", "ranlib", "strip", "xcrun", "xcode-select", "ctest", "unit_tests", "quant_cli", "python", "python3", "python3.12", "git", "mkdir", "ps", "sleep", "sw_vers", "sysctl", "uname", "<defunct>"]
 commands = [["/opt/homebrew/bin/cmake", "-S", ".", "-B", "build", "-DCMAKE_BUILD_TYPE=Release", "-DPython3_EXECUTABLE=/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3"], ["/opt/homebrew/bin/cmake", "--build", "build", "-j", "4", "--target", "unit_tests"], ["/opt/homebrew/bin/ctest", "--test-dir", "build", "-L", "FAST", "--output-on-failure"], ["/opt/homebrew/bin/clang-format", "--dry-run", "--Werror", "include/quant/risk.hpp", "src/risk.cpp", "tests/test_risk.cpp"]]
 proves = ["Project OS integrity, Release configure, unit-test build, all artifact-stable FAST tests, and touched risk-surface formatting at the recorded input fingerprint"]
 limits = ["Does not prove official reproduction, vault compatibility, live-data results, or public claims"]
@@ -73,7 +73,7 @@ timeout_seconds = 1800
 stop_on_failure = false
 trusted_shell = false
 descendant_policy = "supervised"
-allowed_descendant_executables = ["same-executable", "env", "sh", "bash", "cmake", "make", "gmake", "clang", "clang++", "cc", "c++", "ld", "ar", "ranlib", "strip", "xcrun", "ctest", "unit_tests", "quant_cli", "python", "python3", "python3.12", "git", "mkdir", "ps", "sleep", "sw_vers", "sysctl", "<defunct>"]
+allowed_descendant_executables = ["same-executable", "env", "sh", "bash", "cmake", "make", "gmake", "clang", "clang++", "cc", "c++", "ld", "ar", "ranlib", "strip", "xcrun", "xcode-select", "ctest", "unit_tests", "quant_cli", "python", "python3", "python3.12", "git", "mkdir", "ps", "sleep", "sw_vers", "sysctl", "uname", "<defunct>"]
 commands = [["/opt/homebrew/bin/cmake", "-S", ".", "-B", "build", "-DCMAKE_BUILD_TYPE=Release", "-DPython3_EXECUTABLE=/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3"], ["/opt/homebrew/bin/cmake", "--build", "build", "-j", "4"], ["/opt/homebrew/bin/ctest", "--test-dir", "build", "-L", "FAST", "--output-on-failure"], ["/opt/homebrew/bin/clang-format", "--dry-run", "--Werror", "include/quant/risk.hpp", "src/risk.cpp", "tests/test_risk.cpp"], ["/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3", "scripts/check_data_policy.py"], ["/Volumes/Storage/Projects/quant-pricer-cpp/repo/.venv/bin/python3", "tests/test_docs_sanity_fast.py"]]
 proves = ["Project OS integrity, full Release build, all artifact-stable FAST tests, touched risk-surface formatting, tracked-data policy, and documentation sanity at the recorded input fingerprint"]
 limits = ["Does not prove official reproduction, vault compatibility, empirical results, or public claims"]

@@ -43,10 +43,32 @@ Status overview (from `docs/artifacts/metrics_summary.md`):
   invalid; the real five-date replay is separately fail-closed and is not
   represented by this sample result.
 
+## Real-data SSVI temporal confirmation
+
+The published one-use `ssvi_temporal_holdout_v1` result is confirmed on twelve
+fixed Q1/Q3 pairs from 2020 through 2025:
+
+- 2,808 calibration and 2,806 next-day aggregate rows;
+- all 12 SSVI analytic, dense numerical, finite-row, and QuantLib gates passed;
+- 11/12 strict OOS price-MAE wins versus repaired Heston, with median relative
+  change `-8.8825%` and mean `-14.9785%`;
+- 12/12 wins versus tenor-flat Black–Scholes, with median `-79.9033%` and mean
+  `-76.8461%`;
+- 59/72 wins across all six fixed date-level metrics;
+- retained primary loss on 2020-01-06: SSVI `87.3484` versus Heston `81.7428`
+  price-error ticks (`+6.8576%`).
+
+The evidence is SSVI-unseen but not dataset-blind. Four Heston comparator fits
+were boundary-saturated, hedge behavior was not evaluated, and no strategy,
+return, universal-superiority, or future-market claim is supported. Exact
+aggregate evidence is in
+`docs/artifacts/ssvi_temporal_holdout_v1_summary.json`.
+
 ## Key artifact locations
 - Validation figures + CSVs: `docs/artifacts/` (tri-engine, QMC vs PRNG, PDE order, MC Greeks, Heston QE, etc.).
 - Manifest metadata: `docs/artifacts/manifest.json`.
 - Metrics snapshot: `docs/artifacts/metrics_summary.md` and `docs/artifacts/metrics_summary.json`.
+- Real-data SSVI temporal confirmation: `docs/artifacts/ssvi_temporal_holdout_v1_summary.json`.
 - WRDS aggregated outputs (if present): `docs/artifacts/wrds/`.
 - Validation bundle: `docs/validation_pack.zip`.
 

@@ -14,6 +14,35 @@
 
 The dedicated WRDS appendix ([`docs/WRDS_Results.md`](WRDS_Results.md)) lists the current scalar metrics next to the CSV/JSON artifacts that store them.
 
+## Real-data SSVI Temporal Confirmation
+
+The published `ssvi_temporal_holdout_v1` contract was executed exactly once on
+twelve fixed Q1/Q3 date pairs from 2020 through 2025. This is SSVI-unseen but
+not dataset-blind evidence: earlier Heston and tenor-flat Black–Scholes
+aggregates existed, while SSVI had never been calibrated or scored on these
+dates.
+
+All twelve SSVI fits passed the analytic sufficient conditions, dense numerical
+static-arbitrage audit, finite-row gate, and an independent 13,068-price
+QuantLib comparison with zero invalid prices and maximum absolute disagreement
+`5.61195e-13`. The predeclared next-day price-MAE gate passed:
+
+| Comparator | SSVI wins | Median relative change | Mean relative change | Exact one-sided sign probability |
+| --- | ---: | ---: | ---: | ---: |
+| Repaired Heston | 11/12 | -8.8825% | -14.9785% | 0.003173828125 |
+| Tenor-flat Black–Scholes | 12/12 | -79.9033% | -76.8461% | 0.000244140625 |
+
+The retained primary loss is 2020-01-06: SSVI price MAE `87.3484` ticks versus
+Heston `81.7428` (`+6.8576%`). The Heston fit was boundary-saturated, but the
+loss remains counted. SSVI's worst absolute price-error date was 2022-01-03 at
+`617.9374` ticks, and hedge behavior was not evaluated. Accordingly this is an
+exact-panel surface-fit confirmation, not a strategy, return, universal
+superiority, or future-market claim.
+
+- Aggregate result: [artifacts/ssvi_temporal_holdout_v1_summary.json](artifacts/ssvi_temporal_holdout_v1_summary.json)
+- Contract: [`configs/ssvi_temporal_holdout_v1.json`](../configs/ssvi_temporal_holdout_v1.json)
+- Panel: [`wrds_pipeline_dates_ssvi_holdout_v1.yaml`](../wrds_pipeline_dates_ssvi_holdout_v1.yaml)
+
 ## Tri-Engine Agreement
 
 Analytic Black–Scholes, deterministic Monte Carlo (counter RNG + control variate), and Crank–Nicolson disagree by <5 bps across strikes when configured with the same market inputs. MC error bars reflect the 95% CI from 200k paths, so the dashed PDE line and green analytic curve are visually on top of one another.

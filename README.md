@@ -65,6 +65,15 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
   - Generate: `WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh && python scripts/generate_metrics_summary.py --artifacts docs/artifacts --manifest docs/artifacts/manifest.json`
   - Browse: `docs/artifacts/metrics_summary.md` (artifact-derived; current committed snapshot is historical until current-HEAD reproduction is repaired)
 
+- **Real-data SSVI temporal confirmation:** On a published, one-use 12-pair
+  2020–2025 OptionMetrics panel, arbitrage-aware SSVI passed every
+  analytic/numerical/finite/QuantLib gate and won next-day price MAE on 11/12
+  dates versus repaired Heston and 12/12 versus tenor-flat Black–Scholes.
+  Median relative changes were `-8.88%` and `-79.90%`, respectively. This is an
+  exact-panel, SSVI-unseen but not dataset-blind result; hedge behavior and
+  future returns were not tested. Machine-readable aggregate evidence:
+  [`ssvi_temporal_holdout_v1_summary.json`](docs/artifacts/ssvi_temporal_holdout_v1_summary.json).
+
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#tri-engine-agreement"><img src="docs/artifacts/tri_engine_agreement.png" alt="Tri-engine agreement" width="230"></a><br>
   **Tri-Engine Agreement (BS / MC / PDE)** – Analytic, deterministic MC, and Crank–Nicolson agree to <5 bps across strikes; MC CI is shown.<br>
   Reproduce: `python scripts/tri_engine_agreement.py --quant-cli build/quant_cli --output docs/artifacts/tri_engine_agreement.png --csv docs/artifacts/tri_engine_agreement.csv`

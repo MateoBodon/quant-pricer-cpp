@@ -1,0 +1,307 @@
+{
+  "schema_version": 1,
+  "status": "confirmed",
+  "contract_id": "ssvi_temporal_holdout_v1",
+  "evidence_class": "ssvi_unseen_not_dataset_blind",
+  "claim_scope": "exact_twelve_pair_temporal_confirmation_only",
+  "data_policy": "aggregate_only_no_option_rows_or_model_parameters",
+  "contract_sha256": "2b042a32bbaad3f7a83be88721e7b0c4c1d0f50db417a88209c8de1342c276a0",
+  "panel_sha256": "301aced837431eff2276067d08e12581918d85a498d8e9d0ef33e338a69dc974",
+  "inventory_sha256": "ca7fff944cc94c988e5c0b4d34cf7d99c2c46d9a8043c80fde297a464e818ca7",
+  "inventory_receipt_sha256": "115281f3c4796a33c719f905e2fd479f8f3921875b07121c54bf1fba34d5f591",
+  "publication": {
+    "remote_commit_sha": "246bf2c8a71053dbe2f78aa3810e77c7872e1f17",
+    "remote_tree_sha": "8d77178bc9cf85d0263c8451e866d98f45732e8c",
+    "published_at_utc": "2026-07-11T20:19:27Z"
+  },
+  "execution": {
+    "run_id": "ssvi_holdout_20260711T220918Z",
+    "input_generation_pid": 329,
+    "input_generation_wall_seconds": 2934.11,
+    "input_generation_max_rss_bytes": 534724608,
+    "sealed_runner_pid": 92768,
+    "sealed_runner_wall_seconds": 1091.73,
+    "sealed_runner_max_rss_bytes": 196280320,
+    "swaps": 0,
+    "consumed_marker_sha256": "2cc16980708b66ee5bbad37c779f04514ad8a3c53e39384b98efe1b72e5646f7",
+    "full_result_sha256": "385e67995d6b58235e458d95e8339e6aa93aa7f5cede5311b4f3c286ed45b30b"
+  },
+  "sample": {
+    "date_pair_count": 12,
+    "unique_surface_date_count": 24,
+    "insample_surface_rows": 2808,
+    "oos_surface_rows": 2806,
+    "date_range": [
+      "2020-01-06",
+      "2025-07-02"
+    ],
+    "excluded_already_observed_2020_development_pairs": [
+      [
+        "2020-03-16",
+        "2020-03-17"
+      ],
+      [
+        "2020-03-17",
+        "2020-03-18"
+      ]
+    ]
+  },
+  "primary_gate": {
+    "passed": true,
+    "all_ssvi_analytic_numerical_finite_and_quantlib_gates_pass": true,
+    "heston": {
+      "required_wins": 10,
+      "ssvi_win_count": 11,
+      "median_relative_change_percent": -8.882515908216032,
+      "mean_relative_change_percent": -14.978512549360554,
+      "one_sided_exact_sign_probability": 0.003173828125,
+      "passed": true
+    },
+    "tenor_flat_bs": {
+      "required_wins": 10,
+      "ssvi_win_count": 12,
+      "median_relative_change_percent": -79.90325088822753,
+      "mean_relative_change_percent": -76.84612999866961,
+      "one_sided_exact_sign_probability": 0.000244140625,
+      "passed": true
+    }
+  },
+  "numerical_validity": {
+    "ssvi_promotion_eligible_date_count": 12,
+    "ssvi_invalid_oos_row_count": 0,
+    "quantlib_evaluated_price_count": 13068,
+    "quantlib_invalid_price_count": 0,
+    "max_price_abs_error_vs_quantlib": 5.611954871542642e-13,
+    "max_sufficient_curvature": 3.8416,
+    "sufficient_curvature_limit": 4.0,
+    "max_sufficient_wing": 0.5410429669394862,
+    "sufficient_wing_limit": 4.0,
+    "minimum_density_factor": 0.24952638250050263,
+    "minimum_calendar_increment": 1.8245962776952847e-06
+  },
+  "winner_counts": {
+    "comparison_count": 72,
+    "overall": {
+      "ssvi": 59,
+      "heston": 12,
+      "tenor_flat_bs": 1
+    },
+    "by_metric": {
+      "insample_iv_mae_volpts_vega_wt": {
+        "ssvi": 11,
+        "heston": 1,
+        "tenor_flat_bs": 0
+      },
+      "insample_iv_p90_bps": {
+        "ssvi": 10,
+        "heston": 1,
+        "tenor_flat_bs": 1
+      },
+      "insample_iv_rmse_volpts_vega_wt": {
+        "ssvi": 8,
+        "heston": 4,
+        "tenor_flat_bs": 0
+      },
+      "insample_price_rmse_ticks": {
+        "ssvi": 9,
+        "heston": 3,
+        "tenor_flat_bs": 0
+      },
+      "oos_iv_mae_bps": {
+        "ssvi": 10,
+        "heston": 2,
+        "tenor_flat_bs": 0
+      },
+      "oos_price_mae_ticks": {
+        "ssvi": 11,
+        "heston": 1,
+        "tenor_flat_bs": 0
+      }
+    }
+  },
+  "ssvi_stability": {
+    "oos_price_mae_ticks": {
+      "mean": 145.58193830595826,
+      "median": 101.58838483186588,
+      "best": 36.9961863883832,
+      "best_trade_date": "2021-07-06",
+      "worst": 617.937357831019,
+      "worst_trade_date": "2022-01-03"
+    },
+    "oos_iv_mae_bps": {
+      "mean": 148.18544217091255,
+      "median": 86.68355987824273,
+      "best": 30.37796156212886,
+      "best_trade_date": "2021-07-06",
+      "worst": 510.79259081763473,
+      "worst_trade_date": "2023-01-03"
+    }
+  },
+  "negative_evidence": {
+    "primary_heston_loss": {
+      "trade_date": "2020-01-06",
+      "ssvi_oos_price_mae_ticks": 87.34842866611625,
+      "heston_oos_price_mae_ticks": 81.74280909670065,
+      "ssvi_relative_change_percent": 6.857630207917387,
+      "heston_promotion_status": "boundary_saturated",
+      "counted_as_loss": true
+    },
+    "oos_iv_losses_vs_heston": [
+      {
+        "trade_date": "2021-01-04",
+        "ssvi_oos_iv_mae_bps": 88.98857672342695,
+        "heston_oos_iv_mae_bps": 87.95719138124127,
+        "ssvi_relative_change_percent": 1.1725992224049575
+      },
+      {
+        "trade_date": "2024-07-01",
+        "ssvi_oos_iv_mae_bps": 46.09719042142293,
+        "heston_oos_iv_mae_bps": 45.1644031793024,
+        "ssvi_relative_change_percent": 2.0653151076022613
+      }
+    ],
+    "heston_boundary_saturated_dates": [
+      "2020-01-06",
+      "2022-01-03",
+      "2022-07-05",
+      "2024-01-02"
+    ],
+    "hedge_evaluation": "not_evaluated",
+    "universal_superiority_claim": false,
+    "strategy_or_return_claim": false
+  },
+  "per_date_oos": [
+    {
+      "trade_date": "2020-01-06",
+      "ssvi_price_mae_ticks": 87.34842866611625,
+      "heston_price_mae_ticks": 81.74280909670065,
+      "tenor_flat_bs_price_mae_ticks": 378.3424413010542,
+      "ssvi_relative_to_heston_percent": 6.857630207917387,
+      "ssvi_relative_to_tenor_flat_bs_percent": -76.91286540158167,
+      "ssvi_iv_mae_bps": 84.37854303305852,
+      "heston_iv_mae_bps": 101.43012431176334,
+      "heston_promotion_status": "boundary_saturated"
+    },
+    {
+      "trade_date": "2020-07-06",
+      "ssvi_price_mae_ticks": 102.84632945724036,
+      "heston_price_mae_ticks": 156.60783219511197,
+      "tenor_flat_bs_price_mae_ticks": 542.5964480951457,
+      "ssvi_relative_to_heston_percent": -34.32874460000961,
+      "ssvi_relative_to_tenor_flat_bs_percent": -81.04552106481795,
+      "ssvi_iv_mae_bps": 118.88973787523031,
+      "heston_iv_mae_bps": 135.33507094950676,
+      "heston_promotion_status": "eligible"
+    },
+    {
+      "trade_date": "2021-01-04",
+      "ssvi_price_mae_ticks": 136.8884146065885,
+      "heston_price_mae_ticks": 142.46668630220245,
+      "tenor_flat_bs_price_mae_ticks": 644.5138202854372,
+      "ssvi_relative_to_heston_percent": -3.915491993532605,
+      "ssvi_relative_to_tenor_flat_bs_percent": -78.76098071163712,
+      "ssvi_iv_mae_bps": 88.98857672342695,
+      "heston_iv_mae_bps": 87.95719138124127,
+      "heston_promotion_status": "eligible"
+    },
+    {
+      "trade_date": "2021-07-06",
+      "ssvi_price_mae_ticks": 36.9961863883832,
+      "heston_price_mae_ticks": 69.33960518411438,
+      "tenor_flat_bs_price_mae_ticks": 710.5443941828698,
+      "ssvi_relative_to_heston_percent": -46.64494225176381,
+      "ssvi_relative_to_tenor_flat_bs_percent": -94.79326180161776,
+      "ssvi_iv_mae_bps": 30.37796156212886,
+      "heston_iv_mae_bps": 46.633699958319276,
+      "heston_promotion_status": "eligible"
+    },
+    {
+      "trade_date": "2022-01-03",
+      "ssvi_price_mae_ticks": 617.937357831019,
+      "heston_price_mae_ticks": 747.2283088961141,
+      "tenor_flat_bs_price_mae_ticks": 1040.6295949397654,
+      "ssvi_relative_to_heston_percent": -17.302737265949897,
+      "ssvi_relative_to_tenor_flat_bs_percent": -40.61889448120232,
+      "ssvi_iv_mae_bps": 466.6172225759537,
+      "heston_iv_mae_bps": 468.5867646434993,
+      "heston_promotion_status": "boundary_saturated"
+    },
+    {
+      "trade_date": "2022-07-05",
+      "ssvi_price_mae_ticks": 100.33044020649142,
+      "heston_price_mae_ticks": 146.6159312184867,
+      "tenor_flat_bs_price_mae_ticks": 460.1025151144375,
+      "ssvi_relative_to_heston_percent": -31.569209858252556,
+      "ssvi_relative_to_tenor_flat_bs_percent": -78.19389442339018,
+      "ssvi_iv_mae_bps": 89.43799245911897,
+      "heston_iv_mae_bps": 106.3246814245067,
+      "heston_promotion_status": "boundary_saturated"
+    },
+    {
+      "trade_date": "2023-01-03",
+      "ssvi_price_mae_ticks": 156.4993826109321,
+      "heston_price_mae_ticks": 156.86658353337182,
+      "tenor_flat_bs_price_mae_ticks": 348.1958886968817,
+      "ssvi_relative_to_heston_percent": -0.23408485999290018,
+      "ssvi_relative_to_tenor_flat_bs_percent": -55.05421296137962,
+      "ssvi_iv_mae_bps": 510.79259081763473,
+      "heston_iv_mae_bps": 514.5035511147998,
+      "heston_promotion_status": "eligible"
+    },
+    {
+      "trade_date": "2023-07-03",
+      "ssvi_price_mae_ticks": 65.11363090854793,
+      "heston_price_mae_ticks": 73.26740849101975,
+      "tenor_flat_bs_price_mae_ticks": 542.1054446824531,
+      "ssvi_relative_to_heston_percent": -11.12879211972021,
+      "ssvi_relative_to_tenor_flat_bs_percent": -87.98875171846147,
+      "ssvi_iv_mae_bps": 52.10830301236052,
+      "heston_iv_mae_bps": 58.38359422129287,
+      "heston_promotion_status": "eligible"
+    },
+    {
+      "trade_date": "2024-01-02",
+      "ssvi_price_mae_ticks": 75.8675820252608,
+      "heston_price_mae_ticks": 81.26020393652551,
+      "tenor_flat_bs_price_mae_ticks": 499.19555406709134,
+      "ssvi_relative_to_heston_percent": -6.636239696711854,
+      "ssvi_relative_to_tenor_flat_bs_percent": -84.8020317073849,
+      "ssvi_iv_mae_bps": 53.43154542125529,
+      "heston_iv_mae_bps": 61.63747031548093,
+      "heston_promotion_status": "boundary_saturated"
+    },
+    {
+      "trade_date": "2024-07-01",
+      "ssvi_price_mae_ticks": 83.42954406730206,
+      "heston_price_mae_ticks": 84.14736541456122,
+      "tenor_flat_bs_price_mae_ticks": 549.5065356530636,
+      "ssvi_relative_to_heston_percent": -0.8530526698283802,
+      "ssvi_relative_to_tenor_flat_bs_percent": -84.81737001214192,
+      "ssvi_iv_mae_bps": 46.09719042142293,
+      "heston_iv_mae_bps": 45.1644031793024,
+      "heston_promotion_status": "eligible"
+    },
+    {
+      "trade_date": "2025-01-02",
+      "ssvi_price_mae_ticks": 175.13829536452386,
+      "heston_price_mae_ticks": 179.5624624830148,
+      "tenor_flat_bs_price_mae_ticks": 642.8553286561696,
+      "ssvi_relative_to_heston_percent": -2.463859682760494,
+      "ssvi_relative_to_tenor_flat_bs_percent": -72.75618828101894,
+      "ssvi_iv_mae_bps": 190.29652490357665,
+      "heston_iv_mae_bps": 191.89327325640735,
+      "heston_promotion_status": "eligible"
+    },
+    {
+      "trade_date": "2025-07-01",
+      "ssvi_price_mae_ticks": 108.58766753909369,
+      "heston_price_mae_ticks": 158.57452013956453,
+      "tenor_flat_bs_price_mae_ticks": 799.0019942007683,
+      "ssvi_relative_to_heston_percent": -31.52262580172176,
+      "ssvi_relative_to_tenor_flat_bs_percent": -86.40958741940156,
+      "ssvi_iv_mae_bps": 46.80911724578298,
+      "heston_iv_mae_bps": 60.06377253951839,
+      "heston_promotion_status": "eligible"
+    }
+  ]
+}

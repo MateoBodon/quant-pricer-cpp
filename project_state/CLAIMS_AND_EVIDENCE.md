@@ -101,32 +101,38 @@ SSVI superiority remains `needs_protocol_review`: five dates are not a broad
 temporal holdout, the 2024 SSVI fit uses 96.04% of its fixed sufficient-curvature
 limit, and the retained 2020 OOS result rejects a universal-win narrative.
 
-## 2026-07-11 Sealed SSVI Temporal Holdout
+## 2026-07-11 Confirmed SSVI Temporal Holdout
 
-A twelve-pair 2020-2025 Q1/Q3 qanchor panel is frozen before any SSVI outcome
-access. It is the exact qanchor subset of the precommitted resume-v2 panel;
-only its two 2020 stress dates are excluded because both were already used in
-SSVI development. This evidence is SSVI-unseen but not dataset-blind because
-earlier Heston/Black-Scholes aggregates existed.
+The published one-use twelve-pair 2020-2025 Q1/Q3 qanchor panel was consumed
+exactly once after authoritative commit/tree readback. It is the exact qanchor
+subset of the precommitted resume-v2 panel; only its two 2020 stress dates were
+excluded because both were already used in SSVI development. The result is
+SSVI-unseen but not dataset-blind because earlier Heston/Black-Scholes
+aggregates existed. Post-publication input generation necessarily read raw rows
+and reconstructed aggregate surfaces; the no-outcome claim ended at execution.
 
-Metadata-only preflight bound all 24 surface dates to 39 compressed source
-files, 13 acquisition manifests, and 1,379,526,126 bytes without decompression
-or row parsing. Contract and runner guards require authoritative exact-tree
-publication, a post-publication run manifest, the sealed source inventory, and
-an unused output before aggregate surfaces can be opened.
+The run covered 2,808 calibration and 2,806 next-day aggregate surface rows.
+All twelve SSVI fits passed analytic sufficient conditions, dense numerical
+static-arbitrage, finite-row, and independent QuantLib gates. SSVI won strict
+next-day price MAE on 11/12 dates versus repaired Heston, with median relative
+change `-8.8825%`, and 12/12 versus tenor-flat BS, with median `-79.9033%`.
+Both predeclared 10/12 gates passed. Across all six fixed metrics, SSVI won
+59/72 comparisons, Heston 12, and BS 1.
 
-The primary gate is all SSVI numerical/reference gates plus at least 10/12
-strict next-day price-MAE wins against both repaired Heston and tenor-flat BS,
-with negative paired median change against both. The holdout is `sealed_unopened`;
-it supplies no performance evidence yet and execution remains stopped while the
-portfolio empirical slot is occupied.
+The only primary loss remains explicit: on 2020-01-06 SSVI recorded `87.3484`
+price-error ticks versus Heston `81.7428`, or `+6.8576%`. Four Heston comparator
+fits were boundary-saturated, including that date. SSVI's worst absolute OOS
+price MAE was `617.9374` ticks on 2022-01-03; the maximum sufficient-curvature
+use remained `3.8416 / 4.0`. Hedge behavior was not evaluated. Therefore the
+exact temporal-panel confirmation is supported, while strategy, return,
+universal-superiority, and future-market claims remain unsupported.
 
 ## Current Claim Classes
 
 | Claim | Current evidence | Status | Caveat / next evidence |
 |---|---|---|---|
 | C++20 option-pricing library with analytic, MC/QMC, PDE, Heston, exotics, risk, and multi-asset components | `include/quant/`, `src/`, `tests/`; current CMake build and FAST passed in this sprint | `supported_current_head` | Feature breadth is source/test supported; package install remains separate. |
-| FAST validation baseline | `ctest --test-dir build -L FAST --output-on-failure` passed 64/64 with one skipped RNG thread-invariance test | `supported_current_head` | Re-run after source, artifact, or state changes. |
+| FAST validation baseline | `ctest --test-dir build -L FAST --output-on-failure` passed 70/70 with one skipped RNG thread-invariance test | `supported_current_head` | The 2026-07-11 suite completed successfully; its first strict Project OS receipt was rejected only because two observed macOS tool basenames were absent from the containment allowlist. |
 | Data-policy guard | `python3 scripts/check_data_policy.py` passed before and after failed reproduction capture | `supported_current_head` | Guard covers tracked data/artifacts; ignored local/generated files are not public evidence. |
 | Tri-engine agreement across analytic, MC, PDE | `docs/artifacts/tri_engine_agreement.*`, `docs/artifacts/metrics_summary.md` | `supported_historical_snapshot` | Metrics snapshot generated 2026-01-25; current-HEAD reproduction did not complete. |
 | QMC vs PRNG equal-time improvement | `docs/artifacts/qmc_vs_prng_equal_time.*`, `metrics_summary.md` | `supported_historical_snapshot` | Current public wording should use the artifact metric definition: PRNG/QMC RMSE ratio, not vague universal superiority. |
@@ -139,8 +145,8 @@ portfolio empirical slot is occupied.
 | Heston superiority over BS | 2026-07-11 local comparison is mixed by tenor; 10/25 fit parameters hit exact bounds and the reported hedge PnL was actually market-IV Black-Scholes-delta PnL | `unsupported` | Do not headline Heston superiority or risk performance unless a locked protocol passes calibration and model-specific hedge gates. |
 | Arbitrage-aware SSVI implementation and fixed-date numerical validity | `wrds_pipeline/ssvi_surface.py`, `wrds_pipeline/ssvi_reference.py`, dedicated FAST test, and `docs/agent_runs/20260711_191314_ssvi-five-date-panel/` | `supported_current_head` | All five development fits pass analytic, dense static-arbitrage, finite-row, and independent QuantLib price gates. |
 | SSVI fixed-panel performance | Frozen five-date development panel wins 26/30 comparisons and preserves the negative 2020 OOS date | `supported_current_head` | Exact panel claim only; no universal, broad-holdout, hedge-return, or public-superiority wording. |
-| General SSVI performance superiority | Five-date evidence is strong but temporally narrow; 2020 includes a BS OOS win and 2024 reaches 96.04% of the sufficient-curvature limit | `needs_protocol_review` | Requires a materially broader locked temporal holdout and an unchanged direct objective before general promotion. |
-| SSVI temporal-holdout readiness | `configs/ssvi_temporal_holdout_v1.json`, `wrds_pipeline_dates_ssvi_holdout_v1.yaml`, and `docs/agent_runs/20260711_200310_ssvi-sealed-holdout-contract/` | `sealed_unopened` | Manifest/hash complete and SSVI-unseen, but not dataset-blind; no outcome or performance claim exists until one-use execution after authoritative publication. |
+| General SSVI performance superiority | Five-date development evidence plus the confirmed twelve-pair temporal panel show strong surface-fit performance, but the holdout is not dataset-blind and contains one Heston price loss | `needs_protocol_review` | Exact-panel confirmation is supported; universal, strategy, hedge, return, and future-market superiority remain unsupported. |
+| SSVI twelve-pair temporal confirmation | `docs/artifacts/ssvi_temporal_holdout_v1_summary.json`, the published contract/panel, and `docs/agent_runs/20260711_231900_ssvi-temporal-holdout-confirmed/` | `supported_current_head` | All gates passed; 11/12 OOS price wins vs Heston and 12/12 vs BS. SSVI-unseen but not dataset-blind; preserve the 2020 loss and no-hedge boundary. |
 | Heston QE Monte Carlo production accuracy | `docs/artifacts/heston_qe_vs_analytic.*`; known bias remains | `needs_protocol_review` | Treat QE as experimental/caveated; WRDS pipeline uses analytic Heston, not QE. |
 | Curated artifact reproducibility | `scripts/reproduce_all.sh` exists and partial reproduction regenerated artifacts | `stale` | Official current-HEAD reproduction failed in this sprint; repair before promotion. |
 | Validation pack release asset availability | README/release references, `scripts/package_validation.py` | `not_checked` | Local pack generation was not rerun after failed reproduction; release asset claims need T-106/T-105 verification. |
