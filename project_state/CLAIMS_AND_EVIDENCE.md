@@ -69,30 +69,37 @@ What is still not promoted:
   calibration bounds;
 - no local aggregate artifacts were promoted into `docs/artifacts/`.
 
-## 2026-07-11 Fixed-Date SSVI Development Benchmark
+## 2026-07-11 Fixed Five-Date SSVI Development Panel
 
-An arbitrage-aware power-law SSVI benchmark was predeclared and evaluated on
-exactly two existing aggregate development pairs: 2020-03-16/17 and
-2024-06-14/17. The model enforces a monotone ATM total-variance curve and
-sufficient SSVI butterfly conditions, then fails closed on dense calendar,
-density, call-convexity, finite-output, and independent QuantLib price gates.
+The two-date SSVI result was extended without changing the published model,
+guards, objective, multistarts, or reducers. The locked panel contains exactly
+five existing aggregate date pairs: 2020-03-16/17, 2020-03-17/18,
+2022-06-13/14, 2022-06-14/15, and 2024-06-14/17. It covers 1,239 calibration
+surface rows and 1,243 next-day rows split into two stress and three calm dates.
 
 What is supported:
 
-- both fitted SSVI surfaces passed every analytic and numerical arbitrage gate;
-- 2,178 independent QuantLib prices were valid, with maximum repository price
-  disagreement `2.83408e-13`;
-- SSVI won 8 of 12 predeclared date-metric comparisons across in-sample IV,
-  price, and next-day OOS reducers;
-- relative to repaired Heston, two-date median SSVI IV MAE was 18.51% lower,
-  price RMSE 28.61% lower, and next-day price MAE 7.73% lower;
-- the 2020 next-day pair remains negative evidence where tenor-flat BS won both
-  OOS metrics.
+- all five fitted SSVI surfaces passed analytic sufficient conditions, dense
+  numerical static-arbitrage gates, finite-row gates, and independent QuantLib
+  repricing;
+- 5,445 independent QuantLib prices were valid, with maximum repository price
+  disagreement `4.91222e-13`;
+- SSVI won 26 of 30 frozen date-metric comparisons; repaired Heston and
+  tenor-flat Black-Scholes each won 2;
+- relative to repaired Heston, median date-level SSVI changes were -34.68% IV
+  MAE, -37.12% IV p90, -29.19% IV RMSE, -33.67% price RMSE, -0.44% next-day IV
+  MAE, and -2.49% next-day price MAE;
+- SSVI won next-day price on all five dates and next-day IV on four of five;
+- the 2020-03-16/17 pair remains deliberately retained negative evidence:
+  tenor-flat BS won both next-day metrics and Heston narrowly beat SSVI on IV;
+- the one-day delta-hedge calculation is numerically valid on all 1,212 matched
+  rows, but remains a diagnostic rather than a return or strategy result and
+  does not evaluate SSVI deltas.
 
-This is `supported_current_head` as a fixed-date development and numerical
-validation result. SSVI performance superiority remains `needs_protocol_review`:
-it requires a locked larger temporal panel, the same reducers, and retention of
-the negative 2020 regime before public promotion.
+The exact fixed-panel result is `supported_current_head`. General or public
+SSVI superiority remains `needs_protocol_review`: five dates are not a broad
+temporal holdout, the 2024 SSVI fit uses 96.04% of its fixed sufficient-curvature
+limit, and the retained 2020 OOS result rejects a universal-win narrative.
 
 ## Current Claim Classes
 
@@ -110,8 +117,9 @@ the negative 2020 regime before public promotion.
 | Live/local WRDS execution on current HEAD | `docs/agent_runs/20260711_081603_wrds-panel-calm-stress-v1-local-flagship/`, local receipts and aggregate exports under `artifacts/_local/wrds_local/wrds_local_20260711T113500Z_flagship_audit/` | `supported_current_head` | Supported as local execution evidence only; no public promotion yet. |
 | Live/local WRDS performance or superiority | 2026-07-11 local run exists; independent review accepted provenance but rejected promotion because fits are boundary-saturated and the original hedge diagnostic was misattributed | `live_gated` | Requires an exact corrected replay, an eligible calibration panel, genuine model-specific hedging, and sanitized reviewed aggregates before public use. |
 | Heston superiority over BS | 2026-07-11 local comparison is mixed by tenor; 10/25 fit parameters hit exact bounds and the reported hedge PnL was actually market-IV Black-Scholes-delta PnL | `unsupported` | Do not headline Heston superiority or risk performance unless a locked protocol passes calibration and model-specific hedge gates. |
-| Arbitrage-aware SSVI implementation and fixed-date numerical validity | `wrds_pipeline/ssvi_surface.py`, `wrds_pipeline/ssvi_reference.py`, dedicated FAST test, and `docs/agent_runs/20260711_184515_ssvi-development-benchmark/` | `supported_current_head` | Both development fits pass analytic, dense static-arbitrage, finite-row, and independent QuantLib price gates. |
-| SSVI performance superiority | Fixed two-date development benchmark wins 8/12 comparisons but includes a negative 2020 OOS regime | `needs_protocol_review` | Requires a locked larger temporal panel with unchanged reducers before public or general superiority wording. |
+| Arbitrage-aware SSVI implementation and fixed-date numerical validity | `wrds_pipeline/ssvi_surface.py`, `wrds_pipeline/ssvi_reference.py`, dedicated FAST test, and `docs/agent_runs/20260711_191314_ssvi-five-date-panel/` | `supported_current_head` | All five development fits pass analytic, dense static-arbitrage, finite-row, and independent QuantLib price gates. |
+| SSVI fixed-panel performance | Frozen five-date development panel wins 26/30 comparisons and preserves the negative 2020 OOS date | `supported_current_head` | Exact panel claim only; no universal, broad-holdout, hedge-return, or public-superiority wording. |
+| General SSVI performance superiority | Five-date evidence is strong but temporally narrow; 2020 includes a BS OOS win and 2024 reaches 96.04% of the sufficient-curvature limit | `needs_protocol_review` | Requires a materially broader locked temporal holdout and an unchanged direct objective before general promotion. |
 | Heston QE Monte Carlo production accuracy | `docs/artifacts/heston_qe_vs_analytic.*`; known bias remains | `needs_protocol_review` | Treat QE as experimental/caveated; WRDS pipeline uses analytic Heston, not QE. |
 | Curated artifact reproducibility | `scripts/reproduce_all.sh` exists and partial reproduction regenerated artifacts | `stale` | Official current-HEAD reproduction failed in this sprint; repair before promotion. |
 | Validation pack release asset availability | README/release references, `scripts/package_validation.py` | `not_checked` | Local pack generation was not rerun after failed reproduction; release asset claims need T-106/T-105 verification. |

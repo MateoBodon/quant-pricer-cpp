@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Dict
@@ -23,7 +24,11 @@ SCRIPTS_DIR = REPO_ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from wrds_pipeline import calibrate_bs, calibrate_heston  # noqa: E402
+from wrds_pipeline import (  # noqa: E402
+    calibrate_bs,
+    calibrate_heston,
+    delta_hedge_pnl,
+)
 from wrds_pipeline.ssvi_reference import (  # noqa: E402
     quantlib_ssvi_arbitrage_audit,
 )
@@ -75,7 +80,76 @@ def _generic_oos(surface: pd.DataFrame) -> Dict[str, float | int]:
     }
 
 
-def _date_result(run_root: Path, trade_date: str, next_date: str) -> Dict[str, object]:
+def _frequency_weighted_stats(
+    values: pd.Series,
+    frequency: pd.Series,
+) -> Dict[str, float | int | None]:
+    numeric = values.to_numpy(np.float64)
+    weights = frequency.to_numpy(np.float64)
+    valid = np.isfinite(numeric) & np.isfinite(weights) & (weights > 0.0)
+    if not valid.any():
+        return {"mean": None, "sigma": None, "quote_weight": 0}
+    numeric = numeric[valid]
+    weights = weights[valid]
+    total_weight = float(weights.sum())
+    mean = float(np.average(numeric, weights=weights))
+    variance_numerator = float(np.sum(weights * np.square(numeric - mean)))
+    sigma = (
+        math.sqrt(variance_numerator / (total_weight - 1.0))
+        if total_weight > 1.0
+        else 0.0
+    )
+    return {
+        "mean": mean,
+        "sigma": sigma,
+        "quote_weight": int(total_weight),
+    }
+
+
+def _hedge_diagnostics(
+    today: pd.DataFrame,
+    next_surface: pd.DataFrame,
+    heston_params: Dict[str, float],
+) -> Dict[str, object]:
+    detail, _ = delta_hedge_pnl.simulate(
+        today,
+        next_surface,
+        heston_params=heston_params,
+    )
+    numerical = delta_hedge_pnl.summarize_heston_delta_numerics(detail)
+    market = _frequency_weighted_stats(
+        detail[delta_hedge_pnl.PNL_PER_TICK_COL],
+        detail["quotes"],
+    )
+    heston = _frequency_weighted_stats(
+        detail[delta_hedge_pnl.HESTON_PNL_PER_TICK_COL],
+        detail["quotes"],
+    )
+    if numerical["status"] != "valid":
+        heston = {
+            "mean": None,
+            "sigma": None,
+            "quote_weight": int(numerical["valid_quote_weight"]),
+        }
+    return {
+        "scope": "one_day_delta_hedge_diagnostic_not_return_or_strategy_pnl",
+        "matched_surface_rows": int(len(detail)),
+        "heston_delta_numerics": numerical,
+        "market_iv_bs_delta_pnl_ticks": market,
+        "calibrated_heston_delta_pnl_ticks": heston,
+        "ssvi_delta_pnl": "not_evaluated",
+    }
+
+
+def _date_result(
+    run_root: Path,
+    trade_date: str,
+    next_date: str,
+    *,
+    label: str | None = None,
+    regime: str | None = None,
+    include_hedge: bool = False,
+) -> Dict[str, object]:
     date_root = run_root / "per_date" / trade_date
     today = pd.read_csv(date_root / f"spx_{trade_date}_surface.csv")
     next_surface = pd.read_csv(date_root / f"spx_{next_date}_surface.csv")
@@ -140,7 +214,7 @@ def _date_result(run_root: Path, trade_date: str, next_date: str) -> Dict[str, o
             models,
             key=lambda model: float(models[model]["oos"][metric]),
         )
-    return {
+    payload: Dict[str, object] = {
         "trade_date": trade_date,
         "next_trade_date": next_date,
         "insample_surface_rows": int(len(today)),
@@ -148,6 +222,17 @@ def _date_result(run_root: Path, trade_date: str, next_date: str) -> Dict[str, o
         "models": models,
         "metric_winners": winners,
     }
+    if label is not None:
+        payload["label"] = label
+    if regime is not None:
+        payload["regime"] = regime
+    if include_hedge:
+        payload["hedge_diagnostics"] = _hedge_diagnostics(
+            today,
+            next_surface,
+            heston["params"],
+        )
+    return payload
 
 
 def _aggregate(per_date: list[Dict[str, object]]) -> Dict[str, object]:

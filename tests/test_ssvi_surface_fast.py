@@ -30,6 +30,8 @@ from wrds_pipeline.ssvi_surface import (  # noqa: E402
     model_iv,
     summarize_oos,
 )
+from ssvi_development_benchmark import _frequency_weighted_stats  # noqa: E402
+from ssvi_five_date_panel import PANEL_ENTRIES  # noqa: E402
 
 
 def _synthetic_surface(params: SsviParameters) -> pd.DataFrame:
@@ -86,6 +88,25 @@ def _synthetic_surface(params: SsviParameters) -> pd.DataFrame:
 
 
 def main() -> None:
+    if len(PANEL_ENTRIES) != 5:
+        raise AssertionError("The fixed SSVI development panel must contain five dates")
+    frequency_stats = _frequency_weighted_stats(
+        pd.Series([1.0, 3.0]),
+        pd.Series([1, 3]),
+    )
+    if frequency_stats != {"mean": 2.5, "sigma": 1.0, "quote_weight": 4}:
+        raise AssertionError("Frequency-weighted hedge reducer changed")
+    nonpositive_frequency_stats = _frequency_weighted_stats(
+        pd.Series([1.0, 100.0]),
+        pd.Series([2, 0]),
+    )
+    if nonpositive_frequency_stats != {
+        "mean": 1.0,
+        "sigma": 0.0,
+        "quote_weight": 2,
+    }:
+        raise AssertionError("Nonpositive quote frequencies must be excluded")
+
     true_params = SsviParameters(
         theta_knots=(0.006, 0.011, 0.016, 0.030, 0.055),
         rho=-0.70,
