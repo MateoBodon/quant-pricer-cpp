@@ -294,6 +294,12 @@ add_test(
 set_tests_properties(ssvi_surface_fast PROPERTIES LABELS "FAST")
 
 add_test(
+  NAME ssvi_holdout_contract_fast
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_ssvi_holdout_contract_fast.py
+)
+set_tests_properties(ssvi_holdout_contract_fast PROPERTIES LABELS "FAST")
+
+add_test(
   NAME wrds_vault_adapter_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_wrds_vault_adapter_fast.py
 )

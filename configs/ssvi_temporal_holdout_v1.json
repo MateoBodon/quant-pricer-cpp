@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "contract_id": "ssvi_temporal_holdout_v1",
+  "status": "sealed_pre_outcome",
+  "sealed_at_utc": "2026-07-11T20:03:10Z",
+  "evidence_scope": {
+    "ssvi_unseen": true,
+    "dataset_blind": false,
+    "reason_not_dataset_blind": "Earlier Heston and Black-Scholes aggregate work used the parent resume panel, but no SSVI calibration or SSVI score has been opened on these twelve qanchor pairs.",
+    "claim_if_primary_gate_passes": "SSVI performance is confirmed on this sealed twelve-pair temporal holdout.",
+    "claims_never_authorized": [
+      "universal SSVI superiority",
+      "strategy returns",
+      "SSVI hedge performance",
+      "future-market performance"
+    ]
+  },
+  "panel": {
+    "path": "wrds_pipeline_dates_ssvi_holdout_v1.yaml",
+    "sha256": "301aced837431eff2276067d08e12581918d85a498d8e9d0ef33e338a69dc974",
+    "source_panel_path": "wrds_pipeline_dates_panel_resume_v2.yaml",
+    "source_panel_sha256": "51c0cb040a8f45d12bb7db5c1432b6371ff6d08402def442aee1709643af0a3c",
+    "derivation_rule": "Take every qanchor entry from wrds_panel_resume_v2 and exclude only its two stress entries because both were already used in SSVI development.",
+    "date_pair_count": 12,
+    "unique_surface_date_count": 24,
+    "entries": [
+      ["2020-01-06", "2020-01-07", "qanchor-2020q1", "calm"],
+      ["2020-07-06", "2020-07-07", "qanchor-2020q3", "calm"],
+      ["2021-01-04", "2021-01-05", "qanchor-2021q1", "calm"],
+      ["2021-07-06", "2021-07-07", "qanchor-2021q3", "calm"],
+      ["2022-01-03", "2022-01-04", "qanchor-2022q1", "calm"],
+      ["2022-07-05", "2022-07-06", "qanchor-2022q3", "calm"],
+      ["2023-01-03", "2023-01-04", "qanchor-2023q1", "calm"],
+      ["2023-07-03", "2023-07-05", "qanchor-2023q3", "calm"],
+      ["2024-01-02", "2024-01-03", "qanchor-2024q1", "calm"],
+      ["2024-07-01", "2024-07-02", "qanchor-2024q3", "calm"],
+      ["2025-01-02", "2025-01-03", "qanchor-2025q1", "calm"],
+      ["2025-07-01", "2025-07-02", "qanchor-2025q3", "calm"]
+    ],
+    "already_observed_ssvi_development_pairs": [
+      ["2020-03-16", "2020-03-17"],
+      ["2020-03-17", "2020-03-18"],
+      ["2022-06-13", "2022-06-14"],
+      ["2022-06-14", "2022-06-15"],
+      ["2024-06-14", "2024-06-17"]
+    ]
+  },
+  "frozen_implementation": {
+    "wrds_pipeline/ssvi_surface.py": "1f84d5450067d31b9b8070febbfabcaf87df80c6d45a3c3fb74abfc6b6119c79",
+    "wrds_pipeline/ssvi_reference.py": "eb33eccdfd0d83fe62a3def034a5054969330e80bbd0d2de930daaf29ef87228",
+    "scripts/ssvi_development_benchmark.py": "4b2c5a00503e9fe36b6880fd0096487402a9ef9f568c761e109506ccabef9f9c",
+    "scripts/ssvi_five_date_panel.py": "8ea7be5dba607bf3a5a5757350d27efe5d6d78bb270bb5a9cc09c290402e2d77",
+    "wrds_pipeline/calibrate_heston.py": "13fca360402947a16112ccf6a8d3c6c28c6118e89e1c5083f7d1d9d852465aaa",
+    "wrds_pipeline/calibrate_bs.py": "5af0636be886a8e3244c9c776c1edf8345e9ff2b8ccb8a6e5f459f90198d0dff"
+  },
+  "models": {
+    "ssvi": {
+      "parameterization": "power_law_ssvi_monotone_atm_curve",
+      "knot_days": [30, 60, 90, 182, 365],
+      "max_evals": 500,
+      "multistart": true,
+      "start_count": 3,
+      "objective": "vega_times_quote_weighted_iv_residual",
+      "validation_maturity_years": [0.0547945205479452, 1.095890410958904],
+      "validation_log_forward_moneyness": [-1.5, 1.5],
+      "validation_grid": [81, 401],
+      "independent_reference": "QuantLib BlackCalculator price grid"
+    },
+    "heston": {
+      "fast": false,
+      "max_evals": 160,
+      "bootstrap_samples": 0,
+      "rng_seed": 19,
+      "multistart": true,
+      "quadrature_points": 96
+    },
+    "tenor_flat_bs": {
+      "implementation": "published tenor-bucket fit"
+    }
+  },
+  "frozen_metrics": [
+    "insample_iv_rmse_volpts_vega_wt",
+    "insample_iv_mae_volpts_vega_wt",
+    "insample_iv_p90_bps",
+    "insample_price_rmse_ticks",
+    "oos_iv_mae_bps",
+    "oos_price_mae_ticks"
+  ],
+  "inventory": {
+    "source_access": "compressed_hash_and_manifest_metadata_only_no_decompression_or_rows",
+    "snapshot": "20260707_045553_global_project_priority",
+    "unique_surface_date_count": 24,
+    "unique_source_file_count": 39,
+    "unique_acquisition_manifest_count": 13,
+    "total_compressed_bytes": 1379526126,
+    "table_file_counts": {
+      "idxdvd": 1,
+      "opprcd": 24,
+      "secnmd": 1,
+      "secprd": 12,
+      "zerocd": 1
+    },
+    "inventory_sha256": "ca7fff944cc94c988e5c0b4d34cf7d99c2c46d9a8043c80fde297a464e818ca7"
+  },
+  "primary_gate": {
+    "all_twelve_ssvi_analytic_numerical_finite_and_quantlib_gates_pass": true,
+    "oos_price_mae_ticks_ssvi_wins_vs_heston_at_least": 10,
+    "oos_price_mae_ticks_ssvi_wins_vs_tenor_flat_bs_at_least": 10,
+    "oos_price_mae_ticks_median_relative_change_vs_heston_strictly_below_percent": 0.0,
+    "oos_price_mae_ticks_median_relative_change_vs_tenor_flat_bs_strictly_below_percent": 0.0,
+    "ties_count_as_wins": false,
+    "interpretation": "Ten or more wins among twelve fixed dates has one-sided exact sign probability 0.019287109375 under an equal-win null. Both comparator gates and every numerical gate must pass."
+  },
+  "secondary_reporting": {
+    "thresholds": "none",
+    "required": [
+      "all six metrics by date and model",
+      "paired mean and median relative changes",
+      "win counts",
+      "mean, median, standard deviation, coefficient of variation, best and worst dates",
+      "all SSVI arbitrage and independent-reference margins",
+      "all Heston calibration promotion statuses"
+    ]
+  },
+  "decision_policy": {
+    "pass": "Support only the exact sealed temporal-holdout confirmation claim.",
+    "fail": "Record the full negative result and do not tune, replace dates, relax gates, or rerun a modified model on this holdout.",
+    "mixed": "Treat as descriptive evidence only; the primary confirmation claim fails.",
+    "post_outcome_changes": "Any model, date, reducer, threshold, or gate change creates a new development generation and can never reclaim this holdout as confirmatory."
+  },
+  "execution_authority": {
+    "outcome_access_before_contract_publication": "forbidden",
+    "required_publication_readback": "The exact contract, panel, runner, and guards must exist in an authoritatively read-back remote Git tree before any holdout surface is decompressed or scored.",
+    "current_execution_state": "stopped_for_contract_publication_and_portfolio_memory_slot"
+  },
+  "data_policy": "Restricted rows and fitted parameters remain local and ignored. Only aggregate metrics and claim-safe diagnostics may be considered for tracking after review."
+}
