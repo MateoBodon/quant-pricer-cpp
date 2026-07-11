@@ -15,12 +15,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from . import delta_hedge_pnl
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from manifest_utils import ARTIFACTS_ROOT
+from manifest_utils import ARTIFACTS_ROOT  # noqa: E402
 
 
 WRDS_ROOT = ARTIFACTS_ROOT / "wrds"
@@ -169,18 +171,65 @@ def _aggregate_buckets(per_date_root: Path = PER_DATE_ROOT) -> Dict[str, pd.Data
     bs_oos_buckets = oos_bucket(bs_oos)
 
     pnl_bucket = pd.DataFrame(
-        columns=["tenor_bucket", "pnl_sigma", "count", "mean_ticks"]
+        columns=[
+            "tenor_bucket",
+            delta_hedge_pnl.SIGMA_COL,
+            delta_hedge_pnl.HESTON_SIGMA_COL,
+            delta_hedge_pnl.HESTON_DELTA_EVALUATION_COUNT_COL,
+            delta_hedge_pnl.HESTON_DELTA_VALID_COUNT_COL,
+            delta_hedge_pnl.HESTON_DELTA_INVALID_COUNT_COL,
+            "count",
+            delta_hedge_pnl.MEAN_TICKS_COL,
+            delta_hedge_pnl.HESTON_MEAN_TICKS_COL,
+        ]
     )
     if not pnl.empty:
         pnl_bucket = (
             pnl.groupby("tenor_bucket", observed=True)
             .agg(
-                pnl_sigma=("pnl_sigma", "mean"),
-                count=("count", "sum"),
-                mean_ticks=("mean_ticks", "mean"),
+                **{
+                    delta_hedge_pnl.SIGMA_COL: (delta_hedge_pnl.SIGMA_COL, "mean"),
+                    "count": ("count", "sum"),
+                    delta_hedge_pnl.MEAN_TICKS_COL: (
+                        delta_hedge_pnl.MEAN_TICKS_COL,
+                        "mean",
+                    ),
+                    delta_hedge_pnl.HESTON_SIGMA_COL: (
+                        delta_hedge_pnl.HESTON_SIGMA_COL,
+                        "mean",
+                    ),
+                    delta_hedge_pnl.HESTON_MEAN_TICKS_COL: (
+                        delta_hedge_pnl.HESTON_MEAN_TICKS_COL,
+                        "mean",
+                    ),
+                    delta_hedge_pnl.HESTON_DELTA_EVALUATION_COUNT_COL: (
+                        delta_hedge_pnl.HESTON_DELTA_EVALUATION_COUNT_COL,
+                        "sum",
+                    ),
+                    delta_hedge_pnl.HESTON_DELTA_VALID_COUNT_COL: (
+                        delta_hedge_pnl.HESTON_DELTA_VALID_COUNT_COL,
+                        "sum",
+                    ),
+                    delta_hedge_pnl.HESTON_DELTA_INVALID_COUNT_COL: (
+                        delta_hedge_pnl.HESTON_DELTA_INVALID_COUNT_COL,
+                        "sum",
+                    ),
+                }
             )
             .reset_index()
         )
+        invalid_numerics = (
+            pnl_bucket[delta_hedge_pnl.HESTON_DELTA_INVALID_COUNT_COL] > 0
+        ) | (
+            pnl_bucket[delta_hedge_pnl.HESTON_DELTA_EVALUATION_COUNT_COL] == 0
+        )
+        pnl_bucket.loc[
+            invalid_numerics,
+            [
+                delta_hedge_pnl.HESTON_SIGMA_COL,
+                delta_hedge_pnl.HESTON_MEAN_TICKS_COL,
+            ],
+        ] = np.nan
 
     return {
         "heston_insample": heston_insample_buckets,
@@ -260,7 +309,7 @@ def _merge_comparison(buckets: Dict[str, pd.DataFrame]) -> pd.DataFrame:
 
     pnl = base.merge(
         buckets["pnl"], on="tenor_bucket", how="left"
-    ).rename(columns={"pnl_sigma": "heston_pnl_sigma"})
+    )
 
     combined = (
         insample.merge(oos, on="tenor_bucket", how="outer")
@@ -291,6 +340,14 @@ def _merge_comparison(buckets: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     )
     combined["delta_oos_price_mae_ticks"] = (
         combined["heston_oos_price_mae_ticks"] - combined["bs_oos_price_mae_ticks"]
+    )
+    combined["delta_hedge_pnl_sigma_ticks"] = (
+        combined[delta_hedge_pnl.HESTON_SIGMA_COL]
+        - combined[delta_hedge_pnl.SIGMA_COL]
+    )
+    combined["delta_hedge_mean_ticks"] = (
+        combined[delta_hedge_pnl.HESTON_MEAN_TICKS_COL]
+        - combined[delta_hedge_pnl.MEAN_TICKS_COL]
     )
     return combined
 
@@ -353,13 +410,33 @@ def _plot_oos_heatmap(
 
 
 def _plot_pnl_sigma(comp: pd.DataFrame, out_path: Path) -> None:
-    df = comp.dropna(subset=["heston_pnl_sigma"])
+    df = comp.dropna(
+        subset=[delta_hedge_pnl.SIGMA_COL, delta_hedge_pnl.HESTON_SIGMA_COL]
+    )
     if df.empty:
         return
+    x = np.arange(len(df))
+    width = 0.38
     fig, ax = plt.subplots(figsize=(6, 4))
-    ax.bar(df["tenor_bucket"], df["heston_pnl_sigma"], color="#2ca02c")
+    ax.bar(
+        x - width / 2,
+        df[delta_hedge_pnl.SIGMA_COL],
+        width=width,
+        color="#1f77b4",
+        label="Market-IV BS delta",
+    )
+    ax.bar(
+        x + width / 2,
+        df[delta_hedge_pnl.HESTON_SIGMA_COL],
+        width=width,
+        color="#ff7f0e",
+        label="Calibrated Heston delta",
+    )
+    ax.set_xticks(x)
+    ax.set_xticklabels(df["tenor_bucket"])
     ax.set_ylabel("σ (ticks)")
-    ax.set_title("Δ-hedged 1d PnL σ (Heston)")
+    ax.set_title("Model-specific 1d hedge PnL σ")
+    ax.legend(fontsize=8)
     ax.grid(True, axis="y", ls=":", alpha=0.5)
     fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -382,7 +459,7 @@ def generate_comparison_artifacts(
     heatmap_fig = artifacts_root / "wrds_bs_heston_oos_heatmap.png"
     _plot_oos_heatmap(buckets.get("heston_oos", pd.DataFrame()), buckets.get("bs_oos", pd.DataFrame()), heatmap_fig)
 
-    pnl_fig = artifacts_root / "wrds_bs_heston_pnl_sigma.png"
+    pnl_fig = artifacts_root / "wrds_bs_heston_delta_hedge_pnl_sigma.png"
     _plot_pnl_sigma(comp, pnl_fig)
 
     return {

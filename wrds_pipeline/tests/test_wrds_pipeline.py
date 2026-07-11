@@ -61,13 +61,13 @@ def _write_dateset(path: Path) -> Path:
 
 
 def _baseline_sigma() -> pd.Series:
-    """Reference Δ-hedge σ from bundled sample comparison (regression harness)."""
+    """Reference market-IV BS-delta hedge σ from bundled sample comparison."""
     repo_root = _root()
     base_path = repo_root / "docs/artifacts/wrds/wrds_bs_heston_comparison.csv"
     if not base_path.exists():
         return pd.Series(dtype=float)
     base = pd.read_csv(base_path)
-    return base.set_index("tenor_bucket")["heston_pnl_sigma"]
+    return base.set_index("tenor_bucket")["market_iv_bs_delta_pnl_sigma"]
 
 
 def _assert_tolerances(wrds_root: Path, dates: List[str]) -> None:
@@ -83,7 +83,7 @@ def _assert_tolerances(wrds_root: Path, dates: List[str]) -> None:
 
     baseline_sigma = _baseline_sigma()
     if not baseline_sigma.empty:
-        sigma = comp.set_index("tenor_bucket")["heston_pnl_sigma"].dropna()
+        sigma = comp.set_index("tenor_bucket")["market_iv_bs_delta_pnl_sigma"].dropna()
         for bucket, val in sigma.items():
             base = baseline_sigma.get(bucket)
             valid_base = base is not None and not math.isnan(base) and base > 0

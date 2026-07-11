@@ -956,7 +956,7 @@ Opt-in MARKET tests under `wrds_pipeline/` pull live WRDS data only when explici
 
 - [`docs/artifacts/wrds/wrds_agg_pricing.csv`](docs/artifacts/wrds/wrds_agg_pricing.csv) – per-date vega-weighted RMSE/MAE, `iv_p90_bps`, provenance
 - [`docs/artifacts/wrds/wrds_agg_oos.csv`](docs/artifacts/wrds/wrds_agg_oos.csv) – tenor-by-date OOS IV/price MAE with quote counts
-- [`docs/artifacts/wrds/wrds_agg_pnl.csv`](docs/artifacts/wrds/wrds_agg_pnl.csv) – Δ-hedged mean ticks and `pnl_sigma` per bucket
+- [`docs/artifacts/wrds/wrds_agg_pnl.csv`](docs/artifacts/wrds/wrds_agg_pnl.csv) – explicitly labeled market-IV Black-Scholes-delta and calibrated-Heston-delta diagnostics. Heston hedge aggregates are null unless every contributing numerical delta satisfies bump-stability and call no-arbitrage bounds; invalid estimates are counted, never clipped
 - [`docs/artifacts/wrds/wrds_multi_date_summary.png`](docs/artifacts/wrds/wrds_multi_date_summary.png) – overview figure (vega-wtd IV RMSE, OOS MAE heatmap, hedge mean ±σ)
 
 Regenerate the public demo bundle with `./scripts/reproduce_all.sh` (uses the bundled sample data when WRDS env vars are absent), run the multi-date sample via `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample`, or target live IvyDB after exporting `WRDS_ENABLED=1`, `WRDS_USERNAME`, and `WRDS_PASSWORD`. The CLI automatically maps any trade date to the correct OptionMetrics annual table (e.g., `optionm.opprcd2024`).

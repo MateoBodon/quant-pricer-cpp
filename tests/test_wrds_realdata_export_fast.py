@@ -57,7 +57,7 @@ def main() -> None:
         subprocess.check_call(cmd, cwd=repo_root)
 
         payload = json.loads(out_json.read_text())
-        if payload.get("schema_version") != "wrds_realdata_metrics_export_v1":
+        if payload.get("schema_version") != "wrds_realdata_metrics_export_v2":
             raise AssertionError("Unexpected schema_version")
 
         provenance = payload.get("provenance", {})
@@ -90,15 +90,67 @@ def main() -> None:
                 raise AssertionError(f"Missing metrics.{section}")
             _assert_scalars(metrics[section], section)
 
+        pricing_block = metrics["pricing"]
+        for key in ["median_iv_rmse_volpts_vega_wt", "median_price_rmse_ticks"]:
+            if key not in pricing_block:
+                raise AssertionError(f"Missing pricing metric {key}")
+
+        pnl_block = metrics["pnl"]
+        for key in [
+            "market_iv_bs_delta_mean_ticks",
+            "market_iv_bs_delta_mean_pnl",
+            "market_iv_bs_delta_pnl_sigma_median",
+            "calibrated_heston_delta_mean_ticks",
+            "calibrated_heston_delta_mean_pnl",
+            "calibrated_heston_delta_pnl_sigma_median",
+        ]:
+            if key not in pnl_block:
+                raise AssertionError(f"Missing pnl metric {key}")
+
+        comparison_block = metrics["comparison"]
+        if "median_market_iv_bs_delta_pnl_sigma" not in comparison_block:
+            raise AssertionError("Missing renamed comparison hedge sigma metric")
+        if "median_calibrated_heston_delta_pnl_sigma" not in comparison_block:
+            raise AssertionError("Missing genuine Heston-delta hedge sigma metric")
+        if "median_delta_hedge_pnl_sigma_ticks" not in comparison_block:
+            raise AssertionError("Missing model-specific hedge sigma comparison")
+
+        claim_gate = payload.get("claim_gate")
+        if not isinstance(claim_gate, dict):
+            raise AssertionError("Missing claim_gate")
+        if claim_gate.get("status") != "diagnostic_only":
+            raise AssertionError("Boundary-saturated sample must remain diagnostic-only")
+        if claim_gate.get("risk_or_superiority_promotion_eligible") is not False:
+            raise AssertionError("Sample fit diagnostics must fail promotion eligibility")
+        if claim_gate.get("calibration_promotion_eligible") is not False:
+            raise AssertionError("Sample calibration gate must remain ineligible")
+        if claim_gate.get("heston_delta_numerical_promotion_eligible") is not True:
+            raise AssertionError("Complete valid sample delta diagnostics should pass")
+        if int(claim_gate.get("fit_boundary_saturated_count", 0)) <= 0:
+            raise AssertionError("Expected sample calibration boundary saturation")
+        if int(claim_gate.get("heston_delta_evaluated_surface_rows", 0)) != 50:
+            raise AssertionError("Expected all 50 sample surface deltas to be evaluated")
+        if int(claim_gate.get("heston_delta_invalid_surface_rows", -1)) != 0:
+            raise AssertionError("Expected zero invalid sample Heston deltas")
+
         pricing_rows = _count_rows(wrds_root / "wrds_agg_pricing.csv")
         if metrics["pricing"].get("rows") != pricing_rows:
             raise AssertionError("pricing rows mismatch")
 
         export_text = json.dumps(payload, sort_keys=True)
-        restricted_tokens = ["secid", "best_bid", "best_offer", "best_ask", "market_iv", "strike_price"]
-        for token in restricted_tokens:
-            if token in export_text:
-                raise AssertionError(f"Restricted token found in export: {token}")
+        restricted_key_fragments = [
+            '"secid":',
+            '"best_bid":',
+            '"best_offer":',
+            '"best_ask":',
+            '"market_iv":',
+            '"strike_price":',
+        ]
+        for fragment in restricted_key_fragments:
+            if fragment in export_text:
+                raise AssertionError(
+                    f"Restricted raw-data key found in export: {fragment}"
+                )
 
         if "WRDS real-data metrics export" not in out_md.read_text():
             raise AssertionError("Markdown output missing header")

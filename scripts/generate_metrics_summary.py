@@ -85,6 +85,9 @@ REQUIRED_ARTIFACTS: Tuple[RequiredArtifact, ...] = (
             "price_rmse_ticks",
             "iv_mae_bps",
             "price_mae_ticks",
+            "fit_success",
+            "fit_active_bound_count",
+            "fit_promotion_eligible",
         ),
     ),
     RequiredArtifact(
@@ -95,7 +98,14 @@ REQUIRED_ARTIFACTS: Tuple[RequiredArtifact, ...] = (
     RequiredArtifact(
         name="wrds_agg_pnl",
         relative_path=Path("wrds") / "wrds_agg_pnl.csv",
-        required_columns=("mean_ticks", "mean_pnl", "pnl_sigma"),
+        required_columns=(
+            "market_iv_bs_delta_mean_ticks",
+            "market_iv_bs_delta_mean_pnl",
+            "market_iv_bs_delta_pnl_sigma",
+            "calibrated_heston_delta_mean_ticks",
+            "calibrated_heston_delta_mean_pnl",
+            "calibrated_heston_delta_pnl_sigma",
+        ),
     ),
 )
 
@@ -459,6 +469,26 @@ def wrds_metrics(root: Path) -> Dict[str, Any]:
         statuses.append(blocks["pricing"]["status"])
     else:
         blocks["bundle"] = _wrds_bundle_label(pricing_df)
+        fit_success = pricing_df["fit_success"].astype(str).str.lower().isin(
+            ["true", "1", "yes"]
+        )
+        fit_promotion_eligible = (
+            pricing_df["fit_promotion_eligible"]
+            .astype(str)
+            .str.lower()
+            .isin(["true", "1", "yes"])
+        )
+        fit_active_bound_count = pd.to_numeric(
+            pricing_df["fit_active_bound_count"], errors="coerce"
+        )
+        boundary_saturated_count = int((fit_active_bound_count > 0).sum())
+        fit_count = int(len(pricing_df))
+        claim_gate_eligible = bool(
+            fit_count
+            and int(fit_success.sum()) == fit_count
+            and int(fit_promotion_eligible.sum()) == fit_count
+            and boundary_saturated_count == 0
+        )
         metrics = {
             "rows": int(len(pricing_df)),
             "median_iv_rmse_volpts_vega_wt": float(pricing_df["iv_rmse_volpts_vega_wt"].median()),
@@ -466,8 +496,20 @@ def wrds_metrics(root: Path) -> Dict[str, Any]:
             "median_price_rmse_ticks": float(pricing_df["price_rmse_ticks"].median()),
             "median_iv_mae_bps": float(pricing_df["iv_mae_bps"].median()),
             "median_price_mae_ticks": float(pricing_df["price_mae_ticks"].median()),
+            "fit_count": fit_count,
+            "fit_converged_count": int(fit_success.sum()),
+            "fit_boundary_saturated_count": boundary_saturated_count,
+            "fit_promotion_eligible_count": int(fit_promotion_eligible.sum()),
+            "risk_or_superiority_promotion_eligible": claim_gate_eligible,
         }
-        blocks["pricing"] = _status_block("ok", pricing_path, metrics=metrics)
+        notes = []
+        if not claim_gate_eligible:
+            notes.append(
+                "Calibration claim gate is diagnostic-only; do not promote risk or superiority claims."
+            )
+        blocks["pricing"] = _status_block(
+            "ok", pricing_path, metrics=metrics, notes=notes
+        )
         statuses.append("ok")
 
     oos_df, oos_err = _safe_load_csv(oos_path)
@@ -491,9 +533,24 @@ def wrds_metrics(root: Path) -> Dict[str, Any]:
     else:
         metrics = {
             "rows": int(len(pnl_df)),
-            "mean_pnl_ticks": float(pnl_df["mean_ticks"].mean()),
-            "mean_pnl": float(pnl_df["mean_pnl"].mean()),
-            "median_pnl_sigma": float(pnl_df["pnl_sigma"].median()),
+            "market_iv_bs_delta_mean_ticks": float(
+                pnl_df["market_iv_bs_delta_mean_ticks"].mean()
+            ),
+            "market_iv_bs_delta_mean_pnl": float(
+                pnl_df["market_iv_bs_delta_mean_pnl"].mean()
+            ),
+            "median_market_iv_bs_delta_pnl_sigma": float(
+                pnl_df["market_iv_bs_delta_pnl_sigma"].median()
+            ),
+            "calibrated_heston_delta_mean_ticks": float(
+                pnl_df["calibrated_heston_delta_mean_ticks"].mean()
+            ),
+            "calibrated_heston_delta_mean_pnl": float(
+                pnl_df["calibrated_heston_delta_mean_pnl"].mean()
+            ),
+            "median_calibrated_heston_delta_pnl_sigma": float(
+                pnl_df["calibrated_heston_delta_pnl_sigma"].median()
+            ),
         }
         blocks["pnl"] = _status_block("ok", pnl_path, metrics=metrics)
         statuses.append("ok")

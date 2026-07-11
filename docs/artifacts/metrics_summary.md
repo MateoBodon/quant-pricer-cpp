@@ -1,8 +1,8 @@
 # Metrics Snapshot
 
-Generated at: 2026-01-25T21:13:43.226947+00:00
+Generated at: 2026-07-11T15:59:40.965347+00:00
 Artifacts root: docs/artifacts
-Manifest git sha: 653b9e8e07364e5c682dabed5bae856a850c1136
+Manifest git sha: 0dbcd666288729bf519d4471e189685b623aba38
 Protocol synthetic_validation: scenario_grid sha256=ac79e61f4ff636a0260771164fa2e641882f7addbe4d974fb9be90e9f8da18cf, tolerances sha256=6222819e4b23355e3b6ff366350455083b0776299e2203991207ffd81202abe1
 
 ## Status overview

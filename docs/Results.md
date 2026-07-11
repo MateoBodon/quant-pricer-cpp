@@ -114,7 +114,11 @@ The WRDS pipeline can ingest SPX from OptionMetrics IvyDB in explicitly enabled 
 - The tracked BS-vs-Heston sample comparison lives in [artifacts/wrds/wrds_bs_heston_comparison.csv](artifacts/wrds/wrds_bs_heston_comparison.csv). Detail BS CSVs may be generated during sample runs, but they are ignored and are not curated public artifacts by default.
 - Next-day diagnostics per tenor bucket live in [artifacts/wrds/wrds_agg_oos.csv](artifacts/wrds/wrds_agg_oos.csv):
   - `iv_mae_bps` (quotes-weighted IV MAE), `price_mae_ticks` (quotes-weighted price MAE)
-- Δ-hedged distributions per bucket are stored in [artifacts/wrds/wrds_agg_pnl.csv](artifacts/wrds/wrds_agg_pnl.csv) with `mean_ticks` and `pnl_sigma` (tick σ).
+- The model-neutral hedge diagnostic per bucket is stored in [artifacts/wrds/wrds_agg_pnl.csv](artifacts/wrds/wrds_agg_pnl.csv) with `market_iv_bs_delta_mean_ticks` and `market_iv_bs_delta_pnl_sigma`. It uses a Black-Scholes delta computed from market IV and must not be attributed to Heston.
+- A separate calibrated-Heston hedge is reported only when every contributing
+  spot derivative passes bump-halving stability and the European-call delta
+  bounds. Invalid numerical derivatives remain explicit counts and make the
+  Heston hedge aggregate unavailable; they are never clipped into a result.
 - Overview figure: [artifacts/wrds/wrds_multi_date_summary.png](artifacts/wrds/wrds_multi_date_summary.png); detailed narrative lives in [`docs/WRDS_Results.md`](WRDS_Results.md).
 
 Regenerate the bundled sample snapshot with `./scripts/reproduce_all.sh` (the pipeline runs even without credentials) or explicitly via `python -m wrds_pipeline.pipeline --dateset wrds_pipeline_dates_panel.yaml --use-sample`. To hit the live WRDS database, export `WRDS_ENABLED=1`, `WRDS_USERNAME`, and `WRDS_PASSWORD`, then run the same command without `--use-sample`; keep live/local outputs scratch until a reviewed promotion. The panel identifier (`panel_id` in the YAML) is logged at run start and recorded in `docs/artifacts/manifest.json` under `runs.wrds_dateset`. MARKET tests (`ctest -L MARKET`) remain opt-in and skip automatically when the env vars are absent.

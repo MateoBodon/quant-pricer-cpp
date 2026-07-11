@@ -150,7 +150,7 @@ Current pipeline (SPX from IvyDB, secid via `optionm.secnmd`, `optionm.opprcdYYY
     - ΔIV RMSE (vol pts).
     - ΔOOS IV MAE (bps).
     - Δprice RMSE (ticks).
-    - ΔΔ‑hedged PnL σ and maybe mean.
+    - Explicitly attributed market-IV Black-Scholes-delta hedge PnL σ and mean.
 - [ ] Add WRDS summary plots:
   - [ ] Bar chart (per bucket) of IV RMSE: BS vs Heston.
   - [ ] Heatmap of OOS IV MAE in bps vs tenor & moneyness (Heston).
@@ -160,7 +160,7 @@ Current pipeline (SPX from IvyDB, secid via `optionm.secnmd`, `optionm.opprcdYYY
 
 - [ ] A 1–2 paragraph executive summary in `docs/WRDS_Results.md` with concrete numbers (you fill in):
 
-  > On N SPX trade dates (2017–2024), vega‑weighted IV RMSE falls from X to Y vol pts (≈Z% improvement) when moving from BS to Heston in 30–90d tenors. OOS IV MAE drops from A to B bps, and Δ‑hedged 1d PnL σ shrinks by C% in ATMF buckets, with mean PnL statistically indistinguishable from 0.
+  > On N SPX trade dates (2017–2024), report locked-protocol BS-versus-Heston pricing/OOS errors separately from hedge performance. A hedge comparison may be claimed only after genuine model-specific BS and Heston deltas, eligible calibrations, and uncertainty estimates are present.
 
 - [x] Link to the WRDS section explicitly from `README.md` “Results at a Glance”.
 

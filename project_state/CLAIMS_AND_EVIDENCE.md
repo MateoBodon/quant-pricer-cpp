@@ -32,6 +32,43 @@ Failure: FAST test `metrics_snapshot_fast` failed because partial reproduction r
 
 Implication: the 2026-01-25 metrics snapshot remains the committed public evidence baseline unless Heavy intentionally runs a repair/promotion ticket that updates artifacts, manifest, validation pack, and current-results state consistently.
 
+## 2026-07-11 Local WRDS Flagship Run Status
+
+On 2026-07-11, a real local-vault execution of `wrds_panel_calm_stress_v1`
+completed successfully on current HEAD with:
+
+```bash
+WRDS_LOCAL_ROOT=/Volumes/Storage/Data/wrds QUANT_MACHINE_LABEL=codex-local \
+./scripts/reproduce_wrds_local_metrics.sh \
+  --dateset wrds_pipeline_dates_panel.yaml \
+  --run-id wrds_local_20260711T113500Z_flagship_audit
+```
+
+Evidence:
+
+- local scratch outputs:
+  `artifacts/_local/wrds_local/wrds_local_20260711T113500Z_flagship_audit/`
+- tracked run log:
+  `docs/agent_runs/20260711_081603_wrds-panel-calm-stress-v1-local-flagship/`
+
+What is now supported:
+
+- current HEAD can execute the locked local-vault panel in real-data mode
+  against snapshot `20260707_045553_global_project_priority`;
+- every trade-date pair produced manifest-bound per-date source receipts;
+- the delegated frozen scope counts were matched locally:
+  5 trade-date pairs, 8 unique surface dates, 40 partition references,
+  14 unique compressed inputs, and 449,572,051 compressed bytes.
+
+What is still not promoted:
+
+- these local real-data results are not yet public headline truth;
+- they remain `live_gated` / `needs_protocol_review` for promotion because the
+  result is mixed and local-only, the hedge diagnostic was originally
+  misattributed as Heston-specific, and 10 of 25 fitted parameters hit exact
+  calibration bounds;
+- no local aggregate artifacts were promoted into `docs/artifacts/`.
+
 ## Current Claim Classes
 
 | Claim | Current evidence | Status | Caveat / next evidence |
@@ -45,8 +82,9 @@ Implication: the 2026-01-25 metrics snapshot remains the committed public eviden
 | QuantLib parity within about one cent | `docs/artifacts/ql_parity/*`, `metrics_summary.md` | `supported_historical_snapshot` | Must preserve product/grid/bucket context. |
 | Benchmarks and MC paths/sec | `docs/artifacts/bench/*`, `metrics_summary.md`, manifest hardware fields | `supported_historical_snapshot` | Hardware/compiler/protocol specific; do not present as general performance. |
 | WRDS sample pipeline and as-of guards | FAST as-of/poison tests, `wrds_pipeline/`, tracked sample aggregate artifacts | `sample_only` | Sample bundle supports regression/reproducibility, not live-market performance. |
-| Live/local WRDS performance or superiority | Historical/local logs may exist; no reviewed current live/local evidence in this sprint | `live_gated` | Requires locked protocol, sanitized aggregate artifacts, data-policy pass, and Pro/Heavy L4 review. |
-| Heston superiority over BS | Tracked sample comparison shows near parity; QE bias remains known | `unsupported` | Do not headline Heston superiority unless locked-protocol evidence supports it. |
+| Live/local WRDS execution on current HEAD | `docs/agent_runs/20260711_081603_wrds-panel-calm-stress-v1-local-flagship/`, local receipts and aggregate exports under `artifacts/_local/wrds_local/wrds_local_20260711T113500Z_flagship_audit/` | `supported_current_head` | Supported as local execution evidence only; no public promotion yet. |
+| Live/local WRDS performance or superiority | 2026-07-11 local run exists; independent review accepted provenance but rejected promotion because fits are boundary-saturated and the original hedge diagnostic was misattributed | `live_gated` | Requires an exact corrected replay, an eligible calibration panel, genuine model-specific hedging, and sanitized reviewed aggregates before public use. |
+| Heston superiority over BS | 2026-07-11 local comparison is mixed by tenor; 10/25 fit parameters hit exact bounds and the reported hedge PnL was actually market-IV Black-Scholes-delta PnL | `unsupported` | Do not headline Heston superiority or risk performance unless a locked protocol passes calibration and model-specific hedge gates. |
 | Heston QE Monte Carlo production accuracy | `docs/artifacts/heston_qe_vs_analytic.*`; known bias remains | `needs_protocol_review` | Treat QE as experimental/caveated; WRDS pipeline uses analytic Heston, not QE. |
 | Curated artifact reproducibility | `scripts/reproduce_all.sh` exists and partial reproduction regenerated artifacts | `stale` | Official current-HEAD reproduction failed in this sprint; repair before promotion. |
 | Validation pack release asset availability | README/release references, `scripts/package_validation.py` | `not_checked` | Local pack generation was not rerun after failed reproduction; release asset claims need T-106/T-105 verification. |
@@ -63,6 +101,8 @@ Implication: the 2026-01-25 metrics snapshot remains the committed public eviden
 - Tests: `tests/` and CTest labels
 - Historical run logs: `docs/agent_runs/`
 - Local/scratch outputs: `artifacts/_local/` and ignored/generated WRDS detail files; not public truth
+- Current real-data local run log:
+  `docs/agent_runs/20260711_081603_wrds-panel-calm-stress-v1-local-flagship/`
 
 ## Public Claim Rules
 

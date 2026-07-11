@@ -1,7 +1,7 @@
 {
   "artifacts_root": "docs/artifacts",
-  "generated_at": "2026-01-25T21:13:43.226947+00:00",
-  "manifest_git_sha": "653b9e8e07364e5c682dabed5bae856a850c1136",
+  "generated_at": "2026-07-11T15:59:40.965347+00:00",
+  "manifest_git_sha": "0dbcd666288729bf519d4471e189685b623aba38",
   "manifest_path": "docs/artifacts/manifest.json",
   "metrics": {
     "benchmarks": {
@@ -44,7 +44,7 @@
         "r2": 0.9999972497268851,
         "rmse_finest": 0.0011572785725384,
         "rows": 3,
-        "slope": -2.0124048488028414,
+        "slope": -2.0124048488028428,
         "timesteps_finest": 400
       },
       "source": "docs/artifacts/pde_order_slope.csv",
@@ -123,17 +123,20 @@
       "oos": {
         "metrics": {
           "rows": 10,
-          "weighted_iv_mae_bps": 10.59916023174468,
-          "weighted_price_mae_ticks": 11.810290671478011
+          "weighted_iv_mae_bps": 10.598762076117087,
+          "weighted_price_mae_ticks": 11.809832601654563
         },
         "source": "docs/artifacts/wrds/wrds_agg_oos.csv",
         "status": "ok"
       },
       "pnl": {
         "metrics": {
-          "mean_pnl": -20.42912408124312,
-          "mean_pnl_ticks": -408.5824816248624,
-          "median_pnl_sigma": 239.06936760233864,
+          "calibrated_heston_delta_mean_pnl": -20.377211837547478,
+          "calibrated_heston_delta_mean_ticks": -407.54423675094955,
+          "market_iv_bs_delta_mean_pnl": -20.42912408124312,
+          "market_iv_bs_delta_mean_ticks": -408.58248162486234,
+          "median_calibrated_heston_delta_pnl_sigma": 249.24930965029625,
+          "median_market_iv_bs_delta_pnl_sigma": 239.06936760233862,
           "rows": 10
         },
         "source": "docs/artifacts/wrds/wrds_agg_pnl.csv",
@@ -141,13 +144,21 @@
       },
       "pricing": {
         "metrics": {
-          "median_iv_mae_bps": 10.599209020201132,
-          "median_iv_mae_volpts_vega_wt": 0.0010599146937537,
-          "median_iv_rmse_volpts_vega_wt": 0.0012082816720515,
-          "median_price_mae_ticks": 12.39636762388337,
-          "median_price_rmse_ticks": 14.80770107034128,
+          "fit_boundary_saturated_count": 5,
+          "fit_converged_count": 5,
+          "fit_count": 5,
+          "fit_promotion_eligible_count": 0,
+          "median_iv_mae_bps": 10.59883564571703,
+          "median_iv_mae_volpts_vega_wt": 0.001059880827884,
+          "median_iv_rmse_volpts_vega_wt": 0.0012082817713546,
+          "median_price_mae_ticks": 12.395489947443751,
+          "median_price_rmse_ticks": 14.809172345395034,
+          "risk_or_superiority_promotion_eligible": false,
           "rows": 5
         },
+        "notes": [
+          "Calibration claim gate is diagnostic-only; do not promote risk or superiority claims."
+        ],
         "source": "docs/artifacts/wrds/wrds_agg_pricing.csv",
         "status": "ok"
       },

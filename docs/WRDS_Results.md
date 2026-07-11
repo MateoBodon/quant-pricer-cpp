@@ -94,8 +94,15 @@ Future live/local runs should write raw or detailed outputs to ignored scratch p
 | --- | --- | --- | --- |
 | `iv_mae_bps` | Quotes-weighted MAE of next-day IV errors. | `bps` | [`docs/artifacts/wrds/wrds_agg_oos.csv`](artifacts/wrds/wrds_agg_oos.csv) |
 | `price_mae_ticks` | Quotes-weighted MAE of next-day price errors. | `ticks` | [`docs/artifacts/wrds/wrds_agg_oos.csv`](artifacts/wrds/wrds_agg_oos.csv) |
-| `mean_ticks` | Quotes-weighted mean Δ-hedged P&L per tenor bucket. | `ticks` | [`docs/artifacts/wrds/wrds_agg_pnl.csv`](artifacts/wrds/wrds_agg_pnl.csv) |
-| `pnl_sigma` | Standard deviation of Δ-hedged ticks per bucket. | `ticks` | [`docs/artifacts/wrds/wrds_agg_pnl.csv`](artifacts/wrds/wrds_agg_pnl.csv) |
+| `market_iv_bs_delta_mean_ticks` | Quotes-weighted mean hedge P&L using a Black-Scholes delta computed from observed market IV. | `ticks` | [`docs/artifacts/wrds/wrds_agg_pnl.csv`](artifacts/wrds/wrds_agg_pnl.csv) |
+| `market_iv_bs_delta_pnl_sigma` | Standard deviation of that market-IV Black-Scholes-delta hedge P&L. This is not a Heston-specific risk metric. | `ticks` | [`docs/artifacts/wrds/wrds_agg_pnl.csv`](artifacts/wrds/wrds_agg_pnl.csv) |
+| `calibrated_heston_delta_pnl_sigma` | Standard deviation of the distinct calibrated-Heston-delta hedge P&L, available only when every contributing numerical derivative passes stability and no-arbitrage bounds. | `ticks` | [`docs/artifacts/wrds/wrds_agg_pnl.csv`](artifacts/wrds/wrds_agg_pnl.csv) |
+| `calibrated_heston_delta_invalid_count` | Surface rows whose Heston spot derivative is nonfinite, bump-unstable, or outside the European-call delta bounds. These rows are counted and invalidate the affected aggregate; they are not clipped. | `rows` | [`docs/artifacts/wrds/wrds_agg_pnl.csv`](artifacts/wrds/wrds_agg_pnl.csv) |
+
+Every pricing row also carries optimizer convergence, active-bound, and Heston
+delta numerical-validity fields. Any nonconverged or boundary-saturated fit,
+missing derivative diagnostic, or invalid derivative makes the aggregate
+`diagnostic_only` for Heston risk or superiority promotion.
 
 ## Multi-date Dashboard (≥5 trade dates)
 

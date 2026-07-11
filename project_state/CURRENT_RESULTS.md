@@ -1,9 +1,9 @@
 ---
-generated_at: 2026-01-25T21:13:43.226947+00:00
-git_sha: 653b9e8e07364e5c682dabed5bae856a850c1136
-results_commit_sha: 653b9e8e07364e5c682dabed5bae856a850c1136
-manifest_git_sha: 653b9e8e07364e5c682dabed5bae856a850c1136
-branch: codex/ticket-09-refresh-metrics-ax162s
+generated_at: 2026-07-11T15:59:40.965347+00:00
+git_sha: 0dbcd666288729bf519d4471e189685b623aba38
+results_commit_sha: 0dbcd666288729bf519d4471e189685b623aba38
+manifest_git_sha: 0dbcd666288729bf519d4471e189685b623aba38
+branch: recovery/quant-pre-v3-20260710
 commands:
   - python3 -m venv .venv
   - . .venv/bin/activate && python -m pip install -r requirements-dev.txt
@@ -16,9 +16,9 @@ commands:
 # Current Results
 
 ## Metrics snapshot (latest committed)
-Source: `docs/artifacts/metrics_summary.md` (generated at **2026-01-25T21:13:43.226947+00:00**).
-Results commit SHA: `653b9e8e07364e5c682dabed5bae856a850c1136`.
-Manifest git SHA recorded in snapshot: `653b9e8e07364e5c682dabed5bae856a850c1136` (code SHA captured in `docs/artifacts/manifest.json` at snapshot time).
+Source: `docs/artifacts/metrics_summary.md` (generated at **2026-07-11T15:59:40.965347+00:00**).
+Results commit SHA: `0dbcd666288729bf519d4471e189685b623aba38`.
+Manifest git SHA recorded in snapshot: `0dbcd666288729bf519d4471e189685b623aba38` (code SHA captured in `docs/artifacts/manifest.json` at snapshot time).
 
 Status overview (from `docs/artifacts/metrics_summary.md`):
 - tri engine agreement: ok
@@ -35,6 +35,13 @@ Status overview (from `docs/artifacts/metrics_summary.md`):
 - QL parity: max diff=0.861583 cents, median=0.798752 cents, p95=0.855300 cents.
 - Benchmarks: MC paths/sec (1t)=1.27500e+07, eff@max=0.953402.
 - WRDS: median iv_rmse=0.00120828 (sample bundle regression harness).
+- WRDS calibration claim gate: diagnostic-only; 5/5 sample fits converged,
+  5/5 hit at least one exact parameter bound, and 0/5 are promotion eligible.
+- WRDS hedge diagnostics: market-IV Black-Scholes-delta median PnL sigma
+  `239.069` ticks; calibrated-Heston-delta median PnL sigma `249.249` ticks.
+- WRDS Heston-delta numerical gate: 50/50 sample surface rows valid and 0
+  invalid; the real five-date replay is separately fail-closed and is not
+  represented by this sample result.
 
 ## Key artifact locations
 - Validation figures + CSVs: `docs/artifacts/` (tri-engine, QMC vs PRNG, PDE order, MC Greeks, Heston QE, etc.).
@@ -44,5 +51,7 @@ Status overview (from `docs/artifacts/metrics_summary.md`):
 - Validation bundle: `docs/validation_pack.zip`.
 
 ## Notes
-- This update refreshed the metrics snapshot; artifact blocks remain from the latest committed sample bundle run.
+- This update refreshed the sample metrics snapshot with explicit model-specific
+  hedge attribution plus fail-closed calibration and Heston-delta numerical
+  diagnostics.
 - Narrative results live in `docs/Results.md`, `docs/Validation*.md`, and `docs/WRDS_Results.md` (sample bundle).

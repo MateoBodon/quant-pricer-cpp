@@ -17,7 +17,14 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS_ROOT = REPO_ROOT / "docs" / "artifacts"
 LOCAL_ARTIFACTS_ROOT = REPO_ROOT / "artifacts" / "_local"
 LOCAL_WRDS_ROOT = LOCAL_ARTIFACTS_ROOT / "wrds_local"
-SCHEMA_VERSION = "wrds_realdata_metrics_export_v1"
+SCHEMA_VERSION = "wrds_realdata_metrics_export_v2"
+MARKET_IV_BS_DELTA_MEAN_TICKS = "market_iv_bs_delta_mean_ticks"
+MARKET_IV_BS_DELTA_PNL_SIGMA = "market_iv_bs_delta_pnl_sigma"
+HESTON_DELTA_MEAN_TICKS = "calibrated_heston_delta_mean_ticks"
+HESTON_DELTA_PNL_SIGMA = "calibrated_heston_delta_pnl_sigma"
+HESTON_DELTA_EVALUATION_COUNT = "calibrated_heston_delta_evaluation_count"
+HESTON_DELTA_VALID_COUNT = "calibrated_heston_delta_valid_count"
+HESTON_DELTA_INVALID_COUNT = "calibrated_heston_delta_invalid_count"
 
 
 @dataclass
@@ -70,6 +77,14 @@ RESTRICTED_COLUMN_TOKENS = {
 }
 
 
+def _is_restricted_column(column: str) -> bool:
+    lowered = column.lower()
+    if lowered in RESTRICTED_COLUMN_TOKENS:
+        return True
+    tokens = [token for token in lowered.replace("-", "_").split("_") if token]
+    return any(token in RESTRICTED_COLUMN_TOKENS for token in tokens)
+
+
 ALLOWED_COLUMNS = {
     "wrds_agg_pricing.csv": {
         "trade_date",
@@ -86,6 +101,33 @@ ALLOWED_COLUMNS = {
         "price_rmse_ticks",
         "iv_mae_bps",
         "price_mae_ticks",
+        "fit_success",
+        "fit_status",
+        "fit_nfev",
+        "fit_njev",
+        "fit_cost",
+        "fit_optimality",
+        "fit_active_bound_count",
+        "fit_active_bound_params",
+        "fit_promotion_eligible",
+        "fit_promotion_status",
+        "fit_hit_lower_kappa",
+        "fit_hit_lower_theta",
+        "fit_hit_lower_sigma",
+        "fit_hit_lower_rho",
+        "fit_hit_lower_v0",
+        "fit_hit_upper_kappa",
+        "fit_hit_upper_theta",
+        "fit_hit_upper_sigma",
+        "fit_hit_upper_rho",
+        "fit_hit_upper_v0",
+        "heston_delta_numerical_status",
+        "heston_delta_evaluated_surface_rows",
+        "heston_delta_valid_surface_rows",
+        "heston_delta_invalid_surface_rows",
+        "heston_delta_evaluated_quote_weight",
+        "heston_delta_valid_quote_weight",
+        "heston_delta_invalid_quote_weight",
     },
     "wrds_agg_oos.csv": {
         "tenor_bucket",
@@ -99,9 +141,15 @@ ALLOWED_COLUMNS = {
     },
     "wrds_agg_pnl.csv": {
         "tenor_bucket",
-        "mean_pnl",
-        "mean_ticks",
-        "pnl_sigma",
+        "market_iv_bs_delta_mean_pnl",
+        MARKET_IV_BS_DELTA_MEAN_TICKS,
+        MARKET_IV_BS_DELTA_PNL_SIGMA,
+        "calibrated_heston_delta_mean_pnl",
+        HESTON_DELTA_MEAN_TICKS,
+        HESTON_DELTA_PNL_SIGMA,
+        HESTON_DELTA_EVALUATION_COUNT,
+        HESTON_DELTA_VALID_COUNT,
+        HESTON_DELTA_INVALID_COUNT,
         "count",
         "trade_date",
         "label",
@@ -117,13 +165,20 @@ ALLOWED_COLUMNS = {
         "heston_oos_price_mae_ticks",
         "bs_oos_iv_mae_bps",
         "bs_oos_price_mae_ticks",
-        "heston_pnl_sigma",
+        MARKET_IV_BS_DELTA_PNL_SIGMA,
+        HESTON_DELTA_PNL_SIGMA,
+        HESTON_DELTA_EVALUATION_COUNT,
+        HESTON_DELTA_VALID_COUNT,
+        HESTON_DELTA_INVALID_COUNT,
         "count",
-        "mean_ticks",
+        MARKET_IV_BS_DELTA_MEAN_TICKS,
+        HESTON_DELTA_MEAN_TICKS,
         "delta_iv_rmse_volpts",
         "delta_price_rmse_ticks",
         "delta_oos_iv_mae_bps",
         "delta_oos_price_mae_ticks",
+        "delta_hedge_pnl_sigma_ticks",
+        "delta_hedge_mean_ticks",
     },
 }
 
@@ -138,9 +193,7 @@ def _validate_columns(data: CsvData, filename: str) -> None:
     unknown = sorted(set(columns) - allowed)
     if unknown:
         raise ValueError(f"{filename} has unexpected columns: {', '.join(unknown)}")
-    restricted_hits = [
-        col for col in columns if any(token in col.lower() for token in RESTRICTED_COLUMN_TOKENS)
-    ]
+    restricted_hits = [col for col in columns if _is_restricted_column(col)]
     if restricted_hits:
         raise ValueError(f"{filename} includes restricted columns: {', '.join(restricted_hits)}")
 
@@ -158,6 +211,17 @@ def _coerce_float(value: Optional[str]) -> Optional[float]:
         return float(raw)
     except ValueError:
         return None
+
+
+def _coerce_bool(value: Optional[str]) -> Optional[bool]:
+    if value is None:
+        return None
+    raw = str(value).strip().lower()
+    if raw in {"true", "1", "yes"}:
+        return True
+    if raw in {"false", "0", "no"}:
+        return False
+    return None
 
 
 def _column_values(rows: Iterable[Dict[str, str]], key: str) -> List[float]:
@@ -322,9 +386,33 @@ def build_metrics(pricing: CsvData, oos: CsvData, pnl: CsvData, comparison: CsvD
 
     pnl_metrics = {
         "rows": len(pnl_rows),
-        "mean_pnl_ticks": _mean(_column_values(pnl_rows, "mean_ticks")),
-        "mean_pnl": _mean(_column_values(pnl_rows, "mean_pnl")),
-        "median_pnl_sigma": _median(_column_values(pnl_rows, "pnl_sigma")),
+        "market_iv_bs_delta_mean_ticks": _mean(
+            _column_values(pnl_rows, MARKET_IV_BS_DELTA_MEAN_TICKS)
+        ),
+        "market_iv_bs_delta_mean_pnl": _mean(
+            _column_values(pnl_rows, "market_iv_bs_delta_mean_pnl")
+        ),
+        "market_iv_bs_delta_pnl_sigma_median": _median(
+            _column_values(pnl_rows, MARKET_IV_BS_DELTA_PNL_SIGMA)
+        ),
+        "calibrated_heston_delta_mean_ticks": _mean(
+            _column_values(pnl_rows, HESTON_DELTA_MEAN_TICKS)
+        ),
+        "calibrated_heston_delta_mean_pnl": _mean(
+            _column_values(pnl_rows, "calibrated_heston_delta_mean_pnl")
+        ),
+        "calibrated_heston_delta_pnl_sigma_median": _median(
+            _column_values(pnl_rows, HESTON_DELTA_PNL_SIGMA)
+        ),
+        "calibrated_heston_delta_evaluation_count": int(
+            sum(_column_values(pnl_rows, HESTON_DELTA_EVALUATION_COUNT))
+        ),
+        "calibrated_heston_delta_valid_count": int(
+            sum(_column_values(pnl_rows, HESTON_DELTA_VALID_COUNT))
+        ),
+        "calibrated_heston_delta_invalid_count": int(
+            sum(_column_values(pnl_rows, HESTON_DELTA_INVALID_COUNT))
+        ),
     }
 
     comparison_metrics = {
@@ -356,8 +444,23 @@ def build_metrics(pricing: CsvData, oos: CsvData, pnl: CsvData, comparison: CsvD
         "median_delta_oos_iv_mae_bps": _median(
             _column_values(comp_rows, "delta_oos_iv_mae_bps")
         ),
-        "median_heston_pnl_sigma": _median(
-            _column_values(comp_rows, "heston_pnl_sigma")
+        "median_market_iv_bs_delta_pnl_sigma": _median(
+            _column_values(comp_rows, MARKET_IV_BS_DELTA_PNL_SIGMA)
+        ),
+        "median_calibrated_heston_delta_pnl_sigma": _median(
+            _column_values(comp_rows, HESTON_DELTA_PNL_SIGMA)
+        ),
+        "median_delta_hedge_pnl_sigma_ticks": _median(
+            _column_values(comp_rows, "delta_hedge_pnl_sigma_ticks")
+        ),
+        "calibrated_heston_delta_evaluation_count": int(
+            sum(_column_values(comp_rows, HESTON_DELTA_EVALUATION_COUNT))
+        ),
+        "calibrated_heston_delta_valid_count": int(
+            sum(_column_values(comp_rows, HESTON_DELTA_VALID_COUNT))
+        ),
+        "calibrated_heston_delta_invalid_count": int(
+            sum(_column_values(comp_rows, HESTON_DELTA_INVALID_COUNT))
         ),
     }
 
@@ -366,6 +469,114 @@ def build_metrics(pricing: CsvData, oos: CsvData, pnl: CsvData, comparison: CsvD
         "oos": oos_metrics,
         "pnl": pnl_metrics,
         "comparison": comparison_metrics,
+    }
+
+
+def build_claim_gate(pricing: CsvData) -> Dict[str, Any]:
+    fit_rows = [
+        row
+        for row in pricing.rows
+        if str(row.get("status", "ok")).strip().lower() == "ok"
+    ]
+    rows_with_diagnostics = [
+        row
+        for row in fit_rows
+        if _coerce_bool(row.get("fit_success")) is not None
+        and _coerce_bool(row.get("fit_promotion_eligible")) is not None
+        and _coerce_float(row.get("fit_active_bound_count")) is not None
+    ]
+    converged_count = sum(
+        _coerce_bool(row.get("fit_success")) is True for row in rows_with_diagnostics
+    )
+    boundary_saturated_count = sum(
+        (_coerce_float(row.get("fit_active_bound_count")) or 0.0) > 0.0
+        for row in rows_with_diagnostics
+    )
+    promotion_eligible_count = sum(
+        _coerce_bool(row.get("fit_promotion_eligible")) is True
+        for row in rows_with_diagnostics
+    )
+
+    calibration_reasons: List[str] = []
+    if not fit_rows:
+        calibration_reasons.append("no_successful_pricing_rows")
+    if len(rows_with_diagnostics) != len(fit_rows):
+        calibration_reasons.append("missing_fit_diagnostics")
+    if converged_count != len(fit_rows):
+        calibration_reasons.append("one_or_more_fits_nonconverged")
+    if boundary_saturated_count:
+        calibration_reasons.append("one_or_more_fits_boundary_saturated")
+    if promotion_eligible_count != len(fit_rows):
+        calibration_reasons.append("one_or_more_fits_ineligible")
+
+    rows_with_delta_diagnostics = [
+        row
+        for row in fit_rows
+        if _coerce_float(row.get("heston_delta_evaluated_surface_rows"))
+        is not None
+        and _coerce_float(row.get("heston_delta_valid_surface_rows")) is not None
+        and _coerce_float(row.get("heston_delta_invalid_surface_rows"))
+        is not None
+    ]
+    delta_evaluated_count = int(
+        sum(
+            _coerce_float(row.get("heston_delta_evaluated_surface_rows")) or 0.0
+            for row in rows_with_delta_diagnostics
+        )
+    )
+    delta_valid_count = int(
+        sum(
+            _coerce_float(row.get("heston_delta_valid_surface_rows")) or 0.0
+            for row in rows_with_delta_diagnostics
+        )
+    )
+    delta_invalid_count = int(
+        sum(
+            _coerce_float(row.get("heston_delta_invalid_surface_rows")) or 0.0
+            for row in rows_with_delta_diagnostics
+        )
+    )
+    delta_numerical_reasons: List[str] = []
+    if not fit_rows:
+        delta_numerical_reasons.append("no_successful_pricing_rows")
+    if len(rows_with_delta_diagnostics) != len(fit_rows):
+        delta_numerical_reasons.append("missing_heston_delta_numerical_diagnostics")
+    if delta_evaluated_count == 0:
+        delta_numerical_reasons.append("no_heston_delta_numerical_evaluations")
+    if delta_invalid_count:
+        delta_numerical_reasons.append("one_or_more_heston_deltas_invalid")
+    if delta_valid_count + delta_invalid_count != delta_evaluated_count:
+        delta_numerical_reasons.append("heston_delta_numerical_count_mismatch")
+
+    calibration_promotion_eligible = bool(fit_rows) and not calibration_reasons
+    delta_numerical_promotion_eligible = (
+        bool(fit_rows) and not delta_numerical_reasons
+    )
+    promotion_eligible = (
+        calibration_promotion_eligible and delta_numerical_promotion_eligible
+    )
+    reasons = calibration_reasons + delta_numerical_reasons
+    return {
+        "status": "eligible" if promotion_eligible else "diagnostic_only",
+        "risk_or_superiority_promotion_eligible": promotion_eligible,
+        "calibration_promotion_eligible": calibration_promotion_eligible,
+        "heston_delta_numerical_promotion_eligible": (
+            delta_numerical_promotion_eligible
+        ),
+        "fit_count": len(fit_rows),
+        "fit_diagnostics_count": len(rows_with_diagnostics),
+        "fit_converged_count": converged_count,
+        "fit_boundary_saturated_count": boundary_saturated_count,
+        "fit_promotion_eligible_count": promotion_eligible_count,
+        "heston_delta_numerical_diagnostics_count": len(
+            rows_with_delta_diagnostics
+        ),
+        "heston_delta_evaluated_surface_rows": delta_evaluated_count,
+        "heston_delta_valid_surface_rows": delta_valid_count,
+        "heston_delta_invalid_surface_rows": delta_invalid_count,
+        "calibration_reasons": calibration_reasons,
+        "heston_delta_numerical_reasons": delta_numerical_reasons,
+        "reasons": reasons,
     }
 
 
@@ -379,6 +590,7 @@ def _rel_or_abs(path: Path) -> str:
 def render_markdown(payload: Dict[str, Any]) -> str:
     provenance = payload["provenance"]
     metrics = payload["metrics"]
+    claim_gate = payload["claim_gate"]
     lines = [
         "# WRDS real-data metrics export",
         "",
@@ -391,6 +603,22 @@ def render_markdown(payload: Dict[str, Any]) -> str:
         f"- data_mode: {provenance.get('data_mode')}",
         f"- git_sha: {provenance.get('git_sha')}",
         f"- machine_label: {provenance.get('machine_label')}",
+        "",
+        "## Claim gate",
+        f"- status: {claim_gate.get('status')}",
+        "- risk_or_superiority_promotion_eligible: "
+        f"{claim_gate.get('risk_or_superiority_promotion_eligible')}",
+        f"- fit_count: {claim_gate.get('fit_count')}",
+        f"- fit_converged_count: {claim_gate.get('fit_converged_count')}",
+        "- fit_boundary_saturated_count: "
+        f"{claim_gate.get('fit_boundary_saturated_count')}",
+        "- calibration_promotion_eligible: "
+        f"{claim_gate.get('calibration_promotion_eligible')}",
+        "- heston_delta_numerical_promotion_eligible: "
+        f"{claim_gate.get('heston_delta_numerical_promotion_eligible')}",
+        "- heston_delta_invalid_surface_rows: "
+        f"{claim_gate.get('heston_delta_invalid_surface_rows')}",
+        f"- reasons: {', '.join(claim_gate.get('reasons', [])) or 'none'}",
         "",
         "## Metrics",
     ]
@@ -503,6 +731,19 @@ def main() -> None:
     machine_label = _machine_label(args.machine_label)
 
     metrics = build_metrics(pricing, oos, pnl, comparison)
+    claim_gate = build_claim_gate(pricing)
+    metrics["pricing"].update(
+        {
+            "fit_count": claim_gate["fit_count"],
+            "fit_converged_count": claim_gate["fit_converged_count"],
+            "fit_boundary_saturated_count": claim_gate[
+                "fit_boundary_saturated_count"
+            ],
+            "fit_promotion_eligible_count": claim_gate[
+                "fit_promotion_eligible_count"
+            ],
+        }
+    )
 
     payload = {
         "schema_version": SCHEMA_VERSION,
@@ -515,6 +756,7 @@ def main() -> None:
             "git_sha": git_sha,
             "machine_label": machine_label,
         },
+        "claim_gate": claim_gate,
         "inputs": {
             "wrds_root": _rel_or_abs(wrds_root),
             "pricing_csv": _rel_or_abs(pricing.path),

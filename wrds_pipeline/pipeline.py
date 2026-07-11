@@ -25,10 +25,10 @@ for path in (REPO_ROOT, SCRIPTS_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-import manifest_utils
-from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
+import manifest_utils  # noqa: E402
+from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run  # noqa: E402
 
-from . import (
+from . import (  # noqa: E402
     calibrate_heston,
     calibrate_bs,
     compare_bs_heston,
@@ -82,10 +82,11 @@ def _plot_wrds_summary(
 
     if not pnl.empty:
         hist_data = pnl.loc[
-            pnl.index.repeat(pnl["quotes"].clip(lower=1).astype(int)), "pnl_per_tick"
+            pnl.index.repeat(pnl["quotes"].clip(lower=1).astype(int)),
+            delta_hedge_pnl.PNL_PER_TICK_COL,
         ]
         axes[2].hist(hist_data, bins=15, color="#2ca02c", alpha=0.8)
-        axes[2].set_title("Delta-hedged 1d PnL (ticks)")
+        axes[2].set_title("Market-IV BS-delta 1d hedge PnL (ticks)")
     else:
         axes[2].text(0.5, 0.5, "No PnL data", ha="center", va="center")
     axes[2].set_xlabel("PnL (ticks)")
@@ -149,12 +150,31 @@ def _plot_hedge_distribution(pnl_detail: pd.DataFrame, out_path: Path) -> None:
     if pnl_detail.empty:
         ax.text(0.5, 0.5, "No hedge data", ha="center", va="center")
     else:
-        hist_data = pnl_detail.loc[
+        bs_hist = pnl_detail.loc[
             pnl_detail.index.repeat(pnl_detail["quotes"].clip(lower=1).astype(int)),
-            "pnl_per_tick",
+            delta_hedge_pnl.PNL_PER_TICK_COL,
         ]
-        ax.hist(hist_data, bins=20, color="#2ca02c", alpha=0.85)
-    ax.set_title("WRDS Heston – Δ-hedged 1d PnL (ticks)")
+        heston_hist = pnl_detail.loc[
+            pnl_detail.index.repeat(pnl_detail["quotes"].clip(lower=1).astype(int)),
+            delta_hedge_pnl.HESTON_PNL_PER_TICK_COL,
+        ].dropna()
+        ax.hist(
+            bs_hist,
+            bins=20,
+            color="#1f77b4",
+            alpha=0.55,
+            label="Market-IV BS delta",
+        )
+        if not heston_hist.empty:
+            ax.hist(
+                heston_hist,
+                bins=20,
+                color="#ff7f0e",
+                alpha=0.45,
+                label="Calibrated Heston delta",
+            )
+        ax.legend(fontsize=8)
+    ax.set_title("Model-specific 1d hedge PnL (ticks)")
     ax.set_xlabel("PnL (ticks)")
     ax.set_ylabel("Frequency")
     ax.grid(True, ls=":", alpha=0.4)
@@ -209,18 +229,55 @@ def _plot_multi_date_summary(
             pnl.groupby(
                 ["trade_date", "regime", "label"], observed=True, as_index=False
             )
-            .agg(mean_ticks=("mean_ticks", "mean"), pnl_sigma=("pnl_sigma", "mean"))
+            .agg(
+                **{
+                    delta_hedge_pnl.MEAN_TICKS_COL: (
+                        delta_hedge_pnl.MEAN_TICKS_COL,
+                        "mean",
+                    ),
+                    delta_hedge_pnl.SIGMA_COL: (
+                        delta_hedge_pnl.SIGMA_COL,
+                        "mean",
+                    ),
+                    delta_hedge_pnl.HESTON_MEAN_TICKS_COL: (
+                        delta_hedge_pnl.HESTON_MEAN_TICKS_COL,
+                        "mean",
+                    ),
+                    delta_hedge_pnl.HESTON_SIGMA_COL: (
+                        delta_hedge_pnl.HESTON_SIGMA_COL,
+                        "mean",
+                    ),
+                }
+            )
             .sort_values("trade_date")
         )
         pnl_colors = pnl_avg["regime"].map(color_map).fillna(color_map["unknown"])
-        bars = axes[2].bar(
-            pnl_avg["label"].fillna(pnl_avg["trade_date"]),
-            pnl_avg["mean_ticks"],
+        x = np.arange(len(pnl_avg))
+        width = 0.38
+        axes[2].bar(
+            x - width / 2,
+            pnl_avg[delta_hedge_pnl.MEAN_TICKS_COL],
             color=pnl_colors,
-            yerr=pnl_avg["pnl_sigma"],
+            yerr=pnl_avg[delta_hedge_pnl.SIGMA_COL],
             capsize=4,
+            width=width,
+            label="Market-IV BS delta",
         )
-        axes[2].set_title("Δ-hedged mean ticks ± σ")
+        axes[2].bar(
+            x + width / 2,
+            pnl_avg[delta_hedge_pnl.HESTON_MEAN_TICKS_COL],
+            color="#ff7f0e",
+            yerr=pnl_avg[delta_hedge_pnl.HESTON_SIGMA_COL],
+            capsize=4,
+            width=width,
+            label="Calibrated Heston delta",
+        )
+        axes[2].set_xticks(x)
+        axes[2].set_xticklabels(
+            pnl_avg["label"].fillna(pnl_avg["trade_date"])
+        )
+        axes[2].legend(fontsize=7)
+        axes[2].set_title("Model-specific hedge mean ticks ± σ")
         axes[2].set_ylabel("ticks")
         for tick in axes[2].get_xticklabels():
             tick.set_rotation(30)
@@ -376,6 +433,7 @@ def run(
         "price_rmse_ticks",
     )
     fit_metrics = {key: float(calib[key]) for key in metric_keys}
+    fit_diagnostics = dict(calib["diagnostics"])
     data_mode = _data_mode(use_sample, local_root)
     summary_payload = {
         "trade_date": trade_date,
@@ -392,6 +450,7 @@ def run(
         },
         "params": calib["params"],
         **fit_metrics,
+        "calibration_diagnostics": fit_diagnostics,
         "bootstrap_ci": {k: list(v) for k, v in ci.items()},
         "source_today": source_today,
         "source_next": source_next,
@@ -441,7 +500,13 @@ def run(
 
     pnl_detail_csv = out_dir / "delta_hedge_pnl.csv"
     pnl_summary_csv = out_dir / "delta_hedge_pnl_summary.csv"
-    pnl_detail, pnl_summary = delta_hedge_pnl.simulate(agg_today, agg_next)
+    pnl_detail, pnl_summary = delta_hedge_pnl.simulate(
+        agg_today, agg_next, heston_params=calib["params"]
+    )
+    heston_delta_numerics = delta_hedge_pnl.summarize_heston_delta_numerics(
+        pnl_detail
+    )
+    summary_payload["heston_delta_numerics"] = heston_delta_numerics
     delta_hedge_pnl.write_outputs(
         pnl_detail_csv, pnl_summary_csv, pnl_detail, pnl_summary
     )
@@ -475,9 +540,9 @@ def run(
     oos_fig = out_dir / "wrds_heston_oos.png"
     _plot_oos_summary(oos_summary, oos_fig)
 
-    hedge_csv = out_dir / "wrds_heston_hedge.csv"
+    hedge_csv = out_dir / "wrds_model_delta_hedge.csv"
     pnl_summary.to_csv(hedge_csv, index=False)
-    hedge_fig = out_dir / "wrds_heston_hedge.png"
+    hedge_fig = out_dir / "wrds_model_delta_hedge.png"
     _plot_hedge_distribution(pnl_detail, hedge_fig)
 
     summary_payload.update(oos_metrics)
@@ -530,8 +595,8 @@ def run(
             "wrds_heston_insample_fig": str(insample_fig),
             "wrds_heston_oos_csv": str(oos_csv),
             "wrds_heston_oos_fig": str(oos_fig),
-            "wrds_heston_hedge_csv": str(hedge_csv),
-            "wrds_heston_hedge_fig": str(hedge_fig),
+            "wrds_model_delta_hedge_csv": str(hedge_csv),
+            "wrds_model_delta_hedge_fig": str(hedge_fig),
             "wrds_bs_fit_csv": str(bs_fit_csv),
             "wrds_bs_oos_csv": str(bs_oos_csv),
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -657,6 +722,8 @@ def run_dateset(
             )
             continue
         summary = result["summary"]
+        fit_diagnostics = summary.get("calibration_diagnostics", {})
+        heston_delta_numerics = summary.get("heston_delta_numerics", {})
         bs_summary = result["bs_summary"]
         oos_df = result["oos_summary"].copy()
         if not oos_df.empty:
@@ -684,6 +751,49 @@ def run_dateset(
                 "price_rmse_ticks": summary["price_rmse_ticks"],
                 "iv_mae_bps": summary.get("iv_mae_bps"),
                 "price_mae_ticks": price_mae_ticks,
+                "fit_success": fit_diagnostics["success"],
+                "fit_status": fit_diagnostics["status"],
+                "fit_nfev": fit_diagnostics["nfev"],
+                "fit_njev": fit_diagnostics["njev"],
+                "fit_cost": fit_diagnostics["cost"],
+                "fit_optimality": fit_diagnostics["optimality"],
+                "fit_active_bound_count": fit_diagnostics["active_bound_count"],
+                "fit_active_bound_params": ",".join(
+                    fit_diagnostics["active_bound_params"]
+                ),
+                "fit_promotion_eligible": fit_diagnostics["promotion_eligible"],
+                "fit_promotion_status": fit_diagnostics["promotion_status"],
+                "fit_hit_lower_kappa": fit_diagnostics["lower_bound_hits"]["kappa"],
+                "fit_hit_lower_theta": fit_diagnostics["lower_bound_hits"]["theta"],
+                "fit_hit_lower_sigma": fit_diagnostics["lower_bound_hits"]["sigma"],
+                "fit_hit_lower_rho": fit_diagnostics["lower_bound_hits"]["rho"],
+                "fit_hit_lower_v0": fit_diagnostics["lower_bound_hits"]["v0"],
+                "fit_hit_upper_kappa": fit_diagnostics["upper_bound_hits"]["kappa"],
+                "fit_hit_upper_theta": fit_diagnostics["upper_bound_hits"]["theta"],
+                "fit_hit_upper_sigma": fit_diagnostics["upper_bound_hits"]["sigma"],
+                "fit_hit_upper_rho": fit_diagnostics["upper_bound_hits"]["rho"],
+                "fit_hit_upper_v0": fit_diagnostics["upper_bound_hits"]["v0"],
+                "heston_delta_numerical_status": heston_delta_numerics.get(
+                    "status"
+                ),
+                "heston_delta_evaluated_surface_rows": heston_delta_numerics.get(
+                    "evaluated_surface_rows"
+                ),
+                "heston_delta_valid_surface_rows": heston_delta_numerics.get(
+                    "valid_surface_rows"
+                ),
+                "heston_delta_invalid_surface_rows": heston_delta_numerics.get(
+                    "invalid_surface_rows"
+                ),
+                "heston_delta_evaluated_quote_weight": heston_delta_numerics.get(
+                    "evaluated_quote_weight"
+                ),
+                "heston_delta_valid_quote_weight": heston_delta_numerics.get(
+                    "valid_quote_weight"
+                ),
+                "heston_delta_invalid_quote_weight": heston_delta_numerics.get(
+                    "invalid_quote_weight"
+                ),
             }
         )
 
@@ -774,9 +884,15 @@ def run_dateset(
                 "label",
                 "regime",
                 "tenor_bucket",
-                "mean_pnl",
-                "mean_ticks",
-                "pnl_sigma",
+                delta_hedge_pnl.MEAN_PNL_COL,
+                delta_hedge_pnl.MEAN_TICKS_COL,
+                delta_hedge_pnl.SIGMA_COL,
+                delta_hedge_pnl.HESTON_MEAN_PNL_COL,
+                delta_hedge_pnl.HESTON_MEAN_TICKS_COL,
+                delta_hedge_pnl.HESTON_SIGMA_COL,
+                delta_hedge_pnl.HESTON_DELTA_EVALUATION_COUNT_COL,
+                delta_hedge_pnl.HESTON_DELTA_VALID_COUNT_COL,
+                delta_hedge_pnl.HESTON_DELTA_INVALID_COUNT_COL,
                 "count",
             ]
         )
