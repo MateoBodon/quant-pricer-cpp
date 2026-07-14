@@ -106,7 +106,9 @@ GL32_W = np.array(
 )
 
 
-def _heston_cf(u: complex, T: float, params: Params, r: float, q: float, log_spot: float) -> complex:
+def _heston_cf(
+    u: complex, T: float, params: Params, r: float, q: float, log_spot: float
+) -> complex:
     """Risk-neutral characteristic function φ(u).
 
     Mirrors quant::heston::characteristic_function (C++) to stay numerically consistent
@@ -116,14 +118,17 @@ def _heston_cf(u: complex, T: float, params: Params, r: float, q: float, log_spo
     iu = 1j * u
     sigma2 = sigma * sigma
     d = np.sqrt((rho * sigma * iu - kappa) ** 2 + sigma2 * (1j * u + u * u))
-    denom = (kappa - rho * sigma * iu + d)
+    denom = kappa - rho * sigma * iu + d
     denom_safe = np.where(np.abs(denom) < 1e-14, denom + 1e-14, denom)
     g = (kappa - rho * sigma * iu - d) / denom_safe
     exp_dT = np.exp(-d * T)
     one_minus_g = 1.0 - g
     one_minus_g_exp = 1.0 - g * exp_dT
     # Stabilise logs near zero to avoid NaNs
-    log_term = np.log(one_minus_g_exp / np.where(np.abs(one_minus_g) < 1e-14, one_minus_g + 1e-14, one_minus_g))
+    log_term = np.log(
+        one_minus_g_exp
+        / np.where(np.abs(one_minus_g) < 1e-14, one_minus_g + 1e-14, one_minus_g)
+    )
     C = iu * (log_spot + (r - q) * T) + (kappa * theta / sigma2) * (
         (kappa - rho * sigma * iu - d) * T - 2.0 * log_term
     )
@@ -155,7 +160,9 @@ def heston_call_price(
                 continue
             u = x  # Laguerre node
             if j == 1:
-                phi = _heston_cf(u - 1j, T, params, rate, div, log_spot) / (phi_minus_i + 1e-16)
+                phi = _heston_cf(u - 1j, T, params, rate, div, log_spot) / (
+                    phi_minus_i + 1e-16
+                )
             else:
                 phi = _heston_cf(u, T, params, rate, div, log_spot)
             integrand = cmath.exp(-1j * u * log_strike) * phi / (1j * u)
@@ -185,7 +192,9 @@ def _model_iv(row: pd.Series, params: Params) -> Tuple[float, float]:
     rate = float(row["rate"])
     div = float(row["dividend"])
 
-    price = heston_call_price(spot=spot, strike=strike, rate=rate, div=div, T=T, params=params)
+    price = heston_call_price(
+        spot=spot, strike=strike, rate=rate, div=div, T=T, params=params
+    )
     intrinsic = max(0.0, spot * math.exp(-div * T) - strike * math.exp(-rate * T))
     upper = spot * math.exp(-div * T)
     price = float(min(max(price, intrinsic + 1e-10), upper))
@@ -239,7 +248,11 @@ def _vega_quote_weights(surface: pd.DataFrame, default: float = 1.0) -> np.ndarr
     vega = surface.get("vega", default)
     quotes = surface.get("quotes", 1.0)
     taper = _moneyness_taper(surface)
-    weights = np.asarray(vega, dtype=np.float64) * np.asarray(quotes, dtype=np.float64) * taper
+    weights = (
+        np.asarray(vega, dtype=np.float64)
+        * np.asarray(quotes, dtype=np.float64)
+        * taper
+    )
     return _positive_weights(weights, default=default)
 
 

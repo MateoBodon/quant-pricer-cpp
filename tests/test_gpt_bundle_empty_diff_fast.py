@@ -10,7 +10,6 @@ import sys
 import uuid
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 RUN_PREFIX = "_gpt_bundle_empty_diff_"
 MIN_CONTENT = "self-test content for gpt-bundle\n"
@@ -48,9 +47,7 @@ def _write_run_log(run_name: str, ticket_id: str, head_sha: str) -> Path:
         "config_hashes": {},
         "tools": {"runner": "fast-test"},
     }
-    (run_dir / "META.json").write_text(
-        json.dumps(meta, indent=2), encoding="utf-8"
-    )
+    (run_dir / "META.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     return run_dir
 
 
@@ -91,7 +88,8 @@ def main() -> None:
             raise AssertionError("gpt-bundle succeeded with an empty diff range")
         if "no commits in diff range" not in combined or "base_sha" not in combined:
             raise AssertionError(
-                "expected empty-diff error message to mention commit range and BASE_SHA"
+                "expected empty-diff error message to mention commit range and BASE_SHA; "
+                f"output was: {combined[-1200:]}"
             )
     finally:
         if output_path.exists():

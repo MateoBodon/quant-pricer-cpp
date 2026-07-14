@@ -11,6 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import numpy as np
 import pyquant_pricer as qp
 
 
@@ -65,6 +66,21 @@ def heston_helpers() -> None:
     )
 
 
+def price_heston_batch() -> None:
+    """Price an analytic Heston batch; no simulation or market data is used."""
+    markets = np.array(
+        [
+            [100.0, 90.0, 0.015, 0.005, 0.5],
+            [100.0, 100.0, 0.015, 0.005, 1.0],
+            [100.0, 110.0, 0.015, 0.005, 2.0],
+        ],
+        dtype=np.float64,
+    )
+    params = np.array([[1.5, 0.04, 0.6, -0.45, 0.04]])
+    metrics = qp.heston_call_metrics_batch(markets, params)
+    print(f"Heston analytic batch: [call_price, implied_vol] {metrics.tolist()}")
+
+
 def maybe_run_heston(repo_root: Path) -> None:
     samples_dir = repo_root / "data" / "samples"
     normalized_dir = repo_root / "data" / "normalized"
@@ -97,6 +113,7 @@ def main() -> None:
     price_vanilla()
     price_barrier()
     heston_helpers()
+    price_heston_batch()
     maybe_run_heston(repo_root)
 
 

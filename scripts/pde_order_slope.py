@@ -66,15 +66,9 @@ def main() -> None:
     ap.add_argument(
         "--scenario-grid", type=Path, help="Path to frozen scenario grid JSON"
     )
-    ap.add_argument(
-        "--tolerances", type=Path, help="Path to frozen tolerance JSON"
-    )
-    ap.add_argument(
-        "--output", default=str(ARTIFACTS_ROOT / "pde_order_slope.png")
-    )
-    ap.add_argument(
-        "--csv", default=str(ARTIFACTS_ROOT / "pde_order_slope.csv")
-    )
+    ap.add_argument("--tolerances", type=Path, help="Path to frozen tolerance JSON")
+    ap.add_argument("--output", default=str(ARTIFACTS_ROOT / "pde_order_slope.png"))
+    ap.add_argument("--csv", default=str(ARTIFACTS_ROOT / "pde_order_slope.csv"))
     args = ap.parse_args()
 
     scenario_config, tolerance_config, provenance = load_protocol_configs(

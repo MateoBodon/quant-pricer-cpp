@@ -8,7 +8,9 @@ import tempfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SCENARIO_GRID = REPO_ROOT / "configs" / "scenario_grids" / "synthetic_validation_v1.json"
+SCENARIO_GRID = (
+    REPO_ROOT / "configs" / "scenario_grids" / "synthetic_validation_v1.json"
+)
 TOLERANCES = REPO_ROOT / "configs" / "tolerances" / "synthetic_validation_v1.json"
 MISSING_MSG = "missing protocol config provenance"
 

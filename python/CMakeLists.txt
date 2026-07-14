@@ -16,9 +16,10 @@ if(NOT pybind11_FOUND)
 endif()
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(Threads REQUIRED)
 
 pybind11_add_module(pyquant_pricer MODULE pybind_module.cpp)
-target_link_libraries(pyquant_pricer PRIVATE quant_pricer)
+target_link_libraries(pyquant_pricer PRIVATE quant_pricer Threads::Threads)
 target_compile_features(pyquant_pricer PRIVATE cxx_std_20)
 
 install(

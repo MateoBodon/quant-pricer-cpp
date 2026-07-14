@@ -56,7 +56,9 @@ def _scrub_manifest(value: Any, key_path: List[str] | None = None) -> Any:
         last_key = key_path[-1] if key_path else ""
         if last_key not in _ABS_PATH_ALLOWLIST:
             candidate = Path(value)
-            if candidate.is_absolute() and not str(candidate).startswith(str(REPO_ROOT)):
+            if candidate.is_absolute() and not str(candidate).startswith(
+                str(REPO_ROOT)
+            ):
                 return _DROP
         return value
     return value

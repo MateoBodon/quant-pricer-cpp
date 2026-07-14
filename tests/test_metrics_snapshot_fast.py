@@ -220,9 +220,7 @@ def assert_current_results_matches_snapshot(summary: Dict) -> None:
         float(wrds_metrics["median_iv_rmse_volpts_vega_wt"]),
     )
     _assert_close("pde_order.slope", pde_slope, float(pde_metrics["slope"]))
-    _assert_close(
-        "pde_order.rmse_finest", pde_rmse, float(pde_metrics["rmse_finest"])
-    )
+    _assert_close("pde_order.rmse_finest", pde_rmse, float(pde_metrics["rmse_finest"]))
     _assert_close(
         "ql_parity.max_abs_diff_cents_overall",
         ql_max,
@@ -242,7 +240,9 @@ def assert_current_results_matches_snapshot(summary: Dict) -> None:
 
 def test_snapshot_outputs_exist_and_parse() -> None:
     if not JSON_OUT.exists() or not MD_OUT.exists():
-        raise AssertionError("metrics_summary.* missing; run reproduce_all to regenerate")
+        raise AssertionError(
+            "metrics_summary.* missing; run reproduce_all to regenerate"
+        )
     committed_summary = load_json(JSON_OUT)
     assert_current_results_matches_snapshot(committed_summary)
     run_snapshot()

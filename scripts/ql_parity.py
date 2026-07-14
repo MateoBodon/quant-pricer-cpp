@@ -26,11 +26,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import QuantLib as ql
 from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
-from protocol_utils import (
-    load_protocol_configs,
-    record_protocol_manifest,
-)
-
+from protocol_utils import load_protocol_configs, record_protocol_manifest
 
 MONEYNESS_BUCKETS = [
     (0.0, 0.97, "lt_0p97"),
@@ -108,9 +104,12 @@ def _bucket(value: float, buckets: List[tuple[float, float, str]]) -> str:
 
 
 def _bucket_definitions() -> Dict[str, List[Dict[str, float | str]]]:
-    def _format(entries: List[tuple[float, float, str]]) -> List[Dict[str, float | str]]:
+    def _format(
+        entries: List[tuple[float, float, str]]
+    ) -> List[Dict[str, float | str]]:
         return [
-            {"lower": lower, "upper": upper, "label": label} for lower, upper, label in entries
+            {"lower": lower, "upper": upper, "label": label}
+            for lower, upper, label in entries
         ]
 
     return {
@@ -364,9 +363,7 @@ def main() -> None:
     ap.add_argument(
         "--scenario-grid", type=Path, help="Path to frozen scenario grid JSON"
     )
-    ap.add_argument(
-        "--tolerances", type=Path, help="Path to frozen tolerance JSON"
-    )
+    ap.add_argument("--tolerances", type=Path, help="Path to frozen tolerance JSON")
     ap.add_argument(
         "--output",
         default=str(ARTIFACTS_ROOT / "ql_parity" / "ql_parity.png"),
@@ -397,7 +394,9 @@ def main() -> None:
 
     quant_cli = _find_quant_cli(args.quant_cli)
     scenarios = _scenarios_from_config(scenario_config, args.fast)
-    eval_date_value = scenario_config.get("ql_parity", {}).get("eval_date", "2024-01-01")
+    eval_date_value = scenario_config.get("ql_parity", {}).get(
+        "eval_date", "2024-01-01"
+    )
     eval_date = _parse_eval_date(str(eval_date_value))
 
     rows: List[Dict[str, float | str]] = []

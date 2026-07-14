@@ -129,7 +129,10 @@ def _inventory() -> Dict[str, object]:
     role_counts: Dict[str, int] = defaultdict(int)
     role_sizes: Dict[str, int] = defaultdict(int)
     for rel in _rg_files():
-        if any(rel == prefix or rel.startswith(prefix + "/") for prefix in EXCLUDE_INVENTORY_PREFIXES):
+        if any(
+            rel == prefix or rel.startswith(prefix + "/")
+            for prefix in EXCLUDE_INVENTORY_PREFIXES
+        ):
             continue
         path = REPO_ROOT / rel
         if not path.exists():
@@ -348,7 +351,9 @@ def _resolve_internal(module: str, modules: Dict[str, str]) -> Optional[str]:
     return None
 
 
-def _resolve_relative(current: str, level: int, module: Optional[str], name: Optional[str]) -> Optional[str]:
+def _resolve_relative(
+    current: str, level: int, module: Optional[str], name: Optional[str]
+) -> Optional[str]:
     parts = current.split(".")
     if level > len(parts):
         return None
@@ -384,12 +389,16 @@ def _import_graph(symbol_index: Dict[str, object]) -> Dict[str, object]:
                 if level > 0:
                     if module_name:
                         resolved = _resolve_relative(module, level, module_name, None)
-                        resolved = _resolve_internal(resolved, modules) if resolved else None
+                        resolved = (
+                            _resolve_internal(resolved, modules) if resolved else None
+                        )
                         if resolved:
                             internal.append(resolved)
                     for name in names:
                         resolved = _resolve_relative(module, level, module_name, name)
-                        resolved = _resolve_internal(resolved, modules) if resolved else None
+                        resolved = (
+                            _resolve_internal(resolved, modules) if resolved else None
+                        )
                         if resolved:
                             internal.append(resolved)
                 else:

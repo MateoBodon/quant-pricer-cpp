@@ -27,6 +27,9 @@ struct MarketParams {
 // Analytic European call via Heston characteristic function and Gauss-Laguerre
 double call_analytic(const MarketParams& mkt, const Params& h);
 
+// Analytic European put from the Heston call and discounted put-call parity
+double put_analytic(const MarketParams& mkt, const Params& h);
+
 /// Risk-neutral characteristic function φ(u) = E[e^{iu ln S_T}]
 std::complex<double> characteristic_function(double u, const MarketParams& mkt, const Params& h);
 

@@ -1,8 +1,7 @@
 #include <pybind11/complex.h>
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-// Optional: add numpy later for zero-copy arrays
-// #include <pybind11/numpy.h>
 
 #include "quant/american.hpp"
 #include "quant/black_scholes.hpp"
@@ -14,11 +13,229 @@
 #include "quant/pde.hpp"
 #include "quant/pde_barrier.hpp"
 #include "quant/risk.hpp"
+#include "quant/version.hpp"
+#include <algorithm>
+#include <cmath>
+#include <limits>
+#include <semaphore>
+#include <stdexcept>
+#include <thread>
+#include <vector>
 
 namespace py = pybind11;
 
+namespace {
+
+constexpr std::size_t kHestonBatchMaxWorkers = 4;
+constexpr std::size_t kHestonBatchItemsPerWorker = 32;
+std::counting_semaphore<static_cast<std::ptrdiff_t>(kHestonBatchMaxWorkers)> heston_batch_worker_slots{
+    static_cast<std::ptrdiff_t>(kHestonBatchMaxWorkers)};
+
+class HestonBatchWorkerLease {
+  public:
+    explicit HestonBatchWorkerLease(std::size_t desired_workers) {
+        heston_batch_worker_slots.acquire();
+        acquired_workers_ = 1;
+        while (acquired_workers_ < desired_workers && heston_batch_worker_slots.try_acquire()) {
+            ++acquired_workers_;
+        }
+    }
+
+    ~HestonBatchWorkerLease() {
+        heston_batch_worker_slots.release(static_cast<std::ptrdiff_t>(acquired_workers_));
+    }
+
+    HestonBatchWorkerLease(const HestonBatchWorkerLease&) = delete;
+    HestonBatchWorkerLease& operator=(const HestonBatchWorkerLease&) = delete;
+
+    [[nodiscard]] std::size_t worker_count() const { return acquired_workers_; }
+
+  private:
+    std::size_t acquired_workers_{0};
+};
+
+enum class HestonBatchOutput { Call, Put, ImpliedVol, CallMetrics };
+
+void validate_heston_values(const py::array_t<double, py::array::c_style | py::array::forcecast>& markets,
+                            const py::array_t<double, py::array::c_style | py::array::forcecast>& params) {
+    const double* market_data = markets.data();
+    for (py::ssize_t index = 0; index < markets.shape(0); ++index) {
+        const double* row = market_data + index * 5;
+        const bool finite = std::all_of(row, row + 5, [](double value) { return std::isfinite(value); });
+        const bool valid = row[0] > 0.0 && row[1] > 0.0 && row[4] > 0.0;
+        if (!finite || !valid) {
+            throw std::invalid_argument("batch contains nonfinite or invalid Heston inputs");
+        }
+    }
+    const double* param_data = params.data();
+    for (py::ssize_t index = 0; index < params.shape(0); ++index) {
+        const double* row = param_data + index * 5;
+        const bool finite = std::all_of(row, row + 5, [](double value) { return std::isfinite(value); });
+        const bool valid =
+            row[0] > 0.0 && row[1] > 0.0 && row[2] > 0.0 && row[3] > -1.0 && row[3] < 1.0 && row[4] > 0.0;
+        if (!finite || !valid) {
+            throw std::invalid_argument("batch contains nonfinite or invalid Heston inputs");
+        }
+    }
+}
+
+py::array_t<double>
+heston_analytic_batch(const py::array_t<double, py::array::c_style | py::array::forcecast>& markets,
+                      const py::array_t<double, py::array::c_style | py::array::forcecast>& params,
+                      HestonBatchOutput output) {
+    if (markets.ndim() != 2 || markets.shape(1) != 5) {
+        throw std::invalid_argument("markets must have shape (n, 5): spot, strike, rate, dividend, time");
+    }
+    if (params.ndim() != 2 || params.shape(1) != 5) {
+        throw std::invalid_argument("params must have shape (n, 5): kappa, theta, sigma, rho, v0");
+    }
+    const py::ssize_t market_count = markets.shape(0);
+    const py::ssize_t parameter_count = params.shape(0);
+    if (market_count == 0 || parameter_count == 0) {
+        throw std::invalid_argument("markets and params must be non-empty");
+    }
+    if (market_count != parameter_count && market_count != 1 && parameter_count != 1) {
+        throw std::invalid_argument("markets and params must have one row or matching row counts");
+    }
+    validate_heston_values(markets, params);
+    const py::ssize_t output_count = std::max(market_count, parameter_count);
+    const bool broadcast_markets = market_count == 1;
+    const bool broadcast_params = parameter_count == 1;
+    const bool call_metrics = output == HestonBatchOutput::CallMetrics;
+    py::array_t<double> results =
+        call_metrics ? py::array_t<double>(py::array::ShapeContainer{output_count, py::ssize_t{2}})
+                     : py::array_t<double>(py::array::ShapeContainer{output_count});
+    const double* market_data = markets.data();
+    const double* param_data = params.data();
+    double* result_data = results.mutable_data();
+    const std::size_t item_count = static_cast<std::size_t>(output_count);
+    const std::size_t desired_workers = std::min(
+        kHestonBatchMaxWorkers,
+        std::max<std::size_t>(1, (item_count + kHestonBatchItemsPerWorker - 1) / kHestonBatchItemsPerWorker));
+    {
+        py::gil_scoped_release release;
+        HestonBatchWorkerLease worker_lease(desired_workers);
+        const std::size_t worker_count = worker_lease.worker_count();
+        const std::size_t chunk_size = (item_count + worker_count - 1) / worker_count;
+        auto price_range = [=](std::size_t begin, std::size_t end) {
+            for (std::size_t index = begin; index < end; ++index) {
+                const double* market_row = market_data + (broadcast_markets ? 0 : index * 5);
+                const double* param_row = param_data + (broadcast_params ? 0 : index * 5);
+                const quant::heston::MarketParams market{market_row[0], market_row[1], market_row[2],
+                                                         market_row[3], market_row[4]};
+                const quant::heston::Params parameter{param_row[0], param_row[1], param_row[2], param_row[3],
+                                                      param_row[4]};
+                switch (output) {
+                case HestonBatchOutput::Call:
+                    result_data[index] = quant::heston::call_analytic(market, parameter);
+                    break;
+                case HestonBatchOutput::Put:
+                    result_data[index] = quant::heston::put_analytic(market, parameter);
+                    break;
+                case HestonBatchOutput::ImpliedVol:
+                    result_data[index] = quant::heston::implied_vol_call(market, parameter);
+                    break;
+                case HestonBatchOutput::CallMetrics: {
+                    const double call_price = quant::heston::call_analytic(market, parameter);
+                    result_data[2 * index] = call_price;
+                    result_data[2 * index + 1] = quant::bs::implied_vol_call(
+                        market.spot, market.strike, market.rate, market.dividend, market.time, call_price);
+                    break;
+                }
+                }
+            }
+        };
+        if (worker_count == 1) {
+            price_range(0, item_count);
+        } else {
+            std::vector<std::jthread> workers;
+            workers.reserve(worker_count);
+            for (std::size_t worker = 0; worker < worker_count; ++worker) {
+                const std::size_t begin = worker * chunk_size;
+                const std::size_t end = std::min(item_count, begin + chunk_size);
+                if (begin >= end) {
+                    break;
+                }
+                workers.emplace_back(price_range, begin, end);
+            }
+        }
+    }
+    return results;
+}
+
+py::array_t<double>
+heston_call_metrics_grid(const py::array_t<double, py::array::c_style | py::array::forcecast>& markets,
+                         const py::array_t<double, py::array::c_style | py::array::forcecast>& params) {
+    if (markets.ndim() != 2 || markets.shape(1) != 5) {
+        throw std::invalid_argument("markets must have shape (m, 5): spot, strike, rate, dividend, time");
+    }
+    if (params.ndim() != 2 || params.shape(1) != 5) {
+        throw std::invalid_argument("params must have shape (p, 5): kappa, theta, sigma, rho, v0");
+    }
+    const py::ssize_t market_count = markets.shape(0);
+    const py::ssize_t parameter_count = params.shape(0);
+    if (market_count == 0 || parameter_count == 0) {
+        throw std::invalid_argument("markets and params must be non-empty");
+    }
+    validate_heston_values(markets, params);
+    const py::ssize_t max_items = std::numeric_limits<py::ssize_t>::max() / 2;
+    if (parameter_count > max_items / market_count) {
+        throw std::overflow_error("Heston call-metrics Cartesian grid is too large");
+    }
+    const py::ssize_t grid_item_count = parameter_count * market_count;
+    py::array_t<double> results(py::array::ShapeContainer{parameter_count, market_count, py::ssize_t{2}});
+    const double* market_data = markets.data();
+    const double* param_data = params.data();
+    double* result_data = results.mutable_data();
+    const std::size_t item_count = static_cast<std::size_t>(grid_item_count);
+    const std::size_t markets_per_parameter = static_cast<std::size_t>(market_count);
+    const std::size_t desired_workers = std::min(
+        kHestonBatchMaxWorkers,
+        std::max<std::size_t>(1, (item_count + kHestonBatchItemsPerWorker - 1) / kHestonBatchItemsPerWorker));
+    {
+        py::gil_scoped_release release;
+        HestonBatchWorkerLease worker_lease(desired_workers);
+        const std::size_t worker_count = worker_lease.worker_count();
+        const std::size_t chunk_size = (item_count + worker_count - 1) / worker_count;
+        auto price_range = [=](std::size_t begin, std::size_t end) {
+            for (std::size_t index = begin; index < end; ++index) {
+                const std::size_t parameter_index = index / markets_per_parameter;
+                const std::size_t market_index = index % markets_per_parameter;
+                const double* market_row = market_data + market_index * 5;
+                const double* param_row = param_data + parameter_index * 5;
+                const quant::heston::MarketParams market{market_row[0], market_row[1], market_row[2],
+                                                         market_row[3], market_row[4]};
+                const quant::heston::Params parameter{param_row[0], param_row[1], param_row[2], param_row[3],
+                                                      param_row[4]};
+                const double call_price = quant::heston::call_analytic(market, parameter);
+                result_data[2 * index] = call_price;
+                result_data[2 * index + 1] = quant::bs::implied_vol_call(
+                    market.spot, market.strike, market.rate, market.dividend, market.time, call_price);
+            }
+        };
+        if (worker_count == 1) {
+            price_range(0, item_count);
+        } else {
+            std::vector<std::jthread> workers;
+            workers.reserve(worker_count);
+            for (std::size_t worker = 0; worker < worker_count; ++worker) {
+                const std::size_t begin = worker * chunk_size;
+                const std::size_t end = std::min(item_count, begin + chunk_size);
+                if (begin >= end) {
+                    break;
+                }
+                workers.emplace_back(price_range, begin, end);
+            }
+        }
+    }
+    return results;
+}
+
+} // namespace
+
 PYBIND11_MODULE(pyquant_pricer, m) {
     m.doc() = "Python bindings for quant-pricer-cpp (BS/MC/PDE subset)";
+    m.attr("__version__") = quant::version_string();
 
     // Black–Scholes
     m.def("bs_call", (double (*)(double, double, double, double, double, double))&quant::bs::call_price,
@@ -213,6 +430,51 @@ PYBIND11_MODULE(pyquant_pricer, m) {
         .def_readwrite("time", &quant::heston::MarketParams::time);
 
     m.def("heston_call_analytic", &quant::heston::call_analytic, py::arg("mkt"), py::arg("params"));
+    m.def("heston_put_analytic", &quant::heston::put_analytic, py::arg("mkt"), py::arg("params"));
+    m.def(
+        "heston_calls_analytic_batch",
+        [](const py::array_t<double, py::array::c_style | py::array::forcecast>& markets,
+           const py::array_t<double, py::array::c_style | py::array::forcecast>& params) {
+            return heston_analytic_batch(markets, params, HestonBatchOutput::Call);
+        },
+        py::arg("markets"), py::arg("params"),
+        "Price contiguous (n,5) market and parameter matrices with the native analytic engine.");
+    m.def(
+        "heston_puts_analytic_batch",
+        [](const py::array_t<double, py::array::c_style | py::array::forcecast>& markets,
+           const py::array_t<double, py::array::c_style | py::array::forcecast>& params) {
+            return heston_analytic_batch(markets, params, HestonBatchOutput::Put);
+        },
+        py::arg("markets"), py::arg("params"),
+        "Price European puts for contiguous (n,5) matrices using analytic calls and put-call parity.");
+    m.def(
+        "heston_implied_vols_batch",
+        [](const py::array_t<double, py::array::c_style | py::array::forcecast>& markets,
+           const py::array_t<double, py::array::c_style | py::array::forcecast>& params) {
+            return heston_analytic_batch(markets, params, HestonBatchOutput::ImpliedVol);
+        },
+        py::arg("markets"), py::arg("params"),
+        "Compute Black-Scholes implied vols from analytic Heston calls for contiguous (n,5) matrices.");
+    m.def(
+        "heston_call_metrics_batch",
+        [](const py::array_t<double, py::array::c_style | py::array::forcecast>& markets,
+           const py::array_t<double, py::array::c_style | py::array::forcecast>& params) {
+            return heston_analytic_batch(markets, params, HestonBatchOutput::CallMetrics);
+        },
+        py::arg("markets"), py::arg("params"),
+        "Return contiguous (n,2) analytic Heston call_price and implied_vol columns with one integration per "
+        "row.");
+    m.def("heston_call_metrics_grid", &heston_call_metrics_grid, py::arg("markets"), py::arg("params"),
+          "Return a contiguous candidate-major (p,m,2) call_price and implied_vol Cartesian grid.");
+    m.def(
+        "heston_analytic_batch_policy",
+        []() {
+            py::dict policy;
+            policy["max_process_workers"] = kHestonBatchMaxWorkers;
+            policy["items_per_worker"] = kHestonBatchItemsPerWorker;
+            return policy;
+        },
+        "Return the fixed process-wide worker budget for analytic Heston batches.");
     m.def("heston_characteristic_fn", &quant::heston::characteristic_function, py::arg("u"), py::arg("mkt"),
           py::arg("params"), "Risk-neutral characteristic function φ(u)");
     m.def("heston_implied_vol", &quant::heston::implied_vol_call, py::arg("mkt"), py::arg("params"),

@@ -25,7 +25,9 @@ from typing import Optional, Tuple
 
 def run(cmd: list[str], cwd: Optional[Path] = None) -> Tuple[int, str]:
     try:
-        out = subprocess.check_output(cmd, cwd=str(cwd) if cwd else None, stderr=subprocess.STDOUT)
+        out = subprocess.check_output(
+            cmd, cwd=str(cwd) if cwd else None, stderr=subprocess.STDOUT
+        )
         return 0, out.decode("utf-8", errors="replace")
     except subprocess.CalledProcessError as e:
         return e.returncode, e.output.decode("utf-8", errors="replace")
@@ -120,10 +122,19 @@ def write_generated(repo: Path, project_state_dir: Path) -> None:
 
     # simple dependency hints
     dep = []
-    for fname in ["Cargo.toml", "package.json", "pyproject.toml", "requirements.txt", "CMakeLists.txt", "Makefile"]:
+    for fname in [
+        "Cargo.toml",
+        "package.json",
+        "pyproject.toml",
+        "requirements.txt",
+        "CMakeLists.txt",
+        "Makefile",
+    ]:
         if (repo / fname).exists():
             dep.append(fname)
-    (gen / "dependency_hints.txt").write_text("\n".join(dep) + ("\n" if dep else ""), encoding="utf-8")
+    (gen / "dependency_hints.txt").write_text(
+        "\n".join(dep) + ("\n" if dep else ""), encoding="utf-8"
+    )
 
 
 def zip_project_state(repo: Path, project_state_dir: Path, out_zip: Path) -> Path:
@@ -137,12 +148,21 @@ def zip_project_state(repo: Path, project_state_dir: Path, out_zip: Path) -> Pat
             z.write(p, arcname=str(rel))
 
         # include key root docs if present
-        for p in [repo/"PROJECT.md", repo/"PROGRESS.md", repo/"AGENTS.md", repo/"README.md"]:
+        for p in [
+            repo / "PROJECT.md",
+            repo / "PROGRESS.md",
+            repo / "AGENTS.md",
+            repo / "README.md",
+        ]:
             if p.exists() and p.is_file():
                 z.write(p, arcname=str(p.relative_to(repo)))
 
         # include key docs if present
-        for p in [repo/"docs"/"RUNBOOK.md", repo/"docs"/"DECISIONS.md", repo/"docs"/"PLAN_OF_RECORD.md"]:
+        for p in [
+            repo / "docs" / "RUNBOOK.md",
+            repo / "docs" / "DECISIONS.md",
+            repo / "docs" / "PLAN_OF_RECORD.md",
+        ]:
             if p.exists() and p.is_file():
                 z.write(p, arcname=str(p.relative_to(repo)))
 
@@ -151,7 +171,9 @@ def zip_project_state(repo: Path, project_state_dir: Path, out_zip: Path) -> Pat
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--zip", action="store_true", help="Create project_state zip in docs/_bundles/")
+    ap.add_argument(
+        "--zip", action="store_true", help="Create project_state zip in docs/_bundles/"
+    )
     ap.add_argument("--out", type=str, default=None, help="Zip output path (optional)")
     args = ap.parse_args()
 
@@ -166,7 +188,11 @@ def main() -> int:
 
     if args.zip:
         ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-        out_zip = Path(args.out) if args.out else (repo / "docs" / "_bundles" / f"project_state_{ts}.zip")
+        out_zip = (
+            Path(args.out)
+            if args.out
+            else (repo / "docs" / "_bundles" / f"project_state_{ts}.zip")
+        )
         out = zip_project_state(repo, project_state_dir, out_zip)
         print(str(out))
 

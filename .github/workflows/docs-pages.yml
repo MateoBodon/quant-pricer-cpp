@@ -53,8 +53,11 @@ jobs:
             done
           done
       - name: Inject base href for project Pages path
+        env:
+          DOCS_COMMIT: ${{ github.sha }}
         run: |
           python3 - <<'PY'
+          import os
           from pathlib import Path
           import re
 
@@ -63,13 +66,21 @@ jobs:
               raise SystemExit("docs/html not found (run doxygen first)")
           pattern = re.compile(r"<head>", flags=re.IGNORECASE)
           snippet = '<base href="/quant-pricer-cpp/">'
+          commit = os.environ["DOCS_COMMIT"]
+          banner = (
+              '<div style="font:13px system-ui;padding:8px 16px;background:#0969da;'
+              'color:white">Documentation build: '
+              f'<a style="color:white" href="https://github.com/MateoBodon/'
+              f'quant-pricer-cpp/commit/{commit}"><code>{commit[:12]}</code></a></div>'
+          )
+          body_pattern = re.compile(r"<body[^>]*>", flags=re.IGNORECASE)
           for html in root.rglob("*.html"):
               text = html.read_text(encoding="utf-8")
-              if snippet in text:
-                  continue
-              replaced, count = pattern.subn(lambda m: f"{m.group(0)}\n  {snippet}", text, count=1)
-              if count:
-                  html.write_text(replaced, encoding="utf-8")
+              if snippet not in text:
+                  text, _ = pattern.subn(lambda m: f"{m.group(0)}\n  {snippet}", text, count=1)
+              if "Documentation build:" not in text:
+                  text, _ = body_pattern.subn(lambda m: f"{m.group(0)}\n{banner}", text, count=1)
+              html.write_text(text, encoding="utf-8")
           PY
       - name: Disable Jekyll
         run: touch docs/html/.nojekyll

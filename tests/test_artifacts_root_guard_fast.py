@@ -12,11 +12,7 @@ from pathlib import Path
 def _snapshot_files(root: Path) -> set[str]:
     if not root.exists():
         return set()
-    return {
-        str(path.relative_to(root))
-        for path in root.rglob("*")
-        if path.is_file()
-    }
+    return {str(path.relative_to(root)) for path in root.rglob("*") if path.is_file()}
 
 
 def _run(cmd: list[str], cwd: Path) -> None:

@@ -62,4 +62,3 @@ def assert_quote_date_matches(
         f"{count} rows where quote_date != {expected_label}. "
         f"Sample={sample}"
     )
-

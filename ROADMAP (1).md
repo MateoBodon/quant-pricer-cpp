@@ -8,9 +8,9 @@ This roadmap is organized around three goals:
 
 The roadmap assumes the current state:
 
-- Black–Scholes analytics, Monte Carlo (variance reduction, QMC, pathwise & LR Greeks), Crank–Nicolson PDE with Rannacher, barriers, American, exotics, Heston analytic + QE MC.:contentReference[oaicite:0]{index=0}  
-- Reproducible artifacts via `scripts/reproduce_all.sh`, `docs/artifacts/manifest.json`, and GitHub Pages (Results, coverage).:contentReference[oaicite:1]{index=1}  
-- WRDS OptionMetrics pipeline for SPX (IvyDB) with vega-weighted Heston calibration and aggregated pricing/OOS/Δ‑hedged PnL metrics.:contentReference[oaicite:2]{index=2}  
+- Black–Scholes analytics, Monte Carlo (variance reduction, QMC, pathwise & LR Greeks), Crank–Nicolson PDE with Rannacher, barriers, American, exotics, Heston analytic + QE MC.:contentReference[oaicite:0]{index=0}
+- Reproducible artifacts via `scripts/reproduce_all.sh`, `docs/artifacts/manifest.json`, and GitHub Pages (Results, coverage).:contentReference[oaicite:1]{index=1}
+- WRDS OptionMetrics pipeline for SPX (IvyDB) with vega-weighted Heston calibration and aggregated pricing/OOS/Δ‑hedged PnL metrics.:contentReference[oaicite:2]{index=2}
 
 ---
 
@@ -25,7 +25,7 @@ The roadmap assumes the current state:
   - Setup instructions (build, test, WRDS env).
   - Preferred coding style and refactoring rules.
   - Canonical test commands and when to run them.
-  - WRDS data-handling rules (no raw IvyDB in repo; only aggregated CSV/PNGs under `docs/artifacts/wrds/`).:contentReference[oaicite:3]{index=3}  
+  - WRDS data-handling rules (no raw IvyDB in repo; only aggregated CSV/PNGs under `docs/artifacts/wrds/`).:contentReference[oaicite:3]{index=3}
 
 ### 0.2. Confirm coverage & CI baselines
 
@@ -35,7 +35,7 @@ The roadmap assumes the current state:
   - `ctest --test-dir build --output-on-failure`
 - [ ] Regenerate coverage & artifacts:
   - `WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh`
-  - Confirm `docs/artifacts/manifest.json` updated and coverage HTML deployed under `coverage/`.:contentReference[oaicite:4]{index=4}  
+  - Confirm `docs/artifacts/manifest.json` updated and coverage HTML deployed under `coverage/`.:contentReference[oaicite:4]{index=4}
 - [ ] Record current coverage numbers (lines, functions, branches) in `docs/ROADMAP.md` as “Baseline coverage (vX.Y.Z)”.
 
 ---
@@ -46,7 +46,7 @@ The roadmap assumes the current state:
 
 ### 1.1. Heston QE – from “known biased” to “under control”
 
-Current state: Results page explicitly notes “current QE runs still exhibit a large bias versus the analytic reference”; plot is there mainly to detect a future regression fix.:contentReference[oaicite:5]{index=5}  
+Current state: Results page explicitly notes “current QE runs still exhibit a large bias versus the analytic reference”; plot is there mainly to detect a future regression fix.:contentReference[oaicite:5]{index=5}
 
 **Plan:**
 
@@ -72,7 +72,7 @@ Current state: Results page explicitly notes “current QE runs still exhibit a 
 
 ### 1.2. Branch coverage in hard code paths
 
-Coverage is already high for lines/functions; branch coverage is lower, especially in barrier, risk, and CLI logic. (Previous coverage report: ~82% lines, ~94% functions, ~45% branches overall, with some files much lower.)  
+Coverage is already high for lines/functions; branch coverage is lower, especially in barrier, risk, and CLI logic. (Previous coverage report: ~82% lines, ~94% functions, ~45% branches overall, with some files much lower.)
 
 **Focus areas:**
 
@@ -121,7 +121,7 @@ Coverage is already high for lines/functions; branch coverage is lower, especial
 
 ### 2.1. Harden WRDS pipeline
 
-Current pipeline (SPX from IvyDB, secid via `optionm.secnmd`, `optionm.opprcdYYYY`, filtering stale quotes, recomputing IV, vega-weighted Heston calibration, OOS and Δ-hedged metrics) is solid but under‑documented at the metric level.:contentReference[oaicite:6]{index=6}  
+Current pipeline (SPX from IvyDB, secid via `optionm.secnmd`, `optionm.opprcdYYYY`, filtering stale quotes, recomputing IV, vega-weighted Heston calibration, OOS and Δ-hedged metrics) is solid but under‑documented at the metric level.:contentReference[oaicite:6]{index=6}
 
 **Tasks:**
 
@@ -145,7 +145,7 @@ Current pipeline (SPX from IvyDB, secid via `optionm.secnmd`, `optionm.opprcdYYY
   - [x] Per tenor bucket, estimate a single BS σ via vega-weighted least squares in IV space.
   - [x] Write aggregated metrics to `docs/artifacts/wrds/wrds_agg_pricing_bs.csv` and `wrds_agg_oos_bs.csv`.
 - [ ] Compare BS vs Heston:
-  - [ ] Use existing Heston artifacts (`wrds_agg_pricing.csv`, `wrds_agg_oos.csv`, `wrds_agg_pnl.csv`).:contentReference[oaicite:7]{index=7}  
+  - [ ] Use existing Heston artifacts (`wrds_agg_pricing.csv`, `wrds_agg_oos.csv`, `wrds_agg_pnl.csv`).:contentReference[oaicite:7]{index=7}
   - [ ] Compute per-bucket differences:
     - ΔIV RMSE (vol pts).
     - ΔOOS IV MAE (bps).
@@ -190,9 +190,9 @@ Current pipeline (SPX from IvyDB, secid via `optionm.secnmd`, `optionm.opprcdYYY
 
 - [ ] At the top of `README.md`, add “Highlights” (3–5 bullets), e.g.:
 
-  - “Tri-engine BS/MC/PDE agreement <5 bps across strikes on 200k paths (MC CI overlaps PDE/analytic curves).”  
-  - “Sobol QMC + Brownian bridge delivers ≈1.4× lower RMSE than PRNG at matched wall-clock on European and Asian payoffs.”  
-  - “QuantLib parity: vanilla, barrier, and American prices within 1¢ of QuantLib reference engines.”  
+  - “Tri-engine BS/MC/PDE agreement <5 bps across strikes on 200k paths (MC CI overlaps PDE/analytic curves).”
+  - “Sobol QMC + Brownian bridge delivers ≈1.4× lower RMSE than PRNG at matched wall-clock on European and Asian payoffs.”
+  - “QuantLib parity: vanilla, barrier, and American prices within 1¢ of QuantLib reference engines.”
   - “WRDS OptionMetrics SPX: Heston calibration + Δ‑hedged PnL across multiple regimes (see WRDS_Results).”
 
 - [ ] Make sure each bullet links to the relevant plot / CSV / manifest entry on the Results page.
@@ -256,8 +256,8 @@ Only after Phases 1–3:
   - Rules for updating artifacts and docs.
   - Git/commit guidelines for agents.
 - [ ] Create a Codex CLI profile (`quant-pricer-autopilot`) configured for:
-  - Model: `gpt-5.1-codex-max`.  
-  - `sandbox_mode = "workspace-write"`, network access enabled for WRDS and web search.  
+  - Model: `gpt-5.1-codex-max`.
+  - `sandbox_mode = "workspace-write"`, network access enabled for WRDS and web search.
   - `approval_policy = "never"` (or a slightly more cautious mode if you prefer).
   - Features: `web_search_request = true`, `streamable_shell = true`, `apply_patch_freeform = true`, `ghost_commit = true`.
 
