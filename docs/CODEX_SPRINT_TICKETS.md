@@ -271,3 +271,20 @@ with artifacts unchanged and FAST tests green.
 - `ctest --test-dir build -L FAST --output-on-failure` passes with the repo-local `.venv`.
 - `REPRO_FAST=1 WRDS_USE_SAMPLE=1 ./scripts/reproduce_all.sh` updates `docs/artifacts/manifest.json`, `docs/artifacts/metrics_summary.{md,json}`, and `docs/validation_pack.zip`.
 - Run logs + `project_state/CURRENT_RESULTS.md` + `PROGRESS.md` updated; GPT bundle created under `docs/gpt_bundles/`.
+## ticket-99 — Public portfolio presentation
+
+**Status:** DONE.
+
+**Goal (1 sentence):** Make the public repository page communicate the C++20/Python pricing library, frozen validation evidence, and release boundaries precisely enough to reproduce and audit.
+
+**Acceptance criteria (objective):**
+- The first screen states the product value, current release, and source-build/PyPI status.
+- C++ and Python first-price examples, architecture, feature map, repository map, and reproduction commands are present.
+- Numerical accuracy and performance values identify their artifact snapshot and hardware/toolchain context.
+- The Heston candidate grid and 14.2x result are isolated as verified next-release evidence, not a v0.3.2 or model-superiority claim.
+- Build succeeds and presentation-relevant FAST guards pass; unrelated baseline failures are recorded exactly.
+
+**End-of-ticket:**
+- **Tests run:** Release configure/build; FAST CTest suite; focused docs, data-policy, and CLI guards.
+- **Artifacts/logs:** `docs/agent_runs/20260714_220933_ticket-99_portfolio-presentation/`.
+- **Documentation updates:** `README.md`, `docs/evidence/heston_grid_candidate_2026-07-14.md`, `PROGRESS.md`, `CHANGELOG.md`.
