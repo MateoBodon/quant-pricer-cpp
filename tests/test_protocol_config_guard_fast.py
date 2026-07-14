@@ -16,6 +16,13 @@ MISSING_MSG = "missing protocol config provenance"
 
 
 def _find_quant_cli() -> Path:
+    configured = os.environ.get("QUANT_CLI_PATH")
+    if configured:
+        candidate = Path(configured)
+        if candidate.is_file():
+            return candidate
+        raise FileNotFoundError(f"configured quant_cli not found: {candidate}")
+
     candidates = [
         REPO_ROOT / "build" / "quant_cli",
         REPO_ROOT / "build" / "Release" / "quant_cli",

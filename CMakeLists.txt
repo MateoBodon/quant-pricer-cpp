@@ -255,7 +255,10 @@ add_test(
   NAME protocol_config_guard_fast
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_protocol_config_guard_fast.py
 )
-set_tests_properties(protocol_config_guard_fast PROPERTIES LABELS "FAST")
+set_tests_properties(
+  protocol_config_guard_fast
+  PROPERTIES LABELS "FAST" ENVIRONMENT "QUANT_CLI_PATH=$<TARGET_FILE:quant_cli>"
+)
 
 add_test(
   NAME data_policy_guard_fast
