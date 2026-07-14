@@ -24,7 +24,10 @@ class PythonHestonBatchParameterBroadcastTest(unittest.TestCase):
 
     def test_one_parameter_row_matches_explicit_rows_for_calls_and_puts(self) -> None:
         explicit = np.repeat(self.parameter, len(self.markets), axis=0)
-        for batch_pricer in (qp.heston_calls_analytic_batch, qp.heston_puts_analytic_batch):
+        for batch_pricer in (
+            qp.heston_calls_analytic_batch,
+            qp.heston_puts_analytic_batch,
+        ):
             broadcast = batch_pricer(self.markets, self.parameter)
             rowwise = batch_pricer(self.markets, explicit)
             np.testing.assert_array_equal(broadcast, rowwise)
@@ -42,9 +45,13 @@ class PythonHestonBatchParameterBroadcastTest(unittest.TestCase):
 
     def test_other_parameter_row_counts_fail_closed(self) -> None:
         with self.assertRaisesRegex(ValueError, "one row or match"):
-            qp.heston_calls_analytic_batch(self.markets, np.repeat(self.parameter, 2, axis=0))
+            qp.heston_calls_analytic_batch(
+                self.markets, np.repeat(self.parameter, 2, axis=0)
+            )
         with self.assertRaisesRegex(ValueError, "one row or match"):
-            qp.heston_puts_analytic_batch(self.markets, np.repeat(self.parameter, 3, axis=0))
+            qp.heston_puts_analytic_batch(
+                self.markets, np.repeat(self.parameter, 3, axis=0)
+            )
 
 
 if __name__ == "__main__":

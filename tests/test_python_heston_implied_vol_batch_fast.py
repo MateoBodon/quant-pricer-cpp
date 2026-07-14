@@ -14,7 +14,9 @@ def scalar_implied_vol(market_row: np.ndarray, parameter_row: np.ndarray) -> flo
     market = qp.HestonMarket()
     market.spot, market.strike, market.rate, market.dividend, market.time = market_row
     parameter = qp.HestonParams()
-    parameter.kappa, parameter.theta, parameter.sigma, parameter.rho, parameter.v0 = parameter_row
+    parameter.kappa, parameter.theta, parameter.sigma, parameter.rho, parameter.v0 = (
+        parameter_row
+    )
     return qp.heston_implied_vol(market, parameter)
 
 
@@ -47,9 +49,14 @@ class PythonHestonImpliedVolBatchTest(unittest.TestCase):
         parameters = np.repeat(parameter, len(markets), axis=0)
         parameters[:, 0] += np.arange(len(markets), dtype=np.float64) * 0.05
         expected = np.array(
-            [scalar_implied_vol(market, params) for market, params in zip(markets, parameters)]
+            [
+                scalar_implied_vol(market, params)
+                for market, params in zip(markets, parameters)
+            ]
         )
-        np.testing.assert_array_equal(qp.heston_implied_vols_batch(markets, parameters), expected)
+        np.testing.assert_array_equal(
+            qp.heston_implied_vols_batch(markets, parameters), expected
+        )
 
     def test_validation_matches_price_batches(self) -> None:
         markets, parameter = make_inputs(4)
@@ -64,9 +71,13 @@ class PythonHestonImpliedVolBatchTest(unittest.TestCase):
 
     def test_concurrent_callers_are_deterministic_under_shared_policy(self) -> None:
         inputs = [make_inputs(64, offset=1000 * index) for index in range(8)]
-        expected = [qp.heston_implied_vols_batch(*inputs_for_call) for inputs_for_call in inputs]
+        expected = [
+            qp.heston_implied_vols_batch(*inputs_for_call) for inputs_for_call in inputs
+        ]
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
-            futures = [executor.submit(qp.heston_implied_vols_batch, *item) for item in inputs]
+            futures = [
+                executor.submit(qp.heston_implied_vols_batch, *item) for item in inputs
+            ]
             actual = [future.result(timeout=10.0) for future in futures]
         for concurrent_vols, serial_vols in zip(actual, expected):
             np.testing.assert_array_equal(concurrent_vols, serial_vols)

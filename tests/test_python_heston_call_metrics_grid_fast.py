@@ -10,7 +10,6 @@ from pathlib import Path
 import numpy as np
 import pyquant_pricer as qp
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -71,7 +70,9 @@ class PythonHestonCallMetricsGridTest(unittest.TestCase):
         inputs = [make_inputs(offset=1000 * index) for index in range(8)]
         expected = [qp.heston_call_metrics_grid(*item) for item in inputs]
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
-            futures = [executor.submit(qp.heston_call_metrics_grid, *item) for item in inputs]
+            futures = [
+                executor.submit(qp.heston_call_metrics_grid, *item) for item in inputs
+            ]
             actual = [future.result(timeout=10.0) for future in futures]
         for concurrent_grid, serial_grid in zip(actual, expected):
             np.testing.assert_array_equal(concurrent_grid, serial_grid)

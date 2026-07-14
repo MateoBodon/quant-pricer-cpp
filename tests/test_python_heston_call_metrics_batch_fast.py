@@ -33,16 +33,24 @@ class PythonHestonCallMetricsBatchTest(unittest.TestCase):
         metrics = qp.heston_call_metrics_batch(markets, parameter)
         self.assertEqual(metrics.shape, (len(markets), 2))
         self.assertTrue(metrics.flags.c_contiguous)
-        np.testing.assert_array_equal(metrics[:, 0], qp.heston_calls_analytic_batch(markets, parameter))
-        np.testing.assert_array_equal(metrics[:, 1], qp.heston_implied_vols_batch(markets, parameter))
+        np.testing.assert_array_equal(
+            metrics[:, 0], qp.heston_calls_analytic_batch(markets, parameter)
+        )
+        np.testing.assert_array_equal(
+            metrics[:, 1], qp.heston_implied_vols_batch(markets, parameter)
+        )
 
     def test_rowwise_parameters_and_validation_share_the_batch_contract(self) -> None:
         markets, parameter = make_inputs(8)
         parameters = np.repeat(parameter, len(markets), axis=0)
         parameters[:, 0] += np.arange(len(markets), dtype=np.float64) * 0.05
         metrics = qp.heston_call_metrics_batch(markets, parameters)
-        np.testing.assert_array_equal(metrics[:, 0], qp.heston_calls_analytic_batch(markets, parameters))
-        np.testing.assert_array_equal(metrics[:, 1], qp.heston_implied_vols_batch(markets, parameters))
+        np.testing.assert_array_equal(
+            metrics[:, 0], qp.heston_calls_analytic_batch(markets, parameters)
+        )
+        np.testing.assert_array_equal(
+            metrics[:, 1], qp.heston_implied_vols_batch(markets, parameters)
+        )
         with self.assertRaisesRegex(ValueError, "one row or match"):
             qp.heston_call_metrics_batch(markets, parameters[:2])
         invalid = markets.copy()
@@ -54,7 +62,9 @@ class PythonHestonCallMetricsBatchTest(unittest.TestCase):
         inputs = [make_inputs(64, offset=1000 * index) for index in range(8)]
         expected = [qp.heston_call_metrics_batch(*item) for item in inputs]
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
-            futures = [executor.submit(qp.heston_call_metrics_batch, *item) for item in inputs]
+            futures = [
+                executor.submit(qp.heston_call_metrics_batch, *item) for item in inputs
+            ]
             actual = [future.result(timeout=10.0) for future in futures]
         for concurrent_metrics, serial_metrics in zip(actual, expected):
             np.testing.assert_array_equal(concurrent_metrics, serial_metrics)
@@ -87,7 +97,9 @@ class PythonHestonCallMetricsBatchTest(unittest.TestCase):
                 start = time.perf_counter()
                 function()
                 samples.append(time.perf_counter() - start)
-        self.assertLess(statistics.median(combined_seconds), statistics.median(separate_seconds))
+        self.assertLess(
+            statistics.median(combined_seconds), statistics.median(separate_seconds)
+        )
 
 
 if __name__ == "__main__":

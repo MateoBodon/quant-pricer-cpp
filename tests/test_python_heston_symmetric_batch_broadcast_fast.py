@@ -28,7 +28,9 @@ class PythonHestonSymmetricBatchBroadcastTest(unittest.TestCase):
             qp.heston_call_metrics_batch,
         )
 
-    def test_one_market_row_matches_explicit_market_rows_for_every_surface(self) -> None:
+    def test_one_market_row_matches_explicit_market_rows_for_every_surface(
+        self,
+    ) -> None:
         explicit_markets = np.repeat(self.market, len(self.parameters), axis=0)
         for pricer in self.pricers:
             broadcast = pricer(self.market, self.parameters)
@@ -50,7 +52,9 @@ class PythonHestonSymmetricBatchBroadcastTest(unittest.TestCase):
     def test_single_pair_shapes_and_other_mismatches(self) -> None:
         for pricer in self.pricers[:-1]:
             self.assertEqual(pricer(self.market, self.parameters[:1]).shape, (1,))
-        self.assertEqual(qp.heston_call_metrics_batch(self.market, self.parameters[:1]).shape, (1, 2))
+        self.assertEqual(
+            qp.heston_call_metrics_batch(self.market, self.parameters[:1]).shape, (1, 2)
+        )
         two_markets = np.repeat(self.market, 2, axis=0)
         three_parameters = self.parameters[:3]
         for pricer in self.pricers:

@@ -12,7 +12,6 @@ from pathlib import Path
 import numpy as np
 import pyquant_pricer as qp
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 QUICKSTART = REPO_ROOT / "python/examples/quickstart.py"
 
@@ -27,7 +26,9 @@ class PythonHestonBatchDocsTest(unittest.TestCase):
         self.assertIn("heston_analytic_batch_policy", readme)
 
     def test_quickstart_batch_example_executes(self) -> None:
-        spec = importlib.util.spec_from_file_location("quant_pricer_quickstart", QUICKSTART)
+        spec = importlib.util.spec_from_file_location(
+            "quant_pricer_quickstart", QUICKSTART
+        )
         assert spec is not None and spec.loader is not None
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -40,9 +41,14 @@ class PythonHestonBatchDocsTest(unittest.TestCase):
         markets = np.array([[100.0, 100.0, 0.01, 0.0, 1.0]])
         params = np.array([[1.5, 0.04, 0.6, -0.45, 0.04]])
         self.assertEqual(qp.heston_calls_analytic_batch(markets, params).shape, (1,))
-        self.assertEqual(qp.heston_calls_analytic_batch(np.repeat(markets, 2, axis=0), params).shape, (2,))
+        self.assertEqual(
+            qp.heston_calls_analytic_batch(np.repeat(markets, 2, axis=0), params).shape,
+            (2,),
+        )
         with self.assertRaisesRegex(ValueError, "one row or match"):
-            qp.heston_calls_analytic_batch(np.repeat(markets, 3, axis=0), np.repeat(params, 2, axis=0))
+            qp.heston_calls_analytic_batch(
+                np.repeat(markets, 3, axis=0), np.repeat(params, 2, axis=0)
+            )
 
 
 if __name__ == "__main__":
