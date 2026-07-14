@@ -1,6 +1,5 @@
 # quant-pricer-cpp
 
-[![CI](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MateoBodon/quant-pricer-cpp/actions/workflows/ci.yml?query=branch%3Amain)
 [![Release](https://img.shields.io/github/v/release/MateoBodon/quant-pricer-cpp?display_name=tag&sort=semver)](https://github.com/MateoBodon/quant-pricer-cpp/releases/latest)
 [![Docs](https://img.shields.io/badge/docs-results%20%26%20API-0969da)](https://mateobodon.github.io/quant-pricer-cpp/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1a7f37)](LICENSE)
