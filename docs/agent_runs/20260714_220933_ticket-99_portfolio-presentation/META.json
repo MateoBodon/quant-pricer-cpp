@@ -1,0 +1,18 @@
+{
+  "git_sha_before": "0318d95d12a947cef2fde2d8932fffd969998bb5",
+  "git_sha_after": "0318d95d12a947cef2fde2d8932fffd969998bb5",
+  "run_name": "20260714_220933_ticket-99_portfolio-presentation",
+  "ticket_id": "ticket-99",
+  "started_at_utc": "2026-07-14T21:48:14Z",
+  "finished_at_utc": "2026-07-14T22:09:33Z",
+  "branch_name": "codex/ticket-99-portfolio-presentation",
+  "host_os": "macOS 26.5.1",
+  "compiler": "Apple clang 21.0.0",
+  "python_version": "3.12.2",
+  "build_type": "Release",
+  "dataset_id": "frozen_public_validation_and_verified_candidate_receipt",
+  "config_hashes": {},
+  "tools": {
+    "runner": "cmake-ctest"
+  }
+}
