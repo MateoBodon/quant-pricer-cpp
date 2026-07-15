@@ -65,6 +65,7 @@ class PythonReleaseCandidateTest(unittest.TestCase):
         wheels = (ROOT / ".github/workflows/wheels.yml").read_text(encoding="utf-8")
         self.assertIn("pypa/cibuildwheel@v3.4.1", wheels)
         self.assertIn("CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*", wheels)
+        self.assertIn("MACOSX_DEPLOYMENT_TARGET=11.0", wheels)
         reproduce = ROOT / "scripts/reproduce_all.sh"
         self.assertTrue(reproduce.stat().st_mode & stat.S_IXUSR)
 

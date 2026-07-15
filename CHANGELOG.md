@@ -5,6 +5,7 @@
 ## v0.3.6
 
 - test(artifacts): make the metrics snapshot gate restore the committed summary bytes after exercising regeneration, so ordinary CTest runs cannot invalidate the later release reproducibility check.
+- build(wheels): set the macOS universal2 deployment floor to 11.0, matching the documented availability of the shipped C++20 semaphore and jthread implementation.
 - release: supersede v0.3.5 after its validation-pack lane exposed the tracked-artifact mutation; pricing behavior, Python 3.8 wheel support, and accepted Heston evidence are unchanged.
 
 ## v0.3.5

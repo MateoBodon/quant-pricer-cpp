@@ -40,7 +40,8 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_ARCHS_MACOS: universal2
           CIBW_ENVIRONMENT: QUANT_ENABLE_PYBIND=ON QUANT_ENABLE_OPENMP=OFF
-          CIBW_ENVIRONMENT_MACOS: QUANT_ENABLE_PYBIND=ON QUANT_ENABLE_OPENMP=OFF
+          # std::counting_semaphore and std::jthread are available from macOS 11.
+          CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=11.0 QUANT_ENABLE_PYBIND=ON QUANT_ENABLE_OPENMP=OFF
           CIBW_ENVIRONMENT_WINDOWS: QUANT_ENABLE_PYBIND=ON QUANT_ENABLE_OPENMP=OFF
           CIBW_TEST_COMMAND: python "{project}/python/scripts/cibw_test_suite.py"
         with:
