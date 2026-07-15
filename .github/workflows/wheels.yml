@@ -29,10 +29,15 @@ jobs:
       - name: Drop committed venv (not needed in CI)
         run: rm -rf .venv
         shell: bash
-      - uses: pypa/cibuildwheel@v2.17.0
+      - uses: pypa/cibuildwheel@v4.1.0
         env:
           CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
           CIBW_SKIP: pp* *-musllinux*
+          # The accepted C++20 implementation uses std::counting_semaphore.
+          # manylinux2014's GCC 10/libstdc++ cannot provide that API, so Linux
+          # wheels deliberately target the newer PEP 600 baseline and x86_64.
+          CIBW_ARCHS_LINUX: x86_64
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_ARCHS_MACOS: universal2
           CIBW_ENVIRONMENT: QUANT_ENABLE_PYBIND=ON QUANT_ENABLE_OPENMP=OFF
           CIBW_ENVIRONMENT_MACOS: QUANT_ENABLE_PYBIND=ON QUANT_ENABLE_OPENMP=OFF
