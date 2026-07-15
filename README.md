@@ -11,7 +11,7 @@ Use it to price vanilla and exotic options, estimate Greeks with uncertainty,
 cross-check independent methods, and carry the exact validation artifacts with
 the result.
 
-> **Release status — v0.3.5.** Build from source or use the signed-off GitHub
+> **Release status — v0.3.6.** Build from source or use the signed-off GitHub
 > release assets. `pyquant-pricer` is **not published on PyPI**. Benchmark and
 > accuracy numbers below are dated snapshots bound to their artifacts and
 > hardware—not universal guarantees.
@@ -159,7 +159,7 @@ fit or trading performance.
 
 ## Heston
 
-The public v0.3.5 surface includes analytic European calls and puts,
+The public v0.3.6 surface includes analytic European calls and puts,
 characteristic functions, implied-volatility helpers, bounded batch/grid
 interfaces, and Euler/QE Monte Carlo:
 
@@ -305,7 +305,7 @@ ctest --test-dir build-asan --output-on-failure
 - **Heston is not shown to dominate Black–Scholes.** The bundled comparison is
   near parity/mixed by tenor, and older hedge labeling is not a valid
   Heston-specific hedge claim.
-- **SSVI is not a v0.3.5 public API.** Newer research exists outside this public
+- **SSVI is not a v0.3.6 public API.** Newer research exists outside this public
   release, but is intentionally excluded here until its release/evidence path is
   coherent. No SSVI hedge, PnL, or universal-superiority claim is made.
 - **Artifact freshness matters.** The headline snapshot is dated 2026-01-25.
@@ -316,7 +316,7 @@ ctest --test-dir build-asan --output-on-failure
 
 ## Releases, contribution, and citation
 
-The latest public release is [v0.3.5](https://github.com/MateoBodon/quant-pricer-cpp/releases/tag/v0.3.5),
+The latest public release is [v0.3.6](https://github.com/MateoBodon/quant-pricer-cpp/releases/tag/v0.3.6),
 with source/wheel assets, a deterministic release manifest, and a validation
 pack. See
 [`CONTRIBUTING.md`](CONTRIBUTING.md) for focused changes and

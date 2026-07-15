@@ -18,6 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS = REPO_ROOT / "docs" / "artifacts"
 JSON_OUT = ARTIFACTS / "metrics_summary.json"
 MD_OUT = ARTIFACTS / "metrics_summary.md"
+MANIFEST_OUT = ARTIFACTS / "manifest.json"
 CURRENT_RESULTS = REPO_ROOT / "project_state" / "CURRENT_RESULTS.md"
 
 
@@ -245,13 +246,21 @@ def test_snapshot_outputs_exist_and_parse() -> None:
         )
     committed_summary = load_json(JSON_OUT)
     assert_current_results_matches_snapshot(committed_summary)
-    run_snapshot()
-    if not JSON_OUT.exists():
-        raise AssertionError("metrics_summary.json not created")
-    if not MD_OUT.exists():
-        raise AssertionError("metrics_summary.md not created")
-    summary = load_json(JSON_OUT)
-    assert_status_blocks(summary)
+    original_json = JSON_OUT.read_bytes()
+    original_md = MD_OUT.read_bytes()
+    original_manifest = MANIFEST_OUT.read_bytes()
+    try:
+        run_snapshot()
+        if not JSON_OUT.exists():
+            raise AssertionError("metrics_summary.json not created")
+        if not MD_OUT.exists():
+            raise AssertionError("metrics_summary.md not created")
+        summary = load_json(JSON_OUT)
+        assert_status_blocks(summary)
+    finally:
+        JSON_OUT.write_bytes(original_json)
+        MD_OUT.write_bytes(original_md)
+        MANIFEST_OUT.write_bytes(original_manifest)
 
 
 if __name__ == "__main__":
