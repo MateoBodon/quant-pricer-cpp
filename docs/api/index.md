@@ -1,8 +1,16 @@
 # quant-pricer-cpp API Reference
 
-Welcome to the generated reference for the quant-pricer-cpp library. These pages are
-published automatically from the main branch and mirror the exact code that ships
-in the repository.
+Welcome to the generated reference for quant-pricer-cpp. v0.4.0 leads with
+vectorized Black–Scholes portfolio risk and exact five-factor stress, while
+retaining the library's analytic, Monte Carlo/QMC, PDE, Heston, SSVI, and exotic
+pricing surfaces. These pages are built from the public tag source.
+
+@image html portfolio-risk-v040.svg "Recorded v0.4.0 portfolio-risk and aggregate-stress speedups"
+
+The chart is a presentation of the frozen
+`portfolio_risk_benchmark_v1.json` receipt, not a rerun or universal throughput
+claim. See the [v0.4.0 product and evidence hub](../product/DERIVATIVES_SYSTEM_HUB.md)
+for workloads, independent parity, determinism, resource use, and limitations.
 
 ## How to Navigate
 
@@ -17,6 +25,9 @@ in the repository.
 
 ## Frequently Visited Areas
 
+- **Portfolio risk and stress**: `quant::portfolio` namespace – typed positions,
+  quantity-weighted price/Greek aggregation, and exact scenario repricing with
+  optional position attribution.
 - **Black–Scholes analytics**: `quant::bs` namespace – closed-form prices,
   Greeks, parity, and implied volatility solvers used across the project.
 - **Monte Carlo engine**: `quant::mc` namespace – deterministic counter-based

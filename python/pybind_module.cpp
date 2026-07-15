@@ -12,6 +12,7 @@
 #include "quant/multi.hpp"
 #include "quant/pde.hpp"
 #include "quant/pde_barrier.hpp"
+#include "quant/portfolio.hpp"
 #include "quant/risk.hpp"
 #include "quant/version.hpp"
 #include <algorithm>
@@ -229,6 +230,109 @@ heston_call_metrics_grid(const py::array_t<double, py::array::c_style | py::arra
         }
     }
     return results;
+}
+
+std::vector<quant::portfolio::VanillaPosition>
+parse_portfolio_positions(const py::array_t<double, py::array::c_style | py::array::forcecast>& positions) {
+    if (positions.ndim() != 2 || positions.shape(1) != 8) {
+        throw std::invalid_argument("positions must have shape (n, 8): option_type, quantity, spot, strike, "
+                                    "rate, dividend, volatility, time");
+    }
+    if (positions.shape(0) == 0) {
+        throw std::invalid_argument("positions must be non-empty");
+    }
+    std::vector<quant::portfolio::VanillaPosition> parsed;
+    parsed.reserve(static_cast<std::size_t>(positions.shape(0)));
+    const double* data = positions.data();
+    for (py::ssize_t index = 0; index < positions.shape(0); ++index) {
+        const double* row = data + index * 8;
+        quant::portfolio::OptionType type;
+        if (row[0] == 1.0) {
+            type = quant::portfolio::OptionType::Call;
+        } else if (row[0] == -1.0) {
+            type = quant::portfolio::OptionType::Put;
+        } else {
+            throw std::invalid_argument("portfolio option_type must be exactly 1 (call) or -1 (put)");
+        }
+        parsed.push_back({type, row[1], row[2], row[3], row[4], row[5], row[6], row[7]});
+    }
+    return parsed;
+}
+
+std::vector<quant::portfolio::MarketShock>
+parse_portfolio_shocks(const py::array_t<double, py::array::c_style | py::array::forcecast>& shocks) {
+    if (shocks.ndim() != 2 || shocks.shape(1) != 5) {
+        throw std::invalid_argument("shocks must have shape (m, 5): spot_return, volatility_shift, "
+                                    "rate_shift, dividend_shift, time_elapsed");
+    }
+    if (shocks.shape(0) == 0) {
+        throw std::invalid_argument("shocks must be non-empty");
+    }
+    std::vector<quant::portfolio::MarketShock> parsed;
+    parsed.reserve(static_cast<std::size_t>(shocks.shape(0)));
+    const double* data = shocks.data();
+    for (py::ssize_t index = 0; index < shocks.shape(0); ++index) {
+        const double* row = data + index * 5;
+        parsed.push_back({row[0], row[1], row[2], row[3], row[4]});
+    }
+    return parsed;
+}
+
+py::dict
+portfolio_risk_batch(const py::array_t<double, py::array::c_style | py::array::forcecast>& positions) {
+    const auto parsed = parse_portfolio_positions(positions);
+    quant::portfolio::RiskResult result;
+    {
+        py::gil_scoped_release release;
+        result = quant::portfolio::price_risk(parsed);
+    }
+    py::array_t<double> position_metrics(
+        py::array::ShapeContainer{static_cast<py::ssize_t>(result.positions.size()), py::ssize_t{7}});
+    double* position_data = position_metrics.mutable_data();
+    for (std::size_t index = 0; index < result.positions.size(); ++index) {
+        const auto& risk = result.positions[index];
+        const double row[7]{risk.price, risk.value, risk.delta, risk.gamma, risk.vega, risk.theta, risk.rho};
+        std::copy(row, row + 7, position_data + 7 * index);
+    }
+    py::array_t<double> totals(py::array::ShapeContainer{py::ssize_t{6}});
+    const double values[6]{result.totals.value, result.totals.delta, result.totals.gamma,
+                           result.totals.vega,  result.totals.theta, result.totals.rho};
+    std::copy(values, values + 6, totals.mutable_data());
+    py::dict output;
+    output["position_metrics"] = std::move(position_metrics);
+    output["portfolio_totals"] = std::move(totals);
+    output["position_columns"] = py::make_tuple("price", "value", "delta", "gamma", "vega", "theta", "rho");
+    output["total_columns"] = py::make_tuple("value", "delta", "gamma", "vega", "theta", "rho");
+    return output;
+}
+
+py::dict
+portfolio_scenario_pnl(const py::array_t<double, py::array::c_style | py::array::forcecast>& positions,
+                       const py::array_t<double, py::array::c_style | py::array::forcecast>& shocks,
+                       bool detail) {
+    const auto parsed_positions = parse_portfolio_positions(positions);
+    const auto parsed_shocks = parse_portfolio_shocks(shocks);
+    quant::portfolio::ScenarioResult result;
+    {
+        py::gil_scoped_release release;
+        result = quant::portfolio::scenario_pnl(parsed_positions, parsed_shocks, detail);
+    }
+    py::array_t<double> portfolio_pnl(
+        py::array::ShapeContainer{static_cast<py::ssize_t>(result.scenario_count)});
+    std::copy(result.portfolio_pnl.begin(), result.portfolio_pnl.end(), portfolio_pnl.mutable_data());
+    py::dict output;
+    output["base_portfolio_value"] = result.base_portfolio_value;
+    output["portfolio_pnl"] = std::move(portfolio_pnl);
+    if (detail) {
+        py::array_t<double> position_pnl(
+            py::array::ShapeContainer{static_cast<py::ssize_t>(result.scenario_count),
+                                      static_cast<py::ssize_t>(result.position_count)});
+        std::copy(result.position_pnl.begin(), result.position_pnl.end(), position_pnl.mutable_data());
+        output["position_pnl"] = std::move(position_pnl);
+    } else {
+        output["position_pnl"] = py::none();
+    }
+    return output;
 }
 
 } // namespace
@@ -525,6 +629,15 @@ PYBIND11_MODULE(pyquant_pricer, m) {
     m.def("var_cvar_t", &quant::risk::var_cvar_t, py::arg("mu"), py::arg("sigma"), py::arg("nu"),
           py::arg("horizon_years"), py::arg("position"), py::arg("num_sims"), py::arg("seed"),
           py::arg("alpha"));
+
+    // Vectorized vanilla portfolio valuation and exact-repricing scenarios.
+    m.def("bs_portfolio_risk", &portfolio_risk_batch, py::arg("positions"),
+          "Return position metrics and quantity-weighted portfolio Black-Scholes risk totals for an (n,8) "
+          "matrix.");
+    m.def("bs_portfolio_scenarios", &portfolio_scenario_pnl, py::arg("positions"), py::arg("shocks"),
+          py::arg("detail") = false,
+          "Exact-reprice an (n,8) vanilla portfolio under an (m,5) shock matrix; detail=False avoids the m*n "
+          "output.");
 
     // Multi-asset & jumps
     py::class_<quant::multi::BasketMcParams>(m, "BasketMcParams")

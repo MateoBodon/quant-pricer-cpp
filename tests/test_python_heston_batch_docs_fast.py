@@ -8,6 +8,7 @@ import importlib.util
 import io
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import numpy as np
 import pyquant_pricer as qp
@@ -36,6 +37,21 @@ class PythonHestonBatchDocsTest(unittest.TestCase):
         with contextlib.redirect_stdout(output):
             module.price_heston_batch()
         self.assertIn("Heston analytic batch:", output.getvalue())
+
+    def test_quickstart_skips_optional_calibration_without_dev_dependencies(
+        self,
+    ) -> None:
+        spec = importlib.util.spec_from_file_location(
+            "quant_pricer_quickstart_optional", QUICKSTART
+        )
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        output = io.StringIO()
+        with mock.patch.object(module.importlib.util, "find_spec", return_value=None):
+            with contextlib.redirect_stdout(output):
+                module.maybe_run_heston(REPO_ROOT)
+        self.assertIn("skipping calibration demo", output.getvalue())
 
     def test_documented_validation_is_fail_closed(self) -> None:
         markets = np.array([[100.0, 100.0, 0.01, 0.0, 1.0]])

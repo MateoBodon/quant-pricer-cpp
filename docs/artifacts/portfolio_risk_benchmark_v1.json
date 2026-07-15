@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "bs_portfolio_risk_v1",
+  "generated_at": "2026-07-15T08:19:53.333002+00:00",
+  "protocol": {
+    "repetitions": 7,
+    "statistic": "median_after_one_warmup",
+    "risk_positions": 100000,
+    "scenario_positions": 20000,
+    "scenario_count": 16,
+    "performance_gate_speedup": 10.0,
+    "seed_or_randomness": "none; formula-generated deterministic matrices"
+  },
+  "results": {
+    "risk_native_median_seconds": 0.004937916,
+    "risk_scalar_median_seconds": 0.099627333,
+    "risk_speedup": 20.175987805381865,
+    "risk_native_positions_per_second": 20251458.307512727,
+    "scenario_native_median_seconds": 0.009958458,
+    "scenario_scalar_median_seconds": 0.278084792,
+    "scenario_speedup": 27.924483087642688,
+    "scenario_native_cells_per_second": 32133488.939753525,
+    "risk_native_samples_seconds": [
+      0.004982208,
+      0.004548708,
+      0.004981666,
+      0.004937916,
+      0.004768708,
+      0.004617459,
+      0.004997917
+    ],
+    "risk_scalar_samples_seconds": [
+      0.103245834,
+      0.100538292,
+      0.098322417,
+      0.098933667,
+      0.099627333,
+      0.099785959,
+      0.099399875
+    ],
+    "scenario_native_samples_seconds": [
+      0.010017292,
+      0.009945166,
+      0.009942041,
+      0.010069042,
+      0.010073792,
+      0.009958458,
+      0.009932666
+    ],
+    "scenario_scalar_samples_seconds": [
+      0.279878292,
+      0.277834666,
+      0.275931583,
+      0.275628,
+      0.283728917,
+      0.278084792,
+      0.28828225
+    ],
+    "deterministic_repetitions": 5,
+    "scalar_parity_max_abs_pnl": 4.3655745685100555e-11
+  },
+  "resources": {
+    "peak_process_rss_bytes": 121831424,
+    "risk_input_bytes": 6400000,
+    "risk_output_bytes": 5600048,
+    "scenario_input_bytes": 1280640,
+    "scenario_aggregate_output_bytes": 128,
+    "scenario_detail_output_bytes_if_requested": 2560000
+  },
+  "environment": {
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "cpu": "Apple M3 Pro",
+    "logical_cpus": 11,
+    "memory_bytes": "38654705664",
+    "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+    "python": "3.12.2",
+    "numpy": "2.5.0",
+    "quantlib": "1.42.1",
+    "pyquant_pricer": "0.4.0",
+    "git_head": "60c4e9daefbbe481b3002eaa6c1429b069ae79b3"
+  },
+  "claim_boundary": "Hardware/protocol-specific Python orchestration comparison; deterministic Black-Scholes pricing and conditional stress only, not a market-risk, hedge, PnL, or trading claim."
+}

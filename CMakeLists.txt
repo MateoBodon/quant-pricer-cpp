@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(quant_pricer_cpp VERSION 0.3.7 LANGUAGES CXX)
+project(quant_pricer_cpp VERSION 0.4.0 LANGUAGES CXX)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 20)
@@ -108,6 +108,7 @@ add_library(quant_pricer
   src/lookback.cpp
   src/heston.cpp
   src/risk.cpp
+  src/portfolio.cpp
   src/multi.cpp
 )
 
@@ -150,6 +151,7 @@ add_executable(unit_tests
   tests/test_multi.cpp
   tests/test_barrier_mc_regression.cpp
   tests/test_risk.cpp
+  tests/test_portfolio.cpp
   tests/test_heston.cpp
   tests/test_rng_repro.cpp)
 target_sources(unit_tests PRIVATE tests/test_lookback.cpp)
@@ -306,6 +308,12 @@ endif()
 
 if(QUANT_ENABLE_PYBIND)
   add_subdirectory(python)
+  add_test(
+    NAME python_portfolio_risk_fast
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_python_portfolio_risk_fast.py
+            --module-dir $<TARGET_FILE_DIR:pyquant_pricer>
+  )
+  set_tests_properties(python_portfolio_risk_fast PROPERTIES LABELS "FAST")
 endif()
 
 # Install/export package metadata

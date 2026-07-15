@@ -100,3 +100,19 @@ Added explicit `results_commit_sha` + `manifest_git_sha` fields to `project_stat
 
 ### Done
 - Ticket-99: rebuilt the public README around the supported C++20/Python pricing surface, install/use examples, architecture, frozen validation snapshot, reproducibility, and explicit release limitations. Added a bounded evidence note for the verified Heston calibration-grid candidate without advertising it as v0.3.2 or PyPI availability. Run log: `docs/agent_runs/20260714_220933_ticket-99_portfolio-presentation/`.
+
+## 2026-07-15 Vectorized Portfolio Risk and Stress v0.4.0
+
+Selected the largest disjoint product gap after reviewing the consumed-model
+ledger: cross-position risk rather than another SSVI/Heston/PDE/MC experiment.
+Added public C++ portfolio types and installed Python `bs_portfolio_risk` and
+`bs_portfolio_scenarios` APIs, exact five-factor repricing, aggregate-only
+memory control, native and independent QuantLib tests, examples, v0.4.0 release
+surfaces, and deterministic performance/resource receipts. The first unfused
+risk batch missed its frozen 10x gate at 9.94x; fused shared analytic terms
+passed without relaxing the gate. Final installed-wheel evidence: 20.18x risk,
+27.92x scenario, 20.25M positions/s, 32.13M cells/s; worst independent price,
+Greek, and portfolio-scenario errors were 3.91e-14, 3.40e-12, and 2.66e-13.
+ASan/UBSan and installed-wheel checks passed. Full FAST: 89 passed, one existing
+skip, and only the two pre-existing locked SSVI hedge failures caused by their
+intentional CMake hash boundary. Implementation commit: `60c4e9da`.

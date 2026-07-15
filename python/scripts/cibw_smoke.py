@@ -2,8 +2,8 @@
 """
 Minimal runtime smoke test executed inside cibuildwheel.
 
-Ensures the pyquant_pricer wheel imports, exercises BS pricing,
-and touches the Heston helpers (analytic IV + characteristic fn).
+Ensures the pyquant_pricer wheel imports and exercises Black–Scholes,
+portfolio risk/stress, and Heston analytic helpers.
 """
 from __future__ import annotations
 
@@ -63,6 +63,22 @@ def main() -> None:
         assert "one row or match" in str(exc)
     else:
         raise AssertionError("mismatched Heston batch inputs must fail closed")
+
+    positions = np.array(
+        [
+            [1.0, 2.0, 100.0, 105.0, 0.02, 0.01, 0.25, 0.5],
+            [-1.0, -1.0, 100.0, 95.0, 0.02, 0.01, 0.30, 0.75],
+        ],
+        dtype=np.float64,
+    )
+    risk = qp.bs_portfolio_risk(positions)
+    assert risk["position_metrics"].shape == (2, 7)
+    assert risk["portfolio_totals"].shape == (6,)
+    shocks = np.array([[0.0, 0.0, 0.0, 0.0, 0.0], [-0.1, 0.05, 0.01, 0.0, 1.0 / 365.0]])
+    scenario = qp.bs_portfolio_scenarios(positions, shocks, detail=False)
+    assert scenario["position_pnl"] is None
+    assert scenario["portfolio_pnl"].shape == (2,)
+    assert scenario["portfolio_pnl"][0] == 0.0
 
 
 if __name__ == "__main__":

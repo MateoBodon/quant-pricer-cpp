@@ -36,6 +36,8 @@ jobs:
         run: |
           mkdir -p docs/html/artifacts
           cp -R docs/artifacts/. docs/html/artifacts/
+          mkdir -p docs/html/docs/images
+          cp -R docs/images/. docs/html/docs/images/
       - name: Create friendly doc aliases
         run: |
           declare -A alias_sources=(

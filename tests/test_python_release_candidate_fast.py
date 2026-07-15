@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Focused consistency checks for the v0.3.7 Python release candidate."""
+"""Focused consistency checks for the v0.4.0 Python release candidate."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.3.7"
+VERSION = "0.4.0"
 
 
 class PythonReleaseCandidateTest(unittest.TestCase):
@@ -20,25 +20,26 @@ class PythonReleaseCandidateTest(unittest.TestCase):
         header = (ROOT / "include/quant/version.hpp").read_text(encoding="utf-8")
         setup = configparser.ConfigParser()
         setup.read(ROOT / "setup.cfg", encoding="utf-8")
-        self.assertRegex(pyproject, r'(?m)^version = "0\.3\.7"$')
+        self.assertRegex(pyproject, r'(?m)^version = "0\.4\.0"$')
         self.assertRegex(
-            cmake, r"(?m)^project\(quant_pricer_cpp VERSION 0\.3\.7 LANGUAGES CXX\)$"
+            cmake, r"(?m)^project\(quant_pricer_cpp VERSION 0\.4\.0 LANGUAGES CXX\)$"
         )
         self.assertRegex(header, r"(?m)^constexpr int kVersionMajor = 0;$")
-        self.assertRegex(header, r"(?m)^constexpr int kVersionMinor = 3;$")
-        self.assertRegex(header, r"(?m)^constexpr int kVersionPatch = 7;$")
+        self.assertRegex(header, r"(?m)^constexpr int kVersionMinor = 4;$")
+        self.assertRegex(header, r"(?m)^constexpr int kVersionPatch = 0;$")
         self.assertEqual(setup["metadata"]["version"], VERSION)
 
-    def test_v033_release_note_covers_shipped_product_and_release_guarantees(
+    def test_v040_release_note_covers_shipped_product_and_release_guarantees(
         self,
     ) -> None:
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-        match = re.search(r"(?ms)^## v0\.3\.3\n(.*?)(?=^## )", changelog)
+        match = re.search(r"(?ms)^## v0\.4\.0(?: .*?)?\n(.*?)(?=^## )", changelog)
         self.assertIsNotNone(match)
         note = match.group(1)
         for required in (
-            "heston_calls_analytic_batch",
-            "process-wide four-worker budget",
+            "bs_portfolio_risk",
+            "bs_portfolio_scenarios",
+            "QuantLib",
             "installed-wheel contract",
             "source distribution",
             "deterministic manifest",
@@ -107,10 +108,10 @@ class PythonReleaseCandidateTest(unittest.TestCase):
             script.rindex("generate_metrics_summary"),
         )
 
-    def test_existing_v032_note_remains_separate(self) -> None:
+    def test_existing_v033_note_remains_separate(self) -> None:
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-        self.assertLess(changelog.index("## v0.3.3"), changelog.index("## v0.3.2"))
-        self.assertEqual(changelog.count("## v0.3.3"), 1)
+        self.assertLess(changelog.index("## v0.4.0"), changelog.index("## v0.3.3"))
+        self.assertEqual(changelog.count("## v0.4.0"), 1)
 
 
 if __name__ == "__main__":

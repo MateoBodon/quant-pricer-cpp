@@ -7,6 +7,7 @@ Run with:
 """
 from __future__ import annotations
 
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -81,7 +82,38 @@ def price_heston_batch() -> None:
     print(f"Heston analytic batch: [call_price, implied_vol] {metrics.tolist()}")
 
 
+def portfolio_risk_and_stress() -> None:
+    """Value and stress a mixed long/short call-put portfolio."""
+    positions = np.array(
+        [
+            [1, 120, 100, 95, 0.03, 0.01, 0.22, 90 / 365],
+            [-1, -80, 100, 105, 0.03, 0.01, 0.25, 90 / 365],
+            [1, 50, 100, 110, 0.03, 0.01, 0.28, 180 / 365],
+        ],
+        dtype=np.float64,
+    )
+    risk = qp.bs_portfolio_risk(positions)
+    totals = dict(zip(risk["total_columns"], risk["portfolio_totals"]))
+    shocks = np.array(
+        [[0, 0, 0, 0, 0], [-0.10, 0.08, 0.01, 0, 1 / 365]],
+        dtype=np.float64,
+    )
+    pnl = qp.bs_portfolio_scenarios(positions, shocks, detail=False)["portfolio_pnl"]
+    print(f"Portfolio risk: {totals}")
+    print(f"Exact scenario P&L: {pnl.tolist()}")
+
+
 def maybe_run_heston(repo_root: Path) -> None:
+    optional_modules = ("matplotlib", "pandas", "scipy")
+    missing = [
+        name for name in optional_modules if importlib.util.find_spec(name) is None
+    ]
+    if missing:
+        print(
+            "Optional Heston calibration dependencies are unavailable "
+            f"({', '.join(missing)}); skipping calibration demo."
+        )
+        return
     samples_dir = repo_root / "data" / "samples"
     normalized_dir = repo_root / "data" / "normalized"
     candidates = list(samples_dir.glob("spx_*.csv")) + list(
@@ -114,6 +146,7 @@ def main() -> None:
     price_barrier()
     heston_helpers()
     price_heston_batch()
+    portfolio_risk_and_stress()
     maybe_run_heston(repo_root)
 
 

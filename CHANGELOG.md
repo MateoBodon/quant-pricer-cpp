@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.0
+
+- feat(portfolio,risk): add a public C++ vectorized vanilla portfolio engine and installed Python `bs_portfolio_risk` API with quantity-weighted price, value, delta, gamma, vega, theta, and rho surfaces.
+- feat(stress): add `bs_portfolio_scenarios` for deterministic multi-factor exact repricing with spot, volatility, rate, dividend, and elapsed-time shocks; aggregate-only mode avoids the potentially large scenario-by-position allocation.
+- perf(portfolio): fuse shared Black-Scholes analytic terms across price and six Greeks; the final installed-wheel Apple M3 Pro/Python 3.12 benchmark measures 20.18x risk-batch and 27.92x aggregate scenario speedups versus existing scalar binding orchestration.
+- test(portfolio): add native validation/identity coverage plus independent QuantLib 1.42.1 parity across mixed call/put, carry, moneyness, volatility, maturity, long/short, and scenario cases, with deterministic concurrent replay.
+- build(release): prepare the 0.4.0 wheel/source distribution and retain the installed-wheel contract, release tag gates, source distribution checks, deterministic manifest, and explicit rule that PyPI and TestPyPI availability are not asserted.
+- docs(release): make portfolio risk and exact stress the README and Pages lead, publish the frozen evidence hub and benchmark visualization, and retain the broader v0.3.7 numerical and packaging story.
+
 ## Unreleased
 
 ## v0.3.7
