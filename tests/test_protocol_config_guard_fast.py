@@ -160,6 +160,8 @@ def main() -> None:
                 sys.executable,
                 str(pde_script),
                 "--skip-build",
+                "--quant-cli",
+                str(quant_cli),
                 "--scenario-grid",
                 str(SCENARIO_GRID),
                 "--tolerances",
@@ -196,6 +198,8 @@ def main() -> None:
             [
                 sys.executable,
                 str(ql_script),
+                "--quant-cli",
+                str(quant_cli),
                 "--scenario-grid",
                 str(SCENARIO_GRID),
                 "--tolerances",

@@ -63,6 +63,7 @@ def main() -> None:
     ap.add_argument(
         "--skip-build", action="store_true", help="Assume quant_cli is already built"
     )
+    ap.add_argument("--quant-cli", type=Path, help="Path to an existing quant_cli")
     ap.add_argument(
         "--scenario-grid", type=Path, help="Path to frozen scenario grid JSON"
     )
@@ -81,7 +82,9 @@ def main() -> None:
 
     root = Path(__file__).resolve().parents[1]
     build_dir = root / "build"
-    quant_cli = ensure_build(root, build_dir, args.skip_build)
+    quant_cli = args.quant_cli or ensure_build(root, build_dir, args.skip_build)
+    if not quant_cli.is_file():
+        raise FileNotFoundError(f"quant_cli not found: {quant_cli}")
 
     S = float(grid["spot"])
     K = float(grid["strike"])
