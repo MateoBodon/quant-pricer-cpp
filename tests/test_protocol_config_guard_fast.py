@@ -8,12 +8,21 @@ import tempfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SCENARIO_GRID = REPO_ROOT / "configs" / "scenario_grids" / "synthetic_validation_v1.json"
+SCENARIO_GRID = (
+    REPO_ROOT / "configs" / "scenario_grids" / "synthetic_validation_v1.json"
+)
 TOLERANCES = REPO_ROOT / "configs" / "tolerances" / "synthetic_validation_v1.json"
 MISSING_MSG = "missing protocol config provenance"
 
 
 def _find_quant_cli() -> Path:
+    configured = os.environ.get("QUANT_CLI_PATH")
+    if configured:
+        candidate = Path(configured)
+        if candidate.is_file():
+            return candidate
+        raise FileNotFoundError(f"configured quant_cli not found: {candidate}")
+
     candidates = [
         REPO_ROOT / "build" / "quant_cli",
         REPO_ROOT / "build" / "Release" / "quant_cli",
@@ -151,6 +160,8 @@ def main() -> None:
                 sys.executable,
                 str(pde_script),
                 "--skip-build",
+                "--quant-cli",
+                str(quant_cli),
                 "--scenario-grid",
                 str(SCENARIO_GRID),
                 "--tolerances",
@@ -187,6 +198,8 @@ def main() -> None:
             [
                 sys.executable,
                 str(ql_script),
+                "--quant-cli",
+                str(quant_cli),
                 "--scenario-grid",
                 str(SCENARIO_GRID),
                 "--tolerances",

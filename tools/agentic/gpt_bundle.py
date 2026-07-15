@@ -29,7 +29,9 @@ from typing import Dict, Optional, Tuple
 
 def run(cmd: list[str], cwd: Optional[Path] = None) -> Tuple[int, str]:
     try:
-        out = subprocess.check_output(cmd, cwd=str(cwd) if cwd else None, stderr=subprocess.STDOUT)
+        out = subprocess.check_output(
+            cmd, cwd=str(cwd) if cwd else None, stderr=subprocess.STDOUT
+        )
         return 0, out.decode("utf-8", errors="replace")
     except subprocess.CalledProcessError as e:
         return e.returncode, e.output.decode("utf-8", errors="replace")
@@ -90,10 +92,18 @@ def add_file_if_small(
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--zip", action="store_true", help="Create zip bundle (default behavior).")
-    ap.add_argument("--ticket", type=str, default=None, help="Ticket id to include (optional).")
+    ap.add_argument(
+        "--zip", action="store_true", help="Create zip bundle (default behavior)."
+    )
+    ap.add_argument(
+        "--ticket", type=str, default=None, help="Ticket id to include (optional)."
+    )
     ap.add_argument("--out", type=str, default=None, help="Output zip path (optional).")
-    ap.add_argument("--include-files", action="store_true", help="Include small changed files in addition to diffs.")
+    ap.add_argument(
+        "--include-files",
+        action="store_true",
+        help="Include small changed files in addition to diffs.",
+    )
     ap.add_argument(
         "--no-stash",
         action="store_true",
@@ -119,7 +129,9 @@ def main() -> int:
             print("[gpt-bundle] stash failed:")
             print(out.rstrip())
             return None
-        _, ref = run(["git", "-C", str(repo), "stash", "list", "-n", "1", "--format=%H"])
+        _, ref = run(
+            ["git", "-C", str(repo), "stash", "list", "-n", "1", "--format=%H"]
+        )
         return ref.strip() or None
 
     def stash_apply(ref: str) -> Tuple[bool, str]:
@@ -138,11 +150,15 @@ def main() -> int:
     ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     ticket = (args.ticket or "").strip()
     suffix = f"_{ticket}" if ticket else ""
-    out_zip = Path(args.out) if args.out else (bundles_dir / f"gpt_bundle_{ts}{suffix}.zip")
+    out_zip = (
+        Path(args.out) if args.out else (bundles_dir / f"gpt_bundle_{ts}{suffix}.zip")
+    )
 
     if args.self_check:
         print(f"[gpt-bundle] dirty: {'yes' if dirty else 'no'}")
-        print(f"[gpt-bundle] stash: {'no' if args.no_stash else ('yes' if dirty else 'no')}")
+        print(
+            f"[gpt-bundle] stash: {'no' if args.no_stash else ('yes' if dirty else 'no')}"
+        )
         print(f"[gpt-bundle] output: {out_zip}")
         return 0
 
@@ -227,7 +243,9 @@ Contents:
             z.writestr("git_diff.patch", diff)
             z.writestr("git_diff_cached.patch", diff_cached)
             z.writestr("git_diff_stat.txt", diff_stat)
-            z.writestr("changed_files.txt", "\n".join(changed) + ("\n" if changed else ""))
+            z.writestr(
+                "changed_files.txt", "\n".join(changed) + ("\n" if changed else "")
+            )
 
             if snap_content is not None and snap:
                 z.writestr(str(snap.relative_to(repo)), snap_content)
@@ -259,7 +277,9 @@ Contents:
                 return 1
             status_after = git_status_porcelain()
             if status_after != status_before:
-                print("[gpt-bundle] stash restore mismatch; resolve before dropping stash.")
+                print(
+                    "[gpt-bundle] stash restore mismatch; resolve before dropping stash."
+                )
                 print(f"[gpt-bundle] stash ref preserved: {stash_ref}")
                 return 1
             stash_drop(stash_ref)

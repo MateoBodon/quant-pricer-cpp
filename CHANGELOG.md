@@ -23,6 +23,16 @@
 - wrds(panel): make `wrds_pipeline_dates_panel.yaml` the canonical panel config and log `panel_id` in WRDS provenance
 - wrds(panel): require `panel_id` in dateset configs (no legacy `dataset_id`) and record data mode + date ranges in WRDS provenance
 - docs(project_state): refresh project_state docs and generated indices
+
+## v0.3.3
+
+- feat(heston,python): add native and Python `heston_put_analytic` pricing plus `heston_calls_analytic_batch(markets, params)` and `heston_puts_analytic_batch(markets, params)` for contiguous `(n, 5)` matrices; scalar and batch puts share discounted put-call parity, with elementwise scalar parity and fail-closed input validation, and the installed module exposes native-derived `__version__` metadata.
+- feat(heston,python): add broadcast batch price/implied-volatility metrics and `heston_call_metrics_grid`, returning a contiguous candidate-major `(p,m,2)` grid from compact market and parameter matrices with overflow-before-allocation guards.
+- perf(python,heston): bound analytic batch execution to a process-wide four-worker budget with one worker per 32 rows; concurrent callers share the same cap and small batches stay on the caller thread.
+- test(python): run one shared installed-wheel contract across cibuildwheel and pull-request CI, covering scalar analytics, batch parity, concurrency determinism, documented validation, and the quickstart.
+- build(release): build and validate one source distribution, rebuild and install a wheel from it, keep internal Project OS/run material out of the archive, and merge collision-free platform wheel artifacts under one guarded TestPyPI publisher.
+- build(provenance): validate the complete downloaded release set with Twine and emit a separate deterministic manifest binding artifact hashes, version, source commit, and tested runtime before any guarded upload. This is local/CI release-candidate evidence only; PyPI and TestPyPI availability are not asserted.
+
 ## v0.3.2
 
 - feat(wrds): multi-date OptionMetrics panel (vega-weighted RMSE/MAE, OOS bps, Δ-hedged PnL) with aggregated CSV/PNG artifacts, manifest updates, and deterministic sample bundle.

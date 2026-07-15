@@ -51,6 +51,25 @@ jobs:
       - name: Test (FAST tier)
         run: ctest --test-dir build --output-on-failure -C Release -L FAST
 
+  python-wheel-smoke:
+    needs: lint
+    name: Installed Python wheel contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build and install wheel
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip wheel . --no-deps --wheel-dir wheelhouse
+          python -m pip install --force-reinstall wheelhouse/*.whl
+      - name: Run installed-wheel contract
+        run: python python/scripts/cibw_test_suite.py
+
   coverage:
     needs: lint
     name: Coverage (Ubuntu)

@@ -9,7 +9,17 @@ permissions:
   contents: write
 
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require tag/version identity
+        run: python3 python/scripts/check_release_tag.py --ref "${GITHUB_REF}"
+
   build-and-release:
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

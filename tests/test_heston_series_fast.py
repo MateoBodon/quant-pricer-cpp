@@ -56,10 +56,20 @@ def main() -> None:
             )
 
         columns = rows[0].keys()
-        required_cols = {"date", "kappa", "theta", "sigma_v", "rho", "v0", "rmspe_vol_pct"}
+        required_cols = {
+            "date",
+            "kappa",
+            "theta",
+            "sigma_v",
+            "rho",
+            "v0",
+            "rmspe_vol_pct",
+        }
         missing = required_cols - set(columns)
         if missing:
-            raise AssertionError(f"Missing columns in params_series.csv: {sorted(missing)}")
+            raise AssertionError(
+                f"Missing columns in params_series.csv: {sorted(missing)}"
+            )
 
 
 if __name__ == "__main__":

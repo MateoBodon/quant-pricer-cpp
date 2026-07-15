@@ -206,9 +206,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument(
         "--scenario-grid", type=Path, help="Path to frozen scenario grid JSON"
     )
-    ap.add_argument(
-        "--tolerances", type=Path, help="Path to frozen tolerance JSON"
-    )
+    ap.add_argument("--tolerances", type=Path, help="Path to frozen tolerance JSON")
     ap.add_argument(
         "--output", type=Path, default=ARTIFACTS_ROOT / "tri_engine_agreement.png"
     )
@@ -269,19 +267,19 @@ def main() -> None:
     tol = tolerance_config.get("tri_engine_agreement", {})
     tolerance_checks = {}
     if "max_mc_abs_error" in tol:
-        tolerance_checks["max_mc_abs_error_ok"] = (
-            max_mc_abs_error <= float(tol["max_mc_abs_error"])
+        tolerance_checks["max_mc_abs_error_ok"] = max_mc_abs_error <= float(
+            tol["max_mc_abs_error"]
         )
     if "max_pde_abs_error" in tol:
-        tolerance_checks["max_pde_abs_error_ok"] = (
-            max_pde_abs_error <= float(tol["max_pde_abs_error"])
+        tolerance_checks["max_pde_abs_error_ok"] = max_pde_abs_error <= float(
+            tol["max_pde_abs_error"]
         )
     if "min_mc_ci_coverage" in tol and "mc_std_error" in df.columns:
         ci_low = df["mc_price"] - 1.96 * df["mc_std_error"]
         ci_high = df["mc_price"] + 1.96 * df["mc_std_error"]
         coverage = ((df["bs_price"] >= ci_low) & (df["bs_price"] <= ci_high)).mean()
-        tolerance_checks["mc_ci_coverage_ok"] = (
-            float(coverage) >= float(tol["min_mc_ci_coverage"])
+        tolerance_checks["mc_ci_coverage_ok"] = float(coverage) >= float(
+            tol["min_mc_ci_coverage"]
         )
 
     payload = {
@@ -303,7 +301,9 @@ def main() -> None:
         "protocol": protocol_entry,
         "tolerances": tol,
         "tolerance_checks": tolerance_checks,
-        "inputs": describe_inputs([args.quant_cli, args.scenario_grid, args.tolerances]),
+        "inputs": describe_inputs(
+            [args.quant_cli, args.scenario_grid, args.tolerances]
+        ),
     }
     update_run("tri_engine_agreement", payload)
     print(f"Wrote {args.output}")

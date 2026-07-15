@@ -52,7 +52,7 @@ LAST_COMMIT.txt
 ### Quote-surface scan (rg -n "strike,.*market_iv|\bsecid\b|best_bid|best_ask|best_offer" -S .)
 - Hits include WRDS pipeline code references (`wrds_pipeline/ingest_sppx_surface.py`), the deterministic sample data (`wrds_pipeline/sample_data/spx_options_sample.csv`), and pre-existing Heston fit artifacts under `artifacts/heston/`.
 - No new quote-surface files were added or modified in this ticket; `artifacts/heston/**` churn was reverted.
- 
+
 ### Acceptance
 - User accepted scan hits as pre-existing doc/code references and approved proceeding without removal.
 

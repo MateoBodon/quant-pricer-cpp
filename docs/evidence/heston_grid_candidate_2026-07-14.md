@@ -1,7 +1,7 @@
-# Heston call-metrics grid candidate — verification note
+# Heston call-metrics grid — verification note
 
-Status: validated development candidate; not part of public v0.3.2 and not a
-claim of calibration quality or market performance
+Status: accepted candidate integrated into public v0.3.3; not a claim of
+calibration quality or market performance
 
 Verified: 2026-07-14
 
@@ -49,5 +49,7 @@ It does **not** mean:
 - better empirical fit;
 - any hedge, PnL, return, live-data, or trading result.
 
-The candidate must be integrated into a future release before users should
-expect this API from the default branch or a public wheel.
+The exact accepted implementation was integrated into v0.3.3 after the recorded
+Project OS work finished with no active owner. Release artifacts are validated
+separately; this receipt remains the provenance for the 14.2× representation
+claim.

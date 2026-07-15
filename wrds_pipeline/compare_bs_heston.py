@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 from typing import Dict, Iterable, List
-
-import sys
 
 import matplotlib
 
@@ -21,7 +20,6 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from manifest_utils import ARTIFACTS_ROOT
-
 
 WRDS_ROOT = ARTIFACTS_ROOT / "wrds"
 PER_DATE_ROOT = WRDS_ROOT / "per_date"
@@ -90,9 +88,7 @@ def _load_oos(model: str) -> pd.DataFrame:
 
 
 def _load_pnl() -> pd.DataFrame:
-    files = [
-        p / "delta_hedge_pnl_summary.csv" for p in PER_DATE_ROOT.glob("*")
-    ]
+    files = [p / "delta_hedge_pnl_summary.csv" for p in PER_DATE_ROOT.glob("*")]
     return _concat_csv(files)
 
 
@@ -116,10 +112,14 @@ def _aggregate_buckets() -> Dict[str, pd.DataFrame]:
                 {
                     "tenor_bucket": bucket,
                     "iv_rmse_volpts": _bucket_rmse(
-                        g, "iv_error_vol", weight_col="weight" if "weight" in g.columns else "quotes"
+                        g,
+                        "iv_error_vol",
+                        weight_col="weight" if "weight" in g.columns else "quotes",
                     )["value"],
                     "price_rmse_ticks": _bucket_rmse(
-                        g, "price_error_ticks", weight_col="weight" if "weight" in g.columns else "quotes"
+                        g,
+                        "price_error_ticks",
+                        weight_col="weight" if "weight" in g.columns else "quotes",
                     )["value"],
                 }
             )
@@ -145,10 +145,14 @@ def _aggregate_buckets() -> Dict[str, pd.DataFrame]:
                     "trade_date": trade_date,
                     "tenor_bucket": bucket,
                     "iv_mae_bps": _bucket_mae(
-                        g, "iv_error_bps", weight_col="weight" if "weight" in g.columns else "quotes"
+                        g,
+                        "iv_error_bps",
+                        weight_col="weight" if "weight" in g.columns else "quotes",
                     )["value"],
                     "price_mae_ticks": _bucket_mae(
-                        g, "price_error_ticks", weight_col="weight" if "weight" in g.columns else "quotes"
+                        g,
+                        "price_error_ticks",
+                        weight_col="weight" if "weight" in g.columns else "quotes",
                     )["value"],
                     "quotes": g["quotes"].sum(),
                 }
@@ -182,18 +186,35 @@ def _aggregate_buckets() -> Dict[str, pd.DataFrame]:
 
 
 def _merge_comparison(buckets: Dict[str, pd.DataFrame]) -> pd.DataFrame:
-    base = pd.DataFrame({"tenor_bucket": sorted(set(
-        pd.concat(
-            [
-                buckets.get("heston_insample", pd.DataFrame(columns=["tenor_bucket"])),
-                buckets.get("bs_insample", pd.DataFrame(columns=["tenor_bucket"])),
-                buckets.get("heston_oos", pd.DataFrame(columns=["tenor_bucket"])),
-                buckets.get("bs_oos", pd.DataFrame(columns=["tenor_bucket"])),
-                buckets.get("pnl", pd.DataFrame(columns=["tenor_bucket"])),
-            ],
-            ignore_index=True,
-        )["tenor_bucket"].dropna().unique()
-    ))})
+    base = pd.DataFrame(
+        {
+            "tenor_bucket": sorted(
+                set(
+                    pd.concat(
+                        [
+                            buckets.get(
+                                "heston_insample",
+                                pd.DataFrame(columns=["tenor_bucket"]),
+                            ),
+                            buckets.get(
+                                "bs_insample", pd.DataFrame(columns=["tenor_bucket"])
+                            ),
+                            buckets.get(
+                                "heston_oos", pd.DataFrame(columns=["tenor_bucket"])
+                            ),
+                            buckets.get(
+                                "bs_oos", pd.DataFrame(columns=["tenor_bucket"])
+                            ),
+                            buckets.get("pnl", pd.DataFrame(columns=["tenor_bucket"])),
+                        ],
+                        ignore_index=True,
+                    )["tenor_bucket"]
+                    .dropna()
+                    .unique()
+                )
+            )
+        }
+    )
 
     insample = base.merge(
         buckets["heston_insample"], on="tenor_bucket", how="left", suffixes=("", "")
@@ -217,6 +238,7 @@ def _merge_comparison(buckets: Dict[str, pd.DataFrame]) -> pd.DataFrame:
 
     oos_h = buckets["heston_oos"]
     oos_b = buckets["bs_oos"]
+
     def _bucket_average(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
         cols = [
             "tenor_bucket",
@@ -240,16 +262,12 @@ def _merge_comparison(buckets: Dict[str, pd.DataFrame]) -> pd.DataFrame:
             )
         return pd.DataFrame(rows)
 
-    oos = base.merge(
-        _bucket_average(oos_h, "heston"), on="tenor_bucket", how="left"
-    )
-    oos = oos.merge(
-        _bucket_average(oos_b, "bs"), on="tenor_bucket", how="left"
-    )
+    oos = base.merge(_bucket_average(oos_h, "heston"), on="tenor_bucket", how="left")
+    oos = oos.merge(_bucket_average(oos_b, "bs"), on="tenor_bucket", how="left")
 
-    pnl = base.merge(
-        buckets["pnl"], on="tenor_bucket", how="left"
-    ).rename(columns={"pnl_sigma": "heston_pnl_sigma"})
+    pnl = base.merge(buckets["pnl"], on="tenor_bucket", how="left").rename(
+        columns={"pnl_sigma": "heston_pnl_sigma"}
+    )
 
     combined = (
         insample.merge(oos, on="tenor_bucket", how="outer")
@@ -305,9 +323,7 @@ def _plot_iv_rmse(comp: pd.DataFrame, out_path: Path) -> None:
     plt.close(fig)
 
 
-def _plot_oos_heatmap(
-    oos_h: pd.DataFrame, oos_b: pd.DataFrame, out_path: Path
-) -> None:
+def _plot_oos_heatmap(oos_h: pd.DataFrame, oos_b: pd.DataFrame, out_path: Path) -> None:
     if oos_h.empty or oos_b.empty:
         return
     merged = (
@@ -369,7 +385,11 @@ def generate_comparison_artifacts(
     _plot_iv_rmse(comp, iv_fig)
 
     heatmap_fig = artifacts_root / "wrds_bs_heston_oos_heatmap.png"
-    _plot_oos_heatmap(buckets.get("heston_oos", pd.DataFrame()), buckets.get("bs_oos", pd.DataFrame()), heatmap_fig)
+    _plot_oos_heatmap(
+        buckets.get("heston_oos", pd.DataFrame()),
+        buckets.get("bs_oos", pd.DataFrame()),
+        heatmap_fig,
+    )
 
     pnl_fig = artifacts_root / "wrds_bs_heston_pnl_sigma.png"
     _plot_pnl_sigma(comp, pnl_fig)

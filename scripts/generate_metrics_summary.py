@@ -22,8 +22,13 @@ from typing import Any, Dict, Iterable, List, Tuple
 
 import numpy as np
 import pandas as pd
-
-from manifest_utils import ARTIFACTS_ROOT, MANIFEST_PATH, describe_inputs, load_manifest, update_run
+from manifest_utils import (
+    ARTIFACTS_ROOT,
+    MANIFEST_PATH,
+    describe_inputs,
+    load_manifest,
+    update_run,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -99,7 +104,9 @@ REQUIRED_ARTIFACTS: Tuple[RequiredArtifact, ...] = (
     ),
 )
 
-REQUIRED_ARTIFACTS_BY_NAME: Dict[str, RequiredArtifact] = {item.name: item for item in REQUIRED_ARTIFACTS}
+REQUIRED_ARTIFACTS_BY_NAME: Dict[str, RequiredArtifact] = {
+    item.name: item for item in REQUIRED_ARTIFACTS
+}
 
 
 # ---------- Helpers ----------
@@ -223,7 +230,9 @@ def _validate_required_artifacts(artifacts_root: Path) -> List[str]:
 def tri_engine_metrics(path: Path) -> Dict[str, Any]:
     df, err = _safe_load_csv(path)
     if df is None:
-        return _status_block("missing" if err == "file not found" else "parse_error", path, reason=err)
+        return _status_block(
+            "missing" if err == "file not found" else "parse_error", path, reason=err
+        )
 
     required = set(_required_artifact("tri_engine_agreement").required_columns)
     if not required.issubset(df.columns):
@@ -254,7 +263,9 @@ def tri_engine_metrics(path: Path) -> Dict[str, Any]:
 def qmc_vs_prng_metrics(path: Path) -> Dict[str, Any]:
     df, err = _safe_load_csv(path)
     if df is None:
-        return _status_block("missing" if err == "file not found" else "parse_error", path, reason=err)
+        return _status_block(
+            "missing" if err == "file not found" else "parse_error", path, reason=err
+        )
 
     required = set(_required_artifact("qmc_vs_prng_equal_time").required_columns)
     if not required.issubset(df.columns):
@@ -280,7 +291,9 @@ def qmc_vs_prng_metrics(path: Path) -> Dict[str, Any]:
 def pde_order_metrics(path: Path) -> Dict[str, Any]:
     df, err = _safe_load_csv(path)
     if df is None:
-        return _status_block("missing" if err == "file not found" else "parse_error", path, reason=err)
+        return _status_block(
+            "missing" if err == "file not found" else "parse_error", path, reason=err
+        )
 
     required = set(_required_artifact("pde_order_slope").required_columns)
     if not required.issubset(df.columns):
@@ -313,7 +326,9 @@ def pde_order_metrics(path: Path) -> Dict[str, Any]:
 def ql_parity_metrics(path: Path) -> Dict[str, Any]:
     df, err = _safe_load_csv(path)
     if df is None:
-        return _status_block("missing" if err == "file not found" else "parse_error", path, reason=err)
+        return _status_block(
+            "missing" if err == "file not found" else "parse_error", path, reason=err
+        )
 
     required = set(_required_artifact("ql_parity").required_columns)
     if not required.issubset(df.columns):
@@ -340,7 +355,8 @@ def ql_parity_metrics(path: Path) -> Dict[str, Any]:
     if "runtime_ratio" in df.columns:
         metrics["runtime_ratio_median"] = float(df["runtime_ratio"].median())
         metrics["runtime_ratio_by_category"] = {
-            str(cat): float(group["runtime_ratio"].median()) for cat, group in df.groupby("category")
+            str(cat): float(group["runtime_ratio"].median())
+            for cat, group in df.groupby("category")
         }
 
     return _status_block("ok", path, metrics=metrics)
@@ -362,7 +378,11 @@ def benchmark_metrics(root: Path) -> Dict[str, Any]:
     mc_block: Dict[str, Any] | None = None
     df_mc, err_mc = _safe_load_csv(mc_paths_path)
     if df_mc is None:
-        mc_block = _status_block("missing" if err_mc == "file not found" else "parse_error", mc_paths_path, reason=err_mc)
+        mc_block = _status_block(
+            "missing" if err_mc == "file not found" else "parse_error",
+            mc_paths_path,
+            reason=err_mc,
+        )
     else:
         try:
             base = df_mc.loc[df_mc["threads"] == 1].iloc[0]
@@ -372,10 +392,16 @@ def benchmark_metrics(root: Path) -> Dict[str, Any]:
                 mc_paths_path,
                 metrics={
                     "paths_per_sec_1t": float(base["paths_per_sec"]),
-                    "paths_per_sec_max_threads": float(max_threads_row["paths_per_sec"]),
+                    "paths_per_sec_max_threads": float(
+                        max_threads_row["paths_per_sec"]
+                    ),
                     "threads_max": int(max_threads_row["threads"]),
-                    "speedup_max_threads": float(max_threads_row.get("speedup", np.nan)),
-                    "efficiency_max_threads": float(max_threads_row.get("efficiency", np.nan)),
+                    "speedup_max_threads": float(
+                        max_threads_row.get("speedup", np.nan)
+                    ),
+                    "efficiency_max_threads": float(
+                        max_threads_row.get("efficiency", np.nan)
+                    ),
                 },
             )
         except Exception as exc:  # pragma: no cover - defensive guard
@@ -384,13 +410,21 @@ def benchmark_metrics(root: Path) -> Dict[str, Any]:
     equal_time_block: Dict[str, Any] | None = None
     df_eq, err_eq = _safe_load_csv(mc_equal_time_path)
     if df_eq is None:
-        equal_time_block = _status_block("missing" if err_eq == "file not found" else "parse_error", mc_equal_time_path, reason=err_eq)
+        equal_time_block = _status_block(
+            "missing" if err_eq == "file not found" else "parse_error",
+            mc_equal_time_path,
+            reason=err_eq,
+        )
     else:
         payoffs: Dict[str, Any] = {}
         try:
             for payoff, group in df_eq.groupby("payoff"):
-                prng = group.loc[group["method"].str.upper() == "PRNG", "time_scaled_error"]
-                qmc = group.loc[group["method"].str.upper() == "QMC", "time_scaled_error"]
+                prng = group.loc[
+                    group["method"].str.upper() == "PRNG", "time_scaled_error"
+                ]
+                qmc = group.loc[
+                    group["method"].str.upper() == "QMC", "time_scaled_error"
+                ]
                 ratio = None
                 if not prng.empty and not qmc.empty:
                     ratio = float(prng.mean() / qmc.mean())
@@ -404,10 +438,14 @@ def benchmark_metrics(root: Path) -> Dict[str, Any]:
                 metrics={"payoffs": payoffs},
             )
         except Exception as exc:  # pragma: no cover - defensive guard
-            equal_time_block = _status_block("parse_error", mc_equal_time_path, reason=str(exc))
+            equal_time_block = _status_block(
+                "parse_error", mc_equal_time_path, reason=str(exc)
+            )
 
     blocks = {"mc_paths": mc_block, "mc_equal_time": equal_time_block}
-    overall_status = _collapse_status(b.get("status", "missing") for b in blocks.values())
+    overall_status = _collapse_status(
+        b.get("status", "missing") for b in blocks.values()
+    )
     return {
         "status": overall_status,
         "sources": {
@@ -421,7 +459,10 @@ def benchmark_metrics(root: Path) -> Dict[str, Any]:
 def _wrds_bundle_label(pricing_df: pd.DataFrame | None) -> str:
     if pricing_df is None:
         return "sample bundle regression harness"
-    if "source_today" not in pricing_df.columns or "source_next" not in pricing_df.columns:
+    if (
+        "source_today" not in pricing_df.columns
+        or "source_next" not in pricing_df.columns
+    ):
         return "sample bundle regression harness"
     sources = set(
         str(val)
@@ -455,14 +496,22 @@ def wrds_metrics(root: Path) -> Dict[str, Any]:
     pricing_df, pricing_err = _safe_load_csv(pricing_path)
     if pricing_df is None:
         blocks["bundle"] = "sample bundle regression harness"
-        blocks["pricing"] = _status_block("missing" if pricing_err == "file not found" else "parse_error", pricing_path, reason=pricing_err)
+        blocks["pricing"] = _status_block(
+            "missing" if pricing_err == "file not found" else "parse_error",
+            pricing_path,
+            reason=pricing_err,
+        )
         statuses.append(blocks["pricing"]["status"])
     else:
         blocks["bundle"] = _wrds_bundle_label(pricing_df)
         metrics = {
             "rows": int(len(pricing_df)),
-            "median_iv_rmse_volpts_vega_wt": float(pricing_df["iv_rmse_volpts_vega_wt"].median()),
-            "median_iv_mae_volpts_vega_wt": float(pricing_df["iv_mae_volpts_vega_wt"].median()),
+            "median_iv_rmse_volpts_vega_wt": float(
+                pricing_df["iv_rmse_volpts_vega_wt"].median()
+            ),
+            "median_iv_mae_volpts_vega_wt": float(
+                pricing_df["iv_mae_volpts_vega_wt"].median()
+            ),
             "median_price_rmse_ticks": float(pricing_df["price_rmse_ticks"].median()),
             "median_iv_mae_bps": float(pricing_df["iv_mae_bps"].median()),
             "median_price_mae_ticks": float(pricing_df["price_mae_ticks"].median()),
@@ -472,21 +521,31 @@ def wrds_metrics(root: Path) -> Dict[str, Any]:
 
     oos_df, oos_err = _safe_load_csv(oos_path)
     if oos_df is None:
-        blocks["oos"] = _status_block("missing" if oos_err == "file not found" else "parse_error", oos_path, reason=oos_err)
+        blocks["oos"] = _status_block(
+            "missing" if oos_err == "file not found" else "parse_error",
+            oos_path,
+            reason=oos_err,
+        )
         statuses.append(blocks["oos"]["status"])
     else:
         weights = oos_df["weight"] if "weight" in oos_df.columns else None
         metrics = {
             "rows": int(len(oos_df)),
             "weighted_iv_mae_bps": _weighted_average(oos_df["iv_mae_bps"], weights),
-            "weighted_price_mae_ticks": _weighted_average(oos_df["price_mae_ticks"], weights),
+            "weighted_price_mae_ticks": _weighted_average(
+                oos_df["price_mae_ticks"], weights
+            ),
         }
         blocks["oos"] = _status_block("ok", oos_path, metrics=metrics)
         statuses.append("ok")
 
     pnl_df, pnl_err = _safe_load_csv(pnl_path)
     if pnl_df is None:
-        blocks["pnl"] = _status_block("missing" if pnl_err == "file not found" else "parse_error", pnl_path, reason=pnl_err)
+        blocks["pnl"] = _status_block(
+            "missing" if pnl_err == "file not found" else "parse_error",
+            pnl_path,
+            reason=pnl_err,
+        )
         statuses.append(blocks["pnl"]["status"])
     else:
         metrics = {
@@ -553,7 +612,11 @@ def _highlights(name: str, block: Dict[str, Any]) -> str:
             f"eff@max={_fmt(mc_metrics.get('efficiency_max_threads'))}"
         )
     if name == "wrds":
-        pricing = block.get("pricing", {}).get("metrics", {}) if isinstance(block.get("pricing"), dict) else {}
+        pricing = (
+            block.get("pricing", {}).get("metrics", {})
+            if isinstance(block.get("pricing"), dict)
+            else {}
+        )
         bundle = block.get("bundle", "bundle")
         return f"median iv_rmse={_fmt(pricing.get('median_iv_rmse_volpts_vega_wt'))} ({bundle})"
     return "ok"
@@ -568,8 +631,14 @@ def render_markdown(summary: Dict[str, Any]) -> str:
     protocols = summary.get("protocols") or {}
     if protocols:
         for name, record in protocols.items():
-            scenario = (record or {}).get("scenario_grid", {}) if isinstance(record, dict) else {}
-            tolerances = (record or {}).get("tolerances", {}) if isinstance(record, dict) else {}
+            scenario = (
+                (record or {}).get("scenario_grid", {})
+                if isinstance(record, dict)
+                else {}
+            )
+            tolerances = (
+                (record or {}).get("tolerances", {}) if isinstance(record, dict) else {}
+            )
             scenario_sha = scenario.get("sha256")
             tolerances_sha = tolerances.get("sha256")
             lines.append(
@@ -610,12 +679,16 @@ def render_markdown(summary: Dict[str, Any]) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description="Generate artifact-derived metrics snapshot")
+    ap = argparse.ArgumentParser(
+        description="Generate artifact-derived metrics snapshot"
+    )
     ap.add_argument("--artifacts", type=Path, default=ARTIFACTS_ROOT)
     ap.add_argument("--manifest", type=Path, default=MANIFEST_PATH)
     ap.add_argument("--output-json", type=Path, default=None)
     ap.add_argument("--output-md", type=Path, default=None)
-    ap.add_argument("--skip-manifest", action="store_true", help="Do not update manifest.json")
+    ap.add_argument(
+        "--skip-manifest", action="store_true", help="Do not update manifest.json"
+    )
     return ap.parse_args()
 
 
@@ -626,7 +699,9 @@ def build_summary(artifacts_root: Path, manifest_path: Path) -> Dict[str, Any]:
         git_sha = manifest_info.get("git", {}).get("sha")
     except Exception:
         git_sha = None
-    protocols = manifest_info.get("protocols", {}) if isinstance(manifest_info, dict) else {}
+    protocols = (
+        manifest_info.get("protocols", {}) if isinstance(manifest_info, dict) else {}
+    )
 
     tri_engine_path = _required_path("tri_engine_agreement", artifacts_root)
     qmc_path = _required_path("qmc_vs_prng_equal_time", artifacts_root)
@@ -683,7 +758,9 @@ def main() -> None:
     md_out.write_text(render_markdown(summary))
 
     if not args.skip_manifest:
-        inputs: List[str | Path] = [artifacts_root / item.relative_path for item in REQUIRED_ARTIFACTS]
+        inputs: List[str | Path] = [
+            artifacts_root / item.relative_path for item in REQUIRED_ARTIFACTS
+        ]
         update_run(
             "metrics_snapshot",
             {

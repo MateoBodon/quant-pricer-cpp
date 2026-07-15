@@ -24,28 +24,48 @@ def _norm_cdf(x: float) -> float:
     return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
 
 
-def _bs_call_price(spot: float, strike: float, rate: float, div: float, vol: float, tenor: float) -> float:
+def _bs_call_price(
+    spot: float, strike: float, rate: float, div: float, vol: float, tenor: float
+) -> float:
     if vol <= 0.0 or tenor <= 0.0:
-        return max(0.0, spot * math.exp(-div * tenor) - strike * math.exp(-rate * tenor))
+        return max(
+            0.0, spot * math.exp(-div * tenor) - strike * math.exp(-rate * tenor)
+        )
     sqrt_t = math.sqrt(tenor)
-    d1 = (math.log(spot / strike) + (rate - div + 0.5 * vol * vol) * tenor) / (vol * sqrt_t)
+    d1 = (math.log(spot / strike) + (rate - div + 0.5 * vol * vol) * tenor) / (
+        vol * sqrt_t
+    )
     d2 = d1 - vol * sqrt_t
     df_r = math.exp(-rate * tenor)
     df_q = math.exp(-div * tenor)
     return spot * df_q * _norm_cdf(d1) - strike * df_r * _norm_cdf(d2)
 
 
-def _bs_vega(spot: float, strike: float, rate: float, div: float, vol: float, tenor: float) -> float:
+def _bs_vega(
+    spot: float, strike: float, rate: float, div: float, vol: float, tenor: float
+) -> float:
     if vol <= 0.0 or tenor <= 0.0:
         return 0.0
     sqrt_t = math.sqrt(tenor)
-    d1 = (math.log(spot / strike) + (rate - div + 0.5 * vol * vol) * tenor) / (vol * sqrt_t)
+    d1 = (math.log(spot / strike) + (rate - div + 0.5 * vol * vol) * tenor) / (
+        vol * sqrt_t
+    )
     df_q = math.exp(-div * tenor)
-    return spot * df_q * math.sqrt(1.0 / (2.0 * math.pi)) * math.exp(-0.5 * d1 * d1) * sqrt_t
+    return (
+        spot
+        * df_q
+        * math.sqrt(1.0 / (2.0 * math.pi))
+        * math.exp(-0.5 * d1 * d1)
+        * sqrt_t
+    )
 
 
-def _implied_vol_call(price: float, spot: float, strike: float, rate: float, div: float, tenor: float) -> float:
-    intrinsic = max(0.0, spot * math.exp(-div * tenor) - strike * math.exp(-rate * tenor))
+def _implied_vol_call(
+    price: float, spot: float, strike: float, rate: float, div: float, tenor: float
+) -> float:
+    intrinsic = max(
+        0.0, spot * math.exp(-div * tenor) - strike * math.exp(-rate * tenor)
+    )
     if price <= intrinsic + 1e-12:
         return 0.0
     low, high = 1e-4, 5.0
@@ -156,7 +176,9 @@ def main() -> None:
         "dividend": 0.0,
     }
 
-    def make_cli_args(scenario: Dict[str, float], step_count: int, path_count: int) -> List[Any]:
+    def make_cli_args(
+        scenario: Dict[str, float], step_count: int, path_count: int
+    ) -> List[Any]:
         return [
             "heston",
             scenario["kappa"],
@@ -178,7 +200,10 @@ def main() -> None:
     commands: List[str] = []
     for scenario in scenarios:
         for path_count in path_grid:
-            for scheme_flag, label in (("--heston-qe", "qe"), ("--heston-euler", "euler")):
+            for scheme_flag, label in (
+                ("--heston-qe", "qe"),
+                ("--heston-euler", "euler"),
+            ):
                 for steps in step_grid:
                     cmd = [
                         *make_cli_args(scenario, steps, path_count),
@@ -219,7 +244,9 @@ def main() -> None:
                         scenario["tenor"],
                     )
                     bias_price = price - analytic_price
-                    rmse_price = math.sqrt(bias_price * bias_price + std_error * std_error)
+                    rmse_price = math.sqrt(
+                        bias_price * bias_price + std_error * std_error
+                    )
                     bias_iv = model_iv - analytic_iv
                     iv_se = std_error / vega if vega > 1e-12 else 0.0
                     rmse_iv = math.sqrt(bias_iv * bias_iv + iv_se * iv_se)
@@ -255,7 +282,9 @@ def main() -> None:
     fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.0))
     plot_df = df[df["paths"] == df["paths"].max()]
     for label, marker in (("qe", "o"), ("euler", "s")):
-        for scenario_name, group in plot_df[plot_df["scheme"] == label].groupby("scenario"):
+        for scenario_name, group in plot_df[plot_df["scheme"] == label].groupby(
+            "scenario"
+        ):
             axes[0].loglog(
                 group["steps"],
                 group["rmse_price"],

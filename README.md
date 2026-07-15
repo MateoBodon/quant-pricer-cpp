@@ -11,11 +11,16 @@ Use it to price vanilla and exotic options, estimate Greeks with uncertainty,
 cross-check independent methods, and carry the exact validation artifacts with
 the result.
 
-> **Release status — v0.3.2.** Build from source or use the release source
-> archive. `pyquant-pricer` is **not currently published on PyPI**; the latest
-> release attaches a manifest and validation pack, not wheels. Benchmark and
-> accuracy numbers below are historical snapshots bound to their artifacts and
+> **Release status — v0.3.3.** Build from source or use the signed-off GitHub
+> release assets. `pyquant-pricer` is **not published on PyPI**. Benchmark and
+> accuracy numbers below are dated snapshots bound to their artifacts and
 > hardware—not universal guarantees.
+
+| Artifact-backed proof | Result | Scope |
+| --- | ---: | --- |
+| QuantLib parity | max difference `0.862¢` | Vanilla, barrier, and American sample cases; 2026-01-25 snapshot |
+| QMC vs PRNG | median RMSE ratio `4.76×` | Equal-time European + Asian benchmark; 2026-01-25 snapshot |
+| MC throughput | `12.75M` paths/s | One thread, AMD EPYC 9454P, Linux; historical hardware result |
 
 ## At a glance
 
@@ -130,16 +135,13 @@ the committed synthetic/sample validation protocol.
 | QMC vs PRNG | median RMSE ratio `4.76×` | equal-time European + Asian benchmark |
 | MC throughput | `12.75M` paths/s, 1 thread | AMD EPYC 9454P, Linux, 96 logical CPUs; historical benchmark |
 
-<table>
-  <tr>
-    <td width="50%"><img src="docs/artifacts/tri_engine_agreement.png" alt="Black–Scholes, Monte Carlo confidence intervals, and PDE prices agreeing across the validation strike grid"></td>
-    <td width="50%"><img src="docs/artifacts/qmc_vs_prng_equal_time.png" alt="Equal-time RMSE comparison showing Sobol Brownian-bridge QMC below PRNG for European and Asian calls"></td>
-  </tr>
-  <tr>
-    <td align="center">Tri-engine agreement</td>
-    <td align="center">QMC vs PRNG at equal wall time</td>
-  </tr>
-</table>
+![Black–Scholes, Monte Carlo confidence intervals, and PDE prices agreeing across the validation strike grid](docs/artifacts/tri_engine_agreement.png)
+
+*Tri-engine agreement across the frozen validation grid.*
+
+![Equal-time RMSE comparison showing Sobol Brownian-bridge QMC below PRNG for European and Asian calls](docs/artifacts/qmc_vs_prng_equal_time.png)
+
+*QMC versus PRNG at equal wall time.*
 
 Sources: [`metrics_summary.md`](docs/artifacts/metrics_summary.md),
 [`manifest.json`](docs/artifacts/manifest.json), and the underlying
@@ -157,8 +159,9 @@ fit or trading performance.
 
 ## Heston
 
-The public v0.3.2 surface includes analytic European calls, characteristic
-functions, implied-volatility helpers, and Euler/QE Monte Carlo:
+The public v0.3.3 surface includes analytic European calls and puts,
+characteristic functions, implied-volatility helpers, bounded batch/grid
+interfaces, and Euler/QE Monte Carlo:
 
 ```python
 params = qp.HestonParams()
@@ -173,20 +176,38 @@ price = qp.heston_call_analytic(market, params)
 iv = qp.heston_implied_vol(market, params)
 ```
 
-### Validated next-release candidate
+### Vectorized Heston analytics
 
-A newer, **not-yet-released and not-on-v0.3.2** Python binding candidate adds
-`heston_call_metrics_grid`: compact market `(m,5)` and parameter `(p,5)` inputs
-produce a contiguous candidate-major `(p,m,2)` array of call price and implied
-volatility. Its installed-wheel evaluator proved exact cell-by-cell equivalence
-to the batch API, pre-allocation overflow rejection, deterministic eight-way
-concurrency under a shared four-worker cap, and **14.2× lower input
-materialization** than an explicit Cartesian input.
+The batch APIs accept market columns `(spot, strike, rate, dividend, time)` and
+parameter columns `(kappa, theta, sigma, rho, v0)`. Inputs may provide one parameter row
+for broadcasting or one row per market. Execution uses a
+process-wide four-worker budget; inspect the fixed policy with
+`qp.heston_analytic_batch_policy()`.
+
+```python
+import numpy as np
+
+markets = np.array([
+    [100.0, 90.0, 0.015, 0.005, 0.5],
+    [100.0, 110.0, 0.015, 0.005, 2.0],
+])
+params = np.array([[1.5, 0.04, 0.6, -0.45, 0.04]])
+
+calls = qp.heston_calls_analytic_batch(markets, params)
+puts = qp.heston_puts_analytic_batch(markets, params)
+metrics = qp.heston_call_metrics_grid(markets, params)
+```
+
+`heston_call_metrics_grid` produces a contiguous candidate-major `(p,m,2)`
+array of call price and implied volatility. Its installed-wheel evaluator proved
+exact cell-by-cell equivalence to the batch API, pre-allocation overflow
+rejection, deterministic eight-way concurrency under the shared worker cap, and
+**14.2× lower input materialization** than an explicit Cartesian input.
 
 That `14.2×` figure measures compact input representation for the frozen test
 case—not pricing speed or calibration quality. Exact commit, wheel digest,
 verification receipt, and claim limits are in the
-[candidate evidence note](docs/evidence/heston_grid_candidate_2026-07-14.md).
+[verification note](docs/evidence/heston_grid_candidate_2026-07-14.md).
 
 ## Method map
 
@@ -284,19 +305,20 @@ ctest --test-dir build-asan --output-on-failure
 - **Heston is not shown to dominate Black–Scholes.** The bundled comparison is
   near parity/mixed by tenor, and older hedge labeling is not a valid
   Heston-specific hedge claim.
-- **SSVI is not a v0.3.2 public API.** Newer research exists outside this public
+- **SSVI is not a v0.3.3 public API.** Newer research exists outside this public
   release, but is intentionally excluded here until its release/evidence path is
   coherent. No SSVI hedge, PnL, or universal-superiority claim is made.
 - **Artifact freshness matters.** The headline snapshot is dated 2026-01-25.
   Re-run the reproduction pack before using it as current-machine evidence.
 - **Package availability is explicit.** PyPI returned no `pyquant-pricer`
-  distribution on 2026-07-14; use the source build until a verified release
-  publishes installable wheels.
+  distribution on 2026-07-14. Use the source build or the platform wheels
+  attached to the verified GitHub release.
 
 ## Releases, contribution, and citation
 
-The latest public release is [v0.3.2](https://github.com/MateoBodon/quant-pricer-cpp/releases/tag/v0.3.2),
-with a source snapshot, manifest, and validation pack. See
+The latest public release is [v0.3.3](https://github.com/MateoBodon/quant-pricer-cpp/releases/tag/v0.3.3),
+with source/wheel assets, a deterministic release manifest, and a validation
+pack. See
 [`CONTRIBUTING.md`](CONTRIBUTING.md) for focused changes and
 [`CITATION.cff`](CITATION.cff) for citation metadata.
 

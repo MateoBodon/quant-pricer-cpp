@@ -132,12 +132,8 @@ def plot_results(df: pd.DataFrame, output_path: Path) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--fast", action="store_true", help="Smaller grid for FAST tests")
-    ap.add_argument(
-        "--output-csv", default=str(ARTIFACTS_ROOT / "parity_checks.csv")
-    )
-    ap.add_argument(
-        "--output-png", default=str(ARTIFACTS_ROOT / "parity_checks.png")
-    )
+    ap.add_argument("--output-csv", default=str(ARTIFACTS_ROOT / "parity_checks.csv"))
+    ap.add_argument("--output-png", default=str(ARTIFACTS_ROOT / "parity_checks.png"))
     ap.add_argument("--skip-manifest", action="store_true")
     args = ap.parse_args()
 

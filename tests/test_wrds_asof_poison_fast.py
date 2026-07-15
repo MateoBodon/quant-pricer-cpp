@@ -20,9 +20,7 @@ def _run_poison(sample_path: Path, expected_context: str) -> None:
         "--trade-date",
         "2024-06-14",
     ]
-    proc = subprocess.run(
-        cmd, cwd=repo_root, env=env, capture_output=True, text=True
-    )
+    proc = subprocess.run(cmd, cwd=repo_root, env=env, capture_output=True, text=True)
     output = (proc.stdout or "") + (proc.stderr or "")
     if proc.returncode == 0:
         raise AssertionError("Expected WRDS pipeline to fail on poison sample input.")

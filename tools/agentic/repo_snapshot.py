@@ -22,7 +22,9 @@ from typing import Iterable, Optional, Tuple
 
 def run(cmd: list[str], cwd: Optional[Path] = None) -> Tuple[int, str]:
     try:
-        out = subprocess.check_output(cmd, cwd=str(cwd) if cwd else None, stderr=subprocess.STDOUT)
+        out = subprocess.check_output(
+            cmd, cwd=str(cwd) if cwd else None, stderr=subprocess.STDOUT
+        )
         return 0, out.decode("utf-8", errors="replace")
     except subprocess.CalledProcessError as e:
         return e.returncode, e.output.decode("utf-8", errors="replace")
@@ -52,7 +54,12 @@ def guess_language_counts(paths: Iterable[str]) -> dict[str, int]:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", type=str, default=None, help="Output path (default: docs/_generated/repo_snapshot.md)")
+    ap.add_argument(
+        "--out",
+        type=str,
+        default=None,
+        help="Output path (default: docs/_generated/repo_snapshot.md)",
+    )
     args = ap.parse_args()
 
     start = Path.cwd()
@@ -75,14 +82,18 @@ def main() -> int:
     if len(tracked) > 1200:
         tree_lines.append(f"... ({len(tracked) - 1200} more tracked files)")
 
-    out_path = Path(args.out) if args.out else (repo / "docs" / "_generated" / "repo_snapshot.md")
+    out_path = (
+        Path(args.out)
+        if args.out
+        else (repo / "docs" / "_generated" / "repo_snapshot.md")
+    )
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%SZ")
 
     md = f"""# Repo Snapshot
 
-Generated: **{now}**  
+Generated: **{now}**
 Repo root: `{repo}`
 
 ## Git

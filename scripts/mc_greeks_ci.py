@@ -67,9 +67,7 @@ def main() -> None:
     ap.add_argument(
         "--scenario-grid", type=Path, help="Path to frozen scenario grid JSON"
     )
-    ap.add_argument(
-        "--tolerances", type=Path, help="Path to frozen tolerance JSON"
-    )
+    ap.add_argument("--tolerances", type=Path, help="Path to frozen tolerance JSON")
     ap.add_argument(
         "--output",
         default=str(ARTIFACTS_ROOT / "mc_greeks_ci.png"),

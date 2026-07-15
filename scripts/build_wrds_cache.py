@@ -54,14 +54,18 @@ def _sha256(path: Path) -> str:
 def _cache_path(cache_root: Path, symbol: str, trade_date: str) -> Path:
     d = pd.to_datetime(trade_date).date()
     symbol = symbol.upper()
-    return cache_root / "optionm" / symbol / str(d.year) / f"{symbol.lower()}_{d}.parquet"
+    return (
+        cache_root / "optionm" / symbol / str(d.year) / f"{symbol.lower()}_{d}.parquet"
+    )
 
 
 def _cache_meta_path(cache_path: Path) -> Path:
     return cache_path.with_suffix(".json")
 
 
-def _write_cache(cache_root: Path, symbol: str, trade_date: str, df: pd.DataFrame) -> dict:
+def _write_cache(
+    cache_root: Path, symbol: str, trade_date: str, df: pd.DataFrame
+) -> dict:
     cache_path = _cache_path(cache_root, symbol, trade_date)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(cache_path, index=False, compression="zstd")
@@ -75,7 +79,9 @@ def _write_cache(cache_root: Path, symbol: str, trade_date: str, df: pd.DataFram
         "path": str(cache_path),
         "size_bytes": cache_path.stat().st_size,
     }
-    _cache_meta_path(cache_path).write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n")
+    _cache_meta_path(cache_path).write_text(
+        json.dumps(meta, indent=2, sort_keys=True) + "\n"
+    )
     return meta
 
 
@@ -185,17 +191,33 @@ def _summarize_index(index_path: Path) -> dict:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build a WRDS parquet cache for OptionMetrics slices.")
+    ap = argparse.ArgumentParser(
+        description="Build a WRDS parquet cache for OptionMetrics slices."
+    )
     ap.add_argument("--symbol", default="SPX")
     ap.add_argument("--start-date", default=DEFAULT_START)
-    ap.add_argument("--end-date", default=(_today_utc() - timedelta(days=1)).isoformat())
-    ap.add_argument("--dateset", default=None, help="Optional YAML/JSON dateset to cache")
+    ap.add_argument(
+        "--end-date", default=(_today_utc() - timedelta(days=1)).isoformat()
+    )
+    ap.add_argument(
+        "--dateset", default=None, help="Optional YAML/JSON dateset to cache"
+    )
     ap.add_argument("--cache-root", default=str(DEFAULT_CACHE_ROOT))
     ap.add_argument("--overwrite", action="store_true")
-    ap.add_argument("--hash", action="store_true", help="Compute sha256 for cached files")
-    ap.add_argument("--max-dates", type=int, default=None, help="Optional limit for testing")
-    ap.add_argument("--log-every", type=int, default=50, help="Log every N cached dates")
-    ap.add_argument("--rebuild-manifest", action="store_true", help="Rebuild cache_manifest.json from index")
+    ap.add_argument(
+        "--hash", action="store_true", help="Compute sha256 for cached files"
+    )
+    ap.add_argument(
+        "--max-dates", type=int, default=None, help="Optional limit for testing"
+    )
+    ap.add_argument(
+        "--log-every", type=int, default=50, help="Log every N cached dates"
+    )
+    ap.add_argument(
+        "--rebuild-manifest",
+        action="store_true",
+        help="Rebuild cache_manifest.json from index",
+    )
     args = ap.parse_args()
 
     cache_root = Path(args.cache_root).expanduser()
@@ -335,7 +357,9 @@ def main() -> None:
     }
     _write_manifest(cache_root, manifest)
 
-    print(f"[wrds-cache] done. cached={cached}, missing={len(missing)}, errors={len(errors)}")
+    print(
+        f"[wrds-cache] done. cached={cached}, missing={len(missing)}, errors={len(errors)}"
+    )
     if errors:
         print("[wrds-cache] errors:")
         for err in errors:

@@ -164,9 +164,7 @@ def main() -> None:
     ap.add_argument(
         "--output", default=str(ARTIFACTS_ROOT / "american_consistency.png")
     )
-    ap.add_argument(
-        "--csv", default=str(ARTIFACTS_ROOT / "american_consistency.csv")
-    )
+    ap.add_argument("--csv", default=str(ARTIFACTS_ROOT / "american_consistency.csv"))
     args = ap.parse_args()
 
     strike = 100.0

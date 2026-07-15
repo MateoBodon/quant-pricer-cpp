@@ -68,7 +68,9 @@ def main() -> None:
                 "Manifest qmc_vs_prng_equal_time entry reports insufficient csv_rows"
             )
         if "command" not in qmc_entry:
-            raise AssertionError("Manifest qmc_vs_prng_equal_time entry missing command")
+            raise AssertionError(
+                "Manifest qmc_vs_prng_equal_time entry missing command"
+            )
 
 
 if __name__ == "__main__":

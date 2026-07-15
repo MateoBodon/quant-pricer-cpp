@@ -29,8 +29,8 @@ import manifest_utils
 from manifest_utils import ARTIFACTS_ROOT, describe_inputs, update_run
 
 from . import (
-    calibrate_heston,
     calibrate_bs,
+    calibrate_heston,
     compare_bs_heston,
     delta_hedge_pnl,
     ingest_sppx_surface,
@@ -424,7 +424,8 @@ def run(
     # BS baseline (per tenor bucket constant vol)
     bs_fit = calibrate_bs.fit_bs(agg_today)
     bs_oos_detail = calibrate_bs.evaluate_oos(
-        agg_next, bs_fit.surface.groupby("tenor_bucket", observed=True)["fit_vol"].first()
+        agg_next,
+        bs_fit.surface.groupby("tenor_bucket", observed=True)["fit_vol"].first(),
     )
     bs_metrics_oos = calibrate_bs.summarize_oos(bs_oos_detail)
     bs_insample_metrics = bs_fit.metrics
@@ -615,14 +616,14 @@ def run_dateset(
                 trade_date,
                 next_trade_date,
                 use_sample,
-            fast,
-            output_dir=per_date_dir,
-            label=label,
-            regime=regime,
-            wrds_root=wrds_root,
-            local_root=local_root,
-            panel_id=panel_id,
-        )
+                fast,
+                output_dir=per_date_dir,
+                label=label,
+                regime=regime,
+                wrds_root=wrds_root,
+                local_root=local_root,
+                panel_id=panel_id,
+            )
         except Exception as exc:  # pragma: no cover
             print(f"[wrds_pipeline] {trade_date} failed: {exc}")
             pricing_rows.append(

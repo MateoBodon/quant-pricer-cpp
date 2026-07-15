@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from .asof_checks import assert_quote_date_matches
-from .calibrate_heston import apply_model, compute_oos_iv_metrics, _vega_quote_weights
+from .calibrate_heston import _vega_quote_weights, apply_model, compute_oos_iv_metrics
 
 TICK_SIZE = 0.05
 
@@ -26,7 +26,12 @@ def evaluate(
         )
     modeled = apply_model(oos_surface.copy(), params)
     # Drop rows where the model produced NaN / inf so aggregates remain meaningful.
-    mask = modeled[["iv_error_bps", "price_error_ticks"]].replace([float("inf"), -float("inf")], float("nan")).notnull().all(axis=1)
+    mask = (
+        modeled[["iv_error_bps", "price_error_ticks"]]
+        .replace([float("inf"), -float("inf")], float("nan"))
+        .notnull()
+        .all(axis=1)
+    )
     modeled = modeled[mask].copy()
     modeled["abs_iv_bps"] = modeled["iv_error_bps"].abs()
     modeled["abs_price_ticks"] = modeled["price_error_ticks"].abs()

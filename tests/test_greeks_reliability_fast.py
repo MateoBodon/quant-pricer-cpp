@@ -43,7 +43,9 @@ def main() -> None:
         required = {"delta_pathwise", "delta_lr", "delta_fd", "gamma_lr", "gamma_fd"}
         missing = required - methods
         if missing:
-            raise AssertionError(f"Estimator methods missing from CSV: {sorted(missing)}")
+            raise AssertionError(
+                f"Estimator methods missing from CSV: {sorted(missing)}"
+            )
 
 
 if __name__ == "__main__":

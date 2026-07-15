@@ -101,14 +101,14 @@ def main() -> int:
         if not path.exists():
             continue
         if _requires_synthetic_marker(rel_path) and not _has_synthetic_marker(rel_path):
-            violations.append(
-                (rel_path, 1, f"missing {SYNTHETIC_MARKER} marker")
-            )
+            violations.append((rel_path, 1, f"missing {SYNTHETIC_MARKER} marker"))
         for line_no, line in _scan_lines(rel_path):
             violations.append((rel_path, line_no, line))
 
     if not violations:
-        print("[data-policy] OK: no restricted patterns found in tracked data artifacts.")
+        print(
+            "[data-policy] OK: no restricted patterns found in tracked data artifacts."
+        )
         return 0
 
     print("[data-policy] FAIL: restricted patterns found in tracked data artifacts:")

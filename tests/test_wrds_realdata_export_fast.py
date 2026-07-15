@@ -61,7 +61,14 @@ def main() -> None:
             raise AssertionError("Unexpected schema_version")
 
         provenance = payload.get("provenance", {})
-        for key in ["panel_id", "trade_date_range", "next_trade_date_range", "data_mode", "git_sha", "machine_label"]:
+        for key in [
+            "panel_id",
+            "trade_date_range",
+            "next_trade_date_range",
+            "data_mode",
+            "git_sha",
+            "machine_label",
+        ]:
             if key not in provenance:
                 raise AssertionError(f"Missing provenance.{key}")
         if provenance.get("machine_label") != "TEST_BOX":
@@ -95,7 +102,14 @@ def main() -> None:
             raise AssertionError("pricing rows mismatch")
 
         export_text = json.dumps(payload, sort_keys=True)
-        restricted_tokens = ["secid", "best_bid", "best_offer", "best_ask", "market_iv", "strike_price"]
+        restricted_tokens = [
+            "secid",
+            "best_bid",
+            "best_offer",
+            "best_ask",
+            "market_iv",
+            "strike_price",
+        ]
         for token in restricted_tokens:
             if token in export_text:
                 raise AssertionError(f"Restricted token found in export: {token}")

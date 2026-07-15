@@ -39,9 +39,13 @@ def test_docs_sanity_fast() -> None:
         path = REPO_ROOT / rel_path
         if not path.exists():
             continue
-        for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        for line_no, line in enumerate(
+            path.read_text(encoding="utf-8").splitlines(), 1
+        ):
             if is_conflict_marker(line):
-                findings.append(f"{rel_path}:{line_no}: conflict marker: {line.rstrip()}")
+                findings.append(
+                    f"{rel_path}:{line_no}: conflict marker: {line.rstrip()}"
+                )
                 continue
             if SCAFFOLD_RE.search(line):
                 findings.append(f"{rel_path}:{line_no}: placeholder: {line.rstrip()}")

@@ -139,10 +139,14 @@ def _validate_columns(data: CsvData, filename: str) -> None:
     if unknown:
         raise ValueError(f"{filename} has unexpected columns: {', '.join(unknown)}")
     restricted_hits = [
-        col for col in columns if any(token in col.lower() for token in RESTRICTED_COLUMN_TOKENS)
+        col
+        for col in columns
+        if any(token in col.lower() for token in RESTRICTED_COLUMN_TOKENS)
     ]
     if restricted_hits:
-        raise ValueError(f"{filename} includes restricted columns: {', '.join(restricted_hits)}")
+        raise ValueError(
+            f"{filename} includes restricted columns: {', '.join(restricted_hits)}"
+        )
 
 
 def _coerce_float(value: Optional[str]) -> Optional[float]:
@@ -237,7 +241,9 @@ def _normalize_manifest_path(path: str | Path) -> Path:
     return value
 
 
-def _find_wrds_run(manifest: Dict[str, Any], wrds_root: Path) -> Optional[Dict[str, Any]]:
+def _find_wrds_run(
+    manifest: Dict[str, Any], wrds_root: Path
+) -> Optional[Dict[str, Any]]:
     runs = manifest.get("runs", {}).get("wrds_dateset", [])
     if not isinstance(runs, list) or not runs:
         return None
@@ -286,7 +292,9 @@ def _fmt(value: Any) -> str:
     return str(value)
 
 
-def build_metrics(pricing: CsvData, oos: CsvData, pnl: CsvData, comparison: CsvData) -> Dict[str, Any]:
+def build_metrics(
+    pricing: CsvData, oos: CsvData, pnl: CsvData, comparison: CsvData
+) -> Dict[str, Any]:
     pricing_rows = pricing.rows
     oos_rows = oos.rows
     pnl_rows = pnl.rows
@@ -419,7 +427,9 @@ def main() -> None:
             "(default: docs/artifacts/wrds for sample, artifacts/_local/wrds_local for local)."
         ),
     )
-    ap.add_argument("--use-sample", action="store_true", help="Force sample-mode provenance.")
+    ap.add_argument(
+        "--use-sample", action="store_true", help="Force sample-mode provenance."
+    )
     ap.add_argument(
         "--manifest",
         default=None,
@@ -490,10 +500,14 @@ def main() -> None:
     trade_date_range = (wrds_run or {}).get("trade_date_range") or _date_range(
         pricing.rows, "trade_date"
     )
-    next_trade_date_range = (wrds_run or {}).get("next_trade_date_range") or _date_range(
-        pricing.rows, "next_trade_date"
+    next_trade_date_range = (wrds_run or {}).get(
+        "next_trade_date_range"
+    ) or _date_range(pricing.rows, "next_trade_date")
+    git_sha = (
+        args.git_sha
+        or (manifest.get("git", {}) if manifest else {}).get("sha")
+        or _git_sha()
     )
-    git_sha = args.git_sha or (manifest.get("git", {}) if manifest else {}).get("sha") or _git_sha()
     if args.data_mode:
         data_mode = args.data_mode
     elif use_sample:
@@ -526,12 +540,8 @@ def main() -> None:
         "metrics": metrics,
     }
 
-    out_path = _resolve_path(
-        args.out or (LOCAL_WRDS_ROOT / "metrics_export.json")
-    )
-    out_md = _resolve_path(
-        args.out_md or (LOCAL_WRDS_ROOT / "metrics_export.md")
-    )
+    out_path = _resolve_path(args.out or (LOCAL_WRDS_ROOT / "metrics_export.json"))
+    out_md = _resolve_path(args.out_md or (LOCAL_WRDS_ROOT / "metrics_export.md"))
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_md.parent.mkdir(parents=True, exist_ok=True)
 

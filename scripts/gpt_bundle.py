@@ -16,12 +16,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_PATHS = (
     "AGENTS.md",
-    "docs/PLAN_OF_RECORD.md",
-    "docs/DOCS_AND_LOGGING_SYSTEM.md",
     "docs/CODEX_SPRINT_TICKETS.md",
     "PROGRESS.md",
     "project_state/CURRENT_RESULTS.md",
@@ -41,7 +38,9 @@ except ValueError:
 
 def _run_git(args: List[str]) -> str:
     try:
-        return subprocess.check_output(args, cwd=REPO_ROOT, text=True, stderr=subprocess.STDOUT)
+        return subprocess.check_output(
+            args, cwd=REPO_ROOT, text=True, stderr=subprocess.STDOUT
+        )
     except subprocess.CalledProcessError as exc:
         return f"[error] {' '.join(args)}\n{exc.output}"
 
@@ -231,7 +230,9 @@ def _find_ticket_id(ticket_path: Path) -> str | None:
     return match.group(0).lower()
 
 
-def _resolve_base_sha(ticket_id: str, explicit_base: str | None) -> Tuple[str | None, str | None]:
+def _resolve_base_sha(
+    ticket_id: str, explicit_base: str | None
+) -> Tuple[str | None, str | None]:
     base = explicit_base or os.getenv("BASE_SHA")
     if base:
         return base, "explicit"
@@ -295,7 +296,9 @@ def _run_self_test() -> int:
     ticket_path = REPO_ROOT / "docs" / "CODEX_SPRINT_TICKETS.md"
     valid_ticket = _find_ticket_id(ticket_path)
     if not valid_ticket:
-        print("[gpt-bundle] self-test failed: no ticket id found in docs/CODEX_SPRINT_TICKETS.md")
+        print(
+            "[gpt-bundle] self-test failed: no ticket id found in docs/CODEX_SPRINT_TICKETS.md"
+        )
         return 2
 
     temp_run_name = f"_gpt_bundle_selftest_{uuid.uuid4().hex[:8]}"
@@ -324,14 +327,18 @@ def _run_self_test() -> int:
         missing_result = subprocess.run(
             missing_cmd, cwd=REPO_ROOT, text=True, capture_output=True
         )
-        print("[gpt-bundle][self-test] missing-file exit code:", missing_result.returncode)
+        print(
+            "[gpt-bundle][self-test] missing-file exit code:", missing_result.returncode
+        )
         if missing_result.stdout:
             print(missing_result.stdout.rstrip())
         if missing_result.stderr:
             print(missing_result.stderr.rstrip())
-        if missing_result.returncode == 0 or "missing required items" not in (
-            missing_result.stdout + missing_result.stderr
-        ).lower():
+        if (
+            missing_result.returncode == 0
+            or "missing required items"
+            not in (missing_result.stdout + missing_result.stderr).lower()
+        ):
             print("[gpt-bundle][self-test] missing-file case did not fail as expected.")
             return 1
 
@@ -347,15 +354,22 @@ def _run_self_test() -> int:
         ticket_result = subprocess.run(
             ticket_cmd, cwd=REPO_ROOT, text=True, capture_output=True
         )
-        print("[gpt-bundle][self-test] missing-ticket exit code:", ticket_result.returncode)
+        print(
+            "[gpt-bundle][self-test] missing-ticket exit code:",
+            ticket_result.returncode,
+        )
         if ticket_result.stdout:
             print(ticket_result.stdout.rstrip())
         if ticket_result.stderr:
             print(ticket_result.stderr.rstrip())
-        if ticket_result.returncode == 0 or "ticket id not found" not in (
-            ticket_result.stdout + ticket_result.stderr
-        ).lower():
-            print("[gpt-bundle][self-test] missing-ticket case did not fail as expected.")
+        if (
+            ticket_result.returncode == 0
+            or "ticket id not found"
+            not in (ticket_result.stdout + ticket_result.stderr).lower()
+        ):
+            print(
+                "[gpt-bundle][self-test] missing-ticket case did not fail as expected."
+            )
             return 1
     finally:
         if run_dir.exists():
@@ -419,7 +433,9 @@ def main() -> None:
     dirty = bool(status_before.strip())
     if args.self_check:
         print(f"[gpt-bundle] dirty: {'yes' if dirty else 'no'}")
-        print(f"[gpt-bundle] stash: {'no' if args.no_stash else ('yes' if dirty else 'no')}")
+        print(
+            f"[gpt-bundle] stash: {'no' if args.no_stash else ('yes' if dirty else 'no')}"
+        )
         print(f"[gpt-bundle] output: {output_path}")
         return
 
@@ -529,7 +545,9 @@ def main() -> None:
                 sys.exit(1)
             status_after = _status_porcelain()
             if status_after != status_before:
-                print("[gpt-bundle] stash restore mismatch; resolve before dropping stash.")
+                print(
+                    "[gpt-bundle] stash restore mismatch; resolve before dropping stash."
+                )
                 print(f"[gpt-bundle] stash ref preserved: {stash_ref}")
                 sys.exit(1)
             _stash_drop(stash_ref)

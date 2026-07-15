@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <array>
+#include <cmath>
+
 #include "quant/black_scholes.hpp"
 #include "quant/heston.hpp"
 #include "quant/math.hpp"
@@ -69,4 +72,24 @@ TEST(HestonAnalytic, ImpliedVolMatchesAnalyticPrice) {
     ASSERT_GT(iv, 0.0);
     const double bs_price = quant::bs::call_price(mkt.spot, mkt.strike, mkt.rate, mkt.dividend, iv, mkt.time);
     EXPECT_NEAR(bs_price, heston_price, 1e-8);
+}
+
+TEST(HestonAnalytic, PutMatchesDiscountedParityAcrossRepresentativeMarkets) {
+    const quant::heston::Params h{1.5, 0.04, 0.6, -0.45, 0.04};
+    const std::array<quant::heston::MarketParams, 5> markets{{
+        {100.0, 80.0, 0.015, 0.005, 0.25},
+        {100.0, 100.0, 0.0, 0.0, 1.0},
+        {100.0, 120.0, -0.005, 0.01, 2.0},
+        {75.0, 100.0, 0.03, 0.0, 0.5},
+        {125.0, 90.0, 0.01, 0.02, 1.5},
+    }};
+    for (const auto& market : markets) {
+        const double call = quant::heston::call_analytic(market, h);
+        const double put = quant::heston::put_analytic(market, h);
+        const double discounted_spot = market.spot * std::exp(-market.dividend * market.time);
+        const double discounted_strike = market.strike * std::exp(-market.rate * market.time);
+        EXPECT_TRUE(std::isfinite(put));
+        EXPECT_GE(put, std::max(discounted_strike - discounted_spot, 0.0) - 1e-12);
+        EXPECT_NEAR(put, call - discounted_spot + discounted_strike, 1e-12);
+    }
 }

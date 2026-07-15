@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import subprocess
 import sys
 import tempfile
-import math
 from pathlib import Path
 from typing import List
 
@@ -54,7 +54,7 @@ def _write_dateset(path: Path) -> Path:
                 "label": "smoke-calm",
                 "regime": "calm",
             },
-        ]
+        ],
     }
     path.write_text(json.dumps(payload))
     return path

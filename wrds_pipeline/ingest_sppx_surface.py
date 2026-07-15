@@ -99,6 +99,7 @@ def _resolve_secid_local(symbol: str, trade_date: str, local_root: Path | None) 
     symbol = symbol.upper()
     try:
         import pyarrow.dataset as ds  # type: ignore
+
         table = ds.dataset(secnmd_path).to_table(
             filter=ds.field("ticker") == symbol,
             columns=["secid", "effect_date", "ticker"],
@@ -113,7 +114,9 @@ def _resolve_secid_local(symbol: str, trade_date: str, local_root: Path | None) 
     trade_dt = pd.to_datetime(trade_date)
     df = df[df["effect_date"] <= trade_dt]
     if df.empty:
-        raise RuntimeError(f"Local WRDS missing secid for ticker {symbol} @ {trade_date}")
+        raise RuntimeError(
+            f"Local WRDS missing secid for ticker {symbol} @ {trade_date}"
+        )
     secid = df.sort_values("effect_date").iloc[-1]["secid"]
     return int(secid)
 
@@ -131,6 +134,7 @@ def _fetch_from_local(
     secid_val = float(secid)
     try:
         import pyarrow.dataset as ds  # type: ignore
+
         op_dataset = ds.dataset(opprcd_path)
         filt = (
             (ds.field("secid") == secid_val)
@@ -178,9 +182,11 @@ def _fetch_from_local(
 
     try:
         import pyarrow.dataset as ds  # type: ignore
+
         sec_dataset = ds.dataset(secprd_path)
         spot_table = sec_dataset.to_table(
-            filter=(ds.field("secid") == secid_val) & (ds.field("date") == str(trade_date)),
+            filter=(ds.field("secid") == secid_val)
+            & (ds.field("date") == str(trade_date)),
             columns=["close"],
         )
         spot_df = spot_table.to_pandas()
@@ -204,7 +210,9 @@ def _cache_path(symbol: str, trade_date: str) -> Path | None:
         return None
     date = pd.to_datetime(trade_date).date()
     symbol = symbol.upper()
-    return root / "optionm" / symbol / str(date.year) / f"{symbol.lower()}_{date}.parquet"
+    return (
+        root / "optionm" / symbol / str(date.year) / f"{symbol.lower()}_{date}.parquet"
+    )
 
 
 def _cache_meta_path(cache_path: Path) -> Path:
@@ -236,7 +244,9 @@ def _write_cache(symbol: str, trade_date: str, df: pd.DataFrame, source: str) ->
         "source": source,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
-    _cache_meta_path(cache_path).write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n")
+    _cache_meta_path(cache_path).write_text(
+        json.dumps(meta, indent=2, sort_keys=True) + "\n"
+    )
 
 
 def _has_wrds_credentials() -> bool:
@@ -323,7 +333,9 @@ def _fetch_from_wrds(symbol: str, trade_date: str) -> pd.DataFrame:
             LIMIT 1
         """
         spot_df = pd.read_sql(spot_query, conn, params=[secid, trade_date])
-        spot_val = float(spot_df["close"].iloc[0]) if not spot_df.empty else SPOT_FALLBACK
+        spot_val = (
+            float(spot_df["close"].iloc[0]) if not spot_df.empty else SPOT_FALLBACK
+        )
         df["spot"] = spot_val
     except errors.UndefinedTable as exc:  # pragma: no cover
         conn.close()
@@ -446,11 +458,15 @@ def _prepare_quotes(df: pd.DataFrame) -> pd.DataFrame:
         underlying_mid = 0.5 * (df["underlying_bid"] + df["underlying_ask"])
     else:
         underlying_mid = pd.Series(np.nan, index=df.index)
-    base_spot = df["spot"] if "spot" in df.columns else pd.Series(np.nan, index=df.index)
-    forward = df["forward_price"] if "forward_price" in df.columns else pd.Series(np.nan, index=df.index)
-    df["spot"] = (
-        base_spot.fillna(underlying_mid).fillna(forward).fillna(SPOT_FALLBACK)
+    base_spot = (
+        df["spot"] if "spot" in df.columns else pd.Series(np.nan, index=df.index)
     )
+    forward = (
+        df["forward_price"]
+        if "forward_price" in df.columns
+        else pd.Series(np.nan, index=df.index)
+    )
+    df["spot"] = base_spot.fillna(underlying_mid).fillna(forward).fillna(SPOT_FALLBACK)
     df["spot"] = np.clip(df["spot"], 1000.0, 20000.0)
     df["rate"] = df.get("rate", 0.015).fillna(0.015)
     df["dividend"] = df.get("dividend", df.get("divyield", 0.01)).fillna(0.01)
