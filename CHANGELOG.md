@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## v0.3.4
+
+- build(wheels): move the Linux wheel baseline from manylinux2014/GCC 10 to manylinux_2_28 x86_64 so the shipped C++20 `std::counting_semaphore` implementation compiles against a conforming libstdc++; refresh cibuildwheel to v4.1.0.
+- release: supersede v0.3.3 after its platform-wheel lane exposed the legacy compiler mismatch; pricing behavior and accepted Heston evidence are unchanged.
+
 - docs(portfolio): reorganize the public README around the pricing surface, C++/Python quickstarts, architecture, frozen validation evidence, reproducibility, and explicit release boundaries
 - docs(heston): add a provenance note for the verified next-release calibration-grid candidate and its bounded 14.2x compact-input measurement
 - feat(protocol): freeze synthetic validation grid + tolerances; headline scripts now require `--scenario-grid` + `--tolerances` and record protocol hashes in the manifest/metrics snapshot
