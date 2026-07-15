@@ -17,20 +17,20 @@ SPEC.loader.exec_module(MODULE)
 
 class ReleaseTagVersionGateTest(unittest.TestCase):
     def test_matching_canonical_tag_passes_all_version_surfaces(self) -> None:
-        self.assertEqual(MODULE.validate_ref("refs/tags/v0.3.4", ROOT), "0.3.4")
+        self.assertEqual(MODULE.validate_ref("refs/tags/v0.3.5", ROOT), "0.3.5")
         self.assertEqual(
             MODULE.authoritative_versions(ROOT),
             {
-                "cmake": "0.3.4",
-                "native": "0.3.4",
-                "pyproject": "0.3.4",
-                "setup": "0.3.4",
+                "cmake": "0.3.5",
+                "native": "0.3.5",
+                "pyproject": "0.3.5",
+                "setup": "0.3.5",
             },
         )
 
     def test_mismatch_and_malformed_refs_fail_closed(self) -> None:
         for ref in (
-            "refs/tags/v0.3.3",
+            "refs/tags/v0.3.4",
             "refs/tags/v0.3",
             "refs/tags/v00.3.3",
             "refs/tags/v0.3.3-rc1",
