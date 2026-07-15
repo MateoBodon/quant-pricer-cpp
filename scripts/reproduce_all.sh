@@ -215,6 +215,10 @@ PY
 
 export BUILD_DIR BUILD_TYPE TIMESTAMP REPRO_FAST_FLAG SKIP_SLOW_FLAG SKIP_WRDS_FLAG BENCH_MIN_TIME
 
+# Validate the committed snapshot/CURRENT_RESULTS binding before artifact
+# regeneration changes the in-worktree timestamps. The generated summary is
+# validated again by generate_metrics_summary after all producers finish.
+run_py "${ROOT}/tests/test_metrics_snapshot_fast.py"
 maybe_clean_artifacts
 configure_build
 build_all
@@ -225,7 +229,7 @@ run_ql_parity "${quant_cli}"
 run_benchmarks
 run_wrds_pipeline
 
-run_ctest_label "FAST"
+run_ctest_label "FAST" -E "^metrics_snapshot_fast$"
 
 if [[ "${SKIP_SLOW_FLAG}" != "1" ]]; then
   slow_log="${LOG_DIR}/slow_${TIMESTAMP}.log"

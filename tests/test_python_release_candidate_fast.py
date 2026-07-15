@@ -53,6 +53,21 @@ class PythonReleaseCandidateTest(unittest.TestCase):
         for required in ("manylinux_2_28", "GCC 10", "cibuildwheel", "unchanged"):
             self.assertIn(required, note)
 
+    def test_reproduction_checks_committed_snapshot_before_regeneration(self) -> None:
+        script = (ROOT / "scripts/reproduce_all.sh").read_text(encoding="utf-8")
+        committed_check = 'run_py "${ROOT}/tests/test_metrics_snapshot_fast.py"'
+        self.assertLess(
+            script.index(committed_check), script.rindex("maybe_clean_artifacts")
+        )
+        self.assertIn(
+            'run_ctest_label "FAST" -E "^metrics_snapshot_fast$"',
+            script,
+        )
+        self.assertLess(
+            script.rindex("finalize_manifest"),
+            script.rindex("generate_metrics_summary"),
+        )
+
     def test_existing_v032_note_remains_separate(self) -> None:
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
         self.assertLess(changelog.index("## v0.3.3"), changelog.index("## v0.3.2"))
