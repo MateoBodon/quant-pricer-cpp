@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pyquant-pricer"
-version = "0.3.5"
+version = "0.3.6"
 description = "Python bindings for quant-pricer-cpp: Black–Scholes, MC, PDE, Heston"
 readme = "README.md"
 authors = [{ name = "Mateo Bodon" }]

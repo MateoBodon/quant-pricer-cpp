@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(quant_pricer_cpp VERSION 0.3.5 LANGUAGES CXX)
+project(quant_pricer_cpp VERSION 0.3.6 LANGUAGES CXX)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 20)

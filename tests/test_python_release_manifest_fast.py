@@ -21,12 +21,12 @@ class ReleaseManifestTest(unittest.TestCase):
     def test_manifest_binds_hashes_version_commit_and_runtime(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            sdist = root / "pyquant_pricer-0.3.5.tar.gz"
-            wheel = root / "pyquant_pricer-0.3.5-py3-none-any.whl"
+            sdist = root / "pyquant_pricer-0.3.6.tar.gz"
+            wheel = root / "pyquant_pricer-0.3.6-py3-none-any.whl"
             sdist.write_bytes(b"sdist")
             wheel.write_bytes(b"wheel")
             manifest = MODULE.build_manifest([wheel, sdist], "a" * 40, ROOT, "6.2.0")
-        self.assertEqual(manifest["version"], "0.3.5")
+        self.assertEqual(manifest["version"], "0.3.6")
         self.assertEqual(manifest["source_commit"], "a" * 40)
         self.assertEqual(
             [item["filename"] for item in manifest["artifacts"]],
@@ -42,7 +42,7 @@ class ReleaseManifestTest(unittest.TestCase):
 
     def test_manifest_requires_one_sdist_and_at_least_one_wheel(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            wheel = Path(directory) / "pyquant_pricer-0.3.5-py3-none-any.whl"
+            wheel = Path(directory) / "pyquant_pricer-0.3.6-py3-none-any.whl"
             wheel.write_bytes(b"wheel")
             with self.assertRaisesRegex(ValueError, "exactly one sdist"):
                 MODULE.build_manifest([wheel], "b" * 40, ROOT, "6.2.0")
