@@ -65,6 +65,9 @@ jobs:
           if not root.exists():
               raise SystemExit("docs/html not found (run doxygen first)")
           pattern = re.compile(r"<head>", flags=re.IGNORECASE)
+          image_without_alt = re.compile(
+              r"<img(?![^>]*\balt=)([^>]*)>", flags=re.IGNORECASE
+          )
           snippet = '<base href="/quant-pricer-cpp/">'
           commit = os.environ["DOCS_COMMIT"]
           banner = (
@@ -80,6 +83,7 @@ jobs:
                   text, _ = pattern.subn(lambda m: f"{m.group(0)}\n  {snippet}", text, count=1)
               if "Documentation build:" not in text:
                   text, _ = body_pattern.subn(lambda m: f"{m.group(0)}\n{banner}", text, count=1)
+              text = image_without_alt.sub(r'<img alt=""\1>', text)
               html.write_text(text, encoding="utf-8")
           PY
       - name: Disable Jekyll
