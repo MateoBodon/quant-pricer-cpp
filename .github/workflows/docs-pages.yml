@@ -76,13 +76,28 @@ jobs:
               f'<a style="color:white" href="https://github.com/MateoBodon/'
               f'quant-pricer-cpp/commit/{commit}"><code>{commit[:12]}</code></a></div>'
           )
+          accessibility = """<script>
+          (() => {
+            const labelImages = () => document.querySelectorAll('img:not([alt])')
+              .forEach((image) => { image.alt = image.title || ''; });
+            new MutationObserver(labelImages).observe(document.documentElement, {
+              childList: true,
+              subtree: true
+            });
+            labelImages();
+          })();
+          </script>"""
           body_pattern = re.compile(r"<body[^>]*>", flags=re.IGNORECASE)
           for html in root.rglob("*.html"):
               text = html.read_text(encoding="utf-8")
               if snippet not in text:
                   text, _ = pattern.subn(lambda m: f"{m.group(0)}\n  {snippet}", text, count=1)
               if "Documentation build:" not in text:
-                  text, _ = body_pattern.subn(lambda m: f"{m.group(0)}\n{banner}", text, count=1)
+                  text, _ = body_pattern.subn(
+                      lambda m: f"{m.group(0)}\n{banner}\n{accessibility}",
+                      text,
+                      count=1,
+                  )
               text = image_without_alt.sub(r'<img alt=""\1>', text)
               html.write_text(text, encoding="utf-8")
           PY
