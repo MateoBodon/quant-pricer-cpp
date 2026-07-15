@@ -20,7 +20,12 @@ class ReleaseTagVersionGateTest(unittest.TestCase):
         self.assertEqual(MODULE.validate_ref("refs/tags/v0.4.0", ROOT), "0.4.0")
         self.assertEqual(
             MODULE.authoritative_versions(ROOT),
-            {"cmake": "0.4.0", "native": "0.4.0", "pyproject": "0.4.0", "setup": "0.4.0"},
+            {
+                "cmake": "0.4.0",
+                "native": "0.4.0",
+                "pyproject": "0.4.0",
+                "setup": "0.4.0",
+            },
         )
 
     def test_mismatch_and_malformed_refs_fail_closed(self) -> None:

@@ -105,7 +105,9 @@ def portfolio_risk_and_stress() -> None:
 
 def maybe_run_heston(repo_root: Path) -> None:
     optional_modules = ("matplotlib", "pandas", "scipy")
-    missing = [name for name in optional_modules if importlib.util.find_spec(name) is None]
+    missing = [
+        name for name in optional_modules if importlib.util.find_spec(name) is None
+    ]
     if missing:
         print(
             "Optional Heston calibration dependencies are unavailable "

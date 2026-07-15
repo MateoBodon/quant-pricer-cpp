@@ -6,7 +6,6 @@ from __future__ import annotations
 import numpy as np
 import pyquant_pricer as qp
 
-
 # option_type, quantity, spot, strike, rate, dividend, volatility, time
 positions = np.array(
     [

@@ -34,7 +34,9 @@ class ReleaseManifestIdentityTest(unittest.TestCase):
                 artifact(
                     root, "pyquant_pricer-0.4.0-cp311-cp311-manylinux_2_28_x86_64.whl"
                 ),
-                artifact(root, "pyquant_pricer-0.4.0-cp312-cp312-macosx_14_0_arm64.whl"),
+                artifact(
+                    root, "pyquant_pricer-0.4.0-cp312-cp312-macosx_14_0_arm64.whl"
+                ),
             ]
             manifest = self.build(paths)
         self.assertEqual(manifest["project"], "pyquant-pricer")

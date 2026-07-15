@@ -28,7 +28,11 @@ def parse_args() -> argparse.Namespace:
 
 def command_output(argv: list[str]) -> str:
     try:
-        return subprocess.run(argv, check=True, capture_output=True, text=True).stdout.strip().splitlines()[0]
+        return (
+            subprocess.run(argv, check=True, capture_output=True, text=True)
+            .stdout.strip()
+            .splitlines()[0]
+        )
     except (OSError, subprocess.CalledProcessError, IndexError):
         return "unavailable"
 
@@ -63,29 +67,63 @@ def scalar_risk_baseline(qp, positions: np.ndarray) -> float:
     total = 0.0
     for row in positions:
         _, quantity, spot, strike, rate, dividend, volatility, time_to_expiry = row
-        total += quantity * qp.bs_call(spot, strike, rate, dividend, volatility, time_to_expiry)
-        total += quantity * qp.bs_delta_call(spot, strike, rate, dividend, volatility, time_to_expiry)
-        total += quantity * qp.bs_gamma(spot, strike, rate, dividend, volatility, time_to_expiry)
-        total += quantity * qp.bs_vega(spot, strike, rate, dividend, volatility, time_to_expiry)
+        total += quantity * qp.bs_call(
+            spot, strike, rate, dividend, volatility, time_to_expiry
+        )
+        total += quantity * qp.bs_delta_call(
+            spot, strike, rate, dividend, volatility, time_to_expiry
+        )
+        total += quantity * qp.bs_gamma(
+            spot, strike, rate, dividend, volatility, time_to_expiry
+        )
+        total += quantity * qp.bs_vega(
+            spot, strike, rate, dividend, volatility, time_to_expiry
+        )
     return total
 
 
-def scalar_scenario_baseline(qp, positions: np.ndarray, shocks: np.ndarray) -> np.ndarray:
+def scalar_scenario_baseline(
+    qp, positions: np.ndarray, shocks: np.ndarray
+) -> np.ndarray:
     base: list[float] = []
     for row in positions:
-        option_type, quantity, spot, strike, rate, dividend, volatility, time_to_expiry = row
+        (
+            option_type,
+            quantity,
+            spot,
+            strike,
+            rate,
+            dividend,
+            volatility,
+            time_to_expiry,
+        ) = row
         pricer = qp.bs_call if option_type == 1.0 else qp.bs_put
-        base.append(quantity * pricer(spot, strike, rate, dividend, volatility, time_to_expiry))
+        base.append(
+            quantity * pricer(spot, strike, rate, dividend, volatility, time_to_expiry)
+        )
     output = np.empty(len(shocks), dtype=np.float64)
     for shock_index, shock in enumerate(shocks):
         spot_return, vol_shift, rate_shift, dividend_shift, time_elapsed = shock
         total = 0.0
         for position_index, row in enumerate(positions):
-            option_type, quantity, spot, strike, rate, dividend, volatility, time_to_expiry = row
+            (
+                option_type,
+                quantity,
+                spot,
+                strike,
+                rate,
+                dividend,
+                volatility,
+                time_to_expiry,
+            ) = row
             pricer = qp.bs_call if option_type == 1.0 else qp.bs_put
             shocked_price = pricer(
-                spot * (1.0 + spot_return), strike, rate + rate_shift, dividend + dividend_shift,
-                volatility + vol_shift, max(0.0, time_to_expiry - time_elapsed),
+                spot * (1.0 + spot_return),
+                strike,
+                rate + rate_shift,
+                dividend + dividend_shift,
+                volatility + vol_shift,
+                max(0.0, time_to_expiry - time_elapsed),
             )
             total += quantity * shocked_price - base[position_index]
         output[shock_index] = total
@@ -108,8 +146,13 @@ def main() -> int:
     scenario_positions = make_positions(20_000)
     shocks = np.asarray(
         [
-            [-0.30 + 0.04 * i, 0.14 - 0.015 * (i % 7), -0.02 + 0.004 * (i % 9),
-             -0.006 + 0.002 * (i % 6), (i % 8) / 365.0]
+            [
+                -0.30 + 0.04 * i,
+                0.14 - 0.015 * (i % 7),
+                -0.02 + 0.004 * (i % 9),
+                -0.006 + 0.002 * (i % 6),
+                (i % 8) / 365.0,
+            ]
             for i in range(16)
         ],
         dtype=np.float64,
@@ -122,23 +165,34 @@ def main() -> int:
         args.repetitions, lambda: scalar_risk_baseline(qp, scalar_risk_positions)
     )
     scenario_native_median, scenario_native_samples = timed(
-        args.repetitions, lambda: qp.bs_portfolio_scenarios(scenario_positions, shocks, False)
+        args.repetitions,
+        lambda: qp.bs_portfolio_scenarios(scenario_positions, shocks, False),
     )
     scenario_scalar_median, scenario_scalar_samples = timed(
-        args.repetitions, lambda: scalar_scenario_baseline(qp, scenario_positions, shocks)
+        args.repetitions,
+        lambda: scalar_scenario_baseline(qp, scenario_positions, shocks),
     )
 
-    native_scenarios = qp.bs_portfolio_scenarios(scenario_positions, shocks, False)["portfolio_pnl"]
+    native_scenarios = qp.bs_portfolio_scenarios(scenario_positions, shocks, False)[
+        "portfolio_pnl"
+    ]
     scalar_scenarios = scalar_scenario_baseline(qp, scenario_positions, shocks)
-    np.testing.assert_allclose(native_scenarios, scalar_scenarios, rtol=1e-12, atol=1e-9)
-    deterministic = [qp.bs_portfolio_scenarios(scenario_positions, shocks, False)["portfolio_pnl"] for _ in range(5)]
+    np.testing.assert_allclose(
+        native_scenarios, scalar_scenarios, rtol=1e-12, atol=1e-9
+    )
+    deterministic = [
+        qp.bs_portfolio_scenarios(scenario_positions, shocks, False)["portfolio_pnl"]
+        for _ in range(5)
+    ]
     for repeated in deterministic:
         np.testing.assert_array_equal(repeated, native_scenarios)
 
     risk_speedup = risk_scalar_median / risk_native_median
     scenario_speedup = scenario_scalar_median / scenario_native_median
     if risk_speedup < 10.0 or scenario_speedup < 10.0:
-        raise AssertionError(f"frozen performance gate failed: risk={risk_speedup:.3f}x scenario={scenario_speedup:.3f}x")
+        raise AssertionError(
+            f"frozen performance gate failed: risk={risk_speedup:.3f}x scenario={scenario_speedup:.3f}x"
+        )
 
     peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     if platform.system() != "Darwin":
@@ -161,17 +215,22 @@ def main() -> int:
             "risk_native_median_seconds": risk_native_median,
             "risk_scalar_median_seconds": risk_scalar_median,
             "risk_speedup": risk_speedup,
-            "risk_native_positions_per_second": len(scalar_risk_positions) / risk_native_median,
+            "risk_native_positions_per_second": len(scalar_risk_positions)
+            / risk_native_median,
             "scenario_native_median_seconds": scenario_native_median,
             "scenario_scalar_median_seconds": scenario_scalar_median,
             "scenario_speedup": scenario_speedup,
-            "scenario_native_cells_per_second": len(scenario_positions) * len(shocks) / scenario_native_median,
+            "scenario_native_cells_per_second": len(scenario_positions)
+            * len(shocks)
+            / scenario_native_median,
             "risk_native_samples_seconds": risk_native_samples,
             "risk_scalar_samples_seconds": risk_scalar_samples,
             "scenario_native_samples_seconds": scenario_native_samples,
             "scenario_scalar_samples_seconds": scenario_scalar_samples,
             "deterministic_repetitions": 5,
-            "scalar_parity_max_abs_pnl": float(np.max(np.abs(native_scenarios - scalar_scenarios))),
+            "scalar_parity_max_abs_pnl": float(
+                np.max(np.abs(native_scenarios - scalar_scenarios))
+            ),
         },
         "resources": {
             "peak_process_rss_bytes": int(peak_rss),
@@ -179,7 +238,9 @@ def main() -> int:
             "risk_output_bytes": int(len(scalar_risk_positions) * 7 * 8 + 6 * 8),
             "scenario_input_bytes": int(scenario_positions.nbytes + shocks.nbytes),
             "scenario_aggregate_output_bytes": int(len(shocks) * 8),
-            "scenario_detail_output_bytes_if_requested": int(len(shocks) * len(scenario_positions) * 8),
+            "scenario_detail_output_bytes_if_requested": int(
+                len(shocks) * len(scenario_positions) * 8
+            ),
         },
         "environment": {
             "platform": platform.platform(),
@@ -192,7 +253,9 @@ def main() -> int:
             "numpy": np.__version__,
             "quantlib": ql.__version__,
             "pyquant_pricer": qp.__version__,
-            "git_head": command_output(["git", "-C", str(repo_root), "rev-parse", "HEAD"]),
+            "git_head": command_output(
+                ["git", "-C", str(repo_root), "rev-parse", "HEAD"]
+            ),
         },
         "claim_boundary": (
             "Hardware/protocol-specific Python orchestration comparison; deterministic Black-Scholes pricing and "
@@ -201,8 +264,16 @@ def main() -> int:
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"risk_speedup": risk_speedup, "scenario_speedup": scenario_speedup,
-                      "output": str(args.output)}, indent=2))
+    print(
+        json.dumps(
+            {
+                "risk_speedup": risk_speedup,
+                "scenario_speedup": scenario_speedup,
+                "output": str(args.output),
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

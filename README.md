@@ -256,13 +256,13 @@ Curated figures (plus precise reproduction commands) live on the [Results page](
   Data: [wrds_agg_pricing.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pricing.csv), [wrds_agg_oos.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_oos.csv), [wrds_agg_pnl.csv](https://mateobodon.github.io/quant-pricer-cpp/artifacts/wrds_agg_pnl.csv)
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#wrds-heston"><img src="docs/artifacts/wrds/wrds_bs_heston_ivrmse.png" alt="BS vs Heston IV RMSE by tenor" width="230"></a><br>
   **WRDS BS vs Heston (sample comparison)** – On the bundled sample dates Heston and BS are now near parity (per-tenor IV RMSE deltas within ±0.0002 vol pts; OOS deltas single-digit bps). Live IvyDB pulls remain the source of truth; sample bundle is a smoke test/regression harness.<br>
-  
+
   | Tenor | BS IV RMSE | Heston IV RMSE | OOS IV MAE BS (bps) | OOS IV MAE Heston (bps) | Δ‑hedged σ (Heston, ticks) |
   | --- | --- | --- | --- | --- | --- |
   | 30d | 0.0237 | 0.0237 | 166.9 | 167.4 | 96.1 |
   | 60d | 0.0157 | 0.0158 | 122.5 | 121.1 | 64.2 |
   | 90d | 0.0146 | 0.0146 | 126.3 | 128.8 | 47.0 |
-  
+
   See `docs/WRDS_Results.md` for narrative, heatmaps, and the tracked `docs/artifacts/wrds/wrds_bs_heston_comparison.csv`.
 - <a href="https://mateobodon.github.io/quant-pricer-cpp/Results.html#quantlib-parity"><img src="docs/artifacts/ql_parity/ql_parity.png" alt="QuantLib parity" width="230"></a><br>
   **QuantLib Parity (vanilla/barrier/American)** – quant-pricer-cpp prices match QuantLib within ≈1¢ while exposing runtime deltas for each product.<br>

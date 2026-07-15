@@ -14,7 +14,6 @@ from pathlib import Path
 import numpy as np
 import QuantLib as ql
 
-
 POSITION_COLUMNS = ("price", "value", "delta", "gamma", "vega", "theta", "rho")
 TOTAL_COLUMNS = ("value", "delta", "gamma", "vega", "theta", "rho")
 
@@ -32,27 +31,48 @@ def quantlib_metrics(row: np.ndarray) -> np.ndarray:
     ql.Settings.instance().evaluationDate = evaluation_date
     days = int(round(float(time) * 365.0))
     if days == 0:
-        price = max(0.0, spot - strike) if option_type == 1.0 else max(0.0, strike - spot)
+        price = (
+            max(0.0, spot - strike) if option_type == 1.0 else max(0.0, strike - spot)
+        )
         delta = 1.0 if option_type == 1.0 and spot > strike else 0.0
         if option_type == -1.0:
             delta = -1.0 if spot < strike else 0.0
         return np.array([price, quantity * price, quantity * delta, 0.0, 0.0, 0.0, 0.0])
     day_count = ql.Actual365Fixed()
-    risk_free = ql.YieldTermStructureHandle(ql.FlatForward(evaluation_date, float(rate), day_count))
-    dividend_curve = ql.YieldTermStructureHandle(ql.FlatForward(evaluation_date, float(dividend), day_count))
+    risk_free = ql.YieldTermStructureHandle(
+        ql.FlatForward(evaluation_date, float(rate), day_count)
+    )
+    dividend_curve = ql.YieldTermStructureHandle(
+        ql.FlatForward(evaluation_date, float(dividend), day_count)
+    )
     vol_curve = ql.BlackVolTermStructureHandle(
-        ql.BlackConstantVol(evaluation_date, ql.NullCalendar(), float(volatility), day_count)
+        ql.BlackConstantVol(
+            evaluation_date, ql.NullCalendar(), float(volatility), day_count
+        )
     )
     process = ql.BlackScholesMertonProcess(
-        ql.QuoteHandle(ql.SimpleQuote(float(spot))), dividend_curve, risk_free, vol_curve
+        ql.QuoteHandle(ql.SimpleQuote(float(spot))),
+        dividend_curve,
+        risk_free,
+        vol_curve,
     )
     payoff_type = ql.Option.Call if option_type == 1.0 else ql.Option.Put
-    option = ql.VanillaOption(ql.PlainVanillaPayoff(payoff_type, float(strike)), ql.EuropeanExercise(evaluation_date + days))
+    option = ql.VanillaOption(
+        ql.PlainVanillaPayoff(payoff_type, float(strike)),
+        ql.EuropeanExercise(evaluation_date + days),
+    )
     option.setPricingEngine(ql.AnalyticEuropeanEngine(process))
     price = option.NPV()
     return np.array(
-        [price, quantity * price, quantity * option.delta(), quantity * option.gamma(),
-         quantity * option.vega(), quantity * option.theta(), quantity * option.rho()],
+        [
+            price,
+            quantity * price,
+            quantity * option.delta(),
+            quantity * option.gamma(),
+            quantity * option.vega(),
+            quantity * option.theta(),
+            quantity * option.rho(),
+        ],
         dtype=np.float64,
     )
 
@@ -69,7 +89,18 @@ def deterministic_positions() -> np.ndarray:
         rate = (-0.005, 0.0, 0.02, 0.07)[index % 4]
         dividend = (0.0, 0.01, 0.035)[index % 3]
         volatility = (0.08, 0.18, 0.35, 0.8)[index % 4]
-        rows.append([option_type, quantity, spot, strike, rate, dividend, volatility, days[index % 5] / 365.0])
+        rows.append(
+            [
+                option_type,
+                quantity,
+                spot,
+                strike,
+                rate,
+                dividend,
+                volatility,
+                days[index % 5] / 365.0,
+            ]
+        )
     return np.asarray(rows, dtype=np.float64)
 
 
@@ -115,22 +146,40 @@ def main() -> int:
         shocked[:, 5] += shock[3]
         shocked[:, 6] += shock[1]
         shocked[:, 7] = np.maximum(0.0, shocked[:, 7] - shock[4])
-        reference_detail[scenario_index] = np.vstack([quantlib_metrics(row) for row in shocked])[:, 1] - base
-    np.testing.assert_allclose(scenario_result["position_pnl"], reference_detail, rtol=1e-10, atol=1e-9)
+        reference_detail[scenario_index] = (
+            np.vstack([quantlib_metrics(row) for row in shocked])[:, 1] - base
+        )
     np.testing.assert_allclose(
-        scenario_result["portfolio_pnl"], reference_detail.sum(axis=1), rtol=1e-10, atol=1e-9
+        scenario_result["position_pnl"], reference_detail, rtol=1e-10, atol=1e-9
     )
-    scenario_position_max_abs = float(np.max(np.abs(scenario_result["position_pnl"] - reference_detail)))
+    np.testing.assert_allclose(
+        scenario_result["portfolio_pnl"],
+        reference_detail.sum(axis=1),
+        rtol=1e-10,
+        atol=1e-9,
+    )
+    scenario_position_max_abs = float(
+        np.max(np.abs(scenario_result["position_pnl"] - reference_detail))
+    )
     scenario_portfolio_max_abs = float(
         np.max(np.abs(scenario_result["portfolio_pnl"] - reference_detail.sum(axis=1)))
     )
     np.testing.assert_array_equal(scenario_result["portfolio_pnl"][0], np.array(0.0))
     aggregate_only = qp.bs_portfolio_scenarios(scenario_positions, shocks, detail=False)
     assert aggregate_only["position_pnl"] is None
-    np.testing.assert_array_equal(aggregate_only["portfolio_pnl"], scenario_result["portfolio_pnl"])
+    np.testing.assert_array_equal(
+        aggregate_only["portfolio_pnl"], scenario_result["portfolio_pnl"]
+    )
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
-        outputs = list(pool.map(lambda _: qp.bs_portfolio_scenarios(scenario_positions, shocks, False)["portfolio_pnl"], range(32)))
+        outputs = list(
+            pool.map(
+                lambda _: qp.bs_portfolio_scenarios(scenario_positions, shocks, False)[
+                    "portfolio_pnl"
+                ],
+                range(32),
+            )
+        )
     for output in outputs:
         np.testing.assert_array_equal(output, scenario_result["portfolio_pnl"])
 
@@ -146,10 +195,14 @@ def main() -> int:
         except (ValueError, RuntimeError):
             pass
         else:
-            raise AssertionError(f"invalid position input did not fail closed: {invalid!r}")
+            raise AssertionError(
+                f"invalid position input did not fail closed: {invalid!r}"
+            )
 
     try:
-        qp.bs_portfolio_scenarios(scenario_positions, np.array([[0.0, -1.0, 0.0, 0.0, 0.0]]), False)
+        qp.bs_portfolio_scenarios(
+            scenario_positions, np.array([[0.0, -1.0, 0.0, 0.0, 0.0]]), False
+        )
     except (ValueError, RuntimeError):
         pass
     else:
@@ -163,7 +216,9 @@ def main() -> int:
             "scenario_cell_count": len(shocks) * len(scenario_positions),
             "price_greek_tolerance": {"absolute": 1e-10, "relative": 1e-10},
             "scenario_pnl_tolerance": {"absolute": 1e-9, "relative": 1e-10},
-            "metric_max_abs_error": {key: float(value) for key, value in metric_max_abs.items()},
+            "metric_max_abs_error": {
+                key: float(value) for key, value in metric_max_abs.items()
+            },
             "scenario_position_pnl_max_abs_error": scenario_position_max_abs,
             "scenario_portfolio_pnl_max_abs_error": scenario_portfolio_max_abs,
             "zero_shock_exact": bool(scenario_result["portfolio_pnl"][0] == 0.0),

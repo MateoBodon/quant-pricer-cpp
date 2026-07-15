@@ -74,9 +74,7 @@ def main() -> None:
     risk = qp.bs_portfolio_risk(positions)
     assert risk["position_metrics"].shape == (2, 7)
     assert risk["portfolio_totals"].shape == (6,)
-    shocks = np.array(
-        [[0.0, 0.0, 0.0, 0.0, 0.0], [-0.1, 0.05, 0.01, 0.0, 1.0 / 365.0]]
-    )
+    shocks = np.array([[0.0, 0.0, 0.0, 0.0, 0.0], [-0.1, 0.05, 0.01, 0.0, 1.0 / 365.0]])
     scenario = qp.bs_portfolio_scenarios(positions, shocks, detail=False)
     assert scenario["position_pnl"] is None
     assert scenario["portfolio_pnl"].shape == (2,)

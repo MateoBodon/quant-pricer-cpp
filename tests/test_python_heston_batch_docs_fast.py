@@ -38,7 +38,9 @@ class PythonHestonBatchDocsTest(unittest.TestCase):
             module.price_heston_batch()
         self.assertIn("Heston analytic batch:", output.getvalue())
 
-    def test_quickstart_skips_optional_calibration_without_dev_dependencies(self) -> None:
+    def test_quickstart_skips_optional_calibration_without_dev_dependencies(
+        self,
+    ) -> None:
         spec = importlib.util.spec_from_file_location(
             "quant_pricer_quickstart_optional", QUICKSTART
         )
