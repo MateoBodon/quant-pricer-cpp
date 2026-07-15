@@ -10,7 +10,7 @@ constexpr int kVersionMajor = 0;
 /// Minor version
 constexpr int kVersionMinor = 3;
 /// Patch version
-constexpr int kVersionPatch = 6;
+constexpr int kVersionPatch = 7;
 
 /// Return the semantic version string "major.minor.patch".
 inline std::string version_string() {

@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pyquant-pricer"
-version = "0.3.6"
+version = "0.3.7"
 description = "Python bindings for quant-pricer-cpp: Black–Scholes, MC, PDE, Heston"
 readme = "README.md"
 authors = [{ name = "Mateo Bodon" }]
@@ -28,6 +28,7 @@ Issues = "https://github.com/MateoBodon/quant-pricer-cpp/issues"
 cmake.version = ">=3.16"
 build-dir = "build-py"
 wheel.packages = []
+install.components = ["python"]
 cmake.define = { QUANT_ENABLE_PYBIND = "ON", CMAKE_BUILD_TYPE = "Release" }
 wheel.exclude = [".venv", ".venv/*"]
 sdist.exclude = [
