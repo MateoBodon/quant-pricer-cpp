@@ -9,7 +9,7 @@ from importlib.metadata import version
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_VERSION = "0.3.4"
+EXPECTED_VERSION = "0.3.5"
 
 
 class PythonVersionBindingTest(unittest.TestCase):
