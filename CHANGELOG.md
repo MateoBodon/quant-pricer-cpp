@@ -5,6 +5,7 @@
 ## v0.3.4
 
 - build(wheels): move the Linux wheel baseline from manylinux2014/GCC 10 to manylinux_2_28 x86_64 so the shipped C++20 `std::counting_semaphore` implementation compiles against a conforming libstdc++; refresh cibuildwheel to v4.1.0.
+- test(python): replace a sub-50 ms shared-runner timing assertion with a 512-row threaded-path parity contract; performance claims remain bound to the frozen benchmark artifacts rather than noisy CI wall-clock samples.
 - release: supersede v0.3.3 after its platform-wheel lane exposed the legacy compiler mismatch; pricing behavior and accepted Heston evidence are unchanged.
 
 - docs(portfolio): reorganize the public README around the pricing surface, C++/Python quickstarts, architecture, frozen validation evidence, reproducibility, and explicit release boundaries
