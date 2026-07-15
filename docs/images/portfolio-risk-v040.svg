@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 360" role="img" aria-labelledby="title desc">
+  <title id="title">quant-pricer-cpp v0.4.0 recorded native speedups</title>
+  <desc id="desc">Portfolio risk batch measured 20.18 times faster and exact aggregate stress measured 27.92 times faster than scalar Python binding orchestration on the recorded Apple M3 Pro evaluator.</desc>
+  <rect width="1000" height="360" rx="24" fill="#0d1117"/>
+  <text x="52" y="56" fill="#f0f6fc" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="28" font-weight="700">v0.4.0 native portfolio engine</text>
+  <text x="52" y="86" fill="#8b949e" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="17">Recorded speedup vs scalar Python binding orchestration</text>
+
+  <g stroke="#30363d" stroke-width="1">
+    <line x1="250" y1="116" x2="250" y2="278"/>
+    <line x1="467" y1="116" x2="467" y2="278"/>
+    <line x1="683" y1="116" x2="683" y2="278"/>
+    <line x1="900" y1="116" x2="900" y2="278"/>
+  </g>
+  <g fill="#8b949e" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="14" text-anchor="middle">
+    <text x="250" y="303">0×</text>
+    <text x="467" y="303">10×</text>
+    <text x="683" y="303">20×</text>
+    <text x="900" y="303">30×</text>
+  </g>
+
+  <text x="52" y="159" fill="#c9d1d9" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="19" font-weight="600">Portfolio risk</text>
+  <rect x="250" y="132" width="437" height="42" rx="8" fill="#2f81f7"/>
+  <text x="701" y="160" fill="#58a6ff" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="21" font-weight="700">20.18×</text>
+
+  <text x="52" y="235" fill="#c9d1d9" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="19" font-weight="600">Aggregate stress</text>
+  <rect x="250" y="208" width="605" height="42" rx="8" fill="#3fb950"/>
+  <text x="869" y="236" fill="#56d364" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="21" font-weight="700">27.92×</text>
+
+  <text x="52" y="337" fill="#8b949e" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="14">Apple M3 Pro · Python 3.12.2 · median after warm-up over 7 repetitions · frozen JSON receipt</text>
+</svg>

@@ -14,7 +14,9 @@ REQUIRED = (
     "python/pybind_module.cpp",
     "python/scripts/cibw_test_suite.py",
     "include/quant/heston.hpp",
+    "include/quant/portfolio.hpp",
     "src/heston.cpp",
+    "src/portfolio.cpp",
     "external/pcg/include/pcg_random.hpp",
 )
 FORBIDDEN_PREFIXES = (
