@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import configparser
 import re
+import stat
 import unittest
 from pathlib import Path
 
@@ -66,6 +67,8 @@ class PythonReleaseCandidateTest(unittest.TestCase):
         self.assertIn(
             "CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*", wheels
         )
+        reproduce = ROOT / "scripts/reproduce_all.sh"
+        self.assertTrue(reproduce.stat().st_mode & stat.S_IXUSR)
 
     def test_reproduction_checks_committed_snapshot_before_regeneration(self) -> None:
         script = (ROOT / "scripts/reproduce_all.sh").read_text(encoding="utf-8")

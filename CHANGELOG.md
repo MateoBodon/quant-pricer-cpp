@@ -4,7 +4,7 @@
 
 ## v0.3.5
 
-- build(wheels): pin cibuildwheel v3.4.1, the latest line that still builds the declared Python 3.8 surface; v4.x intentionally rejects Python 3.8 selectors.
+- build(wheels): pin cibuildwheel v3.4.1, the latest line that still builds the declared Python 3.8 surface; v4.x intentionally rejects Python 3.8 selectors, and restore the executable bit on the release reproduction entrypoint.
 - release: supersede v0.3.4 after its wheel preflight exposed the action/support mismatch; pricing behavior, the manylinux_2_28 compiler baseline, and accepted Heston evidence are unchanged.
 
 ## v0.3.4
