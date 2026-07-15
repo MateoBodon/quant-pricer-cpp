@@ -24,7 +24,7 @@ target_compile_features(pyquant_pricer PRIVATE cxx_std_20)
 
 install(
   TARGETS pyquant_pricer
-  LIBRARY DESTINATION .
-  RUNTIME DESTINATION .
-  ARCHIVE DESTINATION .
+  LIBRARY DESTINATION . COMPONENT python
+  RUNTIME DESTINATION . COMPONENT python
+  ARCHIVE DESTINATION . COMPONENT python
 )

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## v0.3.7
+
+- build(wheels): install only the `python` CMake component into Python wheels, keeping native static libraries, headers, and CMake package metadata in the separate `cpp` install component so macOS wheel repair inspects only Mach-O payloads.
+- release: supersede v0.3.6 after its macOS lane exposed the mixed native/Python install payload; pricing behavior, Python 3.8 support, and accepted Heston evidence are unchanged.
+
 ## v0.3.6
 
 - test(artifacts): make the metrics snapshot gate restore the committed summary bytes after exercising regeneration, so ordinary CTest runs cannot invalidate the later release reproducibility check.

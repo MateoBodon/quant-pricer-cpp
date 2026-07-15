@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(quant_pricer_cpp VERSION 0.3.6 LANGUAGES CXX)
+project(quant_pricer_cpp VERSION 0.3.7 LANGUAGES CXX)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 20)
@@ -313,18 +313,20 @@ set(QUANT_PRICER_HAS_OPENMP ${HAS_OPENMP})
 
 install(TARGETS quant_pricer quant_cli
   EXPORT quant_pricerTargets
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT cpp
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT cpp
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT cpp
   INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(DIRECTORY include/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT cpp
         PATTERN ".DS_Store" EXCLUDE)
 if(EXISTS ${CMAKE_SOURCE_DIR}/external/pcg/include)
   install(DIRECTORY ${CMAKE_SOURCE_DIR}/external/pcg/include/
           DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/pcg
+          COMPONENT cpp
           PATTERN ".DS_Store" EXCLUDE)
 endif()
 
@@ -332,6 +334,7 @@ install(EXPORT quant_pricerTargets
   FILE quant-pricer-targets.cmake
   NAMESPACE quant_pricer::
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quant-pricer
+  COMPONENT cpp
 )
 
 configure_package_config_file(
@@ -350,4 +353,5 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/quant-pricer-config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/quant-pricer-config-version.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quant-pricer
+  COMPONENT cpp
 )

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Focused consistency checks for the v0.3.6 Python release candidate."""
+"""Focused consistency checks for the v0.3.7 Python release candidate."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.3.6"
+VERSION = "0.3.7"
 
 
 class PythonReleaseCandidateTest(unittest.TestCase):
@@ -20,13 +20,13 @@ class PythonReleaseCandidateTest(unittest.TestCase):
         header = (ROOT / "include/quant/version.hpp").read_text(encoding="utf-8")
         setup = configparser.ConfigParser()
         setup.read(ROOT / "setup.cfg", encoding="utf-8")
-        self.assertRegex(pyproject, r'(?m)^version = "0\.3\.6"$')
+        self.assertRegex(pyproject, r'(?m)^version = "0\.3\.7"$')
         self.assertRegex(
-            cmake, r"(?m)^project\(quant_pricer_cpp VERSION 0\.3\.6 LANGUAGES CXX\)$"
+            cmake, r"(?m)^project\(quant_pricer_cpp VERSION 0\.3\.7 LANGUAGES CXX\)$"
         )
         self.assertRegex(header, r"(?m)^constexpr int kVersionMajor = 0;$")
         self.assertRegex(header, r"(?m)^constexpr int kVersionMinor = 3;$")
-        self.assertRegex(header, r"(?m)^constexpr int kVersionPatch = 6;$")
+        self.assertRegex(header, r"(?m)^constexpr int kVersionPatch = 7;$")
         self.assertEqual(setup["metadata"]["version"], VERSION)
 
     def test_v033_release_note_covers_shipped_product_and_release_guarantees(
@@ -76,6 +76,21 @@ class PythonReleaseCandidateTest(unittest.TestCase):
         note = match.group(1)
         for required in ("restore", "committed summary bytes", "v0.3.5", "unchanged"):
             self.assertIn(required, note)
+
+    def test_v037_separates_python_and_cpp_install_payloads(self) -> None:
+        changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        match = re.search(r"(?ms)^## v0\.3\.7\n(.*?)(?=^## )", changelog)
+        self.assertIsNotNone(match)
+        note = match.group(1)
+        for required in ("python", "cpp", "macOS wheel repair", "unchanged"):
+            self.assertIn(required, note)
+
+        pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        python_cmake = (ROOT / "python/CMakeLists.txt").read_text(encoding="utf-8")
+        root_cmake = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
+        self.assertIn('install.components = ["python"]', pyproject)
+        self.assertEqual(python_cmake.count("COMPONENT python"), 3)
+        self.assertGreaterEqual(root_cmake.count("COMPONENT cpp"), 4)
 
     def test_reproduction_checks_committed_snapshot_before_regeneration(self) -> None:
         script = (ROOT / "scripts/reproduce_all.sh").read_text(encoding="utf-8")
