@@ -28,7 +28,9 @@ class PythonReleaseCandidateTest(unittest.TestCase):
         self.assertRegex(header, r"(?m)^constexpr int kVersionPatch = 4;$")
         self.assertEqual(setup["metadata"]["version"], VERSION)
 
-    def test_v033_release_note_covers_shipped_product_and_release_guarantees(self) -> None:
+    def test_v033_release_note_covers_shipped_product_and_release_guarantees(
+        self,
+    ) -> None:
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
         match = re.search(r"(?ms)^## v0\.3\.3\n(.*?)(?=^## )", changelog)
         self.assertIsNotNone(match)
